@@ -6,6 +6,17 @@
 
 using namespace Rcpp;
 
+// rcpp_log_sum
+double rcpp_log_sum(Eigen::VectorXd& x);
+RcppExport SEXP _surveyvoi_rcpp_log_sum(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_log_sum(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_approximate_expected_value_of_prioritization
 double rcpp_approximate_expected_value_of_prioritization(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma, std::vector<std::size_t> states);
 RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_prioritization(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP statesSEXP) {

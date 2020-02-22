@@ -16,6 +16,7 @@ extern SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_current_
 extern SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_feasible_actions_ilp_matrix(SEXP);
 extern SEXP _surveyvoi_rcpp_fit_xgboost_models_and_assess_performance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_log_sum(SEXP);
 extern SEXP _surveyvoi_rcpp_n_states(SEXP);
 extern SEXP _surveyvoi_rcpp_nth_state(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_nth_state_sparse(SEXP, SEXP, SEXP);
@@ -37,6 +38,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information",              (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information,              8},
     {"_surveyvoi_rcpp_feasible_actions_ilp_matrix",                                                  (DL_FUNC) &_surveyvoi_rcpp_feasible_actions_ilp_matrix,                                                  1},
     {"_surveyvoi_rcpp_fit_xgboost_models_and_assess_performance",                                    (DL_FUNC) &_surveyvoi_rcpp_fit_xgboost_models_and_assess_performance,                                    8},
+    {"_surveyvoi_rcpp_log_sum",                                                                      (DL_FUNC) &_surveyvoi_rcpp_log_sum,                                                                      1},
     {"_surveyvoi_rcpp_n_states",                                                                     (DL_FUNC) &_surveyvoi_rcpp_n_states,                                                                     1},
     {"_surveyvoi_rcpp_nth_state",                                                                    (DL_FUNC) &_surveyvoi_rcpp_nth_state,                                                                    2},
     {"_surveyvoi_rcpp_nth_state_sparse",                                                             (DL_FUNC) &_surveyvoi_rcpp_nth_state_sparse,                                                             3},

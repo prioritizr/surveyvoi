@@ -5,7 +5,7 @@ double expected_value_of_management_action(
   Eigen::MatrixXd &pij_log,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma) {
-    
+
   // initialization
   const std::size_t n_pu = pij_log.cols();
   const std::size_t solution_size =
@@ -35,32 +35,39 @@ double expected_value_of_management_action(
   mpz_t n;
   mpz_init(n);
   n_states(curr_state.size(), n);
+  mpz_add_ui(n, n, 1);
   /// initialize loop iterator
   mpz_t i;
   mpz_init(i);
-  mpz_set_ui(i, 0);
+  mpz_set_ui(i, 1);
   /// iterate over each state
   while (mpz_cmp(i, n) < 0) {
     //// generate the i'th state
     nth_state(i, curr_state);
     //// caculculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      std::log(alpha.cwiseProduct(curr_state.rowwise().sum()).array().
-        pow(gamma.array()).sum());
-    /// calculate probability of the state occurring
-    curr_probability_of_state_occurring =
-      log_probability_of_state(curr_state, sub_pij_log);
-    /// add the value of the prioritization given the state,
-    /// weighted by the probability of the state occuring
-    curr_expected_value_given_state =
-      curr_value_given_state_occurring + curr_probability_of_state_occurring;
-    /// calculate expected value of action
-    if (std::isinf(out)) {
-      out = curr_expected_value_given_state;
-    } else {
-      out =
-        log_sum(out, curr_expected_value_given_state);
+      alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+        pow(gamma.array()).sum();
+    /// if prioritization has a non-zero value then proceed with remaining
+    /// calculations for this state
+    if (curr_value_given_state_occurring > 1.0e-10) {
+      /// calculate probability of the state occurring
+      curr_probability_of_state_occurring =
+        log_probability_of_state(curr_state, sub_pij_log);
+      /// add the value of the prioritization given the state,
+      /// weighted by the probability of the state occuring
+      curr_expected_value_given_state =
+        std::log(curr_value_given_state_occurring) +
+        curr_probability_of_state_occurring;
+      /// calculate expected value of action
+      if (std::isinf(out)) {
+        out = curr_expected_value_given_state;
+      } else {
+        out = log_sum(out, curr_expected_value_given_state);
+      }
     }
+    /// increment loop variable
+    mpz_add_ui(i, i, 1);
   }
 
   // clear memory

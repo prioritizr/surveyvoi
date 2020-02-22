@@ -25,6 +25,11 @@ double log_sum(Eigen::VectorXd &x) {
   return m + std::log((x.array() - m).exp().sum());
 }
 
+// [[Rcpp::export]]
+double rcpp_log_sum(Eigen::VectorXd &x) {
+  return log_sum(x);
+}
+
 void assert_valid_probability_data(Eigen::MatrixXd &x, std::string msg) {
   if ((x.maxCoeff() > (1.0 + 1.0e-15)) | (x.minCoeff() < (0.0 - 1.0e-15)))
     Rcpp::stop(msg);

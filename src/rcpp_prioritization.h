@@ -125,6 +125,13 @@ public:
     GRBchgcoeffs(_model, _n_f * _n_pu, &_update_constraints_idx[0],
                  &_update_vars_idx[0], rij.data());
     // add piece-wise linear objective function components
+    /// initialize dummmy variables if a feature only contains zeros
+    Eigen::VectorXd dummy_held(3);
+    Eigen::VectorXd dummy_benefit(3);
+    dummy_held[0] = 0.0;
+    dummy_benefit[0] = 0.0;
+    dummy_held[1] = 0.5;
+    dummy_benefit[1] = 0.5;
     /// initialize variables
     double curr_value;
     Eigen::VectorXd min_feature_held = rij.rowwise().minCoeff();
@@ -133,24 +140,45 @@ public:
     sum_feature_held *= 1.01;
     Eigen::VectorXd incr_feature_held =
       (sum_feature_held.array() - min_feature_held.array()) /
-      static_cast<double>(_n_approx_obj_fun_points - 1);
+      static_cast<double>(_n_approx_obj_fun_points - 2);
     Eigen::VectorXd obj_feature_held(_n_approx_obj_fun_points);
     Eigen::VectorXd obj_feature_benefit(_n_approx_obj_fun_points);
+    obj_feature_held[0] = 0.0;
+    obj_feature_benefit[0] = 0.0;
     /// add piece-wise components
     for (std::size_t j = 0; j < _n_f; ++j) {
       /// calculate held values
       curr_value = min_feature_held(j);
-      for (std::size_t k = 0; k < _n_approx_obj_fun_points; ++k) {
-        obj_feature_held(k) = curr_value;
+      for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
+        obj_feature_held[k] = curr_value;
         curr_value += incr_feature_held[j];
       }
       /// calculate benefit values
       obj_feature_benefit =
         (*(_alpha + j) * obj_feature_held.array()).pow(*(_gamma + j));
+      obj_feature_benefit[0] = 0.0;
       /// add component
-      GRBsetpwlobj(_model, _n_pu + j, _n_approx_obj_fun_points,
-                   obj_feature_held.data(),
-                   obj_feature_benefit.data());
+      if ((obj_feature_benefit.maxCoeff() - obj_feature_benefit[0]) > 1.0e-5) {
+        // use actual peice-wise linear objectives if the feature doesn't
+        // have zeros in all planning units
+        GRBsetpwlobj(_model, _n_pu + j, _n_approx_obj_fun_points,
+                     obj_feature_held.data(),
+                     obj_feature_benefit.data());
+      } else {
+        // use dummy peice-wise linear objectives if there is zero variation
+        // in the benefit function
+        if (obj_feature_benefit[1] > 1.0e-5) {
+          // if the benefit function has constant values that are greater
+          // than zero, then set this value as the maximum value
+          dummy_held[2] = obj_feature_held[1];
+          dummy_benefit[2] = obj_feature_benefit[1];
+        } else {
+          dummy_held[2] = 1.0;
+          dummy_benefit[2] = 1.0;
+        }
+        GRBsetpwlobj(_model, _n_pu + j, 3, dummy_held.data(),
+                     dummy_benefit.data());
+      }
     }
     // return void
     return;
@@ -159,7 +187,10 @@ public:
   // solve problem
   inline void solve() {
     // generate solution
-    GRBoptimize(_model);
+    int error = GRBoptimize(_model);
+    // check for error
+    if (static_cast<bool>(error))
+      Rcpp::stop("issue solving prioritization problem");
     // return void
     return;
   }
