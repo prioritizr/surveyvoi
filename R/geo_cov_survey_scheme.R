@@ -1,0 +1,105 @@
+#' @include internal.R env_div_survey_scheme.R
+NULL
+
+#' Geographic coverage survey scheme
+#'
+#' Generate a survey scheme by maximizing the geographic coverage
+#' of surveys.
+#'
+#' @inheritParams env_div_survey_scheme
+#'
+#' @inherit env_div_survey_scheme return
+#'
+#' @details The integer programming formulation of the \emph{p}-Median
+#'   problem (Daskin & Maass 2015) is used to generate survey schemes.
+#'
+#' @references
+#' Daskin MS & Maass KL (2015) The p-median problem. In \emph{Location Science}
+#' (pp. 21-45). Springer, Cham.
+#'
+#' @examples
+#' # set seed for reproducibility
+#' set.seed(123)
+#'
+#' # simulate data
+#'  x <- sf::st_as_sf(
+#'    tibble::tibble(x = rnorm(4), y = rnorm(4),
+#'                   v1 = c(0.1, 0.2, 0.3, 10), # environmental axis 1
+#'                   v2 = c(0.1, 0.2, 0.3, 10), # environmental axis 2
+#'                   cost = rep(1, 4)),
+#'     coords = c("x", "y"))
+#'
+#' # plot the sites' locations
+#' plot(st_geometry(x), pch = 16, cex = 3)
+#'
+#' # generate scheme with a budget of 2
+#' s <- geo_cov_survey_scheme(x, "cost", 2)
+#'
+#' # print scheme
+#' print(s)
+#'
+#' # plot scheme
+#' x$scheme <- c(s)
+#' plot(x[, "scheme"], pch = 16, cex = 3)
+#
+#' @export
+geo_cov_survey_scheme <- function(site_data, cost_column, budget,
+                                  locked_in_column = NULL,
+                                  locked_out_column = NULL,
+                                  verbose = FALSE) {
+  # assert that arguments are valid
+  assertthat::assert_that(
+    ## site_data
+    inherits(site_data, "sf"), nrow(site_data) > 0, ncol(site_data) > 0,
+    ## cost_column
+    assertthat::is.string(cost_column), assertthat::noNA(cost_column),
+    all(assertthat::has_name(site_data, cost_column)),
+    is.numeric(site_data[[cost_column]]),
+    assertthat::noNA(site_data[[cost_column]]),
+    all(site_data[[cost_column]] >= 0),
+    ## budget
+    is.numeric(budget), assertthat::noNA(budget), all(budget >= 0))
+  if (!is.null(locked_in_column)) {
+    ## locked_in_column
+    assertthat::assert_that(
+      assertthat::is.string(locked_in_column),
+      all(assertthat::has_name(site_data, locked_in_column)),
+      is.logical(site_data[[locked_in_column]]),
+      assertthat::noNA(site_data[[locked_in_column]]))
+  }
+  if (!is.null(locked_out_column)) {
+    ## locked_out_column
+    assertthat::assert_that(
+      assertthat::is.string(locked_out_column),
+      all(assertthat::has_name(site_data, locked_out_column)),
+      is.logical(site_data[[locked_out_column]]),
+      assertthat::noNA(site_data[[locked_out_column]]))
+  }
+
+  # set locked in sites
+  if (is.null(locked_in_column)) {
+    locked_in <- rep(FALSE, nrow(site_data))
+  } else {
+    locked_in <- site_data[[locked_in_column]]
+  }
+
+  # set locked out sites
+  if (is.null(locked_out_column)) {
+    locked_out <- rep(FALSE, nrow(site_data))
+  } else {
+    locked_out <- site_data[[locked_out_column]]
+  }
+
+  # create geographic distance matrix
+  geo_dists <- sf::st_distance(site_data)
+  geo_dists <- matrix(as.numeric(geo_dists[]),
+                      ncol = ncol(geo_dists),
+                      nrow = nrow(geo_dists))
+
+  # rescale distances to avoid issues with large values
+  geo_dists[] <- scales::rescale(geo_dists[], to = c(0, 1e+4))
+
+  # return survey schemes
+  distance_based_prioritizations(geo_dists, budget, site_data[[cost_column]],
+                                 locked_in, locked_out, verbose)
+}

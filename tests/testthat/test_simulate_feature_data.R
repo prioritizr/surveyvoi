@@ -1,0 +1,27 @@
+context("simulate_feature_data")
+
+test_that("simulate_feature_data", {
+  # data
+  d <- simulate_feature_data(5, 0.5)
+  # tests
+  expect_is(d, "tbl_df")
+  expect_equal(nrow(d), 5)
+  expect_is(d$name, "character")
+  expect_equal(anyDuplicated(d$name), 0)
+  expect_is(d$survey, "logical")
+  expect_equal(sum(d$survey), 3)
+  expect_is(d$alpha, "numeric")
+  expect_gt(min(d$alpha), 0)
+  expect_true(all(is.finite(d$alpha)))
+  expect_is(d$gamma, "numeric")
+  expect_gt(min(d$gamma), 0)
+  expect_true(all(is.finite(d$gamma)))
+  expect_is(d$sensitivity, "numeric")
+  expect_gt(min(d$sensitivity), 0)
+  expect_lt(min(d$sensitivity), 1)
+  expect_true(all(is.finite(d$sensitivity)))
+  expect_is(d$specificity, "numeric")
+  expect_gt(min(d$specificity), 0)
+  expect_lt(min(d$specificity), 1)
+  expect_true(all(is.finite(d$specificity)))
+})

@@ -1,0 +1,79 @@
+#include "package.h"
+#include "functions.h"
+#include "rcpp_states.h"
+#include "rcpp_probability.h"
+#include "rcpp_prioritization.h"
+
+// [[Rcpp::export]]
+double rcpp_expected_value_of_management_decision_given_perfect_information(
+  Eigen::MatrixXd &pij,
+  Eigen::VectorXd &pu_costs,
+  Eigen::VectorXd &pu_locked_in,
+  Eigen::VectorXd &alpha,
+  Eigen::VectorXd &gamma,
+  std::size_t n_approx_obj_fun_points,
+  double budget,
+  double gap) {
+
+  // initialization
+  /// initialize loop variables
+  double out = std::numeric_limits<double>::infinity();
+  double curr_value_given_state_occurring;
+  double curr_probability_of_state_occurring;
+  double curr_expected_value_given_state;
+  Eigen::MatrixXd curr_state(pij.rows(), pij.cols());
+
+  /// create log version of probabilities
+  Eigen::MatrixXd pij_log(pij.cols(), pij.rows());
+  pij_log = pij.array().log();
+
+  /// initialize prioritization
+  std::vector<bool> solution(pij.cols());
+  Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
+                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
+
+  /// determine number of states
+  mpz_t n;
+  mpz_init(n);
+  n_states(curr_state.size(), n);
+
+  /// initialize loop iterator
+  mpz_t i;
+  mpz_init(i);
+  mpz_set_ui(i, 0);
+
+  // main processing
+  while (mpz_cmp(i, n) < 0) {
+    /// generate the i'th state
+    nth_state(i, curr_state);
+    /// generate solution for state
+    p.add_rij_data(curr_state);
+    p.solve();
+    p.get_solution(solution);
+    /// calculate the value of the prioritization given the state
+    curr_value_given_state_occurring =
+      std::log(alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+        pow(gamma.array()).sum());
+    /// calculate probability of the state occurring
+    curr_probability_of_state_occurring =
+      log_probability_of_state(curr_state, pij_log);
+    /// add the value of the prioritization given the state,
+    /// weighted by the probability of the state occuring
+    curr_expected_value_given_state =
+      curr_value_given_state_occurring + curr_probability_of_state_occurring;
+    /// calculate expected value of action
+    if (std::isinf(out)) {
+      out = curr_expected_value_given_state;
+    } else {
+      out =
+        log_sum(out, curr_expected_value_given_state);
+    }
+  }
+
+  // clear memory
+  mpz_clear(i);
+  mpz_clear(n);
+
+  // return result
+  return std::exp(out);
+}

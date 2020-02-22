@@ -1,0 +1,44 @@
+url: https://jeffrey-hanson.com/surveyroi
+
+authors:
+  Jeffrey O Hanson:
+    href: https://jeffrey-hanson.com
+  Joseph Bennett:
+    href: https://josephrbennett.wordpress.com
+
+template:
+  params:
+    bootswatch: flatly
+
+reference:
+  - title: Summary
+    desc: Summary of the package
+    contents:
+      - surveyroi
+  - title: Survey schemes
+    desc: Functions for generating and evaluating survey schemes
+    contents:
+      - env_div_survey_scheme
+      - geo_cov_survey_scheme
+      - optimal_survey_scheme
+      - weighted_survey_scheme
+      - feasible_survey_schemes
+      - expected_value_of_survey_scheme
+  - title: Site scores
+    desc: Functions for calculating scores for sites
+    contents:
+      - relative_site_richness_scores
+      - relative_site_uncertainty_scores
+  - title: Occupancy models
+    desc: Functions for fitting occupancy models
+    contents:
+      - tune_occupancy_models
+      - fit_occupancy_models
+  - title: Simulate data
+    desc: Functions for simulating datasets
+    contents:
+      - simulate_site_data
+      - simulate_feature_data
+  - title: Miscellanous functions
+    contents:
+      - prior_probability_matrix
