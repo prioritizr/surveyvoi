@@ -1,4 +1,4 @@
-context("n_states")
+context("rcpp_n_states")
 
 # define helper function
 correct_n_states <- function(x) {
@@ -8,19 +8,14 @@ correct_n_states <- function(x) {
 
 test_that("correct result", {
   # 1 planning unit and 1 feature
-  expect_equal(n_states(1), correct_n_states(1))
+  expect_equal(rcpp_n_states(1), correct_n_states(1))
   # 1 planning unit and 2 features
-  expect_equal(n_states(2), correct_n_states(2))
+  expect_equal(rcpp_n_states(2), correct_n_states(2))
   # 2 planning unit and 2 features
-  expect_equal(n_states(4), correct_n_states(4))
+  expect_equal(rcpp_n_states(4), correct_n_states(4))
   # 3 planning units and 2 features
-  expect_equal(n_states(6), correct_n_states(6))
+  expect_equal(rcpp_n_states(6), correct_n_states(6))
   # verify several numbers
   for (i in seq_len(20))
-    expect_equal(n_states(i), correct_n_states(i))
-})
-
-test_that("invalid arguments", {
-  expect_error(n_states("a"))
-  expect_error(n_states(-1))
+    expect_equal(rcpp_n_states(i), correct_n_states(i))
 })

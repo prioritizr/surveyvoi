@@ -239,15 +239,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_which_state
-std::size_t rcpp_which_state(Eigen::MatrixXd& matrix, std::vector<std::size_t>& idx);
-RcppExport SEXP _surveyvoi_rcpp_which_state(SEXP matrixSEXP, SEXP idxSEXP) {
+// rcpp_which_state_sparse
+std::size_t rcpp_which_state_sparse(Eigen::MatrixXd matrix, std::vector<std::size_t> idx);
+RcppExport SEXP _surveyvoi_rcpp_which_state_sparse(SEXP matrixSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type matrix(matrixSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::size_t>& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_which_state(matrix, idx));
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type matrix(matrixSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::size_t> >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_which_state_sparse(matrix, idx));
     return rcpp_result_gen;
 END_RCPP
 }

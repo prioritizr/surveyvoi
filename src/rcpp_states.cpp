@@ -197,7 +197,9 @@ std::size_t rcpp_n_states(std::size_t n) {
 }
 
 // [[Rcpp::export]]
-std::size_t rcpp_which_state(
-  Eigen::MatrixXd &matrix, std::vector<std::size_t> &idx) {
+std::size_t rcpp_which_state_sparse(
+  Eigen::MatrixXd matrix, std::vector<std::size_t> idx) {
+  for(auto& i : idx)
+    i -= 1;
   return which_state(matrix, idx);
 }

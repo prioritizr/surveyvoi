@@ -1,6 +1,6 @@
 context("xgboost")
 
-r_xgboost_wrapper <- function(y, x_train, predict_x, xgb_parameters,
+r_xgboost <- function(y, x_train, predict_x, xgb_parameters,
                               xgb_nrounds) {
   spw <- round(sum(y < 0.5) / sum(y > 0.5), 6) # C++ code uses 1e-6 precision
   set.seed(as.numeric(xgb_parameters$seed))
@@ -40,8 +40,8 @@ test_that("works", {
   yhat <- c(exp(yhat) / (1 + exp(yhat)))
   y[] <- rbinom(length(y), 1, y[])
   ## generate predictions
-  r1 <- rcpp_xgboost_wrapper(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
-  r2 <- r_xgboost_wrapper(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
+  r1 <- rcpp_xgboost(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
+  r2 <- r_xgboost(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
   ## tests
   expect_equal(r1, r2)
 })
@@ -76,7 +76,7 @@ test_that("reproducible", {
   ## generate predictions
   r <- sapply(seq_len(n_reps), function(i) {
     set.seed(123)
-    rcpp_xgboost_wrapper(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
+    rcpp_xgboost(y, x_train, x_predict, xgb_parameters, xgb_nrounds)
   })
   ## tests
   for (i in seq_len(n_reps))

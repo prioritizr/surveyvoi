@@ -65,8 +65,8 @@ rcpp_n_states <- function(n) {
     .Call(`_surveyvoi_rcpp_n_states`, n)
 }
 
-rcpp_which_state <- function(matrix, idx) {
-    .Call(`_surveyvoi_rcpp_which_state`, matrix, idx)
+rcpp_which_state_sparse <- function(matrix, idx) {
+    .Call(`_surveyvoi_rcpp_which_state_sparse`, matrix, idx)
 }
 
 rcpp_fit_xgboost_models_and_assess_performance <- function(rij, wij, pu_env_data_raw, survey_features, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds) {

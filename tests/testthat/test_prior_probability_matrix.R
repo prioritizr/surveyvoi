@@ -18,28 +18,15 @@ test_that("correct result", {
     survey = rep(TRUE, 3),
     sensitivity = c(0.5, 0.96, 0.97),
     specificity = c(0.34, 0.92, 0.98),
+    model_sensitivity = c(0.8, 0.7, 0.6),
     alpha = abs(rnorm(3)) + 1,
     gamma = runif(3))
   site_occupancy_columns <- c("f1", "f2", "f3")
   site_probability_columns <-  c("p1", "p2", "p3")
-  # calculate models sensitivity and specificity
-  model_sensitivity <- vapply(seq_along(site_occupancy_columns), numeric(1),
-    FUN = function(i) {
-      x <- !is.na(site_data[[site_occupancy_columns[i]]])
-      sensitivity(site_data[[site_occupancy_columns[i]]][x],
-                  site_data[[site_probability_columns[i]]][x])
-  })
-  model_specificity <- vapply(seq_along(site_occupancy_columns), numeric(1),
-    FUN = function(i) {
-      x <- !is.na(site_data[[site_occupancy_columns[i]]])
-      specificity(site_data[[site_occupancy_columns[i]]][x],
-                  site_data[[site_probability_columns[i]]][x])
-  })
   # calculations
-  pij <- prior_probability_matrix(site_data, feature_data,
-                                  site_occupancy_columns,
-                                  site_probability_columns,
-                                  "sensitivity", "specificity")
+  pij <- prior_probability_matrix(
+    site_data, feature_data, site_occupancy_columns, site_probability_columns,
+    "sensitivity", "specificity", "model_sensitivity")
   # tests
   expect_is(pij, "matrix")
   expect_true(all(is.finite(pij)))
@@ -57,7 +44,7 @@ test_that("correct result", {
           correct[f, j] <- 1 - feature_data$specificity[f]
         }
       } else {
-        correct[f, j] <- model_sensitivity[f] * m
+        correct[f, j] <- feature_data$model_sensitivity[f] * m
       }
     }
   }
