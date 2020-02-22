@@ -1,5 +1,30 @@
 #include "rcpp_states.h"
 
+void n_states(std::size_t x, mpz_t out) {
+  // init
+  mpz_set_ui(out, 1);
+  mpz_t v1, v2, v3;
+  mpz_init(v1);
+  mpz_init(v2);
+  mpz_init(v3);
+  // main
+  for (std::size_t i = 1; i < x; ++i) {
+    // out += (factorial(x) / (factorial(i) * factorial(x - i)));
+    factorial(x, v1);
+    factorial(i, v2);
+    factorial(x - i, v3);
+    mpz_mul(v2, v2, v3);
+    mpz_divexact(v1, v1, v2);
+    mpz_add(out, out, v1);
+  }
+  // clean-up
+  mpz_clear(v1);
+  mpz_clear(v2);
+  mpz_clear(v3);
+  // return void
+  return;
+}
+
 void nth_state(mpz_t n, Eigen::MatrixXd &matrix) {
   // if n is equal to zero then simply set all values to zero and exit
   if (mpz_cmp_ui(n, 0) == 0) {
@@ -31,7 +56,7 @@ void nth_state(mpz_t n, Eigen::MatrixXd &matrix) {
   return;
 }
 
-void nth_state(
+void nth_state_sparse(
   mpz_t n,
   Eigen::MatrixXd &matrix,
   std::vector<std::size_t> &idx) {
@@ -72,41 +97,33 @@ void nth_state(
   return;
 }
 
-void n_states(std::size_t x, mpz_t out) {
+void which_state(Eigen::MatrixXd &matrix, mpz_t out) {
   // init
-  mpz_set_ui(out, 1);
-  mpz_t v1, v2, v3;
-  mpz_init(v1);
-  mpz_init(v2);
-  mpz_init(v3);
+  mpz_t tmp;
+  mpz_init(tmp);
+  mpz_set_ui(out, 0);
   // main
-  for (std::size_t i = 1; i < x; ++i) {
-    // out += (factorial(x) / (factorial(i) * factorial(x - i)));
-    factorial(x, v1);
-    factorial(i, v2);
-    factorial(x - i, v3);
-    mpz_mul(v2, v2, v3);
-    mpz_divexact(v1, v1, v2);
-    mpz_add(out, out, v1);
+  for (auto itr = matrix.data(); itr != matrix.data() + matrix.size(); ++itr) {
+    // out = out * 2 + matrix(*itr);
+    mpz_mul_ui(tmp, out, 2);
+    mpz_add_ui(out, tmp, static_cast<std::size_t>(*itr));
   }
   // clean-up
-  mpz_clear(v1);
-  mpz_clear(v2);
-  mpz_clear(v3);
+  mpz_clear(tmp);
   // return void
   return;
 }
 
-std::size_t n_states(std::size_t x) {
+std::size_t which_state(Eigen::MatrixXd& matrix) {
   mpz_t tmp;
   mpz_init(tmp);
-  n_states(x, tmp);
+  which_state(matrix, tmp);
   std::size_t out = mpz_get_ui(tmp);
   mpz_clear(tmp);
   return out;
 }
 
-void which_state(
+void which_state_sparse(
   Eigen::MatrixXd &matrix,
   std::vector<std::size_t> &idx,
   mpz_t out) {
@@ -126,15 +143,33 @@ void which_state(
   return;
 }
 
-std::size_t which_state(
-  Eigen::MatrixXd &matrix,
-  std::vector<std::size_t> &idx) {
+std::size_t which_state_sparse(
+  Eigen::MatrixXd& matrix,
+  std::vector<std::size_t>& idx) {
   mpz_t tmp;
   mpz_init(tmp);
-  which_state(matrix, idx, tmp);
+  which_state_sparse(matrix, idx, tmp);
   std::size_t out = mpz_get_ui(tmp);
   mpz_clear(tmp);
   return out;
+}
+
+void sample_k_nth_states(
+  std::size_t k, Eigen::MatrixXd &pij, std::vector<mpz_t> &out) {
+  // init
+  const std::size_t n_v = pij.size();
+  Eigen::MatrixXd states(pij.cols(), pij.rows());
+  // main
+  for (std::size_t i = 0; i < k; ++i) {
+    // generate i'th state
+    for (std::size_t j = 0; j < n_v; ++j)
+      states(j) = Rcpp::rbinom(n_v, 1, pij(j))[0];
+    // identify state number
+    mpz_init(out[i]);
+    which_state(states, out[i]);
+  }
+  // return void
+  return;
 }
 
 void which_feature_state(
@@ -155,7 +190,8 @@ void which_feature_state(
     for (std::size_t j = 0; j < n_pu_survey; ++j) {
       curr_feature_pu_survey_solution_idx[j] =
         (n_f_total * pu_survey_solution_idx[j]) + features[i];
-      out[i] = which_state(oij, curr_feature_pu_survey_solution_idx);
+      out[i] =
+        which_state_sparse(oij, curr_feature_pu_survey_solution_idx);
     }
   }
   // return void
@@ -172,7 +208,7 @@ Eigen::MatrixXd rcpp_nth_state_sparse(
   mpz_init(m);
   mpz_set_ui(m, n);
   // main processing
-  nth_state(m, matrix, idx);
+  nth_state_sparse(m, matrix, idx);
   // clean-up
   mpz_clear(m);
   return matrix;
@@ -193,7 +229,12 @@ Eigen::MatrixXd rcpp_nth_state(std::size_t n, Eigen::MatrixXd matrix) {
 
 // [[Rcpp::export]]
 std::size_t rcpp_n_states(std::size_t n) {
-  return n_states(n);
+  mpz_t tmp;
+  mpz_init(tmp);
+  n_states(n, tmp);
+  std::size_t out = mpz_get_ui(tmp);
+  mpz_clear(tmp);
+  return out;
 }
 
 // [[Rcpp::export]]
@@ -201,5 +242,30 @@ std::size_t rcpp_which_state_sparse(
   Eigen::MatrixXd matrix, std::vector<std::size_t> idx) {
   for(auto& i : idx)
     i -= 1;
-  return which_state(matrix, idx);
+  return which_state_sparse(matrix, idx);
+}
+
+// [[Rcpp::export]]
+std::size_t rcpp_which_state(Eigen::MatrixXd matrix) {
+  return which_state(matrix);
+}
+
+// [[Rcpp::export]]
+std::vector<std::size_t> rcpp_sample_k_nth_states(
+  std::size_t k, Eigen::MatrixXd &pij) {
+  // init
+  std::vector<mpz_t> s(k);
+  std::vector<std::size_t> o(k);
+  for (std::size_t i = 0; i < k; ++i)
+    mpz_init(s[i]);
+  // generate states
+  sample_k_nth_states(k, pij, s);
+  // extract values
+  for (std::size_t i = 0; i < k; ++i)
+    o[i] = mpz_get_ui(s[i]);
+  // clean up
+  for (std::size_t i = 0; i < k; ++i)
+    mpz_clear(s[i]);
+  // return result
+  return o;
 }
