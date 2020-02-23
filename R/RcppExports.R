@@ -5,8 +5,8 @@ rcpp_log_sum <- function(x) {
     .Call(`_surveyvoi_rcpp_log_sum`, x)
 }
 
-rcpp_approximate_expected_value_of_prioritization <- function(solution, pij, alpha, gamma, states) {
-    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_prioritization`, solution, pij, alpha, gamma, states)
+rcpp_approximate_expected_value_of_management_action <- function(solution, pij, alpha, gamma, states) {
+    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_action`, solution, pij, alpha, gamma, states)
 }
 
 rcpp_appproximate_expected_value_of_management_decision_given_current_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {

@@ -1,6 +1,6 @@
 #include "rcpp_approximate_expected_value_of_management_action.h"
 
-double approximate_expected_value_of_prioritization(
+double approximate_expected_value_of_management_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::VectorXd &alpha,
@@ -28,36 +28,54 @@ double approximate_expected_value_of_prioritization(
   /// determine number of states that affect the solution
   const std::size_t n_approx_states = states.size();
   /// initialize loop variables
-  Eigen::VectorXd curr_value_given_state_occurring(n_approx_states);
-  Eigen::VectorXd curr_probability_of_state_occurring(n_approx_states);
+  double v;
+  std::size_t k = 0;
   Eigen::MatrixXd curr_state(sub_pij_log.rows(), sub_pij_log.cols());
+  std::vector<double> value_given_state_occurring;
+  std::vector<double> prob_of_state_occurring;
+  value_given_state_occurring.reserve(n_approx_states);
+  prob_of_state_occurring.reserve(n_approx_states);
+
   /// iterate over each state
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     //// generate the i'th state
     nth_state(states[i], curr_state);
     //// calculate the value of the prioritization given the state
-    curr_value_given_state_occurring[i] =
-      std::log(alpha.cwiseProduct(curr_state.rowwise().sum()).array().
-        pow(gamma.array()).sum());
-    /// calculate probability of the state occurring
-    curr_probability_of_state_occurring[i] =
-      log_probability_of_state(curr_state, sub_pij_log);
+    v = alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+        pow(gamma.array()).sum();
+    if (v > 1.0e-10) {
+      /// store value if the priorititization has a non-zero benefit
+      value_given_state_occurring.push_back(v);
+      /// calculate probability of the state occurring
+      prob_of_state_occurring.push_back(
+        log_probability_of_state(curr_state, sub_pij_log));
+      /// increment counter
+      ++k;
+    }
   }
 
+  // create Eigen maps of data
+  Eigen::VectorXd value_given_state_occurring2 =
+    Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      value_given_state_occurring.data(), k);
+  Eigen::VectorXd prob_of_state_occurring2 =
+    Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      prob_of_state_occurring.data(), k);
+
   // rescale probabilities
-  curr_probability_of_state_occurring.array() /=
-    curr_probability_of_state_occurring.sum();
+  prob_of_state_occurring2.array() /=
+    prob_of_state_occurring2.sum();
 
   // calculate values weighted by probabilities
-  curr_probability_of_state_occurring.array() +=
-    curr_value_given_state_occurring.array();
+  prob_of_state_occurring2.array() +=
+    value_given_state_occurring2.array().log();
 
   // return result
-  return std::exp(log_sum(curr_probability_of_state_occurring));
+  return std::exp(log_sum(prob_of_state_occurring2));
 }
 
 // [[Rcpp::export]]
-double rcpp_approximate_expected_value_of_prioritization(
+double rcpp_approximate_expected_value_of_management_action(
   std::vector<bool> solution,
   Eigen::MatrixXd pij,
   Eigen::VectorXd alpha,
@@ -75,7 +93,7 @@ double rcpp_approximate_expected_value_of_prioritization(
   }
 
   // calculate result
-  double out = approximate_expected_value_of_prioritization(
+  double out = approximate_expected_value_of_management_action(
     solution, pij, alpha, gamma, states2);
 
   // clear memory

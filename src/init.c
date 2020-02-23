@@ -9,8 +9,8 @@
 
 /* .Call calls */
 extern SEXP _surveyvoi_rcpp_appproximate_expected_value_of_management_decision_given_current_information(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_action(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_perfect_information(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_approximate_expected_value_of_prioritization(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_management_action(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_current_information(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -33,8 +33,8 @@ extern SEXP _surveyvoi_rcpp_xgboost(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_appproximate_expected_value_of_management_decision_given_current_information", (DL_FUNC) &_surveyvoi_rcpp_appproximate_expected_value_of_management_decision_given_current_information, 9},
+    {"_surveyvoi_rcpp_approximate_expected_value_of_management_action",                              (DL_FUNC) &_surveyvoi_rcpp_approximate_expected_value_of_management_action,                              5},
     {"_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_perfect_information",  (DL_FUNC) &_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_perfect_information,  9},
-    {"_surveyvoi_rcpp_approximate_expected_value_of_prioritization",                                 (DL_FUNC) &_surveyvoi_rcpp_approximate_expected_value_of_prioritization,                                 5},
     {"_surveyvoi_rcpp_expected_value_of_management_action",                                          (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_management_action,                                          4},
     {"_surveyvoi_rcpp_expected_value_of_management_decision_given_current_information",              (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_management_decision_given_current_information,              8},
     {"_surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information",              (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information,              8},

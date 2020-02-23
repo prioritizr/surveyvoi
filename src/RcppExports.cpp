@@ -17,9 +17,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_approximate_expected_value_of_prioritization
-double rcpp_approximate_expected_value_of_prioritization(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma, std::vector<std::size_t> states);
-RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_prioritization(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP statesSEXP) {
+// rcpp_approximate_expected_value_of_management_action
+double rcpp_approximate_expected_value_of_management_action(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma, std::vector<std::size_t> states);
+RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_action(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP statesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,7 +28,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type gamma(gammaSEXP);
     Rcpp::traits::input_parameter< std::vector<std::size_t> >::type states(statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_prioritization(solution, pij, alpha, gamma, states));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_management_action(solution, pij, alpha, gamma, states));
     return rcpp_result_gen;
 END_RCPP
 }
