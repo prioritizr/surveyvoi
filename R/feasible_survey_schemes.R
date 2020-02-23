@@ -8,8 +8,8 @@ NULL
 #'
 #' @inheritParams env_div_survey_scheme
 #'
-#' @param budget \code{numeric} the maximum possible expenditure permitted
-#'  for conducting surveys.
+#' @param survey_budget \code{numeric} the maximum possible expenditure
+#'  permitted for conducting surveys.
 #'
 #' @param verbose \code{logical} indicating if information should be
 #'   printed while searching for feasible schemes. Defaults to \code{FALSE}.
@@ -35,7 +35,7 @@ NULL
 #' plot(st_geometry(x), pch = 16, cex = 3)
 #'
 #' # generate all feasible schemes given a budget of 4
-#' s <- feasible_survey_schemes(x, "cost", budget = 4)
+#' s <- feasible_survey_schemes(x, "cost", survey_budget = 4)
 #'
 #' # print schemes
 #' print(s)
@@ -45,10 +45,9 @@ NULL
 #' plot(x[, "scheme_1"], pch = 16, cex = 3)
 #'
 #' @export
-feasible_survey_schemes <- function(site_data, cost_column, budget,
-                                    locked_in_column = NULL,
-                                    locked_out_column = NULL,
-                                    verbose = FALSE) {
+feasible_survey_schemes <- function(
+  site_data, cost_column, survey_budget, locked_in_column = NULL,
+  locked_out_column = NULL, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -60,8 +59,9 @@ feasible_survey_schemes <- function(site_data, cost_column, budget,
     is.numeric(site_data[[cost_column]]),
     assertthat::noNA(site_data[[cost_column]]),
     all(site_data[[cost_column]] >= 0),
-    ## budget
-    is.numeric(budget), assertthat::noNA(budget), all(budget >= 0),
+    ## survey_budget
+    is.numeric(survey_budget), assertthat::noNA(survey_budget),
+    all(survey_budget >= 0),
     ## verbose
     assertthat::is.flag(verbose), assertthat::noNA(verbose))
   if (!is.null(locked_in_column)) {
@@ -95,13 +95,13 @@ feasible_survey_schemes <- function(site_data, cost_column, budget,
   if (abs(diff(range(site_data[[cost_column]]))) < 1e-10) {
     ## if all the sites have identical costs, no sites are locked in, and
     ## no sites are locked out, then generate the schemes using combinations
-    out <- manual_feasible_survey_schemes(site_data[[cost_column]], budget,
-                                          locked_in, locked_out, verbose)
+    out <- manual_feasible_survey_schemes(
+      site_data[[cost_column]], survey_budget, locked_in, locked_out, verbose)
   } else {
     ## otherwise, if we have complicated criteria for generating the schemes,
     ## then use ILP to generate the schemes
-    out <- gurobi_feasible_survey_schemes(site_data[[cost_column]], budget,
-                                          locked_in, locked_out, verbose)
+    out <- gurobi_feasible_survey_schemes(
+      site_data[[cost_column]], survey_budget, locked_in, locked_out, verbose)
   }
 
   # return result

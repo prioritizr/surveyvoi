@@ -9,7 +9,7 @@ NULL
 #' and uncertainty values calculated using different matrices cannot be
 #' compared to each other.
 #'
-#' @inheritParams optimal_survey_scheme
+#' @inheritParams expected_value_of_decision_given_current_information
 #'
 #' @details
 #' The relative site uncertainty scores are calculated as joint Shannon's
@@ -32,7 +32,6 @@ NULL
 #'
 #' }
 #'
-#' Note that
 #' @return \code{numeric} \code{vector} of uncertainty scores. Note that
 #'  these values are automatically rescaled between 0.01 and 1.
 #'
@@ -67,8 +66,8 @@ NULL
 #' plot(x[, c("s")], pch = 16, cex = 3)
 #'
 #' @export
-relative_site_uncertainty_scores <- function(site_data,
-                                             site_probability_columns) {
+relative_site_uncertainty_scores <- function(
+  site_data, site_probability_columns) {
   # assert that arguments are valid
   assertthat::assert_that(
     inherits(site_data, "sf"),

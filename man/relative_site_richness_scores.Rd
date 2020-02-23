@@ -6,6 +6,16 @@
 \usage{
 relative_site_richness_scores(site_data, site_probability_columns)
 }
+\arguments{
+\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+
+\item{site_probability_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain modelled
+probabilities of occupancy for each feature in each site.
+Each column should correspond to a different feature, and contain
+probability data (values between zero and one). No missing (\code{NA})
+values are permitted in these columns.}
+}
 \value{
 \code{numeric} \code{vector} of richness scores. Note that
  these values are automatically rescaled between 0.01 and 1.

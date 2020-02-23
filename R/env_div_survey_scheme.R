@@ -13,7 +13,7 @@ NULL
 #'   the argument to \code{site_data} that contains the cost for surveying each
 #'   site. No missing (\code{NA}) values are permitted.
 #'
-#' @param budget \code{numeric} vector of maximum budgets for the survey
+#' @param survey_budget \code{numeric} vector of maximum budgets for the survey
 #'   schemes. No missing (\code{NA}) values are permitted.
 #'
 #' @param env_vars_columns \code{character} vector names of the columns in
@@ -83,12 +83,10 @@ NULL
 #' plot(x[, "scheme"], pch = 16, cex = 3)
 #
 #' @export
-env_div_survey_scheme <- function(site_data, cost_column, budget,
-                                  env_vars_columns,
-                                  method ="mahalanobis",
-                                  locked_in_column = NULL,
-                                  locked_out_column = NULL,
-                                  verbose = FALSE) {
+env_div_survey_scheme <- function(
+  site_data, cost_column, survey_budget, env_vars_columns,
+  method = "mahalanobis", locked_in_column = NULL, locked_out_column = NULL,
+  verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -107,8 +105,9 @@ env_div_survey_scheme <- function(site_data, cost_column, budget,
     all(sapply(cost_column, function(z) assertthat::noNA(site_data[[z]]))),
     ## method
     assertthat::is.string(method),
-    ## budget
-    is.numeric(budget), assertthat::noNA(budget), all(budget >= 0))
+    ## survey_budget
+    is.numeric(survey_budget), assertthat::noNA(survey_budget),
+    all(survey_budget >= 0))
   if (!is.null(locked_in_column)) {
     ## locked_in_column
     assertthat::assert_that(
@@ -147,6 +146,7 @@ env_div_survey_scheme <- function(site_data, cost_column, budget,
                              method = method))
 
   # return survey schemes
-  distance_based_prioritizations(env_dists, budget, site_data[[cost_column]],
-                                 locked_in, locked_out, verbose)
+  distance_based_prioritizations(
+    env_dists, survey_budget, site_data[[cost_column]],
+    locked_in, locked_out, verbose)
 }

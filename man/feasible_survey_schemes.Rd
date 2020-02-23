@@ -4,7 +4,7 @@
 \alias{feasible_survey_schemes}
 \title{Find all feasible survey schemes}
 \usage{
-feasible_survey_schemes(site_data, cost_column, budget,
+feasible_survey_schemes(site_data, cost_column, survey_budget,
   locked_in_column = NULL, locked_out_column = NULL, verbose = FALSE)
 }
 \arguments{
@@ -15,8 +15,8 @@ sites.}
 the argument to \code{site_data} that contains the cost for surveying each
 site. No missing (\code{NA}) values are permitted.}
 
-\item{budget}{\code{numeric} the maximum possible expenditure permitted
-for conducting surveys.}
+\item{survey_budget}{\code{numeric} the maximum possible expenditure
+permitted for conducting surveys.}
 
 \item{locked_in_column}{\code{character} (optional) name of the column in
 the argument to \code{site_data} that contains \code{logical}
@@ -61,7 +61,7 @@ print(x)
 plot(st_geometry(x), pch = 16, cex = 3)
 
 # generate all feasible schemes given a budget of 4
-s <- feasible_survey_schemes(x, "cost", budget = 4)
+s <- feasible_survey_schemes(x, "cost", survey_budget = 4)
 
 # print schemes
 print(s)

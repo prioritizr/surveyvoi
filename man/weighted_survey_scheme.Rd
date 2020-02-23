@@ -4,8 +4,9 @@
 \alias{weighted_survey_scheme}
 \title{Weighted survey scheme}
 \usage{
-weighted_survey_scheme(site_data, cost_column, budget, weight_column,
-  locked_in_column = NULL, locked_out_column = NULL, verbose = FALSE)
+weighted_survey_scheme(site_data, cost_column, survey_budget,
+  weight_column, locked_in_column = NULL, locked_out_column = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey
@@ -15,7 +16,7 @@ sites.}
 the argument to \code{site_data} that contains the cost for surveying each
 site. No missing (\code{NA}) values are permitted.}
 
-\item{budget}{\code{numeric} vector of maximum budgets for the survey
+\item{survey_budget}{\code{numeric} vector of maximum budgets for the survey
 schemes. No missing (\code{NA}) values are permitted.}
 
 \item{weight_column}{\code{character} name of the column in the argument
@@ -78,7 +79,7 @@ x <- sf::st_as_sf(
 plot(x[, "w"], pch = 16, cex = 3)
 
 # generate scheme without any sites locked in
-s <- weighted_survey_scheme(x, cost_column = "cost", budget = 2,
+s <- weighted_survey_scheme(x, cost_column = "cost", survey_budget = 2,
                              weight_column = "w")
 
 # print solution

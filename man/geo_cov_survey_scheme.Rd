@@ -4,7 +4,7 @@
 \alias{geo_cov_survey_scheme}
 \title{Geographic coverage survey scheme}
 \usage{
-geo_cov_survey_scheme(site_data, cost_column, budget,
+geo_cov_survey_scheme(site_data, cost_column, survey_budget,
   locked_in_column = NULL, locked_out_column = NULL, verbose = FALSE)
 }
 \arguments{
@@ -15,7 +15,7 @@ sites.}
 the argument to \code{site_data} that contains the cost for surveying each
 site. No missing (\code{NA}) values are permitted.}
 
-\item{budget}{\code{numeric} vector of maximum budgets for the survey
+\item{survey_budget}{\code{numeric} vector of maximum budgets for the survey
 schemes. No missing (\code{NA}) values are permitted.}
 
 \item{locked_in_column}{\code{character} (optional) name of the column in

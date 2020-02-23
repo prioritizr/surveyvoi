@@ -8,6 +8,48 @@ prior_probability_matrix(site_data, feature_data, site_occupancy_columns,
   site_probability_columns, feature_survey_sensitivity_column,
   feature_survey_specificity_column, feature_model_sensitivity_column)
 }
+\arguments{
+\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+
+\item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
+
+\item{site_occupancy_columns}{\code{character} names of \code{numeric}
+columns in the
+argument to \code{site_data} that contain presence/absence data.
+Each column should correspond to a different feature, and contain
+binary presence/absence data (zeros or ones) indicating if the
+feature was detected in a previous survey or not. If a site has not
+been surveyed before, then missing (\code{NA}) values should be used.}
+
+\item{site_probability_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain modelled
+probabilities of occupancy for each feature in each site.
+Each column should correspond to a different feature, and contain
+probability data (values between zero and one). No missing (\code{NA})
+values are permitted in these columns.}
+
+\item{feature_survey_sensitivity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of future surveys correctly detecting a presence of each
+feature in a given site (i.e. the sensitivity of the survey methodology).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.}
+
+\item{feature_survey_specificity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of future surveys correctly detecting an absence of each
+feature in a given site (i.e. the specificity of the survey methodology).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.}
+
+\item{feature_model_sensitivity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of the initial models correctly predicting a presence of each
+feature in a given site (i.e. the sensitivity of the models).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.
+This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
+}
 \value{
 \code{matrix} object containing the prior probabilities of each
   feature occupying each site. Each row corresponds to a different

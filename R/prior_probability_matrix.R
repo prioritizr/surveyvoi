@@ -2,7 +2,7 @@
 #'
 #' Create prior probability matrix for the value of information analysis.
 #'
-#' @inheritParams expected_value_of_survey_scheme
+#' @inheritParams expected_value_of_decision_given_current_information
 #'
 #' @details The prior matrix is constructed using a combination of previous
 #'   survey results and modelled predictions for sites that have not been

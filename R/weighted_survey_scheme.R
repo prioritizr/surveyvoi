@@ -44,7 +44,7 @@ NULL
 #' plot(x[, "w"], pch = 16, cex = 3)
 #'
 #' # generate scheme without any sites locked in
-#' s <- weighted_survey_scheme(x, cost_column = "cost", budget = 2,
+#' s <- weighted_survey_scheme(x, cost_column = "cost", survey_budget = 2,
 #'                              weight_column = "w")
 #'
 #' # print solution
@@ -55,11 +55,9 @@ NULL
 #' plot(x[, "s"], pch = 16, cex = 3)
 #'
 #' @export
-weighted_survey_scheme <- function(site_data, cost_column, budget,
-                                   weight_column,
-                                   locked_in_column = NULL,
-                                   locked_out_column = NULL,
-                                   verbose = FALSE) {
+weighted_survey_scheme <- function(
+  site_data, cost_column, survey_budget, weight_column, locked_in_column = NULL,
+  locked_out_column = NULL, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -70,8 +68,9 @@ weighted_survey_scheme <- function(site_data, cost_column, budget,
     is.numeric(site_data[[cost_column]]),
     assertthat::noNA(site_data[[cost_column]]),
     all(site_data[[cost_column]] >= 0),
-    ## budget
-    is.numeric(budget), assertthat::noNA(budget), all(budget >= 0),
+    ## survey_budget
+    is.numeric(survey_budget), assertthat::noNA(survey_budget),
+    all(survey_budget >= 0),
     ## weight_column
     assertthat::is.string(weight_column),
     all(assertthat::has_name(site_data, weight_column)),
@@ -110,7 +109,7 @@ weighted_survey_scheme <- function(site_data, cost_column, budget,
   }
 
   # return survey schemes
-  weight_based_prioritizations(site_data[[weight_column]], budget,
-                               site_data[[cost_column]],
-                               locked_in, locked_out, verbose)
+  weight_based_prioritizations(
+    site_data[[weight_column]], survey_budget, site_data[[cost_column]],
+    locked_in, locked_out, verbose)
 }

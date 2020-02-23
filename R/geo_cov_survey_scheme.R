@@ -43,10 +43,9 @@ NULL
 #' plot(x[, "scheme"], pch = 16, cex = 3)
 #
 #' @export
-geo_cov_survey_scheme <- function(site_data, cost_column, budget,
-                                  locked_in_column = NULL,
-                                  locked_out_column = NULL,
-                                  verbose = FALSE) {
+geo_cov_survey_scheme <- function(
+  site_data, cost_column, survey_budget, locked_in_column = NULL,
+  locked_out_column = NULL, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -57,8 +56,9 @@ geo_cov_survey_scheme <- function(site_data, cost_column, budget,
     is.numeric(site_data[[cost_column]]),
     assertthat::noNA(site_data[[cost_column]]),
     all(site_data[[cost_column]] >= 0),
-    ## budget
-    is.numeric(budget), assertthat::noNA(budget), all(budget >= 0))
+    ## survey_budget
+    is.numeric(survey_budget), assertthat::noNA(survey_budget),
+    all(survey_budget >= 0))
   if (!is.null(locked_in_column)) {
     ## locked_in_column
     assertthat::assert_that(
@@ -100,6 +100,7 @@ geo_cov_survey_scheme <- function(site_data, cost_column, budget,
   geo_dists[] <- scales::rescale(geo_dists[], to = c(0, 1e+4))
 
   # return survey schemes
-  distance_based_prioritizations(geo_dists, budget, site_data[[cost_column]],
-                                 locked_in, locked_out, verbose)
+  distance_based_prioritizations(
+    geo_dists, survey_budget, site_data[[cost_column]],
+    locked_in, locked_out, verbose)
 }

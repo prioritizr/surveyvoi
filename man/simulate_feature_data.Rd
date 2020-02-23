@@ -29,14 +29,10 @@ data:
   of the survey methodology for each features.}
 
 \item{\code{alpha}}{\code{numeric} values used to parametrize
-  the conservation benefit of managing of each feature. See
-  \code{\link{expected_value_of_survey_scheme}} documentation for
-  more information.}
+  the conservation benefit of managing of each feature.}
 
 \item{\code{gamma}}{\code{numeric} values used to parametrize
-  the conservation benefit of managing of each feature. See
-  \code{\link{expected_value_of_survey_scheme}} documentation for
-  more information.}
+  the conservation benefit of managing of each feature.}
 
 }
 }
