@@ -5,8 +5,7 @@
 #include "rcpp_prioritization.h"
 #include "rcpp_approximate_expected_value_of_management_action.h"
 
-// [[Rcpp::export]]
-double rcpp_appproximate_expected_value_of_management_decision_given_current_information(
+double approximate_expected_value_of_management_decision_given_current_information(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -15,8 +14,7 @@ double rcpp_appproximate_expected_value_of_management_decision_given_current_inf
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
-  const std::size_t n_approx_states) {
-
+  std::vector<mpz_t> &states) {
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
@@ -28,34 +26,70 @@ double rcpp_appproximate_expected_value_of_management_decision_given_current_inf
   // calculate log prior probabilities
   pij.array() = pij.array().log();
 
-  // calculate total number of states
-  mpz_t n_states_total;
-  mpz_init(n_states_total);
-  n_states(pij.size(), n_states_total);
-
-  // generate random seed for generating states
-  unsigned long int max_uint = std::numeric_limits<unsigned long int>::max();
-  unsigned long int rng_seed = Rcpp::sample(max_uint, 1)[0];
-
-  // generate states
-  gmp_randstate_t rng_state;
-  gmp_randinit_default(rng_state);
-  gmp_randseed_ui(rng_state, rng_seed);
-  std::vector<mpz_t> states(n_approx_states);
-  for (std::size_t i = 0; i < n_approx_states; ++i) {
-    mpz_init(states[i]);
-    mpz_urandomm(states[i], rng_state, n_states_total);
-  }
-
   // calculate expected value of management action
   double out = approximate_expected_value_of_management_action(
     solution, pij, alpha, gamma, states);
 
+  // return result
+  return out;
+}
+
+// [[Rcpp::export]]
+double rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(
+  Eigen::MatrixXd &pij,
+  Eigen::VectorXd &pu_costs,
+  Eigen::VectorXd &pu_locked_in,
+  Eigen::VectorXd &alpha,
+  Eigen::VectorXd &gamma,
+  std::size_t n_approx_obj_fun_points,
+  double budget,
+  double gap,
+  std::size_t n_approx_states) {
+
+  // generate states
+  std::vector<mpz_t> states(n_approx_states);
+  sample_k_nth_states(n_approx_states, pij, states);
+
+  // calculate result
+  double out = approximate_expected_value_of_management_decision_given_current_information(
+    pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
+    gap, states);
+
   // clear memory
-  gmp_randclear(rng_state);
-  mpz_clear(n_states_total);
   for (std::size_t i = 0; i < n_approx_states; ++i)
     mpz_clear(states[i]);
+
+  // return result
+  return out;
+}
+
+// [[Rcpp::export]]
+double rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(
+  Eigen::MatrixXd &pij,
+  Eigen::VectorXd &pu_costs,
+  Eigen::VectorXd &pu_locked_in,
+  Eigen::VectorXd &alpha,
+  Eigen::VectorXd &gamma,
+  std::size_t n_approx_obj_fun_points,
+  double budget,
+  double gap,
+  std::vector<std::size_t> states) {
+  // convert state indices from std::size_t to mpz_t
+  const std::size_t n = states.size();
+  std::vector<mpz_t> states2(n);
+  for (std::size_t i = 0; i < n; ++i) {
+    mpz_init(states2[i]);
+    mpz_set_ui(states2[i], states[i]);
+  }
+
+  // calculate result
+  double out = approximate_expected_value_of_management_decision_given_current_information(
+    pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
+    gap, states2);
+
+  // clear memory
+  for (std::size_t i = 0; i < n; ++i)
+    mpz_clear(states2[i]);
 
   // return result
   return out;

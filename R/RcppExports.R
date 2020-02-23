@@ -9,8 +9,12 @@ rcpp_approximate_expected_value_of_management_action <- function(solution, pij, 
     .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_action`, solution, pij, alpha, gamma, states)
 }
 
-rcpp_appproximate_expected_value_of_management_decision_given_current_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
-    .Call(`_surveyvoi_rcpp_appproximate_expected_value_of_management_decision_given_current_information`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
+    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+}
+
+rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states) {
+    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states)
 }
 
 rcpp_approximate_expected_value_of_management_decision_given_perfect_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
