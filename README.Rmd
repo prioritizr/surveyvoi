@@ -1,0 +1,44 @@
+---
+output:
+  rmarkdown::github_document:
+    html_preview: no
+---
+
+<!--- README.md is generated from README.Rmd. Please edit that file -->
+
+# Survey Value of Information
+
+[![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
+```
+
+```{r, include = FALSE}
+devtools::load_all()
+h = 3.5
+w = 3.5
+ow = "400"
+```
+
+TODO OVERVIEW TODO.
+
+## Installation
+
+The latest version of the _surveyvoi R_ package can be installed using the following _R_ code. Note that before you can install this _R_ package, you will first need to install the [Gurobi optimization suite](http://www.gurobi.com/) and [_gurobi R_ package](https://www.gurobi.com/documentation/8.1/refman/r_api_overview.html). For instructions on installing _Gurobi_ software, please refer to [this installation guide](https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html).
+
+```{r, eval = FALSE}
+if (!require(remotes))
+  install.packages("remotes")
+remotes::install_github("jeffreyhanson/surveyvoi")
+```
+
+## Usage
+
+Just don't - it's still early in development and isn't ready yet.
+
+## Citation
+
+```{r, echo = FALSE, result = "asis", comment = ""}
+citation("surveyvoi")
+```
