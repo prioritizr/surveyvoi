@@ -1,13 +1,12 @@
-context("rcpp_approx_expected_value_of_decision_given_current_info")
+context("rcpp_approx_expected_value_of_decision_given_perfect_info")
 
-test_that("expected result (fixed states)", {
+test_that("correct result (fixed states)", {
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
       x = seq_len(3),
       y = x,
-      solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
@@ -23,32 +22,31 @@ test_that("expected result (fixed states)", {
     model_sensitivity = c(0.8, 0.7),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
+  site_data <- site_data[c(1, 2), ]
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
-  states <- c(0, 1, 4, 8, 10)
+  states <- c(0, 1, 5, 10, 20, 23)
   # calculations
-  r1 <-
-    rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
-  r2 <-
-    r_approx_expected_value_of_decision_given_current_info_fixed_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+  r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+  r2 <- r_approx_expected_value_of_decision_given_perfect_info_fixed_states(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
   # tests
   expect_equal(r1, r2)
 })
 
-test_that("expected result (n states)", {
+test_that("correct result (n states)", {
+  # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
       x = seq_len(3),
       y = x,
-      solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
@@ -69,18 +67,16 @@ test_that("expected result (n states)", {
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
-  states <- 5
+  states <- 10
   # calculations
   set.seed(100)
-  r1 <-
-    rcpp_approx_expected_value_of_decision_given_current_info_n_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+  r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
   set.seed(100)
-  r2 <-
-    r_approx_expected_value_of_decision_given_current_info_n_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+  r2 <- r_approx_expected_value_of_decision_given_perfect_info_n_states(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
   # tests
   expect_equal(r1, r2)
 })
@@ -92,7 +88,6 @@ test_that("expected error", {
     tibble::tibble(
       x = seq_len(3),
       y = x,
-      solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
@@ -115,7 +110,7 @@ test_that("expected error", {
     "sensitivity", "specificity", "model_sensitivity")
   # tests
   expect_error({
-    rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
+    rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
       prior_data, site_data$management_cost, site_data$locked_in,
       feature_data$alpha, feature_data$gamma, 1000, 301, 0, 0)
   })

@@ -54,6 +54,10 @@ double approx_expected_value_of_action(
     }
   }
 
+  // check that at least one state had a non-zero value
+  assert_gt_value(k, (std::size_t) 0,
+    "all states have zero value, try increasing argument to n_approx_states");
+
   // create Eigen maps of data
   Eigen::VectorXd value_given_state_occurring2 =
     Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(

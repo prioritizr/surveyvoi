@@ -42,12 +42,6 @@ void assert_valid_probability_data(double x, std::string msg) {
   return;
 }
 
-void assert_equal_value(double x, double y, std::string msg) {
-  if (std::abs(x - y) > 1.0e-15)
-    Rcpp::stop(msg);
-  return;
-}
-
 void extract_k_fold_indices(Rcpp::List &x,
   std::vector<std::vector<std::vector<std::size_t>>> &out) {
   const std::size_t n1 = x.size();

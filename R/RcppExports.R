@@ -17,8 +17,12 @@ rcpp_approx_expected_value_of_decision_given_current_info_fixed_states <- functi
     .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states)
 }
 
-rcpp_approx_expected_value_of_decision_given_perfect_info <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+rcpp_approx_expected_value_of_decision_given_perfect_info_n_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+}
+
+rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states)
 }
 
 rcpp_expected_value_of_action <- function(solution, pij, alpha, gamma) {

@@ -45,9 +45,6 @@ double rcpp_expected_value_of_decision_given_perfect_info(
   mpz_init(i);
   mpz_set_ui(i, 1);
 
-
-  std::size_t g = 1;
-
   // main processing
   while (mpz_cmp(i, n) < 0) {
 
@@ -83,8 +80,6 @@ double rcpp_expected_value_of_decision_given_perfect_info(
         out = log_sum(out, curr_expected_value_given_state);
       }
     }
-
-    ++g;
 
     /// increment loop variable
     mpz_add_ui(i, i, 1);

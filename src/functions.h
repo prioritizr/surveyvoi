@@ -13,7 +13,20 @@ void assert_valid_probability_data(Eigen::MatrixXd&, std::string msg);
 
 void assert_valid_probability_data(double, std::string msg);
 
-void assert_equal_value(double, double, std::string msg);
+template<typename T>
+inline void assert_equal_value(T x, T y, std::string msg) {
+  if (std::abs(x - y) > 1.0e-15)
+    Rcpp::stop(msg);
+  return;
+}
+
+template<typename T>
+inline void assert_gt_value(T x, T y, std::string msg) {
+  if (!(x > y))
+    Rcpp::stop(msg);
+  return;
+}
+
 
 void extract_k_fold_indices(Rcpp::List&,
   std::vector<std::vector<std::vector<std::size_t>>>&);
