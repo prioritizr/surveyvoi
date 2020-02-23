@@ -17,9 +17,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_approximate_expected_value_of_management_action
-double rcpp_approximate_expected_value_of_management_action(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma, std::vector<std::size_t> states);
-RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_action(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP statesSEXP) {
+// rcpp_approx_expected_value_of_action
+double rcpp_approx_expected_value_of_action(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma, std::vector<std::size_t> states);
+RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_action(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP statesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -28,13 +28,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type gamma(gammaSEXP);
     Rcpp::traits::input_parameter< std::vector<std::size_t> >::type states(statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_management_action(solution, pij, alpha, gamma, states));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_action(solution, pij, alpha, gamma, states));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states
-double rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, std::size_t n_approx_states);
-RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP n_approx_statesSEXP) {
+// rcpp_approx_expected_value_of_decision_given_current_info_n_states
+double rcpp_approx_expected_value_of_decision_given_current_info_n_states(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, std::size_t n_approx_states);
+RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP n_approx_statesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -47,13 +47,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type budget(budgetSEXP);
     Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
     Rcpp::traits::input_parameter< std::size_t >::type n_approx_states(n_approx_statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_decision_given_current_info_n_states(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states
-double rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, std::vector<std::size_t> states);
-RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP statesSEXP) {
+// rcpp_approx_expected_value_of_decision_given_current_info_fixed_states
+double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, std::vector<std::size_t> states);
+RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP statesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -66,13 +66,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type budget(budgetSEXP);
     Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
     Rcpp::traits::input_parameter< std::vector<std::size_t> >::type states(statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_approximate_expected_value_of_management_decision_given_perfect_information
-double rcpp_approximate_expected_value_of_management_decision_given_perfect_information(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, const std::size_t n_approx_states);
-RcppExport SEXP _surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_perfect_information(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP n_approx_statesSEXP) {
+// rcpp_approx_expected_value_of_decision_given_perfect_info
+double rcpp_approx_expected_value_of_decision_given_perfect_info(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap, const std::size_t n_approx_states);
+RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP, SEXP n_approx_statesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -85,13 +85,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type budget(budgetSEXP);
     Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
     Rcpp::traits::input_parameter< const std::size_t >::type n_approx_states(n_approx_statesSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approximate_expected_value_of_management_decision_given_perfect_information(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_decision_given_perfect_info(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_expected_value_of_management_action
-double rcpp_expected_value_of_management_action(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma);
-RcppExport SEXP _surveyvoi_rcpp_expected_value_of_management_action(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP) {
+// rcpp_expected_value_of_action
+double rcpp_expected_value_of_action(std::vector<bool> solution, Eigen::MatrixXd pij, Eigen::VectorXd alpha, Eigen::VectorXd gamma);
+RcppExport SEXP _surveyvoi_rcpp_expected_value_of_action(SEXP solutionSEXP, SEXP pijSEXP, SEXP alphaSEXP, SEXP gammaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -99,13 +99,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type pij(pijSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type gamma(gammaSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_management_action(solution, pij, alpha, gamma));
+    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_action(solution, pij, alpha, gamma));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_expected_value_of_management_decision_given_current_information
-double rcpp_expected_value_of_management_decision_given_current_information(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap);
-RcppExport SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_current_information(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP) {
+// rcpp_expected_value_of_decision_given_current_info
+double rcpp_expected_value_of_decision_given_current_info(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap);
+RcppExport SEXP _surveyvoi_rcpp_expected_value_of_decision_given_current_info(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -117,13 +117,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::size_t >::type n_approx_obj_fun_points(n_approx_obj_fun_pointsSEXP);
     Rcpp::traits::input_parameter< double >::type budget(budgetSEXP);
     Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_management_decision_given_current_information(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap));
+    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_decision_given_current_info(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap));
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_expected_value_of_management_decision_given_perfect_information
-double rcpp_expected_value_of_management_decision_given_perfect_information(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap);
-RcppExport SEXP _surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP) {
+// rcpp_expected_value_of_decision_given_perfect_info
+double rcpp_expected_value_of_decision_given_perfect_info(Eigen::MatrixXd& pij, Eigen::VectorXd& pu_costs, Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& alpha, Eigen::VectorXd& gamma, std::size_t n_approx_obj_fun_points, double budget, double gap);
+RcppExport SEXP _surveyvoi_rcpp_expected_value_of_decision_given_perfect_info(SEXP pijSEXP, SEXP pu_costsSEXP, SEXP pu_locked_inSEXP, SEXP alphaSEXP, SEXP gammaSEXP, SEXP n_approx_obj_fun_pointsSEXP, SEXP budgetSEXP, SEXP gapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -135,7 +135,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::size_t >::type n_approx_obj_fun_points(n_approx_obj_fun_pointsSEXP);
     Rcpp::traits::input_parameter< double >::type budget(budgetSEXP);
     Rcpp::traits::input_parameter< double >::type gap(gapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_management_decision_given_perfect_information(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap));
+    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_decision_given_perfect_info(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap));
     return rcpp_result_gen;
 END_RCPP
 }

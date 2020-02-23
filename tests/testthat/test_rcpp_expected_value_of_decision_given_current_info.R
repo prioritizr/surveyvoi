@@ -1,4 +1,4 @@
-context("rcpp_expected_value_of_management_decision_given_current_information")
+context("rcpp_expected_value_of_decision_given_current_info")
 
 test_that("correct result", {
   # data
@@ -28,10 +28,10 @@ test_that("correct result", {
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
   # calculations
-  r1 <- rcpp_expected_value_of_management_decision_given_current_information(
+  r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$alpha, feature_data$gamma, 1000, 301, 0)
-  r2 <- r_expected_value_of_management_decision_given_current_information(
+  r2 <- r_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$alpha, feature_data$gamma, 1000, 301, 0)
   # tests

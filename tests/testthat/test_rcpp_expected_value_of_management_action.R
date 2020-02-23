@@ -1,4 +1,4 @@
-context("rcpp_expected_value_of_management_action")
+context("rcpp_expected_value_of_action")
 
 test_that("correct result", {
   # data
@@ -26,9 +26,9 @@ test_that("correct result", {
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
   # calculations
-  r1 <- rcpp_expected_value_of_management_action(
+  r1 <- rcpp_expected_value_of_action(
     site_data$solution, prior_data, feature_data$alpha, feature_data$gamma)
-  r2 <- r_expected_value_of_management_action(
+  r2 <- r_expected_value_of_action(
     site_data$solution, prior_data, feature_data$alpha, feature_data$gamma)
   # tests
   expect_equal(r1, r2)

@@ -1,4 +1,4 @@
-r_approximate_expected_value_of_management_action <- function(
+r_approx_expected_value_of_action <- function(
   solution, prior_data, alpha, gamma, states) {
   # initialization
   sub_prior_data <- prior_data[, solution, drop = FALSE]
@@ -17,7 +17,7 @@ r_approximate_expected_value_of_management_action <- function(
   exp(rcpp_log_sum(colSums(out)))
 }
 
-r_approximate_expected_value_of_management_decision_given_current_information_fixed_states <- function(
+r_approx_expected_value_of_decision_given_current_info_fixed_states <- function(
   prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
   budget, gap, states) {
   # find optimal solution
@@ -25,11 +25,11 @@ r_approximate_expected_value_of_management_decision_given_current_information_fi
     prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
     budget, gap, "")$x
   # calculate expected value
-  r_approximate_expected_value_of_management_action(solution, prior_data,
+  r_approx_expected_value_of_action(solution, prior_data,
     alpha, gamma, states)
 }
 
-r_approximate_expected_value_of_management_decision_given_current_information_n_states <- function(
+r_approx_expected_value_of_decision_given_current_info_n_states <- function(
   prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
   budget, gap, n) {
   # find optimal solution
@@ -37,6 +37,6 @@ r_approximate_expected_value_of_management_decision_given_current_information_n_
     prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
     budget, gap, "")$x
   # calculate expected value
-  r_approximate_expected_value_of_management_action(solution, prior_data,
+  r_approx_expected_value_of_action(solution, prior_data,
     alpha, gamma, rcpp_sample_k_nth_states(n, prior_data))
 }

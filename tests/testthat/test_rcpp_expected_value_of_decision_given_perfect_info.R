@@ -1,13 +1,12 @@
-context("rcpp_approximate_expected_value_of_management_decision_given_current_information")
+context("rcpp_expected_value_of_decision_given_perfect_info")
 
-test_that("expected result (fixed states)", {
+test_that("correct result", {
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
       x = seq_len(3),
       y = x,
-      solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
@@ -23,32 +22,30 @@ test_that("expected result (fixed states)", {
     model_sensitivity = c(0.8, 0.7),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
+  site_data <- site_data[c(1, 2), ]
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
-  states <- c(0, 1, 4, 8, 10)
   # calculations
-  r1 <-
-    rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
-  r2 <-
-    r_approximate_expected_value_of_management_decision_given_current_information_fixed_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+  r1 <- rcpp_expected_value_of_decision_given_perfect_info(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0)
+  r2 <- r_expected_value_of_decision_given_perfect_info(
+    prior_data, site_data$management_cost, site_data$locked_in,
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0)
   # tests
   expect_equal(r1, r2)
 })
 
-test_that("expected result (n states)", {
+test_that("consistent results", {
+  # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
       x = seq_len(3),
       y = x,
-      solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
@@ -64,23 +61,23 @@ test_that("expected result (n states)", {
     model_sensitivity = c(0.8, 0.7),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
+  site_data <- site_data[c(1, 2), ]
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
-  states <- 5
   # calculations
-  set.seed(100)
-  r1 <-
-    rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(
+  r1 <- sapply(seq_len(50), function(i) {
+    rcpp_expected_value_of_decision_given_perfect_info(
       prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
-  set.seed(100)
-  r2 <-
-    r_approximate_expected_value_of_management_decision_given_current_information_n_states(
+      feature_data$alpha, feature_data$gamma, 1000, 301, 0)
+  })
+  r2 <- sapply(seq_len(50), function(i) {
+    r_expected_value_of_decision_given_perfect_info(
       prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+      feature_data$alpha, feature_data$gamma, 1000, 301, 0)
+  })
   # tests
-  expect_equal(r1, r2)
+  expect_length(unique(c(r1, r2)), 1)
 })

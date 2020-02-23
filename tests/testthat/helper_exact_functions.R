@@ -1,4 +1,4 @@
-r_expected_value_of_management_action <- function(
+r_expected_value_of_action <- function(
   solution, prior_data, alpha, gamma) {
   # initialization
   sub_prior_data <- prior_data[, solution, drop = FALSE]
@@ -15,7 +15,7 @@ r_expected_value_of_management_action <- function(
   sum(out)
 }
 
-r_expected_value_of_management_decision_given_current_information <- function(
+r_expected_value_of_decision_given_current_info <- function(
   prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
   budget, gap) {
   # find optimal solution
@@ -23,10 +23,10 @@ r_expected_value_of_management_decision_given_current_information <- function(
     prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
     budget, gap, "")$x
   # calculate expected value
-  r_expected_value_of_management_action(solution, prior_data, alpha, gamma)
+  r_expected_value_of_action(solution, prior_data, alpha, gamma)
 }
 
-r_expected_value_of_management_decision_given_perfect_information <- function(
+r_expected_value_of_decision_given_perfect_info <- function(
   prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
   budget, gap) {
   # calculate log of prior data

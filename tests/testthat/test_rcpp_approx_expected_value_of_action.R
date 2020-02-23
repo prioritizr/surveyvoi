@@ -1,4 +1,4 @@
-context("rcpp_approximate_expected_value_of_management_action")
+context("rcpp_approx_expected_value_of_action")
 
 test_that("expected result", {
   # data
@@ -27,10 +27,10 @@ test_that("expected result", {
     "sensitivity", "specificity", "model_sensitivity")
   states <- c(0, 1, 4, 8, 10)
   # calculations
-  r1 <- rcpp_approximate_expected_value_of_management_action(
+  r1 <- rcpp_approx_expected_value_of_action(
     site_data$solution, prior_data, feature_data$alpha, feature_data$gamma,
     states)
-  r2 <- r_approximate_expected_value_of_management_action(
+  r2 <- r_approx_expected_value_of_action(
     site_data$solution, prior_data, feature_data$alpha, feature_data$gamma,
     states)
   # tests
@@ -65,12 +65,12 @@ test_that("consistent result", {
   states <- c(0, 1, 4, 8, 10)
   # calculations
   r1 <- sapply(seq_len(50), function(x) {
-    rcpp_approximate_expected_value_of_management_action(
+    rcpp_approx_expected_value_of_action(
       site_data$solution, prior_data, feature_data$alpha, feature_data$gamma,
       states)
   })
   r2 <- sapply(seq_len(50), function(x) {
-    r_approximate_expected_value_of_management_action(
+    r_approx_expected_value_of_action(
       site_data$solution, prior_data, feature_data$alpha, feature_data$gamma,
       states)
   })

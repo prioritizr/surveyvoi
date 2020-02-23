@@ -5,32 +5,32 @@ rcpp_log_sum <- function(x) {
     .Call(`_surveyvoi_rcpp_log_sum`, x)
 }
 
-rcpp_approximate_expected_value_of_management_action <- function(solution, pij, alpha, gamma, states) {
-    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_action`, solution, pij, alpha, gamma, states)
+rcpp_approx_expected_value_of_action <- function(solution, pij, alpha, gamma, states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_action`, solution, pij, alpha, gamma, states)
 }
 
-rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
-    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+rcpp_approx_expected_value_of_decision_given_current_info_n_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
 }
 
-rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states) {
-    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states)
+rcpp_approx_expected_value_of_decision_given_current_info_fixed_states <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, states)
 }
 
-rcpp_approximate_expected_value_of_management_decision_given_perfect_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
-    .Call(`_surveyvoi_rcpp_approximate_expected_value_of_management_decision_given_perfect_information`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
+rcpp_approx_expected_value_of_decision_given_perfect_info <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, n_approx_states)
 }
 
-rcpp_expected_value_of_management_action <- function(solution, pij, alpha, gamma) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_management_action`, solution, pij, alpha, gamma)
+rcpp_expected_value_of_action <- function(solution, pij, alpha, gamma) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_action`, solution, pij, alpha, gamma)
 }
 
-rcpp_expected_value_of_management_decision_given_current_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_management_decision_given_current_information`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap)
+rcpp_expected_value_of_decision_given_current_info <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_current_info`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap)
 }
 
-rcpp_expected_value_of_management_decision_given_perfect_information <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_management_decision_given_perfect_information`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap)
+rcpp_expected_value_of_decision_given_perfect_info <- function(pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_perfect_info`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap)
 }
 
 rcpp_feasible_actions_ilp_matrix <- function(x) {

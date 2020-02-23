@@ -5,7 +5,7 @@
 #include "rcpp_prioritization.h"
 
 // [[Rcpp::export]]
-double rcpp_expected_value_of_management_decision_given_perfect_information(
+double rcpp_expected_value_of_decision_given_perfect_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,

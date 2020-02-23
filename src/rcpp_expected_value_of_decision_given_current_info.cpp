@@ -3,10 +3,10 @@
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
-#include "rcpp_expected_value_of_management_action.h"
+#include "rcpp_expected_value_of_action.h"
 
 // [[Rcpp::export]]
-double rcpp_expected_value_of_management_decision_given_current_information(
+double rcpp_expected_value_of_decision_given_current_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -28,5 +28,5 @@ double rcpp_expected_value_of_management_decision_given_current_information(
   pij.array() = pij.array().log();
 
   // calculate expected value of management action
-  return expected_value_of_management_action(solution, pij, alpha, gamma);
+  return expected_value_of_action(solution, pij, alpha, gamma);
 }

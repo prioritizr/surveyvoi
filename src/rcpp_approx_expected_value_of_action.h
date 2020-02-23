@@ -1,12 +1,12 @@
-#ifndef EXPECTED_VALUE_OF_MANAGEMENT_ACTION_H
-#define EXPECTED_VALUE_OF_MANAGEMENT_ACTION_H
+#ifndef APPROX_EXPECTED_VALUE_OF_ACTION_H
+#define APPROX_EXPECTED_VALUE_OF_ACTION_H
 
 #include "package.h"
 #include "functions.h"
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
 
-double approximate_expected_value_of_management_action(
+double approx_expected_value_of_action(
   std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&,
   std::vector<mpz_t>&);
 

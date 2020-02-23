@@ -1,6 +1,6 @@
-#include "rcpp_expected_value_of_management_action.h"
+#include "rcpp_expected_value_of_action.h"
 
-double expected_value_of_management_action(
+double expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::VectorXd &alpha,
@@ -80,7 +80,7 @@ double expected_value_of_management_action(
 
 
 // [[Rcpp::export]]
-double rcpp_expected_value_of_management_action(
+double rcpp_expected_value_of_action(
   std::vector<bool> solution,
   Eigen::MatrixXd pij,
   Eigen::VectorXd alpha,
@@ -88,5 +88,5 @@ double rcpp_expected_value_of_management_action(
   // calculate log pij
   pij.array() = pij.array().log();
   // return result
-  return expected_value_of_management_action(solution, pij, alpha, gamma);
+  return expected_value_of_action(solution, pij, alpha, gamma);
 }

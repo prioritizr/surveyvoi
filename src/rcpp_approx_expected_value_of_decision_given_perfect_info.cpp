@@ -3,10 +3,10 @@
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
-#include "rcpp_approximate_expected_value_of_management_action.h"
+#include "rcpp_approx_expected_value_of_action.h"
 
 // [[Rcpp::export]]
-double rcpp_approximate_expected_value_of_management_decision_given_perfect_information(
+double rcpp_approx_expected_value_of_decision_given_perfect_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,

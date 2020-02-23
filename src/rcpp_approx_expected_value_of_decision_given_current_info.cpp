@@ -3,9 +3,9 @@
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
-#include "rcpp_approximate_expected_value_of_management_action.h"
+#include "rcpp_approx_expected_value_of_action.h"
 
-double approximate_expected_value_of_management_decision_given_current_information(
+double approx_expected_value_of_decision_given_current_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -27,7 +27,7 @@ double approximate_expected_value_of_management_decision_given_current_informati
   pij.array() = pij.array().log();
 
   // calculate expected value of management action
-  double out = approximate_expected_value_of_management_action(
+  double out = approx_expected_value_of_action(
     solution, pij, alpha, gamma, states);
 
   // return result
@@ -35,7 +35,7 @@ double approximate_expected_value_of_management_decision_given_current_informati
 }
 
 // [[Rcpp::export]]
-double rcpp_approximate_expected_value_of_management_decision_given_current_information_n_states(
+double rcpp_approx_expected_value_of_decision_given_current_info_n_states(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -51,7 +51,7 @@ double rcpp_approximate_expected_value_of_management_decision_given_current_info
   sample_k_nth_states(n_approx_states, pij, states);
 
   // calculate result
-  double out = approximate_expected_value_of_management_decision_given_current_information(
+  double out = approx_expected_value_of_decision_given_current_info(
     pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
     gap, states);
 
@@ -64,7 +64,7 @@ double rcpp_approximate_expected_value_of_management_decision_given_current_info
 }
 
 // [[Rcpp::export]]
-double rcpp_approximate_expected_value_of_management_decision_given_current_information_fixed_states(
+double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -83,7 +83,7 @@ double rcpp_approximate_expected_value_of_management_decision_given_current_info
   }
 
   // calculate result
-  double out = approximate_expected_value_of_management_decision_given_current_information(
+  double out = approx_expected_value_of_decision_given_current_info(
     pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
     gap, states2);
 

@@ -1,6 +1,6 @@
-#include "rcpp_approximate_expected_value_of_management_action.h"
+#include "rcpp_approx_expected_value_of_action.h"
 
-double approximate_expected_value_of_management_action(
+double approx_expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::VectorXd &alpha,
@@ -75,7 +75,7 @@ double approximate_expected_value_of_management_action(
 }
 
 // [[Rcpp::export]]
-double rcpp_approximate_expected_value_of_management_action(
+double rcpp_approx_expected_value_of_action(
   std::vector<bool> solution,
   Eigen::MatrixXd pij,
   Eigen::VectorXd alpha,
@@ -93,7 +93,7 @@ double rcpp_approximate_expected_value_of_management_action(
   }
 
   // calculate result
-  double out = approximate_expected_value_of_management_action(
+  double out = approx_expected_value_of_action(
     solution, pij, alpha, gamma, states2);
 
   // clear memory
