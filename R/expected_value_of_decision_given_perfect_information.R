@@ -276,7 +276,7 @@ expected_value_of_decision_given_perfect_information <- function(
     all(feature_data[[feature_gamma_column]] >= 0),
     ## total_budget
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
-    isTRUE(total_budget >= 0),
+    isTRUE(total_budget > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
     ## n_approx_obj_fun_points
