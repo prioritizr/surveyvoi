@@ -18,7 +18,10 @@ void which_state_sparse(Eigen::MatrixXd&, std::vector<std::size_t>&, mpz_t);
 
 std::size_t which_state_sparse(Eigen::MatrixXd&, std::vector<std::size_t>&);
 
-void sample_k_nth_states(
+void sample_k_weighted_nth_states(
+  std::size_t, Eigen::MatrixXd&, std::vector<mpz_t>&);
+
+void sample_k_uniform_nth_states(
   std::size_t, Eigen::MatrixXd&, std::vector<mpz_t>&);
 
 void which_feature_state(

@@ -154,7 +154,7 @@ std::size_t which_state_sparse(
   return out;
 }
 
-void sample_k_nth_states(
+void sample_k_weighted_nth_states(
   std::size_t k, Eigen::MatrixXd &pij, std::vector<mpz_t> &out) {
   // init
   const std::size_t n_v = pij.size();
@@ -168,6 +168,27 @@ void sample_k_nth_states(
     mpz_init(out[i]);
     which_state(states, out[i]);
   }
+  // return void
+  return;
+}
+
+void sample_k_uniform_nth_states(
+  std::size_t k, Eigen::MatrixXd &pij, std::vector<mpz_t> &out) {
+  // init
+  std::size_t seed = static_cast<std::size_t>(Rcpp::sample(1e+6, 1, true)[0]);
+  mpz_t n;
+  mpz_init(n);
+  n_states(pij.size(), n);
+  mpz_add_ui(n, n, 1);
+  gmp_randstate_t rng;
+  gmp_randinit_default(rng);
+  gmp_randseed_ui(rng, seed);
+  // main
+  for (std::size_t i = 0; i < k; ++i)
+    mpz_urandomm(out[i], rng, n);
+  // clean up
+  mpz_clear(n);
+  gmp_randclear(rng);
   // return void
   return;
 }
@@ -251,7 +272,7 @@ std::size_t rcpp_which_state(Eigen::MatrixXd matrix) {
 }
 
 // [[Rcpp::export]]
-std::vector<std::size_t> rcpp_sample_k_nth_states(
+std::vector<std::size_t> rcpp_sample_k_weighted_nth_states(
   std::size_t k, Eigen::MatrixXd &pij) {
   // init
   std::vector<mpz_t> s(k);
@@ -259,7 +280,27 @@ std::vector<std::size_t> rcpp_sample_k_nth_states(
   for (std::size_t i = 0; i < k; ++i)
     mpz_init(s[i]);
   // generate states
-  sample_k_nth_states(k, pij, s);
+  sample_k_weighted_nth_states(k, pij, s);
+  // extract values
+  for (std::size_t i = 0; i < k; ++i)
+    o[i] = mpz_get_ui(s[i]);
+  // clean up
+  for (std::size_t i = 0; i < k; ++i)
+    mpz_clear(s[i]);
+  // return result
+  return o;
+}
+
+// [[Rcpp::export]]
+std::vector<std::size_t> rcpp_sample_k_uniform_nth_states(
+  std::size_t k, Eigen::MatrixXd &pij) {
+  // init
+  std::vector<mpz_t> s(k);
+  std::vector<std::size_t> o(k);
+  for (std::size_t i = 0; i < k; ++i)
+    mpz_init(s[i]);
+  // generate states
+  sample_k_uniform_nth_states(k, pij, s);
   // extract values
   for (std::size_t i = 0; i < k; ++i)
     o[i] = mpz_get_ui(s[i]);

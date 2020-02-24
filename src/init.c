@@ -26,7 +26,8 @@ extern SEXP _surveyvoi_rcpp_pmedian_constraint_matrix(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_prioritization(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_probability_of_outcome(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_probability_of_state(SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_sample_k_nth_states(SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_sample_k_uniform_nth_states(SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_sample_k_weighted_nth_states(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_negative_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_positive_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_which_state(SEXP);
@@ -52,7 +53,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_prioritization",                                                    (DL_FUNC) &_surveyvoi_rcpp_prioritization,                                                    9},
     {"_surveyvoi_rcpp_probability_of_outcome",                                            (DL_FUNC) &_surveyvoi_rcpp_probability_of_outcome,                                            4},
     {"_surveyvoi_rcpp_probability_of_state",                                              (DL_FUNC) &_surveyvoi_rcpp_probability_of_state,                                              2},
-    {"_surveyvoi_rcpp_sample_k_nth_states",                                               (DL_FUNC) &_surveyvoi_rcpp_sample_k_nth_states,                                               2},
+    {"_surveyvoi_rcpp_sample_k_uniform_nth_states",                                       (DL_FUNC) &_surveyvoi_rcpp_sample_k_uniform_nth_states,                                       2},
+    {"_surveyvoi_rcpp_sample_k_weighted_nth_states",                                      (DL_FUNC) &_surveyvoi_rcpp_sample_k_weighted_nth_states,                                      2},
     {"_surveyvoi_rcpp_total_probability_of_negative_result",                              (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_negative_result,                              3},
     {"_surveyvoi_rcpp_total_probability_of_positive_result",                              (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_positive_result,                              3},
     {"_surveyvoi_rcpp_which_state",                                                       (DL_FUNC) &_surveyvoi_rcpp_which_state,                                                       1},

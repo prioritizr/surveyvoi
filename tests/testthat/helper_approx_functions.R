@@ -39,7 +39,7 @@ r_approx_expected_value_of_decision_given_current_info_n_states <- function(
     budget, gap, "")$x
   # calculate expected value
   r_approx_expected_value_of_action(solution, prior_data,
-    alpha, gamma, rcpp_sample_k_nth_states(n, prior_data))
+    alpha, gamma, rcpp_sample_k_uniform_nth_states(n, prior_data))
 }
 
 r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
@@ -70,5 +70,5 @@ r_approx_expected_value_of_decision_given_perfect_info_n_states <- function(
   budget, gap, n) {
   r_approx_expected_value_of_decision_given_perfect_info_fixed_states(
     prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
-    budget, gap, rcpp_sample_k_nth_states(n, prior_data))
+    budget, gap, rcpp_sample_k_uniform_nth_states(n, prior_data))
 }

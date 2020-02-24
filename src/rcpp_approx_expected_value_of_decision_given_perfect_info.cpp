@@ -109,7 +109,7 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(
 
   // generate states
   std::vector<mpz_t> states(n_approx_states);
-  sample_k_nth_states(n_approx_states, pij, states);
+  sample_k_uniform_nth_states(n_approx_states, pij, states);
 
   // calculate result
   double out = approx_expected_value_of_decision_given_perfect_info(
