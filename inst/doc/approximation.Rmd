@@ -161,7 +161,7 @@ ev_current <- expected_value_of_decision_given_current_information(
 # estimate the correct value of the decision given current information using
 # approximation methods
 ev_prime_current <-
-  expand.grid(n = n_approx_states, replicate = seq_len(5)) %>%
+  expand.grid(n = n_approx_states, replicate = seq_len(50)) %>%
   mutate(seed = sample.int(1e+8, nrow(.))) %>%
   plyr::ddply(c("n", "replicate"), function(x) {
     data.frame(value =
@@ -183,18 +183,85 @@ ev_prime_current <-
   as_tibble()
 
 # preview results
+print(ev_current)
 print(ev_prime_current)
 ```
 
-Now let's create a plot to visualize the results. In this plot, points correspond to estimates calculated used the approximate method. Also the line shows the correct value calculated using the exact method. We can see that, on average, the points get closer to the line at greater values on the x-axis. This confirms that the approximation method is more accurate when we use a greater proportion of number of states for the calculations. Indeed, the approximation method is roughly equal to the exact method when using a large number of states for the calculations.
+In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.
 
-```{r, fig.height = h, fig.width = w * 1.5}
-# plot results
-ggplot(ev_prime_current) +
-geom_jitter(aes(x = n, y = value), height = 0) +
-geom_hline(yintercept = ev_current, colour = "#3366FF") +
-xlab("Number of states used in approximation calculations") +
-ylab("Expected value")
+```{r}
+# calculate the correct value of the decision given current information using
+# exact methods
+ev_certainty <- expected_value_of_decision_given_perfect_information(
+  site_data = site_data,
+  feature_data = feature_data,
+  site_occupancy_columns = "f1",
+  site_probability_columns = "p1",
+  site_management_cost_column = "management_cost",
+  feature_survey_sensitivity_column = "survey_sensitivity",
+  feature_survey_specificity_column = "survey_specificity",
+  feature_model_sensitivity_column = "model_sensitivity",
+  feature_alpha_column = "alpha",
+  feature_gamma_column = "gamma",
+  total_budget = total_budget)
+
+# estimate the correct value of the decision given current information using
+# approximation methods
+ev_prime_certainty <-
+  expand.grid(n = n_approx_states, replicate = seq_len(50)) %>%
+  mutate(seed = sample.int(1e+8, nrow(.))) %>%
+  plyr::ddply(c("n", "replicate"), function(x) {
+    data.frame(value =
+      expected_value_of_decision_given_perfect_information(
+        site_data = site_data,
+        feature_data = feature_data,
+        site_occupancy_columns = "f1",
+        site_probability_columns = "p1",
+        site_management_cost_column = "management_cost",
+        feature_survey_sensitivity_column = "survey_sensitivity",
+        feature_survey_specificity_column = "survey_specificity",
+        feature_model_sensitivity_column = "model_sensitivity",
+        feature_alpha_column = "alpha",
+        feature_gamma_column = "gamma",
+        total_budget = total_budget,
+        n_approx_states = x$n,
+        seed = x$seed))
+  }) %>%
+  as_tibble()
+
+# preview results
+print(ev_certainty)
+print(ev_prime_certainty)
 ```
+
+Now let's create a plot to visualize the results. This plot has two panels. The top panel corresponds to the _expected value of the decision given current information_ and the bottom panel corresponds to the _expected value of the decision given perfect information_, Within each plot, points correspond to estimates from the approximate method and the lines show the correct value calculated using the exact methods.
+
+```{r, fig.height = h * 2, fig.width = w * 1.5}
+# prepare data for plotting
+point_data <-
+  ev_prime_current %>%
+  mutate(metric = "expected value of decision given current information") %>%
+  bind_rows(ev_prime_certainty %>%
+            mutate(metric = paste("expected value of decision given",
+                                  "perfect information"))) %>%
+  mutate(n2 = as.character(n))
+line_data <- tibble(
+  metric = c("expected value of decision given current information",
+             "expected value of decision given perfect information"),
+  yint = c(ev_current, ev_certainty))
+
+# create plot
+ggplot() +
+geom_boxplot(aes(x = n, y = value, group = n2), point_data,
+             width = abs(diff(range(n_approx_states))) * 0.05) +
+geom_hline(aes(yintercept = yint), line_data, colour = "#3366FF") +
+facet_wrap(~ metric, ncol = 1, scales = "free_y") +
+xlab("Number of states used in approximation calculations") +
+ylab("Expected value") +
+theme(strip.background = element_rect(color = "black", fill = "black"),
+      strip.text = element_text(color = "white", size = 12))
+```
+
+We can see that, on average, the points get closer to the line at greater values on the x-axis. This demonstrates that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.
 
 ## References
