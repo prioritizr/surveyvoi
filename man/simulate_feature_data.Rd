@@ -22,11 +22,14 @@ data:
 \item{\code{survey}}{\code{logical} (\code{TRUE} / \code{FALSE}) values
   indicating if each feature should be examined in surveys or not.}
 
-\item{\code{sensitivity}}{\code{numeric} sensitivity (true positive rate)
-  of the survey methodology for each features.}
+\item{\code{survey_sensitivity}}{\code{numeric} sensitivity (true positive
+  rate) of the survey methodology for each features.}
 
-\item{\code{specificity}}{\code{numeric} specificity (true absence rate)
-  of the survey methodology for each features.}
+\item{\code{survey_specificity}}{\code{numeric} specificity (true negative
+  rate) of the survey methodology for each features.}
+
+\item{\code{model_sensitivity}}{\code{numeric} specificity (true positive
+  rate) of the occupancy models for each features.}
 
 \item{\code{alpha}}{\code{numeric} values used to parametrize
   the conservation benefit of managing of each feature.}

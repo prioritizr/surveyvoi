@@ -254,15 +254,59 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
 <span class='co'># identify suitable tuning parameters for each feature,</span>
 <span class='co'># note that we use 10 iterations here so that the example finishes quickly,</span>
 <span class='co'># you would probably want something like 1000+</span>
-<span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>tune_occupancy_models</span>(
+<span class='no'>parameters</span> <span class='kw'>&lt;-</span> <span class='fu'>tune_occupancy_models</span>(
    <span class='no'>x</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/paste'>paste0</a></span>(<span class='st'>"f"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_len</a></span>(<span class='fl'>2</span>)), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/paste'>paste0</a></span>(<span class='st'>"e"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_len</a></span>(<span class='fl'>3</span>)),
    <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10</span>,
    <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>parameters</span> <span class='kw'>=</span> <span class='no'>all_parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
-<span class='co'># print best found parameters</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>parameters</span>)</div><div class='output co'>#&gt; NULL</div><div class='input'>
-<span class='co'># print performance of models generated using best found parameters</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>parameters</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; <span class='error'>Error in print(parameters$performance): object 'parameters' not found</span></div></pre>
+<span class='co'># print best found parameters for each feature</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>parameters</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; [[1]]$max_depth
+#&gt; [1] 5
+#&gt; 
+#&gt; [[1]]$eta
+#&gt; [1] 0.4
+#&gt; 
+#&gt; [[1]]$nrounds
+#&gt; [1] 200
+#&gt; 
+#&gt; [[1]]$lambda
+#&gt; [1] 0.1
+#&gt; 
+#&gt; [[1]]$subsample
+#&gt; [1] 0.9
+#&gt; 
+#&gt; [[1]]$colsample_bytree
+#&gt; [1] 1
+#&gt; 
+#&gt; [[1]]$objective
+#&gt; [1] "binary:logistic"
+#&gt; 
+#&gt; 
+#&gt; [[2]]
+#&gt; [[2]]$max_depth
+#&gt; [1] 10
+#&gt; 
+#&gt; [[2]]$eta
+#&gt; [1] 0.2
+#&gt; 
+#&gt; [[2]]$nrounds
+#&gt; [1] 300
+#&gt; 
+#&gt; [[2]]$lambda
+#&gt; [1] 0.1
+#&gt; 
+#&gt; [[2]]$subsample
+#&gt; [1] 0.5
+#&gt; 
+#&gt; [[2]]$colsample_bytree
+#&gt; [1] 1
+#&gt; 
+#&gt; [[2]]$objective
+#&gt; [1] "binary:logistic"
+#&gt; 
+#&gt; </div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

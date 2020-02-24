@@ -43,10 +43,17 @@
 #'                                 prop = 0.5)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #'
-#' # calculate prior probability matrix
-#' prior_probability_matrix(site_data, feature_data, c("f1", "f2"),
-#'                          c("p1", "p2"), "sensitivity", "specificity")
+#' # preview simulated data
+#' print(site_data)
+#' print(feature_data)
 #'
+#' # calculate prior probability matrix
+#' prior_matrix <- prior_probability_matrix(
+#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   "survey_sensitivity", "survey_specificity", "model_sensitivity")
+#'
+#' # preview prior probability matrix
+#' print(prior_matrix)
 #' @export
 prior_probability_matrix <- function(
   site_data, feature_data, site_occupancy_columns, site_probability_columns,

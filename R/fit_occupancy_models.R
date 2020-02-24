@@ -38,9 +38,10 @@ NULL
 #'  \item{performance}{\code{\link[tibble]{tibble}} with model information.
 #'    Each row corresponds to a different feature and column contain
 #'    different information. Specifically, the columns contain:
-#'    (\code{sensitivity}) model sensitivities,
-#'    (\code{specificity}) model specificities, and
-#'    (\code{auc}) model area under the curve (AUC) statistics.}
+#'    (\code{name}) \code{character} name of the features,
+#'    (\code{sensitivity}) \code{numeric} model sensitivities,
+#'    (\code{specificity}) \code{numeric} model specificities, and
+#'    (\code{auc}) \code{numeric} model area under the curve (AUC) statistics.}
 #'  }
 #'
 #' @examples
@@ -55,11 +56,14 @@ NULL
 #'                    list(nrounds = 5, objective = "binary:logistic"))
 #'
 #' # fit models
-#' p <- fit_occupancy_models(x, c("f1", "f2"), c("e1", "e2", "e3"),
+#' m <- fit_occupancy_models(x, c("f1", "f2"), c("e1", "e2", "e3"),
 #'                           xgb_params)
 #'
-#' # preview results
-#' str(p)
+#' # preview models predictions
+#' print(m$predictions)
+#'
+#' # preview models performance
+#' print(m$performance)
 #'
 #' @export
 fit_occupancy_models <- function(
@@ -150,8 +154,9 @@ fit_occupancy_models <- function(
   # return results
   pij <- vapply(m, `[[`, numeric(nrow(site_data)), "predictions")
   colnames(pij) <- site_occupancy_columns
-  list(predictions = tibble::as_tibble(pij),
-       performance = tibble::as_tibble(plyr::ldply(m, `[[`, "performance")))
+  perf <- tibble::as_tibble(plyr::ldply(m, `[[`, "performance"))
+  perf$name <- site_occupancy_columns
+  list(predictions = tibble::as_tibble(pij), performance = perf)
 }
 
 #' @noRd

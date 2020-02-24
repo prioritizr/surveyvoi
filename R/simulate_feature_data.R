@@ -19,11 +19,14 @@ NULL
 #' \item{\code{survey}}{\code{logical} (\code{TRUE} / \code{FALSE}) values
 #'   indicating if each feature should be examined in surveys or not.}
 #'
-#' \item{\code{sensitivity}}{\code{numeric} sensitivity (true positive rate)
-#'   of the survey methodology for each features.}
+#' \item{\code{survey_sensitivity}}{\code{numeric} sensitivity (true positive
+#'   rate) of the survey methodology for each features.}
 #'
-#' \item{\code{specificity}}{\code{numeric} specificity (true absence rate)
-#'   of the survey methodology for each features.}
+#' \item{\code{survey_specificity}}{\code{numeric} specificity (true negative
+#'   rate) of the survey methodology for each features.}
+#'
+#' \item{\code{model_sensitivity}}{\code{numeric} specificity (true positive
+#'   rate) of the occupancy models for each features.}
 #'
 #' \item{\code{alpha}}{\code{numeric} values used to parametrize
 #'   the conservation benefit of managing of each feature.}
@@ -63,8 +66,9 @@ simulate_feature_data <- function(n_features, proportion_of_survey_features) {
   tibble::tibble(
     name = paste0("f", seq_len(n_features)),
     survey = survey_feature,
-    sensitivity = runif(n_features, 0.95, 0.99),
-    specificity = runif(n_features, 0.8, 0.9),
+    survey_sensitivity = runif(n_features, 0.95, 0.99),
+    survey_specificity = runif(n_features, 0.8, 0.9),
+    model_sensitivity = runif(n_features, 0.7, 0.8),
     alpha = abs(rnorm(n_features)) + 1,
     gamma = runif(n_features))
 }

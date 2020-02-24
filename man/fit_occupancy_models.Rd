@@ -67,9 +67,10 @@ printed during computations. Defaults to \code{FALSE}.}
  \item{performance}{\code{\link[tibble]{tibble}} with model information.
    Each row corresponds to a different feature and column contain
    different information. Specifically, the columns contain:
-   (\code{sensitivity}) model sensitivities,
-   (\code{specificity}) model specificities, and
-   (\code{auc}) model area under the curve (AUC) statistics.}
+   (\code{name}) \code{character} name of the features,
+   (\code{sensitivity}) \code{numeric} model sensitivities,
+   (\code{specificity}) \code{numeric} model specificities, and
+   (\code{auc}) \code{numeric} model area under the curve (AUC) statistics.}
  }
 }
 \description{
@@ -100,10 +101,13 @@ xgb_params <- list(list(nrounds = 10, objective = "binary:logistic"),
                    list(nrounds = 5, objective = "binary:logistic"))
 
 # fit models
-p <- fit_occupancy_models(x, c("f1", "f2"), c("e1", "e2", "e3"),
+m <- fit_occupancy_models(x, c("f1", "f2"), c("e1", "e2", "e3"),
                           xgb_params)
 
-# preview results
-str(p)
+# preview models predictions
+print(m$predictions)
+
+# preview models performance
+print(m$performance)
 
 }

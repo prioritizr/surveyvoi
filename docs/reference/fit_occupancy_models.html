@@ -213,9 +213,10 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
  <dt>performance</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> with model information.
    Each row corresponds to a different feature and column contain
    different information. Specifically, the columns contain:
-   (<code>sensitivity</code>) model sensitivities,
-   (<code>specificity</code>) model specificities, and
-   (<code>auc</code>) model area under the curve (AUC) statistics.</p></dd>
+   (<code>name</code>) <code>character</code> name of the features,
+   (<code>sensitivity</code>) <code>numeric</code> model sensitivities,
+   (<code>specificity</code>) <code>numeric</code> model specificities, and
+   (<code>auc</code>) <code>numeric</code> model area under the curve (AUC) statistics.</p></dd>
  </dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
@@ -242,28 +243,35 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
                    <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>))
 
 <span class='co'># fit models</span>
-<span class='no'>p</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(<span class='no'>x</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
+<span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(<span class='no'>x</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
                           <span class='no'>xgb_params</span>)
 
-<span class='co'># preview results</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/utils/topics/str'>str</a></span>(<span class='no'>p</span>)</div><div class='output co'>#&gt; List of 2
-#&gt;  $ predictions:Classes 'tbl_df', 'tbl' and 'data.frame':	200 obs. of  2 variables:
-#&gt;   ..$ f1: num [1:200] 0.0405 0.0626 0.4685 0.0522 0.2935 ...
-#&gt;   ..$ f2: num [1:200] 0.878 0.878 0.482 0.878 0.482 ...
-#&gt;  $ performance:Classes 'tbl_df', 'tbl' and 'data.frame':	2 obs. of  12 variables:
-#&gt;   ..$ train_auc_mean        : num [1:2] 1 0.998
-#&gt;   ..$ train_auc_std         : num [1:2] 0.000663 0.000864
-#&gt;   ..$ train_sensitivity_mean: num [1:2] 0.988 0.975
-#&gt;   ..$ train_sensitivity_std : num [1:2] 0.0172 0.0354
-#&gt;   ..$ train_specificity_mean: num [1:2] 0.987 0.978
-#&gt;   ..$ train_specificity_std : num [1:2] 0.0181 0.0307
-#&gt;   ..$ test_auc_mean         : num [1:2] 0.953 0.995
-#&gt;   ..$ test_auc_std          : num [1:2] 0.06629 0.00737
-#&gt;   ..$ test_sensitivity_mean : num [1:2] 0.808 0.917
-#&gt;   ..$ test_sensitivity_std  : num [1:2] 0.0825 0.1179
-#&gt;   ..$ test_specificity_mean : num [1:2] 0.958 0.875
-#&gt;   ..$ test_specificity_std  : num [1:2] 0.0589 0.1768</div><div class='input'>
-</div></pre>
+<span class='co'># preview models predictions</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>m</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 200 x 2</span><span>
+#&gt;        f1    f2
+#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 0.040</span><span style='text-decoration: underline;'>5</span><span> 0.878
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 0.062</span><span style='text-decoration: underline;'>6</span><span> 0.878
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 0.469  0.482
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 0.052</span><span style='text-decoration: underline;'>2</span><span> 0.878
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 0.293  0.482
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 0.413  0.878
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 0.957  0.123
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 0.486  0.878
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 0.269  0.878
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 0.040</span><span style='text-decoration: underline;'>5</span><span> 0.878
+#&gt; </span><span style='color: #949494;'># … with 190 more rows</span><span></div><div class='input'>
+<span class='co'># preview models performance</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>m</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 13</span><span>
+#&gt;   train_auc_mean train_auc_std train_sensitivi… train_sensitivi…
+#&gt;            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span>          1.00       0.000</span><span style='text-decoration: underline;'>663</span><span>            0.988           0.017</span><span style='text-decoration: underline;'>2</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span>          0.998      0.000</span><span style='text-decoration: underline;'>864</span><span>            0.975           0.035</span><span style='text-decoration: underline;'>4</span><span>
+#&gt; </span><span style='color: #949494;'># … with 9 more variables: train_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+#&gt; #   train_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+#&gt; #   test_sensitivity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_sensitivity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+#&gt; #   test_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, name </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

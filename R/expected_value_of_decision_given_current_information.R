@@ -259,7 +259,43 @@
 #' \code{\link{expected_value_of_decision_given_perfect_information}}.
 #'
 #' @examples
-#' # TODO
+#' # set seeds for reproducibility
+#' library(RandomFields)
+#' set.seed(123)
+#' RFoptions(seed = 123)
+#'
+#' # simulate data
+#' site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
+#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+#'
+#' # preview simulated data
+#' print(site_data)
+#' print(feature_data)
+#'
+#' # set total budget for managing sites for conservation
+#  # (i.e. 50% of the cost of managing all sites)
+#' total_budget <- sum(site_data$management_cost) * 0.5
+#'
+#' # calculate expected value of management decision given current information
+#' # using exact method
+#' ev_current <- expected_value_of_decision_given_current_information(
+#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   "management_cost", "survey_sensitivity",
+#'   "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget)
+#'
+#' # print exact value
+#' print(ev_current)
+#'
+#' # calculate expected value of management decision given current information
+#' # using approximate method with 40 approximate states
+#' ev_prime_current <- expected_value_of_decision_given_current_information(
+#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   "management_cost", "survey_sensitivity",
+#'   "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget,
+#'   n_approx_states = 40)
+#'
+#' # print approximate value
+#' print(ev_prime_current)
 #'
 #' @export
 expected_value_of_decision_given_current_information <- function(

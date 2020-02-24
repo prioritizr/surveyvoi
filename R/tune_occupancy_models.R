@@ -97,16 +97,14 @@ NULL
 #' # identify suitable tuning parameters for each feature,
 #' # note that we use 10 iterations here so that the example finishes quickly,
 #' # you would probably want something like 1000+
-#' results <- tune_occupancy_models(
+#' parameters <- tune_occupancy_models(
 #'    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
 #'    n_folds = rep(5, 2), n_random_search_iterations = 10,
 #'    early_stopping_rounds = 5, parameters = all_parameters, n_threads = 1)
 #'
-#' # print best found parameters
-#' print(results$parameters)
+#' # print best found parameters for each feature
+#' print(parameters)
 #'
-#' # print performance of models generated using best found parameters
-#' print(parameters$performance)
 #' @export
 tune_occupancy_models <- function(
   site_data, site_occupancy_columns, site_env_vars_columns, parameters,

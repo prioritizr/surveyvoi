@@ -154,11 +154,14 @@ data:</p><dl class='dl-horizontal'>
 <dt><code>survey</code></dt><dd><p><code>logical</code> (<code>TRUE</code> / <code>FALSE</code>) values
   indicating if each feature should be examined in surveys or not.</p></dd>
 
-<dt><code>sensitivity</code></dt><dd><p><code>numeric</code> sensitivity (true positive rate)
-  of the survey methodology for each features.</p></dd>
+<dt><code>survey_sensitivity</code></dt><dd><p><code>numeric</code> sensitivity (true positive
+  rate) of the survey methodology for each features.</p></dd>
 
-<dt><code>specificity</code></dt><dd><p><code>numeric</code> specificity (true absence rate)
-  of the survey methodology for each features.</p></dd>
+<dt><code>survey_specificity</code></dt><dd><p><code>numeric</code> specificity (true negative
+  rate) of the survey methodology for each features.</p></dd>
+
+<dt><code>model_sensitivity</code></dt><dd><p><code>numeric</code> specificity (true positive
+  rate) of the occupancy models for each features.</p></dd>
 
 <dt><code>alpha</code></dt><dd><p><code>numeric</code> values used to parametrize
   the conservation benefit of managing of each feature.</p></dd>
@@ -180,14 +183,14 @@ data:</p><dl class='dl-horizontal'>
 <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>5</span>,
                            <span class='kw'>proportion_of_survey_features</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
 <span class='co'># print data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5 x 6</span><span>
-#&gt;   name  survey sensitivity specificity alpha gamma
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    FALSE        0.952       0.896  2.28 0.709
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE         0.971       0.845  2.73 0.544
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span> f3    TRUE         0.986       0.868  2.69 0.594
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span> f4    FALSE        0.972       0.857  1.50 0.289
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span> f5    TRUE         0.968       0.810  3.53 0.147</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 5 x 7</span><span>
+#&gt;   name  survey survey_sensitivi~ survey_specifici~ model_sensitivi~ alpha  gamma
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    FALSE              0.952             0.896            0.790  2.22 0.963 
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE               0.971             0.845            0.725  1.36 0.902 
+#&gt; </span><span style='color: #BCBCBC;'>3</span><span> f3    TRUE               0.986             0.868            0.704  1.40 0.691 
+#&gt; </span><span style='color: #BCBCBC;'>4</span><span> f4    FALSE              0.972             0.857            0.733  1.11 0.795 
+#&gt; </span><span style='color: #BCBCBC;'>5</span><span> f5    TRUE               0.968             0.810            0.795  1.56 0.024</span><span style='text-decoration: underline;'>6</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
