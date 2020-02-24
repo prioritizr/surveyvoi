@@ -53,8 +53,8 @@ SystemRequirements:
     C++11,
     gurobi (>= 8.1.0),
     gmp (>= 4.2.3)
-URL: https://github.com/jeffreyhanson/surveyroi
-BugReports: https://github.com/jeffreyhanson/surveyroi/issues
+URL: https://github.com/jeffreyhanson/surveyvoi
+BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Collate:

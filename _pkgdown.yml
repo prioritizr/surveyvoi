@@ -1,4 +1,4 @@
-url: https://jeffrey-hanson.com/surveyroi
+url: https://jeffrey-hanson.com/surveyvoi
 
 authors:
   Jeffrey O Hanson:
@@ -14,23 +14,27 @@ reference:
   - title: Summary
     desc: Summary of the package
     contents:
-      - surveyroi
+      - surveyvoi
+  - title: Value of information
+    desc: Functions for value of information analyses
+    contents:
+      - expected_value_of_decision_given_current_information
+      - expected_value_of_decision_given_perfect_information
+      - prior_probability_matrix
   - title: Survey schemes
-    desc: Functions for generating and evaluating survey schemes
+    desc: Functions for generating survey schemes
     contents:
       - env_div_survey_scheme
       - geo_cov_survey_scheme
-      - optimal_survey_scheme
       - weighted_survey_scheme
       - feasible_survey_schemes
-      - expected_value_of_survey_scheme
   - title: Site scores
     desc: Functions for calculating scores for sites
     contents:
       - relative_site_richness_scores
       - relative_site_uncertainty_scores
   - title: Occupancy models
-    desc: Functions for fitting occupancy models
+    desc: Functions for modelling occupancy
     contents:
       - tune_occupancy_models
       - fit_occupancy_models
@@ -39,6 +43,3 @@ reference:
     contents:
       - simulate_site_data
       - simulate_feature_data
-  - title: Miscellanous functions
-    contents:
-      - prior_probability_matrix
