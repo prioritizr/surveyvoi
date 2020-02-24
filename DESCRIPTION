@@ -67,6 +67,7 @@ Collate:
     'tune_occupancy_models.R'
     'fit_occupancy_models.R'
     'geo_cov_survey_scheme.R'
+    'n_states.R'
     'package.R'
     'prior_probability_matrix.R'
     'relative_site_richness_scores.R'
