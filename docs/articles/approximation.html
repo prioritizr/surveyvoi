@@ -93,7 +93,112 @@
 
     
     
-<p>TODO.</p>
+<p>Here we will verify that the approximation methods are valid for value of information analyses. To achieve this, we will compare estimates from the approximation methods against the correct values from the exact methods. We will also examine how the number of approximation states affects the quality of the estimate.</p>
+<div id="setup" class="section level2">
+<h2 class="hasAnchor">
+<a href="#setup" class="anchor"></a>Setup</h2>
+<p>Let’s start by setting up our R session. Here we will load some R packages and pre-set the random number generators for reproducibility.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load packages</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(surveyvoi)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidyr)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ggplot2)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tibble)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(gridExtra)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(viridis)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(RandomFields)
+
+<span class="co"># set RNG seeds for reproducibility</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/Random">set.seed</a></span>(<span class="dv">505</span>)
+<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions">RFoptions</a></span>(<span class="dt">seed =</span> <span class="dv">505</span>)
+
+<span class="co"># set default table printing options</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">pillar.sigfig =</span> <span class="dv">6</span>)</code></pre></div>
+</div>
+<div id="simulate-data" class="section level2">
+<h2 class="hasAnchor">
+<a href="#simulate-data" class="anchor"></a>Simulate data</h2>
+<p>Let’s simulate some data. To keep things simple, we will simulate data for 10 sites and 1 conservation feature (e.g. species). Of the 10 sites in total, we will simulate survey data for 5 sites—meaning that 10 sites will not have survey data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate site data</span>
+site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/simulate_site_data">simulate_site_data</a></span>(
+  <span class="dt">n_sites =</span> <span class="dv">10</span>, <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_sites_missing_data =</span> <span class="dv">5</span> <span class="op">/</span><span class="st"> </span><span class="dv">10</span>)</code></pre></div>
+<pre><code>## ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print site data</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(site_data)</code></pre></div>
+<pre><code>## Simple feature collection with 10 features and 7 fields
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: 0.02070792 ymin: 0.1813143 xmax: 0.7855831 ymax: 0.8754956
+## epsg (SRID):    NA
+## proj4string:    NA
+## # A tibble: 10 x 8
+##    survey_cost management_cost        e1         e2         e3    f1
+##          &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
+##  1     7.94602         72.1741 -0.416735 -0.832440   0.0844003     1
+##  2     4.53083         71.4528 -1.15906   0.628728   1.46784      NA
+##  3     7.16376         72.1627 -1.10065  -0.908241   0.885747      1
+##  4     7.20006         69.8814 -0.807846 -1.01260    0.556981     NA
+##  5     5.36988         69.3756  0.588708 -0.761210  -0.660947      0
+##  6     5.03169         62.6822 -0.349896  2.28301    1.01294      NA
+##  7     6.27642         66.6239  1.11393   0.0835220 -1.23753       0
+##  8     4.65999         58.0444  1.54020   0.362299  -1.10079      NA
+##  9     4.68288         68.2921 -0.529539 -0.165824   0.212885      1
+## 10     6.28144         61.8291  1.12090   0.322752  -1.22152      NA
+## # … with 2 more variables: p1 &lt;dbl&gt;, geometry &lt;POINT&gt;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the spatial location of the sites</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(site_data) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"sites"</span>)</code></pre></div>
+<p><img src="approximation_files/figure-html/unnamed-chunk-4-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code>) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>p1</code> column contains modelled probability of occupancy predictions from environmental niche models. The <code>management_cost</code> column contains the cost for managing each site for conservation. Although the <code>site_data</code> object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let’s create some visualizations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># map of site occupancy data from previous surveys</span>
+p1 &lt;-
+<span class="st">  </span>site_data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> f1)) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"1"</span> =<span class="st"> "red"</span>, <span class="st">"0"</span> =<span class="st"> "black"</span>),
+                     <span class="dt">na.value =</span> <span class="st">"blue"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"presence/absence data"</span>)
+
+<span class="co"># make map of site occupancy data from previous surveys</span>
+p2 &lt;-
+<span class="st">  </span>site_data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> p1)) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"modelled probability of occupancy"</span>)
+
+<span class="co"># make map of site occupancy data from previous surveys</span>
+p3 &lt;-
+<span class="st">  </span>site_data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> management_cost)) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"management costs"</span>)
+
+<span class="co"># display plots</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/gridExtra/topics/arrangeGrob">grid.arrange</a></span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
+<p><img src="approximation_files/figure-html/fig.hold-1.png" width="336" style="display: block; margin: auto;"></p>
+<p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate feature data</span>
+feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/simulate_feature_data">simulate_feature_data</a></span>(
+  <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_survey_features =</span> <span class="dv">1</span>)
+
+<span class="co"># print feature data</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(feature_data)</code></pre></div>
+<pre><code>## # A tibble: 1 x 7
+##   name  survey survey_sensitiv… survey_specific… model_sensitivi…   alpha
+##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;
+## 1 f1    TRUE           0.982836         0.861585         0.713643 1.57766
+## # … with 1 more variable: gamma &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>alpha</code> and <code>gamma</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> column denotes the sensitivity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
+</div>
+<div id="benchmark-analysis" class="section level2">
+<h2 class="hasAnchor">
+<a href="#benchmark-analysis" class="anchor"></a>Benchmark analysis</h2>
+<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of <code>surveyvoi::rcpp_n_states(1 * 10)</code> states.</p>
+</div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h2>
@@ -106,7 +211,10 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#references">References</a></li>
+<li><a href="#setup">Setup</a></li>
+      <li><a href="#simulate-data">Simulate data</a></li>
+      <li><a href="#benchmark-analysis">Benchmark analysis</a></li>
+      <li><a href="#references">References</a></li>
       </ul>
 </div>
       </div>
