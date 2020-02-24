@@ -7,6 +7,6 @@
 #include "rcpp_probability.h"
 
 double expected_value_of_action(
-  std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&);
+  std::vector<bool>&, Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&);
 
 #endif

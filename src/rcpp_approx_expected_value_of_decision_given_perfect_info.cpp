@@ -22,8 +22,10 @@ double approx_expected_value_of_decision_given_perfect_info(
   const std::size_t n_approx_states = states.size();
 
   /// create log version of probabilities
-  Eigen::MatrixXd pij_log(pij.cols(), pij.rows());
-  pij_log = pij.array().log();
+  Eigen::MatrixXd pij_log = pij;
+  pij_log = pij_log.array().log();
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
 
   /// initialize prioritization
   std::vector<bool> solution(n_pu);
@@ -63,7 +65,7 @@ double approx_expected_value_of_decision_given_perfect_info(
       value_given_state_occurring.push_back(curr_value_given_state_occurring);
       /// store probability of state occurring
       prob_of_state_occurring.push_back(
-        log_probability_of_state(curr_state, pij_log));
+        log_probability_of_state(curr_state, pij_log, pij_log1m));
       /// increment counter
       ++k;
     }
@@ -82,8 +84,8 @@ double approx_expected_value_of_decision_given_perfect_info(
       prob_of_state_occurring.data(), k);
 
   // rescale probabilities
-  prob_of_state_occurring2.array() /=
-    prob_of_state_occurring2.sum();
+  prob_of_state_occurring2.array() -=
+    log_sum(prob_of_state_occurring2);
 
   // calculate values weighted by probabilities
   prob_of_state_occurring2.array() +=

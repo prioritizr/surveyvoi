@@ -18,6 +18,7 @@ double log_probability_of_outcome(
   Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&,
   std::vector<std::size_t>&);
 
-double log_probability_of_state(Eigen::MatrixXd&, Eigen::MatrixXd&);
+double log_probability_of_state(
+  Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&);
 
 #endif

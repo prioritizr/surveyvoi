@@ -79,5 +79,5 @@ test_that("consistent results", {
       feature_data$alpha, feature_data$gamma, 1000, 301, 0)
   })
   # tests
-  expect_length(unique(c(r1, r2)), 1)
+  expect_lte(abs(diff(range(c(r1, r2)))), 1e-15)
 })

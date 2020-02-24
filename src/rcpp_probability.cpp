@@ -47,10 +47,11 @@ double log_probability_of_outcome(
 
 double log_probability_of_state(
   Eigen::MatrixXd &sij,
-  Eigen::MatrixXd &pij_log) {
+  Eigen::MatrixXd &pij_log,
+  Eigen::MatrixXd &pij_log1m) {
   return
     (sij.array() * pij_log.array()).sum() +
-    ((1.0 - sij.array()) * (1.0 - pij_log.array())).sum();
+    ((1.0 - sij.array()) * pij_log1m.array()).sum();
 }
 
 // [[Rcpp::export]]
@@ -96,6 +97,8 @@ double rcpp_probability_of_outcome(
 double rcpp_probability_of_state(
   Eigen::MatrixXd sij,
   Eigen::MatrixXd pij) {
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
   pij.array() = pij.array().log();
-  return std::exp(log_probability_of_state(sij, pij));
+  return std::exp(log_probability_of_state(sij, pij, pij_log1m));
 }

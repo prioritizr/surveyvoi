@@ -3,17 +3,18 @@ r_approx_expected_value_of_action <- function(
   # initialization
   sub_prior_data <- prior_data[, solution, drop = FALSE]
   sub_prior_data_log <- log(sub_prior_data)
+  sub_prior_data_log1m <- log(1 - sub_prior_data)
   # iterate over each state
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, sub_prior_data)
     v <- sum((alpha * rowSums(s)) ^ gamma)
     p <- sum(s[] * sub_prior_data_log[]) +
-         sum((1 - s[]) * (1 - sub_prior_data_log[]))
+         sum((1 - s[]) * sub_prior_data_log1m[])
     c(v, p)
   })
   out[1, ] <- log(out[1, ])
   out <- out[, is.finite(out[1, ]), drop = FALSE]
-  out[2, ] <- out[2, ] / sum(out[2, ])
+  out[2, ] <- out[2, ] - rcpp_log_sum(out[2, ])
   exp(rcpp_log_sum(colSums(out)))
 }
 
@@ -46,6 +47,7 @@ r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
   budget, gap, states) {
   # calculate log of prior data
   prior_data_log <- log(prior_data)
+  prior_data_log1m <- log(1 - prior_data)
   # calculate expected value for each state
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, prior_data)
@@ -54,12 +56,12 @@ r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
       n_approx_obj_fun_points, budget, gap, "")$x
     v <- sum((alpha * rowSums(s[, solution, drop = FALSE])) ^ gamma)
     p <- sum(s[] * prior_data_log[]) +
-         sum((1 - s[]) * (1 - prior_data_log[]))
+         sum((1 - s[]) * prior_data_log1m[])
     c(v, p)
   })
   out[1, ] <- log(out[1, ])
   out <- out[, is.finite(out[1, ]), drop = FALSE]
-  out[2, ] <- out[2, ] / sum(out[2, ])
+  out[2, ] <- out[2, ] - rcpp_log_sum(out[2, ])
   exp(rcpp_log_sum(colSums(out)))
 }
 

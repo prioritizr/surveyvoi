@@ -26,8 +26,10 @@ double rcpp_expected_value_of_decision_given_perfect_info(
   Eigen::MatrixXd curr_rij(pij.rows(), pij.cols());
 
   /// create log version of probabilities
-  Eigen::MatrixXd pij_log(pij.cols(), pij.rows());
-  pij_log = pij.array().log();
+  Eigen::MatrixXd pij_log = pij;
+  pij_log = pij_log.array().log();
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m = (1.0 - pij_log1m.array()).array().log();
 
   /// initialize prioritization
   std::vector<bool> solution(n_pu);
@@ -67,7 +69,7 @@ double rcpp_expected_value_of_decision_given_perfect_info(
     if (curr_value_given_state_occurring > 1.0e-10) {
       /// calculate probability of the state occurring
       curr_probability_of_state_occurring =
-        log_probability_of_state(curr_state, pij_log);
+        log_probability_of_state(curr_state, pij_log, pij_log1m);
       /// add the value of the prioritization given the state,
       /// weighted by the probability of the state occuring
       curr_expected_value_given_state =

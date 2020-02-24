@@ -3,6 +3,7 @@
 double approx_expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
+  Eigen::MatrixXd &pij_log1m,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma,
   std::vector<mpz_t> &states) {
@@ -11,6 +12,7 @@ double approx_expected_value_of_action(
   const std::size_t solution_size =
     std::accumulate(solution.begin(), solution.end(), 0);
   Eigen::MatrixXd sub_pij_log(pij_log.rows(), solution_size);
+  Eigen::MatrixXd sub_pij_log1m(pij_log1m.rows(), solution_size);
 
   // preliminary processing
   /// subset planning units selected in the solution
@@ -19,6 +21,7 @@ double approx_expected_value_of_action(
     for (std::size_t j = 0; j < n_pu; ++j) {
       if (solution[j]) {
         sub_pij_log.col(i) = pij_log.col(j);
+        sub_pij_log1m.col(i) = pij_log1m.col(j);
         ++i;
       }
     }
@@ -48,7 +51,7 @@ double approx_expected_value_of_action(
       value_given_state_occurring.push_back(v);
       /// calculate probability of the state occurring
       prob_of_state_occurring.push_back(
-        log_probability_of_state(curr_state, sub_pij_log));
+        log_probability_of_state(curr_state, sub_pij_log, sub_pij_log1m));
       /// increment counter
       ++k;
     }
@@ -67,8 +70,8 @@ double approx_expected_value_of_action(
       prob_of_state_occurring.data(), k);
 
   // rescale probabilities
-  prob_of_state_occurring2.array() /=
-    prob_of_state_occurring2.sum();
+  prob_of_state_occurring2.array() -=
+    log_sum(prob_of_state_occurring2);
 
   // calculate values weighted by probabilities
   prob_of_state_occurring2.array() +=
@@ -86,6 +89,8 @@ double rcpp_approx_expected_value_of_action(
   Eigen::VectorXd gamma,
   std::vector<std::size_t> states) {
   // calculate log pij
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
   pij.array() = pij.array().log();
 
   // convert state indices from std::size_t to mpz_t
@@ -98,7 +103,7 @@ double rcpp_approx_expected_value_of_action(
 
   // calculate result
   double out = approx_expected_value_of_action(
-    solution, pij, alpha, gamma, states2);
+    solution, pij, pij_log1m, alpha, gamma, states2);
 
   // clear memory
   for (std::size_t i = 0; i < n; ++i)

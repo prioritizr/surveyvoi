@@ -3,13 +3,14 @@ r_expected_value_of_action <- function(
   # initialization
   sub_prior_data <- prior_data[, solution, drop = FALSE]
   sub_prior_data_log <- log(sub_prior_data)
+  sub_prior_data_log1m <- log(1 - sub_prior_data)
   # iterate over each state
   states <- seq(1, rcpp_n_states(length(sub_prior_data)))
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, sub_prior_data)
     v <- sum((alpha * rowSums(s)) ^ gamma)
     p <- sum(s[] * sub_prior_data_log[]) +
-         sum((1 - s[]) * (1 - sub_prior_data_log[]))
+         sum((1 - s[]) * sub_prior_data_log1m[])
     v * exp(p)
   })
   sum(out)
@@ -31,6 +32,7 @@ r_expected_value_of_decision_given_perfect_info <- function(
   budget, gap) {
   # calculate log of prior data
   prior_data_log <- log(prior_data)
+  prior_data_log1m <- log(1 - prior_data)
   # calculate expected value for each state
   states <- seq(1, rcpp_n_states(length(prior_data)))
   out <- sapply(states, function(i) {
@@ -41,7 +43,7 @@ r_expected_value_of_decision_given_perfect_info <- function(
     v <- sum((alpha * rowSums(s[, solution, drop = FALSE])) ^ gamma)
     if (v < 1e-10) return(NA_real_)
     p <- sum(s[] * prior_data_log[]) +
-         sum((1 - s[]) * (1 - prior_data_log[]))
+         sum((1 - s[]) * prior_data_log1m[])
     log(v) + p
   })
   out <- out[is.finite(out)]

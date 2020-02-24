@@ -3,6 +3,7 @@
 double expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
+  Eigen::MatrixXd &pij_log1m,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma) {
 
@@ -11,6 +12,7 @@ double expected_value_of_action(
   const std::size_t solution_size =
     std::accumulate(solution.begin(), solution.end(), 0);
   Eigen::MatrixXd sub_pij_log(pij_log.rows(), solution_size);
+  Eigen::MatrixXd sub_pij_log1m(pij_log.rows(), solution_size);
 
   // preliminary processing
   /// subset planning units selected in the solution
@@ -19,6 +21,7 @@ double expected_value_of_action(
     for (std::size_t j = 0; j < n_pu; ++j) {
       if (solution[j]) {
         sub_pij_log.col(i) = pij_log.col(j);
+        sub_pij_log1m.col(i) = pij_log1m.col(j);
         ++i;
       }
     }
@@ -53,7 +56,7 @@ double expected_value_of_action(
     if (curr_value_given_state_occurring > 1.0e-10) {
       /// calculate probability of the state occurring
       curr_probability_of_state_occurring =
-        log_probability_of_state(curr_state, sub_pij_log);
+        log_probability_of_state(curr_state, sub_pij_log, sub_pij_log1m);
       /// add the value of the prioritization given the state,
       /// weighted by the probability of the state occuring
       curr_expected_value_given_state =
@@ -86,7 +89,9 @@ double rcpp_expected_value_of_action(
   Eigen::VectorXd alpha,
   Eigen::VectorXd gamma) {
   // calculate log pij
+  Eigen::MatrixXd pij1m = pij;
+  pij1m.array() = (1.0 - pij1m.array()).array().log();
   pij.array() = pij.array().log();
   // return result
-  return expected_value_of_action(solution, pij, alpha, gamma);
+  return expected_value_of_action(solution, pij, pij1m, alpha, gamma);
 }

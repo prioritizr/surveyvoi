@@ -78,7 +78,7 @@ test_that("correct result (n states)", {
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
   # tests
-  expect_equal(r1, r2)
+  expect_lte(abs(diff(range(c(r1, r2)))), 1e-15)
 })
 
 test_that("expected error", {

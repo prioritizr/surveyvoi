@@ -7,7 +7,7 @@
 #include "rcpp_probability.h"
 
 double approx_expected_value_of_action(
-  std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&,
-  std::vector<mpz_t>&);
+  std::vector<bool>&, Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&,
+  Eigen::VectorXd&, std::vector<mpz_t>&);
 
 #endif
