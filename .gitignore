@@ -5,24 +5,32 @@ doc
 *.so
 *.dll
 
+# temporary files
+approximation.R
+simulation.R
+
 # R profile files
 *.Rproj.user
 *.Rhistory
 .Rproj.user
+
 # log files
 gurobi.log
 test.log
 check.log
 spell.log
 gp.log
+
 # system files
 .directory
+
 # do not ignore the following files
 !.gitkeep
 !*/
 !inst/doc/*.html
 !inst/doc/*.Rmd
 !inst/doc/.gitkeep
+
 # devtools files
 doc/*
 Meta/*
