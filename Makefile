@@ -23,6 +23,10 @@ vigns:
 purl_vigns:
 	R --slave -e "lapply(dir('vignettes', '^.*\\\\.Rmd$$'), function(x) knitr::purl(file.path('vignettes', x), gsub('.Rmd', '.R', x, fixed = TRUE)))"
 
+benchmark:
+	R --slave -e "library(devtools);load_all()"
+	R --slave -e "library(devtools);load_all();source('inst/code/benchmark.R')" > benchmark.log 2>&1
+
 quicksite:
 	R --slave -e "pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
 	cp -R doc inst/
@@ -51,4 +55,4 @@ check:
 install:
 	R --slave -e "devtools::install_local('../surveyroi', force = TRUE, upgrade = 'never')"
 
-.PHONY: initc docs site test check checkwb build install man readme vigns site quicksite
+.PHONY: initc docs site test check checkwb build install man readme vigns site quicksite benchmark
