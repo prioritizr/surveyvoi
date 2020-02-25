@@ -140,7 +140,7 @@ n_approx_states <- ceiling(seq(10, n_states(1, 10), length.out = 10))
 print(n_approx_states)
 ```
 
-Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will generate ten 50 replicates per number of approximation states.
+Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 10 replicates per number of approximation states.
 
 ```{r}
 # calculate the correct value of the decision given current information using
@@ -161,11 +161,9 @@ ev_current <- expected_value_of_decision_given_current_information(
 # estimate the correct value of the decision given current information using
 # approximation methods
 ev_prime_current <-
-  expand.grid(n = n_approx_states, replicate = seq_len(50)) %>%
-  mutate(seed = sample.int(1e+8, nrow(.))) %>%
-  plyr::ddply(c("n", "replicate"), function(x) {
-    data.frame(value =
-      expected_value_of_decision_given_current_information(
+  plyr::ldply(n_approx_states, function(x) {
+    result <-
+      approx_expected_value_of_decision_given_current_information(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
@@ -177,8 +175,9 @@ ev_prime_current <-
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
-        n_approx_states = x$n,
-        seed = x$seed))
+        n_approx_replicates = 25,
+        n_approx_states_per_replicate = x)
+    data.frame(n = x, mean = result[[1]], se = result[[2]])
   }) %>%
   as_tibble()
 
@@ -190,7 +189,7 @@ print(ev_prime_current)
 In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.
 
 ```{r}
-# calculate the correct value of the decision given current information using
+# calculate the correct value of the decision given perfect information using
 # exact methods
 ev_certainty <- expected_value_of_decision_given_perfect_information(
   site_data = site_data,
@@ -205,14 +204,12 @@ ev_certainty <- expected_value_of_decision_given_perfect_information(
   feature_gamma_column = "gamma",
   total_budget = total_budget)
 
-# estimate the correct value of the decision given current information using
+# estimate the correct value of the decision given perfect information using
 # approximation methods
 ev_prime_certainty <-
-  expand.grid(n = n_approx_states, replicate = seq_len(50)) %>%
-  mutate(seed = sample.int(1e+8, nrow(.))) %>%
-  plyr::ddply(c("n", "replicate"), function(x) {
-    data.frame(value =
-      expected_value_of_decision_given_perfect_information(
+  plyr::ldply(n_approx_states, function(x) {
+    result <-
+      approx_expected_value_of_decision_given_perfect_information(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
@@ -224,8 +221,9 @@ ev_prime_certainty <-
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
-        n_approx_states = x$n,
-        seed = x$seed))
+        n_approx_replicates = 10,
+        n_approx_states_per_replicate = x)
+    data.frame(n = x, mean = result[[1]], se = result[[2]])
   }) %>%
   as_tibble()
 
@@ -234,7 +232,7 @@ print(ev_certainty)
 print(ev_prime_certainty)
 ```
 
-Now let's create a plot to visualize the results. This plot has two panels. The top panel corresponds to the _expected value of the decision given current information_ and the bottom panel corresponds to the _expected value of the decision given perfect information_, Within each plot, points correspond to estimates from the approximate method and the lines show the correct value calculated using the exact methods.
+Now let's create a plot to visualize the results. This plot has two panels. The top panel corresponds to the _expected value of the decision given current information_ and the bottom panel corresponds to the _expected value of the decision given perfect information_. Within each panel, points correspond to mean estimates from the approximate method, error bars show standard errors associated with estimates from the approximation method, and the blue line shows the correct value calculated using the exact methods.
 
 ```{r, fig.height = h * 2, fig.width = w * 1.5}
 # prepare data for plotting
@@ -244,7 +242,7 @@ point_data <-
   bind_rows(ev_prime_certainty %>%
             mutate(metric = paste("expected value of decision given",
                                   "perfect information"))) %>%
-  mutate(n2 = as.character(n))
+  mutate(lower = mean - se, upper = mean + se)
 line_data <- tibble(
   metric = c("expected value of decision given current information",
              "expected value of decision given perfect information"),
@@ -252,16 +250,16 @@ line_data <- tibble(
 
 # create plot
 ggplot() +
-geom_boxplot(aes(x = n, y = value, group = n2), point_data,
-             width = abs(diff(range(n_approx_states))) * 0.05) +
+geom_point(aes(x = n, y = mean), point_data) +
+geom_errorbar(aes(x = n, ymin = lower, ymax = upper), point_data) +
 geom_hline(aes(yintercept = yint), line_data, colour = "#3366FF") +
-facet_wrap(~ metric, ncol = 1, scales = "free_y") +
+facet_wrap(~ metric, ncol = 1) +
 xlab("Number of states used in approximation calculations") +
 ylab("Expected value") +
 theme(strip.background = element_rect(color = "black", fill = "black"),
       strip.text = element_text(color = "white", size = 12))
 ```
 
-We can see that, on average, the points get closer to the line at greater values on the x-axis. This demonstrates that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.
+We can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). These results demonstrate that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.
 
 ## References

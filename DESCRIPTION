@@ -59,6 +59,8 @@ VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Collate:
     'RcppExports.R'
+    'approx_expected_value_of_decision_given_current_information.R'
+    'approx_expected_value_of_decision_given_perfect_information.R'
     'internal.R'
     'env_div_survey_scheme.R'
     'expected_value_of_decision_given_current_information.R'

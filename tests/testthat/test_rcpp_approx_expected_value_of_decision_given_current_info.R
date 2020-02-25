@@ -69,18 +69,19 @@ test_that("expected result (n states)", {
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
-  states <- 5
+  states <- 4
+  reps <- 3
   # calculations
-  set.seed(100)
-  r1 <-
-    rcpp_approx_expected_value_of_decision_given_current_info_n_states(
-      prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
   set.seed(100)
   r2 <-
     r_approx_expected_value_of_decision_given_current_info_n_states(
       prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+      feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states)
+  set.seed(100)
+  r1 <-
+    rcpp_approx_expected_value_of_decision_given_current_info_n_states(
+      prior_data, site_data$management_cost, site_data$locked_in,
+      feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states)
   # tests
   expect_equal(r1, r2)
 })

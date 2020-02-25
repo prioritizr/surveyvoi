@@ -32,7 +32,7 @@ void nth_state(mpz_t n, Eigen::MatrixXd &matrix) {
     return;
   }
   // initialization
-  std::size_t n_cells = matrix.size();
+  const std::size_t n_cells = matrix.size();
   mpz_t mask, bitwise_and, n2;
   mpz_init(mask);
   mpz_init(bitwise_and);
@@ -165,7 +165,6 @@ void sample_k_weighted_nth_states(
     for (std::size_t j = 0; j < n_v; ++j)
       states(j) = Rcpp::rbinom(n_v, 1, pij(j))[0];
     // identify state number
-    mpz_init(out[i]);
     which_state(states, out[i]);
   }
   // return void

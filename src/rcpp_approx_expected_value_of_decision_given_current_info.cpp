@@ -5,7 +5,9 @@
 #include "rcpp_prioritization.h"
 #include "rcpp_approx_expected_value_of_action.h"
 
-double approx_expected_value_of_decision_given_current_info(
+// [[Rcpp::export]]
+Rcpp::NumericVector
+  rcpp_approx_expected_value_of_decision_given_current_info_n_states(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
@@ -14,7 +16,15 @@ double approx_expected_value_of_decision_given_current_info(
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
-  std::vector<mpz_t> &states) {
+  std::size_t n_approx_replicates,
+  std::size_t n_approx_states_per_replicate) {
+
+  // initialize
+  Eigen::VectorXd values(n_approx_replicates);
+  std::vector<mpz_t> states(n_approx_states_per_replicate);
+  for (std::size_t j = 0; j < n_approx_states_per_replicate; ++j)
+    mpz_init(states[j]);
+
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
@@ -28,38 +38,23 @@ double approx_expected_value_of_decision_given_current_info(
   pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
   pij.array() = pij.array().log();
 
-  // calculate expected value of management action
-  double out = approx_expected_value_of_action(
-    solution, pij, pij_log1m, alpha, gamma, states);
-
-  // return result
-  return out;
-}
-
-// [[Rcpp::export]]
-double rcpp_approx_expected_value_of_decision_given_current_info_n_states(
-  Eigen::MatrixXd &pij,
-  Eigen::VectorXd &pu_costs,
-  Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
-  std::size_t n_approx_obj_fun_points,
-  double budget,
-  double gap,
-  std::size_t n_approx_states) {
-
-  // generate states
-  std::vector<mpz_t> states(n_approx_states);
-  sample_k_uniform_nth_states(n_approx_states, pij, states);
-
-  // calculate result
-  double out = approx_expected_value_of_decision_given_current_info(
-    pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
-    gap, states);
+  // main processing
+  for (std::size_t i = 0; i < n_approx_replicates; ++i) {
+    /// generate states
+    sample_k_uniform_nth_states(n_approx_states_per_replicate, pij, states);
+    /// calculate result
+    values[i] = approx_expected_value_of_action(
+        solution, pij, pij_log1m, alpha, gamma, states);
+  }
 
   // clear memory
-  for (std::size_t i = 0; i < n_approx_states; ++i)
+  for (std::size_t i = 0; i < n_approx_states_per_replicate; ++i)
     mpz_clear(states[i]);
+
+  // calculate mean and standard error
+  Rcpp::NumericVector out(2);
+  out[0] = mean_value(values);
+  out[1] = standard_error_value(values);
 
   // return result
   return out;
@@ -76,7 +71,7 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   double budget,
   double gap,
   std::vector<std::size_t> states) {
-  // convert state indices from std::size_t to mpz_t
+  // initialize states
   const std::size_t n = states.size();
   std::vector<mpz_t> states2(n);
   for (std::size_t i = 0; i < n; ++i) {
@@ -84,10 +79,22 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
     mpz_set_ui(states2[i], states[i]);
   }
 
+  // find optimal management action using prior data
+  std::vector<bool> solution(pij.cols());
+  Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
+                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
+  p.add_rij_data(pij);
+  p.solve();
+  p.get_solution(solution);
+
+  // calculate log prior probabilities
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
+  pij.array() = pij.array().log();
+
   // calculate result
-  double out = approx_expected_value_of_decision_given_current_info(
-    pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
-    gap, states2);
+  double out = approx_expected_value_of_action(
+    solution, pij, pij_log1m, alpha, gamma, states2);
 
   // clear memory
   for (std::size_t i = 0; i < n; ++i)

@@ -11,8 +11,7 @@ expected_value_of_decision_given_current_information(site_data,
   feature_survey_specificity_column, feature_model_sensitivity_column,
   feature_alpha_column, feature_gamma_column, total_budget,
   site_management_locked_in_column = NULL, prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000, n_approx_states = NULL,
-  optimality_gap = 0, seed = 500)
+  n_approx_obj_fun_points = 1000, optimality_gap = 0, seed = 500)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
@@ -101,13 +100,6 @@ for approximating the piecewise-linear components of the objective
 function. Greater values result in more precise calculations, but
 also incur more computational costs. Defaults to 1000.}
 
-\item{n_approx_states}{\code{integer} number of states to use for
-approximating the expected value of a given management action.
-Valid arguments include an integer value greater than zero (e.g. 10000), or
-\code{NULL}. If \code{NULL} is supplied as an argument, then the expected
-value of a given management action is calculated precisely and not using
-approximation methods. Defaults to \code{NULL}.}
-
 \item{optimality_gap}{\code{numeric} relative optimality gap for generating
 conservation prioritizations. A value of zero indicates that
 prioritizations must be solved to optimality. A value of 0.1 indicates
@@ -166,16 +158,10 @@ conservation planning problem. For example, a conservation planning problem
 involving ten sites and five features (species) has approximately
 \eqn{1.126 \times 10^{16}} states. Unfortunately, this means that it is not
 computationally feasible to calculate exact values of information for
-conservation problems involving many sites. Later on, we outline an
-\emph{approximation method} for reducing computational
-burden; but first we will outline an \emph{exact method} for exactly
-calculating values of information. If the argument to \code{n_approx_states}
-is (default) \code{NULL} then the \emph{exact method} is used for
-calculations. Otherwise, the \emph{approximate method} is used for
-calculations. Let \eqn{G_{ijs}} indicate which species \eqn{i \in I} occur
-in which planning units \eqn{j \in J} given state \eqn{s \in S}.
-We calculate the prior probability of each state \eqn{s \in S} being the
-true state following:
+conservation problems involving many sites. Let \eqn{G_{ijs}} indicate which
+species \eqn{i \in I} occur in which planning units \eqn{j \in J} given
+state \eqn{s \in S}. We calculate the prior probability of each state \eqn{s
+\in S} being the true state following:
 
 \deqn{P_s = \\
 Q_{ij}, \text{ if } G_{ijs} = 1 \\
@@ -242,26 +228,6 @@ management action given current information (using zeros and ones):
 \text{subject to } \sum_{j \in J} {{X'}_j} A_j \leq b \\
 {{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
 }
-
-Now we will outline the \emph{approximation method} for approximating the
-value of information calculations. To achieve this, let \eqn{S'} denote a
-subset of the states \eqn{s \in S} (indexed by \eqn{s}). Under the
-\emph{approximation method}, we perform the value of information analyses
-using the subset of states \eqn{s \in S'} instead of all states
-\eqn{s \in S} (per the \emph{exact method}). We calculated the approximate
-prior probabilities of states \eqn{s \in S'} following:
-
-\deqn{
-{P'}_{s} = \frac{P_{s}}{\sum_{\bar{s} \in S'} P_{\bar{s}}}
-}
-
-The \emph{approximate expected value of the management decision given
-current information} (\eqn{{\text{EV}'}_{\text{current}}}) is calculated
-following:
-
-\deqn{
-{\text{EV}'}_{\text{current}} = \max_{z \in Z} \mathbb{E} \left[ V(z, S') \right]
-}
 }
 \examples{
 # set seeds for reproducibility
@@ -289,17 +255,6 @@ ev_current <- expected_value_of_decision_given_current_information(
 
 # print exact value
 print(ev_current)
-
-# calculate expected value of management decision given current information
-# using approximate method with 40 approximate states
-ev_prime_current <- expected_value_of_decision_given_current_information(
-  site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-  "management_cost", "survey_sensitivity",
-  "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget,
-  n_approx_states = 40)
-
-# print approximate value
-print(ev_prime_current)
 
 }
 \references{

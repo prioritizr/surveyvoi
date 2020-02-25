@@ -1,6 +1,6 @@
-context("expected_value_of_decision_given_current_information")
+context("expected_value_of_decision_given_perfect_information")
 
-test_that("expected result", {
+test_that("expected results", {
   # data
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -27,10 +27,10 @@ test_that("expected result", {
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
   # calculations
-  r1 <- rcpp_expected_value_of_decision_given_current_info(
+  r1 <- rcpp_expected_value_of_decision_given_perfect_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$alpha, feature_data$gamma, 1000, 301, 0)
-  r2 <- expected_value_of_decision_given_current_information(
+  r2 <- expected_value_of_decision_given_perfect_information(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
     "alpha", "gamma", 301, "locked_in", NULL, 1000, 0)

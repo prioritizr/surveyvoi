@@ -13,6 +13,9 @@ man:
 	R --slave -e "devtools::document()"
 
 vigns:
+	rm -f doc/*.html
+	rm -f vignettes/*.html
+	rm -f inst/doc/*.html
 	R --slave -e "devtools::build_vignettes(install = FALSE)"
 	cp -R doc inst/
 	touch inst/doc/.gitkeep

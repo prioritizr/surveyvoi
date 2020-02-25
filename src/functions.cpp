@@ -25,6 +25,24 @@ double log_sum(Eigen::VectorXd &x) {
   return m + std::log((x.array() - m).exp().sum());
 }
 
+double mean_value(Eigen::VectorXd &x) {
+  return x.mean();
+}
+
+double standard_error_value(Eigen::VectorXd &x) {
+  return std::sqrt(variance_value(x) / static_cast<double>(x.size()));
+}
+
+double variance_value(Eigen::VectorXd &x) {
+  return (x.array() - x.mean()).array().pow(2).sum() /
+         static_cast<double>(x.size() - 1);
+}
+
+// [[Rcpp::export]]
+double rcpp_standard_error_value(Eigen::VectorXd &x) {
+  return standard_error_value(x);
+}
+
 // [[Rcpp::export]]
 double rcpp_log_sum(Eigen::VectorXd &x) {
   return log_sum(x);

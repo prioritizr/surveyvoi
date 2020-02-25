@@ -9,6 +9,12 @@ double log_sum(double, double);
 
 double log_sum(Eigen::VectorXd&);
 
+double mean_value(Eigen::VectorXd&);
+
+double standard_error_value(Eigen::VectorXd&);
+
+double variance_value(Eigen::VectorXd&);
+
 void assert_valid_probability_data(Eigen::MatrixXd&, std::string msg);
 
 void assert_valid_probability_data(double, std::string msg);

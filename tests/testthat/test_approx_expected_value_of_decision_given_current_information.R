@@ -1,4 +1,4 @@
-context("expected_value_of_decision_given_current_information")
+context("approx_expected_value_of_decision_given_perfect_information")
 
 test_that("expected result", {
   # data
@@ -27,13 +27,14 @@ test_that("expected result", {
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity")
   # calculations
-  r1 <- rcpp_expected_value_of_decision_given_current_info(
+  set.seed(500)
+  r1 <- rcpp_approx_expected_value_of_decision_given_current_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0)
-  r2 <- expected_value_of_decision_given_current_information(
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, 10, 20)
+  r2 <- approx_expected_value_of_decision_given_current_information(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "alpha", "gamma", 301, "locked_in", NULL, 1000, 0)
+    "alpha", "gamma", 301, "locked_in", NULL, 1000, 0, 10, 20, 500)
   # tests
-  expect_equal(r1, r2)
+  expect_equal(setNames(r1, c("mean", "se")), r2)
 })
