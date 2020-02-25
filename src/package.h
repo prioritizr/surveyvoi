@@ -1,6 +1,9 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+/* Set definititions */
+#define EIGEN_USE_MKL_ALL
+
 /* Set plugins */
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppEigen)]]
