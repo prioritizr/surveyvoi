@@ -348,6 +348,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_sample_k_uniform_no_replacement_nth_states
+std::vector<std::size_t> rcpp_sample_k_uniform_no_replacement_nth_states(std::size_t k, Eigen::MatrixXd& pij);
+RcppExport SEXP _surveyvoi_rcpp_sample_k_uniform_no_replacement_nth_states(SEXP kSEXP, SEXP pijSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sample_k_uniform_no_replacement_nth_states(k, pij));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_fit_xgboost_models_and_assess_performance
 Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(Eigen::MatrixXd rij, Eigen::MatrixXd wij, Eigen::MatrixXf pu_env_data_raw, std::vector<bool> survey_features, Rcpp::List xgb_parameters, std::vector<std::size_t> n_xgb_nrounds, Rcpp::List xgb_train_folds, Rcpp::List xgb_test_folds);
 RcppExport SEXP _surveyvoi_rcpp_fit_xgboost_models_and_assess_performance(SEXP rijSEXP, SEXP wijSEXP, SEXP pu_env_data_rawSEXP, SEXP survey_featuresSEXP, SEXP xgb_parametersSEXP, SEXP n_xgb_nroundsSEXP, SEXP xgb_train_foldsSEXP, SEXP xgb_test_foldsSEXP) {

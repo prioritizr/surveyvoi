@@ -10,6 +10,32 @@ test_that("rcpp_sample_k_uniform_nth_states (expected results)", {
   expect_gte(min(k), 0)
 })
 
+test_that("rcpp_sample_k_uniform_no_replacement_nth_states (k < n_states)", {
+  p <- matrix(runif(6), nrow = 3, ncol = 2)
+  k <- 4
+  n <- rcpp_n_states(length(p))
+  s <- character(20)
+  for (i in seq_len(20)) {
+    o <- rcpp_sample_k_uniform_no_replacement_nth_states(k, p)
+    s[i] <- paste(o, collapse = "")
+    expect_is(o, "numeric")
+    expect_length(o, k)
+    expect_lte(max(o), n)
+    expect_gte(min(o), 0)
+    expect_equal(anyDuplicated(o), 0)
+  }
+  expect_equal(anyDuplicated(s), 0)
+})
+
+test_that("rcpp_sample_k_uniform_no_replacement_nth_states (k = n_states)", {
+  p <- matrix(runif(6), nrow = 3, ncol = 2)
+  k <- rcpp_n_states(length(p))
+  s <- character(20)
+  o <- rcpp_sample_k_uniform_no_replacement_nth_states(k + 1, p)
+  expect_is(o, "numeric")
+  expect_equal(sort(o), seq(0, k))
+})
+
 test_that("rcpp_sample_k_weighted_nth_states (expected results)", {
   p <- matrix(runif(6), nrow = 3, ncol = 2)
   max_n <- rcpp_n_states(length(p))

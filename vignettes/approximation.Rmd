@@ -140,7 +140,7 @@ n_approx_states <- ceiling(seq(10, n_states(1, 10), length.out = 10))
 print(n_approx_states)
 ```
 
-Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 10 replicates per number of approximation states.
+Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 25 replicates per number of approximation states.
 
 ```{r}
 # calculate the correct value of the decision given current information using
@@ -176,7 +176,8 @@ ev_prime_current <-
         feature_gamma_column = "gamma",
         total_budget = total_budget,
         n_approx_replicates = 25,
-        n_approx_states_per_replicate = x)
+        n_approx_states_per_replicate = x,
+        seed = 100)
     data.frame(n = x, mean = result[[1]], se = result[[2]])
   }) %>%
   as_tibble()
@@ -221,8 +222,9 @@ ev_prime_certainty <-
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
-        n_approx_replicates = 10,
-        n_approx_states_per_replicate = x)
+        n_approx_replicates = 25,
+        n_approx_states_per_replicate = x,
+        seed = 100)
     data.frame(n = x, mean = result[[1]], se = result[[2]])
   }) %>%
   as_tibble()

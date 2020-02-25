@@ -6,40 +6,27 @@
 #include "rcpp_approx_expected_value_of_action.h"
 
 double approx_expected_value_of_decision_given_perfect_info(
-  Eigen::MatrixXd &pij,
-  Eigen::VectorXd &pu_costs,
-  Eigen::VectorXd &pu_locked_in,
+  Eigen::MatrixXd &pij_log,
+  Eigen::MatrixXd &pij_log1m,
+  Prioritization &p,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma,
-  std::size_t n_approx_obj_fun_points,
-  double budget,
-  double gap,
   std::vector<mpz_t> &states) {
 
   // initialization
   // constant variables
-  const std::size_t n_pu = pij.cols();
+  const std::size_t n_pu = pij_log.cols();
   const std::size_t n_approx_states = states.size();
-
-  /// create log version of probabilities
-  Eigen::MatrixXd pij_log = pij;
-  pij_log = pij_log.array().log();
-  Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
-
-  /// initialize prioritization
-  std::vector<bool> solution(n_pu);
-  Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
 
   /// initialize loop variables
   double curr_value_given_state_occurring;
+  Eigen::VectorXd solution(n_pu);
   std::vector<double> value_given_state_occurring;
   std::vector<double> prob_of_state_occurring;
   value_given_state_occurring.reserve(n_approx_states);
   prob_of_state_occurring.reserve(n_approx_states);
-  Eigen::MatrixXd curr_state(pij.rows(), pij.cols());
-  Eigen::MatrixXd curr_rij(pij.rows(), pij.cols());
+  Eigen::MatrixXd curr_state(pij_log.rows(), pij_log.cols());
+  Eigen::MatrixXd curr_rij(pij_log.rows(), pij_log.cols());
   std::size_t k = 0;
 
   // main processing
@@ -53,11 +40,12 @@ double approx_expected_value_of_decision_given_perfect_info(
     /// create matrix only containing feature data for selected planning units
     curr_rij = curr_state;
     for (std::size_t j = 0; j < n_pu; ++j)
-      curr_rij.col(j).array() *= static_cast<double>(solution[j]);
+      curr_rij.col(j) *= solution[j];
     /// calculate the value of the prioritization given the state
     curr_value_given_state_occurring =
       alpha.cwiseProduct(curr_rij.rowwise().sum()).array().
         pow(gamma.array()).sum();
+
     /// if prioritization has a non-zero value then proceed with remaining
     /// calculations for this state
     if (curr_value_given_state_occurring > 1.0e-10) {
@@ -73,7 +61,7 @@ double approx_expected_value_of_decision_given_perfect_info(
 
   // check that at least one state had a non-zero value
   assert_gt_value(k, (std::size_t) 0,
-    "all states have zero value, try increasing argument to n_approx_states");
+    "all states have zero value, try increasing argument to n_approx_states_per_replicate");
 
   // create Eigen maps of data
   Eigen::VectorXd value_given_state_occurring2 =
@@ -114,14 +102,25 @@ Rcpp::NumericVector
   for (std::size_t j = 0; j < n_approx_states_per_replicate; ++j)
     mpz_init(states[j]);
 
+  /// initialize prioritization
+  Prioritization p(
+    pij.cols(), pij.rows(), pu_costs, pu_locked_in, alpha, gamma,
+    n_approx_obj_fun_points, budget, gap);
+
+  /// create log version of probabilities
+  Eigen::MatrixXd pij_log = pij;
+  pij_log = pij_log.array().log();
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
+
   // main processing
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
     /// generate states
-    sample_k_uniform_nth_states(n_approx_states_per_replicate, pij, states);
+    sample_k_uniform_no_replacement_nth_states(
+      n_approx_states_per_replicate, pij, states);
     /// calculate result
     values[i] = approx_expected_value_of_decision_given_perfect_info(
-      pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
-      budget, gap, states);
+      pij_log, pij_log1m, p, alpha, gamma, states);
   }
 
   // clear memory
@@ -148,18 +147,26 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
   double budget,
   double gap,
   std::vector<std::size_t> states) {
-  // convert state indices from std::size_t to mpz_t
+  // initialize states
   const std::size_t n = states.size();
   std::vector<mpz_t> states2(n);
-  for (std::size_t i = 0; i < n; ++i) {
-    mpz_init(states2[i]);
-    mpz_set_ui(states2[i], states[i]);
-  }
+  for (std::size_t i = 0; i < n; ++i)
+    mpz_init_set_ui(states2[i], states[i]);
+
+  /// initialize prioritization
+  Prioritization p(
+    pij.cols(), pij.rows(), pu_costs, pu_locked_in,
+    alpha, gamma, n_approx_obj_fun_points, budget, gap);
+
+  /// create log version of probabilities
+  Eigen::MatrixXd pij_log = pij;
+  pij_log = pij_log.array().log();
+  Eigen::MatrixXd pij_log1m = pij;
+  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
 
   // calculate result
   double out = approx_expected_value_of_decision_given_perfect_info(
-    pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget,
-    gap, states2);
+    pij_log, pij_log1m, p, alpha, gamma, states2);
 
   // clear memory
   for (std::size_t i = 0; i < n; ++i)

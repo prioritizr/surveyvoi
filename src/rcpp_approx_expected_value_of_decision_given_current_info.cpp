@@ -41,7 +41,8 @@ Rcpp::NumericVector
   // main processing
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
     /// generate states
-    sample_k_uniform_nth_states(n_approx_states_per_replicate, pij, states);
+    sample_k_uniform_no_replacement_nth_states(
+      n_approx_states_per_replicate, pij, states);
     /// calculate result
     values[i] = approx_expected_value_of_action(
         solution, pij, pij_log1m, alpha, gamma, states);

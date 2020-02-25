@@ -207,6 +207,22 @@ public:
     return;
   }
 
+  // extract solution
+  inline void get_solution(Eigen::VectorXd &out) {
+    // extract solution
+    GRBgetdblattrarray(_model, GRB_DBL_ATTR_X, 0, _n_pu, out.data());
+    // return void
+    return;
+  }
+
+  // extract solution
+  inline void get_solution(Eigen::ArrayXd &out) {
+    // extract solution
+    GRBgetdblattrarray(_model, GRB_DBL_ATTR_X, 0, _n_pu, out.data());
+    // return void
+    return;
+  }
+
   // objective value
   inline double get_obj_value() {
     double out;

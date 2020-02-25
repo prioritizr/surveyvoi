@@ -41,7 +41,8 @@ r_approx_expected_value_of_decision_given_current_info_n_states <- function(
   value <- sapply(seq_len(n_replicates), function(i) {
     r_approx_expected_value_of_action(
       solution, prior_data, alpha, gamma,
-      rcpp_sample_k_uniform_nth_states(n_states_per_replicate, prior_data))
+      rcpp_sample_k_uniform_no_replacement_nth_states(
+        n_states_per_replicate, prior_data))
   })
   c(mean(value), se(value))
 }
@@ -76,7 +77,8 @@ r_approx_expected_value_of_decision_given_perfect_info_n_states <- function(
     r_approx_expected_value_of_decision_given_perfect_info_fixed_states(
       prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
       budget, gap,
-      rcpp_sample_k_uniform_nth_states(n_states_per_replicate, prior_data))
+      rcpp_sample_k_uniform_no_replacement_nth_states(
+        n_states_per_replicate, prior_data))
   })
   c(mean(value), se(value))
 }

@@ -24,6 +24,9 @@ void sample_k_weighted_nth_states(
 void sample_k_uniform_nth_states(
   std::size_t, Eigen::MatrixXd&, std::vector<mpz_t>&);
 
+void sample_k_uniform_no_replacement_nth_states(
+  std::size_t, Eigen::MatrixXd&, std::vector<mpz_t>&);
+
 void which_feature_state(
   Eigen::MatrixXd&, std::vector<std::size_t>&, std::vector<std::size_t>&,
   std::vector<std::size_t>&);
