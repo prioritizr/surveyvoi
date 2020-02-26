@@ -15,7 +15,7 @@ n_states(n_sites, n_features)
 \code{numeric} value.
 }
 \description{
-Calculate the total number of presence and absence states for a given
+Calculate the total number of presence/absence states for a given
 number of sites and features.
 }
 \examples{

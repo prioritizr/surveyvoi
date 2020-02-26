@@ -1,6 +1,6 @@
 #' Number of states
 #'
-#' Calculate the total number of presence and absence states for a given
+#' Calculate the total number of presence/absence states for a given
 #' number of sites and features.
 #'
 #' @param n_sites \code{numeric} number of sites.
