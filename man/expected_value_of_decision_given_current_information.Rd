@@ -11,7 +11,7 @@ expected_value_of_decision_given_current_information(site_data,
   feature_survey_specificity_column, feature_model_sensitivity_column,
   feature_alpha_column, feature_gamma_column, total_budget,
   site_management_locked_in_column = NULL, prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000, optimality_gap = 0, seed = 500)
+  n_approx_obj_fun_points = 1000, optimality_gap = 0)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
@@ -104,11 +104,6 @@ also incur more computational costs. Defaults to 1000.}
 conservation prioritizations. A value of zero indicates that
 prioritizations must be solved to optimality. A value of 0.1 indicates
 prioritizations must be within 10\% of optimality. Defaults to 0.}
-
-\item{seed}{\code{integer} random seed used for calculations. This
-parameter only has an influence when approximation methods are used
-for calculating the expected value of a given management action.
-Defaults to 500.}
 }
 \value{
 \code{numeric} value.
@@ -121,23 +116,24 @@ existing biodiversity data (i.e. survey data and environmental niche models).
 }
 \details{
 Let \eqn{I} denote the set of feature (indexed by
-\eqn{i}); \eqn{J} the set of planning units (indexed by \eqn{j}).
+\eqn{i}) and \eqn{J} the set of planning units (indexed by \eqn{j}).
 To describe the results of previous surveys, let \eqn{D_{ij}} indicate the
 detection/non-detection of feature \eqn{i \in I} in planning unit
 \eqn{j \in J} during previous surveys using zeros and ones
 (specified via \code{site_occupancy_columns}).
 Also let \eqn{U_j} indicate if planning unit \eqn{j \in J} has previously
 been surveyed or not.
-To describe the accuracy of the surveys, let \eqn{S_i} the sensitivity, and
-\eqn{N_i} denote the specificity of the surveying methodology for feature
-\eqn{i \in I} (specified via \code{feature_survey_sensitivity_column} and
+To describe the accuracy of the surveys, let \eqn{S_i} denote the
+sensitivity and \eqn{N_i} denote the specificity of the surveying
+methodology for features \eqn{i \in I} (specified via
+\code{feature_survey_sensitivity_column} and
 \code{feature_survey_specificity_column} respectively).
 Next, let \eqn{H_{ij}} denote the modelled probabilities of
-the feature \eqn{i \in I} occupying planning units \eqn{j \in J}
+the features \eqn{i \in I} occupying planning units \eqn{j \in J}
 (specified via \code{site_probability_columns}).
 To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-the sensitivity of the models for feature \eqn{i \in I} (specified via
-\code{feature_model_sensitivity_column}).
+denote the sensitivity of the models for features \eqn{i \in I} (specified
+via \code{feature_model_sensitivity_column}).
 We can calculate the prior probability of each feature \eqn{i \in I}
 occupying each site \eqn{j \in J} following
 (or manually specified via \code{prior_matrix}):
@@ -155,13 +151,15 @@ management action (indexed by \eqn{s}). Here, \eqn{S} represents all possible
 combinations of different species occurring in different sites.
 The total number of states \eqn{s \in S} is incredibly large for even a small
 conservation planning problem. For example, a conservation planning problem
-involving ten sites and five features (species) has approximately
-\eqn{1.126 \times 10^{16}} states. Unfortunately, this means that it is not
+involving ten sites and four features (species) has approximately
+\eqn{1.09 \times 10^{12}} states. In other words, one trillion ninety-nine
+billion five hundred eleven million six hundred twenty-seven thousand seven
+hundred seventy-five states. Unfortunately, this means that it is not
 computationally feasible to calculate exact values of information for
 conservation problems involving many sites. Let \eqn{G_{ijs}} indicate which
 species \eqn{i \in I} occur in which planning units \eqn{j \in J} given
-state \eqn{s \in S}. We calculate the prior probability of each state \eqn{s
-\in S} being the true state following:
+state \eqn{s \in S}. We calculate the prior probability of each state
+\eqn{s \in S} being the true state following:
 
 \deqn{P_s = \\
 Q_{ij}, \text{ if } G_{ijs} = 1 \\
@@ -190,6 +188,14 @@ for species \eqn{i \in I} to parametrise trade-offs in the protection of
 different species. These scaling terms are crucial to ensure that competing
 management decisions are evaluated in a manner conforming to the principle
 of complementarity (Vane-Wright \emph{et al.} 1991).
+The value of a management action (\eqn{z}) for a given state (\eqn{s}) is
+calculated following, wherein \eqn{Y_j} indicates
+if each site \eqn{j \in J} is selected in the (\eqn{z}) management action or
+not (using zeros and ones):
+
+\deqn{
+V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
+}
 
 We can now calculate the
 \emph{expected value of the management decision given
@@ -203,7 +209,6 @@ information}. Let \eqn{z'} denote an optimal management action
 \deqn{
 \text{EV}_{\text{current}} = \mathbb{E} \left[ V(z', S) \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S) \right] \\
 \mathbb{E} \left[ V(z, S) \right] = \sum_{s \in S} V(z, s) \times P_s \\
-V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} X_{jz} G_{ijs} \right) ^{\gamma_i} \\
 }
 
 Typically, the emph{expected value of the best management action given
@@ -213,8 +218,8 @@ computationally expensive for even a small conservation planning problem.
 For example, a conservation planning problem involving 60 planning units has
 approximately \eqn{1.52 \times 10^{18}} different solutions (i.e.
 combinations of different planning units being selected). Therefore, we
-applied combinatorial optimization instead. Specifically, we identified the
-best management action by formulating the management action problem as an
+applied combinatorial optimization instead. Specifically, we identify the
+best management action by formulating an
 integer programming problem -- using piecewise linear constraints to
 linearise the objective function (precision controlled using
 \code{n_approx_n_approx_obj_fun_points}) -- and solving it to (near)
@@ -226,6 +231,7 @@ management action given current information (using zeros and ones):
 \deqn{
 \text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X'}_j Q_{ij} \right) ^{\gamma_i} \\
 \text{subject to } \sum_{j \in J} {{X'}_j} A_j \leq b \\
+{{X'}_j} \geq T_j \text{ } \forall j \in J \\
 {{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
 }
 }
@@ -268,5 +274,5 @@ protect? Systematics and the agony of choice.
 }
 \seealso{
 \code{\link{prior_probability_matrix}},
-\code{\link{expected_value_of_decision_given_perfect_information}}.
+\code{\link{approx_expected_value_of_decision_given_current_information}}.
 }

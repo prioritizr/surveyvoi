@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Expected value of decision given perfect information — expected_value_of_decision_given_perfect_information • surveyvoi</title>
+<title>Approximate expected value of decision given perfect information — approx_expected_value_of_decision_given_perfect_information • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -33,7 +33,7 @@
 
 
 
-<meta property="og:title" content="Expected value of decision given perfect information — expected_value_of_decision_given_perfect_information" />
+<meta property="og:title" content="Approximate expected value of decision given perfect information — approx_expected_value_of_decision_given_perfect_information" />
 <meta property="og:description" content="Calculate the expected value of the conservation management decision
 given perfect information. This metric describes the value of the management
 decision that is expected when the decision maker is omniscient (i.e. they
@@ -125,9 +125,9 @@ value of management decisions following additional data collection." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Expected value of decision given perfect information</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/expected_value_of_decision_given_perfect_information.R'><code>R/expected_value_of_decision_given_perfect_information.R</code></a></small>
-    <div class="hidden name"><code>expected_value_of_decision_given_perfect_information.Rd</code></div>
+    <h1>Approximate expected value of decision given perfect information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/approx_expected_value_of_decision_given_perfect_information.R'><code>R/approx_expected_value_of_decision_given_perfect_information.R</code></a></small>
+    <div class="hidden name"><code>approx_expected_value_of_decision_given_perfect_information.Rd</code></div>
     </div>
 
     <div class="ref-description">
@@ -140,13 +140,15 @@ makers, this metric is useful to provide an upper bound on the expected
 value of management decisions following additional data collection.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>expected_value_of_decision_given_perfect_information</span>(<span class='no'>site_data</span>,
+    <pre class="usage"><span class='fu'>approx_expected_value_of_decision_given_perfect_information</span>(<span class='no'>site_data</span>,
   <span class='no'>feature_data</span>, <span class='no'>site_occupancy_columns</span>, <span class='no'>site_probability_columns</span>,
   <span class='no'>site_management_cost_column</span>, <span class='no'>feature_survey_sensitivity_column</span>,
   <span class='no'>feature_survey_specificity_column</span>, <span class='no'>feature_model_sensitivity_column</span>,
   <span class='no'>feature_alpha_column</span>, <span class='no'>feature_gamma_column</span>, <span class='no'>total_budget</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
+  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min</a></span>(<span class='fl'>1000</span>,
+  <span class='fu'>n_states</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>site_data</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>))), <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -272,11 +274,35 @@ conservation prioritizations. A value of zero indicates that
 prioritizations must be solved to optimality. A value of 0.1 indicates
 prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
     </tr>
+    <tr>
+      <th>n_approx_replicates</th>
+      <td><p><code>integer</code> number of replicates to use for
+approximating the expected value of a given management action.
+Valid arguments include an integer value greater than zero (e.g.
+100), or <code>NULL</code>. If <code>NULL</code> is supplied as an argument, then
+the expected value of a given management action is calculated precisely
+and not using approximation methods. Defaults to <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>n_approx_states_per_replicate</th>
+      <td><p><code>integer</code> number of states to use
+per replicate for approximating the expected value of a given management
+action. Valid arguments include an integer value greater than zero (e.g.
+10000), or <code>NULL</code>. If <code>NULL</code> is supplied as an argument, then
+the expected value of a given management action is calculated precisely
+and not using approximation methods. Defaults to <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p><code>integer</code> random seed used for generating states. Defaults
+to 500.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>numeric</code> value.</p>
+    <p><code>numeric</code> <code>vector</code> containing the mean estimate and
+  standard error.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Let \(I\) denote the set of feature (indexed by
@@ -326,6 +352,12 @@ state \(s \in S\). We calculate the prior probability of each state
 Q_{ij}, \text{ if } G_{ijs} = 1 \\
 1 - Q_{ij}, \text{ else } \\
 $$</p>
+<p>Under the <em>approximation method</em>, we define \(S'\) which contains a
+subset of sites \(s \in S\). The prior probability of each state
+\(s \in S'\) being the true state is calculated following:</p>
+<p>$$
+{P'}_s = \frac{P_s}{\sum_{k \in S'} P_k}
+$$</p>
 <p>Here, the management action is to purchase a set of sites for
 protected area establishment. In other words, the management action is to
 implement a spatial prioritisation for protected area establishment. The
@@ -355,40 +387,47 @@ not (using zeros and ones):</p>
 <p>$$
 V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
 $$</p>
-<p>We can now calculate the <em>expected value of the management
-decision given perfect information</em> (\(\text{EV}_{\text{certainty}}\)).
+<p>We can now calculate the <em>approximate expected value of the management
+decision given perfect information</em> (\(\text{EV'}_{\text{certainty}}\)).
 To achieve this, we assume that the decision maker will act optimally based
-on their perfect knowledge. Thus the <em>expected value of the management
-decision given perfect information</em> is the <em>expected value of the best
-management action given perfect information</em>. Let \({z''}_s\) denote an
-optimal management action \(z \in Z\) given state \(s \in S\). This can
-be expressed as follows:</p>
+on their perfect knowledge. Thus the <em>approximate expected value of the
+management decision given perfect information</em> is the <em>approximate
+expected value of the best management action given perfect information</em>. Let
+\(z''\) denote an optimal
+management action \(z \in Z\) given perfect information. This can be
+expressed as follows:</p>
 <p>$$
-\text{EV}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S) \right] = \sum_{s \in S} \left[ \left\{ V({z''}_s , s) \right\} \times P_s \right]
+\text{EV'}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S') \right] = \sum_{s \in S'} \left[ \left\{ V({{z''}_s}, s) \right\} \times {P'}_s \right]
 $$</p>
-<p>Typically, the emphexpected value of the best management action given
-perfect information is calculated by iterating over every possible
-management action \(z \in Z\). However, this approach would be
-computationally expensive for even a small conservation planning problem.
-For example, a conservation planning problem involving 60 planning units has
-approximately \(1.52 \times 10^{18}\) different solutions (i.e.
-combinations of different planning units being selected). Therefore, we
-applied combinatorial optimization instead. Specifically, we identified the
-best management action by formulating the management action problem as an
-integer programming problem -- using piecewise linear constraints to
-linearise the objective function (precision controlled using
-<code>n_approx_n_approx_obj_fun_points</code>) -- and solving it to (near)
+<p>We use combinatorial optimization to identify the (\({z''}_s\))
+best management action for each state \(s \in S'\). Specifically, we
+formulate an integer programming problem -- using piecewise linear
+constraints to linearise the objective function (precision controlled using
+<code>n_approx_n_approx_obj_fun_points</code>) -- and solve it to (near)
 optimality (controlled using
 <code>optimality_gap</code>) with the <span class="pkg">gurobi</span> package. Let \({X''}_{js}\)
-indicate if each planning unit \(j \in J\) is selected in the \(z''\)
-best management action given perfect information (using zeros and ones):</p>
+indicate if each planning unit \(j \in J\) is selected in the
+\({z''}_s\) best management action for state eqns (using zeros and ones):</p>
 <p>$$
 \text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X''}_{js}
-G_{ijs} \right) ^{\gamma_i} \\
-\text{subject to } \sum_{j \in J} {X''}_{js} A_j \leq b\\
+ G_{ijs} \right) ^{\gamma_i} \\
+\text{subject to } \sum_{j \in J} {{X''}_{js}} A_j \leq b \\
 {{X''}_{js}} \geq T_j \text{ } \forall j \in J \\
-{X''}_{js} \in \{ 0, 1 \} \text{ } \forall j \in J
+{{X''}_{js}} \in \{ 0, 1 \} \text{ } \forall j \in J
 $$</p>
+<p>The accuracy of the approximate method depends on which subset of states
+\(s \in S'\) are used for the calculations. As such, this function
+calculates multiple estimates of the  <em>approximate expected value of
+the management decision given perfect information</em>
+(\(\text{EV'}_{\text{certainty}}\)) using multiple subsets of states \(s
+\in S'\) and reports the mean and standard error of these estimates. The
+number of estimates is controlled using the <code>n_replicates</code> parameter,
+and the number of states in \(S'\) is controlled using the
+<code>n_states_per_replicate</code> parameter. For a given replicate, the states
+are sampled randomly without replacement. This means that the
+<em>approximation method</em> is equivalent to the <em>exact method</em>
+when the argument to <code>n_states_per_replicate</code> is equal to the total
+number of states.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Moilanen A (2007) Landscape zonation, benefit functions and target-based
@@ -400,7 +439,7 @@ protect? Systematics and the agony of choice.
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>prior_probability_matrix</code>,
-<code>approx_expected_value_of_decision_given_perfect_information</code>.</p></div>
+<code>expected_value_of_decision_given_perfect_information</code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -435,14 +474,18 @@ protect? Systematics and the agony of choice.
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
 <span class='co'># calculate expected value of management decision given perfect information</span>
-<span class='co'># using exact method</span>
-<span class='no'>ev_certainty</span> <span class='kw'>&lt;-</span> <span class='fu'>expected_value_of_decision_given_perfect_information</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
-  <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>,
-  <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>)
+<span class='co'># using approximate method with 100 replicates and 50 states per replicate</span>
+<span class='no'>ev_prime_certainty</span> <span class='kw'>&lt;-</span>
+  <span class='fu'>approx_expected_value_of_decision_given_perfect_information</span>(
+    <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+    <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>,
+    <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>,
+    <span class='no'>total_budget</span>, <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+    <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>50</span>)
 
-<span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_certainty</span>)</div><div class='output co'>#&gt; [1] 4.059087</div><div class='input'>
+<span class='co'># print approximate value</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_certainty</span>)</div><div class='output co'>#&gt;       mean         se 
+#&gt; 3.98541732 0.01565369 </div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

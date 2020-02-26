@@ -140,8 +140,7 @@ existing biodiversity data (i.e. survey data and environmental niche models).</p
   <span class='no'>feature_survey_specificity_column</span>, <span class='no'>feature_model_sensitivity_column</span>,
   <span class='no'>feature_alpha_column</span>, <span class='no'>feature_gamma_column</span>, <span class='no'>total_budget</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>n_approx_states</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>)</pre>
+  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -261,27 +260,11 @@ function. Greater values result in more precise calculations, but
 also incur more computational costs. Defaults to 1000.</p></td>
     </tr>
     <tr>
-      <th>n_approx_states</th>
-      <td><p><code>integer</code> number of states to use for
-approximating the expected value of a given management action.
-Valid arguments include an integer value greater than zero (e.g. 10000), or
-<code>NULL</code>. If <code>NULL</code> is supplied as an argument, then the expected
-value of a given management action is calculated precisely and not using
-approximation methods. Defaults to <code>NULL</code>.</p></td>
-    </tr>
-    <tr>
       <th>optimality_gap</th>
       <td><p><code>numeric</code> relative optimality gap for generating
 conservation prioritizations. A value of zero indicates that
 prioritizations must be solved to optimality. A value of 0.1 indicates
 prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
-    </tr>
-    <tr>
-      <th>seed</th>
-      <td><p><code>integer</code> random seed used for calculations. This
-parameter only has an influence when approximation methods are used
-for calculating the expected value of a given management action.
-Defaults to 500.</p></td>
     </tr>
     </table>
 
@@ -291,23 +274,24 @@ Defaults to 500.</p></td>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Let \(I\) denote the set of feature (indexed by
-\(i\)); \(J\) the set of planning units (indexed by \(j\)).
+\(i\)) and \(J\) the set of planning units (indexed by \(j\)).
 To describe the results of previous surveys, let \(D_{ij}\) indicate the
 detection/non-detection of feature \(i \in I\) in planning unit
 \(j \in J\) during previous surveys using zeros and ones
 (specified via <code>site_occupancy_columns</code>).
 Also let \(U_j\) indicate if planning unit \(j \in J\) has previously
 been surveyed or not.
-To describe the accuracy of the surveys, let \(S_i\) the sensitivity, and
-\(N_i\) denote the specificity of the surveying methodology for feature
-\(i \in I\) (specified via <code>feature_survey_sensitivity_column</code> and
+To describe the accuracy of the surveys, let \(S_i\) denote the
+sensitivity and \(N_i\) denote the specificity of the surveying
+methodology for features \(i \in I\) (specified via
+<code>feature_survey_sensitivity_column</code> and
 <code>feature_survey_specificity_column</code> respectively).
 Next, let \(H_{ij}\) denote the modelled probabilities of
-the feature \(i \in I\) occupying planning units \(j \in J\)
+the features \(i \in I\) occupying planning units \(j \in J\)
 (specified via <code>site_probability_columns</code>).
 To describe the accuracy of the environmental niche models, let \({S'}_i\)
-the sensitivity of the models for feature \(i \in I\) (specified via
-<code>feature_model_sensitivity_column</code>).
+denote the sensitivity of the models for features \(i \in I\) (specified
+via <code>feature_model_sensitivity_column</code>).
 We can calculate the prior probability of each feature \(i \in I\)
 occupying each site \(j \in J\) following
 (or manually specified via <code>prior_matrix</code>):</p>
@@ -323,19 +307,15 @@ management action (indexed by \(s\)). Here, \(S\) represents all possible
 combinations of different species occurring in different sites.
 The total number of states \(s \in S\) is incredibly large for even a small
 conservation planning problem. For example, a conservation planning problem
-involving ten sites and five features (species) has approximately
-\(1.126 \times 10^{16}\) states. Unfortunately, this means that it is not
+involving ten sites and four features (species) has approximately
+\(1.09 \times 10^{12}\) states. In other words, one trillion ninety-nine
+billion five hundred eleven million six hundred twenty-seven thousand seven
+hundred seventy-five states. Unfortunately, this means that it is not
 computationally feasible to calculate exact values of information for
-conservation problems involving many sites. Later on, we outline an
-<em>approximation method</em> for reducing computational
-burden; but first we will outline an <em>exact method</em> for exactly
-calculating values of information. If the argument to <code>n_approx_states</code>
-is (default) <code>NULL</code> then the <em>exact method</em> is used for
-calculations. Otherwise, the <em>approximate method</em> is used for
-calculations. Let \(G_{ijs}\) indicate which species \(i \in I\) occur
-in which planning units \(j \in J\) given state \(s \in S\).
-We calculate the prior probability of each state \(s \in S\) being the
-true state following:</p>
+conservation problems involving many sites. Let \(G_{ijs}\) indicate which
+species \(i \in I\) occur in which planning units \(j \in J\) given
+state \(s \in S\). We calculate the prior probability of each state
+\(s \in S\) being the true state following:</p>
 <p>$$P_s = \\
 Q_{ij}, \text{ if } G_{ijs} = 1 \\
 1 - Q_{ij}, \text{ else } \\
@@ -361,7 +341,14 @@ used in the objective function of the <em>Zonation</em> decision support tool
 for species \(i \in I\) to parametrise trade-offs in the protection of
 different species. These scaling terms are crucial to ensure that competing
 management decisions are evaluated in a manner conforming to the principle
-of complementarity (Vane-Wright <em>et al.</em> 1991).</p>
+of complementarity (Vane-Wright <em>et al.</em> 1991).
+The value of a management action (\(z\)) for a given state (\(s\)) is
+calculated following, wherein \(Y_j\) indicates
+if each site \(j \in J\) is selected in the (\(z\)) management action or
+not (using zeros and ones):</p>
+<p>$$
+V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
+$$</p>
 <p>We can now calculate the
 <em>expected value of the management decision given
 current information</em> (\(\text{EV}_{\text{current}}\)). To achieve this, we
@@ -373,7 +360,6 @@ information</em>. Let \(z'\) denote an optimal management action
 <p>$$
 \text{EV}_{\text{current}} = \mathbb{E} \left[ V(z', S) \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S) \right] \\
 \mathbb{E} \left[ V(z, S) \right] = \sum_{s \in S} V(z, s) \times P_s \\
-V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} X_{jz} G_{ijs} \right) ^{\gamma_i} \\
 $$</p>
 <p>Typically, the emphexpected value of the best management action given
 current information is calculated by iterating over every possible
@@ -382,8 +368,8 @@ computationally expensive for even a small conservation planning problem.
 For example, a conservation planning problem involving 60 planning units has
 approximately \(1.52 \times 10^{18}\) different solutions (i.e.
 combinations of different planning units being selected). Therefore, we
-applied combinatorial optimization instead. Specifically, we identified the
-best management action by formulating the management action problem as an
+applied combinatorial optimization instead. Specifically, we identify the
+best management action by formulating an
 integer programming problem -- using piecewise linear constraints to
 linearise the objective function (precision controlled using
 <code>n_approx_n_approx_obj_fun_points</code>) -- and solving it to (near)
@@ -394,23 +380,8 @@ management action given current information (using zeros and ones):</p>
 <p>$$
 \text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X'}_j Q_{ij} \right) ^{\gamma_i} \\
 \text{subject to } \sum_{j \in J} {{X'}_j} A_j \leq b \\
+{{X'}_j} \geq T_j \text{ } \forall j \in J \\
 {{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
-$$</p>
-<p>Now we will outline the <em>approximation method</em> for approximating the
-value of information calculations. To achieve this, let \(S'\) denote a
-subset of the states \(s \in S\) (indexed by \(s\)). Under the
-<em>approximation method</em>, we perform the value of information analyses
-using the subset of states \(s \in S'\) instead of all states
-\(s \in S\) (per the <em>exact method</em>). We calculated the approximate
-prior probabilities of states \(s \in S'\) following:</p>
-<p>$$
-{P'}_{s} = \frac{P_{s}}{\sum_{\bar{s} \in S'} P_{\bar{s}}}
-$$</p>
-<p>The <em>approximate expected value of the management decision given
-current information</em> (\({\text{EV}'}_{\text{current}}\)) is calculated
-following:</p>
-<p>$$
-{\text{EV}'}_{\text{current}} = \max_{z \in Z} \mathbb{E} \left[ V(z, S') \right]
 $$</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -423,14 +394,12 @@ protect? Systematics and the agony of choice.
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>prior_probability_matrix</code>,
-<code>expected_value_of_decision_given_perfect_information</code>.</p></div>
+<code>approx_expected_value_of_decision_given_current_information</code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    RFoptions</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
@@ -451,8 +420,8 @@ protect? Systematics and the agony of choice.
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
 #&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># … with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 7</span><span>
-#&gt;   name  survey survey_sensitivi… survey_specifici… model_sensitivi… alpha  gamma
+#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 7</span><span>
+#&gt;   name  survey survey_sensitivi~ survey_specifici~ model_sensitivi~ alpha  gamma
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE               0.955             0.822            0.775  2.70 0.642 
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE               0.961             0.829            0.723  2.95 0.077</span><span style='text-decoration: underline;'>7</span><span></div><div class='input'>
@@ -467,17 +436,7 @@ protect? Systematics and the agony of choice.
   <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 286.9507</div><div class='input'>
-<span class='co'># calculate expected value of management decision given current information</span>
-<span class='co'># using approximate method with 40 approximate states</span>
-<span class='no'>ev_prime_current</span> <span class='kw'>&lt;-</span> <span class='fu'>expected_value_of_decision_given_current_information</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
-  <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>,
-  <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>,
-  <span class='kw'>n_approx_states</span> <span class='kw'>=</span> <span class='fl'>40</span>)
-
-<span class='co'># print approximate value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_current</span>)</div><div class='output co'>#&gt; [1] 124.8919</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 3.995959</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

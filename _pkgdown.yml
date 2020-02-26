@@ -19,7 +19,9 @@ reference:
     desc: Functions for value of information analyses
     contents:
       - expected_value_of_decision_given_current_information
+      - approx_expected_value_of_decision_given_current_information
       - expected_value_of_decision_given_perfect_information
+      - approx_expected_value_of_decision_given_perfect_information
       - prior_probability_matrix
   - title: Survey schemes
     desc: Functions for generating survey schemes

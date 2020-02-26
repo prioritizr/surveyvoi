@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' # calculate number of states for 3 sites and 2 features
-#' n_states(x = 2, y = 3)
+#' n_states(n_sites = 2, n_features = 3)
 #'
 #' @export
 n_states <- function(n_sites, n_features) {

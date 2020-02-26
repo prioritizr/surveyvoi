@@ -4,6 +4,12 @@
     <loc>https://jeffrey-hanson.com/surveyvoi/index.html</loc>
   </url>
   <url>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/approx_expected_value_of_decision_given_current_information.html</loc>
+  </url>
+  <url>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/approx_expected_value_of_decision_given_perfect_information.html</loc>
+  </url>
+  <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/env_div_survey_scheme.html</loc>
   </url>
   <url>
@@ -20,6 +26,9 @@
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/geo_cov_survey_scheme.html</loc>
+  </url>
+  <url>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/n_states.html</loc>
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/prior_probability_matrix.html</loc>

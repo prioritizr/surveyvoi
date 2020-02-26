@@ -154,32 +154,42 @@ site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># map of site occupancy data from previous surveys</span>
 p1 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> f1)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"1"</span> =<span class="st"> "red"</span>, <span class="st">"0"</span> =<span class="st"> "black"</span>),
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"1"</span> =<span class="st"> "red"</span>, <span class="st">"0"</span> =<span class="st"> "black"</span>),
                      <span class="dt">na.value =</span> <span class="st">"blue"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"presence/absence data"</span>)
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"presence/absence data"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)
 
-<span class="co"># make map of site occupancy data from previous surveys</span>
+<span class="co"># make map of modelled probability of occupancy data</span>
 p2 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> p1)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"modelled probability of occupancy"</span>)
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">limits =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"probability data"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)
 
 <span class="co"># make map of site occupancy data from previous surveys</span>
 p3 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> management_cost)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>() <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"management costs"</span>)
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/viridis/topics/scale_viridis">scale_color_viridis</a></span>(<span class="dt">name =</span> <span class="st">""</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="dt">title =</span> <span class="st">"management costs"</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">legend.position =</span> <span class="st">"bottom"</span>)
 
 <span class="co"># display plots</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/gridExtra/topics/arrangeGrob">grid.arrange</a></span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="approximation_files/figure-html/fig.hold-1.png" width="336" style="display: block; margin: auto;"></p>
+<p><img src="approximation_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>Next we will simulate a total budget for protecting sites. Specifically, we will set this budget (i.e. <code>total_budget</code>) as 60% of the overall site management costs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate total budget for protecting sites</span>
+total_budget &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(site_data<span class="op">$</span>management_cost) <span class="op">*</span><span class="st"> </span><span class="fl">0.6</span>
+
+<span class="co"># print budget</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(total_budget)</code></pre></div>
+<pre><code>## [1] 403.5109</code></pre>
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate feature data</span>
 feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/simulate_feature_data">simulate_feature_data</a></span>(
@@ -197,7 +207,153 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 <div id="benchmark-analysis" class="section level2">
 <h2 class="hasAnchor">
 <a href="#benchmark-analysis" class="anchor"></a>Benchmark analysis</h2>
-<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of <code>surveyvoi::rcpp_n_states(1 * 10)</code> states.</p>
+<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of 1023 states. Since we are interested in understanding how the number states in the approximation method affects its accuracy, we will create a set of containing different numbers of states (i.e. <code>n_approx_states</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create set of number of approximation states</span>
+n_approx_states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">ceiling</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">10</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/n_states">n_states</a></span>(<span class="dv">1</span>, <span class="dv">10</span>), <span class="dt">length.out =</span> <span class="dv">10</span>))
+
+<span class="co"># print states</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(n_approx_states)</code></pre></div>
+<pre><code>##  [1]   10  123  236  348  461  573  686  798  911 1023</code></pre>
+<p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given current information using</span>
+<span class="co"># exact methods</span>
+ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/expected_value_of_decision_given_current_information">expected_value_of_decision_given_current_information</a></span>(
+  <span class="dt">site_data =</span> site_data,
+  <span class="dt">feature_data =</span> feature_data,
+  <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
+  <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+  <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+  <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
+  <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
+  <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
+  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+  <span class="dt">total_budget =</span> total_budget)
+
+<span class="co"># estimate the correct value of the decision given current information using</span>
+<span class="co"># approximation methods</span>
+ev_prime_current &lt;-
+<span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
+    result &lt;-
+<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_expected_value_of_decision_given_current_information">approx_expected_value_of_decision_given_current_information</a></span>(
+        <span class="dt">site_data =</span> site_data,
+        <span class="dt">feature_data =</span> feature_data,
+        <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
+        <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+        <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+        <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
+        <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
+        <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+        <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
+        <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+        <span class="dt">total_budget =</span> total_budget,
+        <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
+        <span class="dt">n_approx_states_per_replicate =</span> x,
+        <span class="dt">seed =</span> <span class="dv">100</span>)
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
+  }) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
+
+<span class="co"># preview results</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
+<pre><code>## [1] 1.728281</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_current)</code></pre></div>
+<pre><code>## # A tibble: 10 x 3
+##        n    mean           se
+##    &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;
+##  1    10 1.68029 0.0155333   
+##  2   123 1.72582 0.00346853  
+##  3   236 1.72448 0.00224911  
+##  4   348 1.72602 0.00227868  
+##  5   461 1.72650 0.00168336  
+##  6   573 1.72820 0.00114694  
+##  7   686 1.72734 0.00109281  
+##  8   798 1.72757 0.000795504 
+##  9   911 1.72838 0.000466555 
+## 10  1023 1.72822 0.0000643453</code></pre>
+<p>In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given perfect information using</span>
+<span class="co"># exact methods</span>
+ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/expected_value_of_decision_given_perfect_information">expected_value_of_decision_given_perfect_information</a></span>(
+  <span class="dt">site_data =</span> site_data,
+  <span class="dt">feature_data =</span> feature_data,
+  <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
+  <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+  <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+  <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
+  <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
+  <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
+  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+  <span class="dt">total_budget =</span> total_budget)
+
+<span class="co"># estimate the correct value of the decision given perfect information using</span>
+<span class="co"># approximation methods</span>
+ev_prime_certainty &lt;-
+<span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
+    result &lt;-
+<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_expected_value_of_decision_given_perfect_information">approx_expected_value_of_decision_given_perfect_information</a></span>(
+        <span class="dt">site_data =</span> site_data,
+        <span class="dt">feature_data =</span> feature_data,
+        <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
+        <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+        <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+        <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
+        <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
+        <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+        <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
+        <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+        <span class="dt">total_budget =</span> total_budget,
+        <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
+        <span class="dt">n_approx_states_per_replicate =</span> x,
+        <span class="dt">seed =</span> <span class="dv">100</span>)
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
+  }) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
+
+<span class="co"># preview results</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_certainty)</code></pre></div>
+<pre><code>## [1] 1.746199</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_certainty)</code></pre></div>
+<pre><code>## # A tibble: 10 x 3
+##        n    mean           se
+##    &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;
+##  1    10 1.69948 0.0272967   
+##  2   123 1.72835 0.0127688   
+##  3   236 1.73495 0.0108250   
+##  4   348 1.74638 0.00830249  
+##  5   461 1.74949 0.00660624  
+##  6   573 1.74801 0.00515168  
+##  7   686 1.74550 0.00420778  
+##  8   798 1.74309 0.00304518  
+##  9   911 1.74658 0.00135912  
+## 10  1023 1.74621 0.0000183758</code></pre>
+<p>Now let’s create a plot to visualize the results. This plot has two panels. The top panel corresponds to the <em>expected value of the decision given current information</em> and the bottom panel corresponds to the <em>expected value of the decision given perfect information</em>. Within each panel, points correspond to mean estimates from the approximate method, error bars show standard errors associated with estimates from the approximation method, and the blue line shows the correct value calculated using the exact methods.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># prepare data for plotting</span>
+point_data &lt;-
+<span class="st">  </span>ev_prime_current <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
+<span class="st">            </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
+                                  <span class="st">"perfect information"</span>))) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
+line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(
+  <span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"expected value of decision given current information"</span>,
+             <span class="st">"expected value of decision given perfect information"</span>),
+  <span class="dt">yint =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(ev_current, ev_certainty))
+
+<span class="co"># create plot</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">y =</span> mean), point_data) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), point_data) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">yintercept =</span> yint), line_data, <span class="dt">colour =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>metric, <span class="dt">ncol =</span> <span class="dv">1</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Number of states used in approximation calculations"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected value"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">strip.background =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span>(<span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">fill =</span> <span class="st">"black"</span>),
+      <span class="dt">strip.text =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">color =</span> <span class="st">"white"</span>, <span class="dt">size =</span> <span class="dv">12</span>))</code></pre></div>
+<p><img src="approximation_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;"></p>
+<p>We can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). These results demonstrate that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.</p>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">

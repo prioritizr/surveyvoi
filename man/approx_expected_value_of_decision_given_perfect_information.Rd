@@ -3,7 +3,7 @@
 %   R/approx_expected_value_of_decision_given_perfect_information.R
 \name{approx_expected_value_of_decision_given_perfect_information}
 \alias{approx_expected_value_of_decision_given_perfect_information}
-\title{Expected value of decision given perfect information}
+\title{Approximate expected value of decision given perfect information}
 \usage{
 approx_expected_value_of_decision_given_perfect_information(site_data,
   feature_data, site_occupancy_columns, site_probability_columns,
@@ -11,9 +11,9 @@ approx_expected_value_of_decision_given_perfect_information(site_data,
   feature_survey_specificity_column, feature_model_sensitivity_column,
   feature_alpha_column, feature_gamma_column, total_budget,
   site_management_locked_in_column = NULL, prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000, n_approx_replicates = 100,
-  n_approx_states_per_replicate = min(1000, n_states(nrow(site_data),
-  nrow(feature_data))), optimality_gap = 0, seed = 500)
+  n_approx_obj_fun_points = 1000, optimality_gap = 0,
+  n_approx_replicates = 100, n_approx_states_per_replicate = min(1000,
+  n_states(nrow(site_data), nrow(feature_data))), seed = 500)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
@@ -102,6 +102,18 @@ for approximating the piecewise-linear components of the objective
 function. Greater values result in more precise calculations, but
 also incur more computational costs. Defaults to 1000.}
 
+\item{optimality_gap}{\code{numeric} relative optimality gap for generating
+conservation prioritizations. A value of zero indicates that
+prioritizations must be solved to optimality. A value of 0.1 indicates
+prioritizations must be within 10\% of optimality. Defaults to 0.}
+
+\item{n_approx_replicates}{\code{integer} number of replicates to use for
+approximating the expected value of a given management action.
+Valid arguments include an integer value greater than zero (e.g.
+100), or \code{NULL}. If \code{NULL} is supplied as an argument, then
+the expected value of a given management action is calculated precisely
+and not using approximation methods. Defaults to \code{NULL}.}
+
 \item{n_approx_states_per_replicate}{\code{integer} number of states to use
 per replicate for approximating the expected value of a given management
 action. Valid arguments include an integer value greater than zero (e.g.
@@ -109,15 +121,8 @@ action. Valid arguments include an integer value greater than zero (e.g.
 the expected value of a given management action is calculated precisely
 and not using approximation methods. Defaults to \code{NULL}.}
 
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
-
-\item{seed}{\code{integer} random seed used for calculations. This
-parameter only has an influence when approximation methods are used
-for calculating the expected value of a given management action.
-Defaults to 500.}
+\item{seed}{\code{integer} random seed used for generating states. Defaults
+to 500.}
 }
 \value{
 \code{numeric} \code{vector} containing the mean estimate and
@@ -134,23 +139,24 @@ value of management decisions following additional data collection.
 }
 \details{
 Let \eqn{I} denote the set of feature (indexed by
-\eqn{i}); \eqn{J} the set of planning units (indexed by \eqn{j}).
+\eqn{i}) and \eqn{J} the set of planning units (indexed by \eqn{j}).
 To describe the results of previous surveys, let \eqn{D_{ij}} indicate the
 detection/non-detection of feature \eqn{i \in I} in planning unit
 \eqn{j \in J} during previous surveys using zeros and ones
 (specified via \code{site_occupancy_columns}).
 Also let \eqn{U_j} indicate if planning unit \eqn{j \in J} has previously
 been surveyed or not.
-To describe the accuracy of the surveys, let \eqn{S_i} the sensitivity, and
-\eqn{N_i} denote the specificity of the surveying methodology for feature
-\eqn{i \in I} (specified via \code{feature_survey_sensitivity_column} and
+To describe the accuracy of the surveys, let \eqn{S_i} denote the
+sensitivity and \eqn{N_i} denote the specificity of the surveying
+methodology for features \eqn{i \in I} (specified via
+\code{feature_survey_sensitivity_column} and
 \code{feature_survey_specificity_column} respectively).
 Next, let \eqn{H_{ij}} denote the modelled probabilities of
-the feature \eqn{i \in I} occupying planning units \eqn{j \in J}
+the features \eqn{i \in I} occupying planning units \eqn{j \in J}
 (specified via \code{site_probability_columns}).
 To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-the sensitivity of the models for feature \eqn{i \in I} (specified via
-\code{feature_model_sensitivity_column}).
+denote the sensitivity of the models for features \eqn{i \in I} (specified
+via \code{feature_model_sensitivity_column}).
 We can calculate the prior probability of each feature \eqn{i \in I}
 occupying each site \eqn{j \in J} following
 (or manually specified via \code{prior_matrix}):
@@ -168,23 +174,27 @@ management action (indexed by \eqn{s}). Here, \eqn{S} represents all possible
 combinations of different species occurring in different sites.
 The total number of states \eqn{s \in S} is incredibly large for even a small
 conservation planning problem. For example, a conservation planning problem
-involving ten sites and five features (species) has approximately
-\eqn{1.126 \times 10^{16}} states. Unfortunately, this means that it is not
+involving ten sites and four features (species) has approximately
+\eqn{1.09 \times 10^{12}} states. In other words, one trillion ninety-nine
+billion five hundred eleven million six hundred twenty-seven thousand seven
+hundred seventy-five states. Unfortunately, this means that it is not
 computationally feasible to calculate exact values of information for
-conservation problems involving many sites. Later on, we outline an
-\emph{approximation method} for reducing computational
-burden; but first we will outline an \emph{exact method} for exactly
-calculating values of information. If the argument to \code{n_approx_states}
-is (default) \code{NULL} then the \emph{exact method} is used for
-calculations. Otherwise, the \emph{approximate method} is used for
-calculations. Let \eqn{G_{ijs}} indicate which species \eqn{i \in I} occur
-in which planning units \eqn{j \in J} given state \eqn{s \in S}.
-We calculate the prior probability of each state \eqn{s \in S} being the
-true state following:
+conservation problems involving many sites. Let \eqn{G_{ijs}} indicate which
+species \eqn{i \in I} occur in which planning units \eqn{j \in J} given
+state \eqn{s \in S}. We calculate the prior probability of each state
+\eqn{s \in S} being the true state following:
 
 \deqn{P_s = \\
 Q_{ij}, \text{ if } G_{ijs} = 1 \\
 1 - Q_{ij}, \text{ else } \\
+}
+
+Under the \emph{approximation method}, we define \eqn{S'} which contains a
+subset of sites \eqn{s \in S}. The prior probability of each state
+\eqn{s \in S'} being the true state is calculated following:
+
+\deqn{
+{P'}_s = \frac{P_s}{\sum_{k \in S'} P_k}
 }
 
 Here, the management action is to purchase a set of sites for
@@ -209,63 +219,60 @@ for species \eqn{i \in I} to parametrise trade-offs in the protection of
 different species. These scaling terms are crucial to ensure that competing
 management decisions are evaluated in a manner conforming to the principle
 of complementarity (Vane-Wright \emph{et al.} 1991).
+The value of a management action (\eqn{z}) for a given state (\eqn{s}) is
+calculated following, wherein \eqn{Y_j} indicates
+if each site \eqn{j \in J} is selected in the (\eqn{z}) management action or
+not (using zeros and ones):
 
-We can now calculate the \emph{expected value of the management decision
-given perfect information} (\eqn{\text{EV}_{\text{certainty}}}). To achieve
-this, we assume that the decision maker will act optimally based on their
-perfect knowledge. Thus the \emph{expected value of the management decision
-given perfect information} is the \emph{expected value of the best management
-action given perfect information}. Let \eqn{z''} denote an optimal
+\deqn{
+V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
+}
+
+We can now calculate the \emph{approximate expected value of the management
+decision given perfect information} (\eqn{\text{EV'}_{\text{certainty}}}).
+To achieve this, we assume that the decision maker will act optimally based
+on their perfect knowledge. Thus the \emph{approximate expected value of the
+management decision given perfect information} is the \emph{approximate
+expected value of the best management action given perfect information}. Let
+\eqn{z''} denote an optimal
 management action \eqn{z \in Z} given perfect information. This can be
 expressed as follows:
 
 \deqn{
-\text{EV}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S) \right] = \sum_{s \in S} \left[ \left\{ V({z''_s}, s) \right\} \times P_s \right]
+\text{EV'}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S') \right] = \sum_{s \in S'} \left[ \left\{ V({{z''}_s}, s) \right\} \times {P'}_s \right]
 }
 
-Typically, the emph{expected value of the best management action given
-perfect information} is calculated by iterating over every possible
-management action \eqn{z \in Z}. However, this approach would be
-computationally expensive for even a small conservation planning problem.
-For example, a conservation planning problem involving 60 planning units has
-approximately \eqn{1.52 \times 10^{18}} different solutions (i.e.
-combinations of different planning units being selected). Therefore, we
-applied combinatorial optimization instead. Specifically, we identified the
-best management action by formulating the management action problem as an
-integer programming problem -- using piecewise linear constraints to
-linearise the objective function (precision controlled using
-\code{n_approx_n_approx_obj_fun_points}) -- and solving it to (near)
+We use combinatorial optimization to identify the (\eqn{{z''}_s})
+best management action for each state \eqn{s \in S'}. Specifically, we
+formulate an integer programming problem -- using piecewise linear
+constraints to linearise the objective function (precision controlled using
+\code{n_approx_n_approx_obj_fun_points}) -- and solve it to (near)
 optimality (controlled using
-\code{optimality_gap}) with the \pkg{gurobi} package. Let \eqn{{X''}_j}
-indicate if each planning unit \eqn{j \in J} is selected in the \eqn{z''}
-best management action given perfect information (using zeros and ones):
+\code{optimality_gap}) with the \pkg{gurobi} package. Let \eqn{{X''}_{js}}
+indicate if each planning unit \eqn{j \in J} is selected in the
+\eqn{{z''}_s} best management action for state eqn{s} (using zeros and ones):
 
 \deqn{
 \text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X''}_{js}
-G_{ijs} \right) ^{\gamma_i} \\
-\text{subject to } \sum_{j \in J} {X''}_{js} A_j \leq b\\
-{X''}_{js} \in \{ 0, 1 \} \text{ } \forall j \in J
+ G_{ijs} \right) ^{\gamma_i} \\
+\text{subject to } \sum_{j \in J} {{X''}_{js}} A_j \leq b \\
+{{X''}_{js}} \geq T_j \text{ } \forall j \in J \\
+{{X''}_{js}} \in \{ 0, 1 \} \text{ } \forall j \in J
 }
 
-Now we will outline the \emph{approximation method} for approximating the
-value of information calculations. To achieve this, let \eqn{S'} denote a
-subset of the states \eqn{s \in S} (indexed by \eqn{s}). Under the
-\emph{approximation method}, we perform the value of information analyses
-using the subset of states \eqn{s \in S'} instead of all states
-\eqn{s \in S} (per the \emph{exact method}). We calculated the approximate
-prior probabilities of states \eqn{s \in S'} following:
-
-\deqn{
-{P'}_{s} = \frac{P_{s}}{\sum_{\bar{s} \in S'} P_{\bar{s}}}
-}
-
-The \emph{approximate expected value of the management decision given
-perfect information} (\eqn{{\text{EV}'}_{\text{certainty}}}) is calculated
-following:
-
-\deqn{
-{\text{EV}'}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S') \right]
-}
+The accuracy of the approximate method depends on which subset of states
+\eqn{s \in S'} are used for the calculations. As such, this function
+calculates multiple estimates of the  \emph{approximate expected value of
+the management decision given perfect information}
+(\eqn{\text{EV'}_{\text{certainty}}}) using multiple subsets of states \eqn{s
+\in S'} and reports the mean and standard error of these estimates. The
+number of estimates is controlled using the \code{n_replicates} parameter,
+and the number of states in \eqn{S'} is controlled using the
+\code{n_states_per_replicate} parameter. For a given replicate, the states
+are sampled randomly without replacement. This means that the
+\emph{approximation method} is equivalent to the \emph{exact method}
+when the argument to \code{n_states_per_replicate} is equal to the total
+number of states.
 }
 \examples{
 # set seeds for reproducibility
@@ -286,11 +293,13 @@ total_budget <- sum(site_data$management_cost) * 0.5
 
 # calculate expected value of management decision given perfect information
 # using approximate method with 100 replicates and 50 states per replicate
-ev_prime_certainty <- expected_value_of_decision_given_perfect_information(
-  site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-  "management_cost", "survey_sensitivity",
-  "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget,
-  n_approx_replicates = 100, n_approx_states_per_replicate = 50)
+ev_prime_certainty <-
+  approx_expected_value_of_decision_given_perfect_information(
+    site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+    "management_cost", "survey_sensitivity",
+    "survey_specificity", "model_sensitivity", "alpha", "gamma",
+    total_budget, n_approx_replicates = 100,
+    n_approx_states_per_replicate = 50)
 
 # print approximate value
 print(ev_prime_certainty)
@@ -307,5 +316,5 @@ protect? Systematics and the agony of choice.
 }
 \seealso{
 \code{\link{prior_probability_matrix}},
-\code{\link{approx_expected_value_of_decision_given_current_information}}.
+\code{\link{expected_value_of_decision_given_perfect_information}}.
 }
