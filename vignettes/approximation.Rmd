@@ -263,5 +263,3 @@ theme(strip.background = element_rect(color = "black", fill = "black"),
 ```
 
 We can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). These results demonstrate that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.
-
-## References
