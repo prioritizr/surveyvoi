@@ -38,5 +38,5 @@ test_that("expected result", {
     "model_specificity", "alpha", "gamma", 301, "locked_in", NULL, 1000, 0, 10,
     20, 500)
   # tests
-  expect_equal(setNames(r1, c("mean", "se")), r2)
+  expect_equal(r1, r2)
 })

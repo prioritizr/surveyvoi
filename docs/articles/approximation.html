@@ -154,7 +154,7 @@ site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># map of site occupancy data from previous surveys</span>
 p1 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> f1)) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"1"</span> =<span class="st"> "red"</span>, <span class="st">"0"</span> =<span class="st"> "black"</span>),
@@ -232,6 +232,9 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
   <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
   <span class="dt">total_budget =</span> total_budget)
 
+<span class="co"># define function for calculating standard error</span>
+se &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">sqrt</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var</a></span>(x) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x))
+
 <span class="co"># estimate the correct value of the decision given current information using</span>
 <span class="co"># approximation methods</span>
 ev_prime_current &lt;-
@@ -253,9 +256,9 @@ ev_prime_current &lt;-
         <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
         <span class="dt">n_approx_states_per_replicate =</span> x,
         <span class="dt">seed =</span> <span class="dv">100</span>)
-    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(result), <span class="dt">se =</span> <span class="kw">se</span>(result))
   }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">as_tibble</a></span>()
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
 
 <span class="co"># preview results</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
@@ -312,9 +315,9 @@ ev_prime_certainty &lt;-
         <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
         <span class="dt">n_approx_states_per_replicate =</span> x,
         <span class="dt">seed =</span> <span class="dv">100</span>)
-    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(result), <span class="dt">se =</span> <span class="kw">se</span>(result))
   }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">as_tibble</a></span>()
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
 
 <span class="co"># preview results</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_certainty)</code></pre></div>
@@ -337,12 +340,12 @@ ev_prime_certainty &lt;-
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># prepare data for plotting</span>
 point_data &lt;-
 <span class="st">  </span>ev_prime_current <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/bind">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
-<span class="st">            </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
+<span class="st">            </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
                                   <span class="st">"perfect information"</span>))) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
-line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">tibble</a></span>(
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
+line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(
   <span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"expected value of decision given current information"</span>,
              <span class="st">"expected value of decision given perfect information"</span>),
   <span class="dt">yint =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(ev_current, ev_certainty))
