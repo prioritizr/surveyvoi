@@ -154,7 +154,7 @@ site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># map of site occupancy data from previous surveys</span>
 p1 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> f1)) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">name =</span> <span class="st">""</span>, <span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"1"</span> =<span class="st"> "red"</span>, <span class="st">"0"</span> =<span class="st"> "black"</span>),
@@ -197,12 +197,13 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 
 <span class="co"># print feature data</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(feature_data)</code></pre></div>
-<pre><code>## # A tibble: 1 x 7
-##   name  survey survey_sensitiv… survey_specific… model_sensitivi…   alpha
-##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;   &lt;dbl&gt;
-## 1 f1    TRUE           0.982836         0.861585         0.713643 1.57766
-## # … with 1 more variable: gamma &lt;dbl&gt;</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>alpha</code> and <code>gamma</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> column denotes the sensitivity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
+<pre><code>## # A tibble: 1 x 8
+##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
+##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 f1    TRUE           0.982836         0.861585         0.713643
+## # … with 3 more variables: model_specificity &lt;dbl&gt;, alpha &lt;dbl&gt;,
+## #   gamma &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>alpha</code> and <code>gamma</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
 </div>
 <div id="benchmark-analysis" class="section level2">
 <h2 class="hasAnchor">
@@ -217,7 +218,7 @@ n_approx_states &lt;-<span class="st"> </span><span class="kw"><a href="https://
 <p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given current information using</span>
 <span class="co"># exact methods</span>
-ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/expected_value_of_decision_given_current_information">expected_value_of_decision_given_current_information</a></span>(
+ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdci">evdci</a></span>(
   <span class="dt">site_data =</span> site_data,
   <span class="dt">feature_data =</span> feature_data,
   <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
@@ -226,6 +227,7 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
   <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+  <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
   <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
   <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
   <span class="dt">total_budget =</span> total_budget)
@@ -235,7 +237,7 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 ev_prime_current &lt;-
 <span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
     result &lt;-
-<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_expected_value_of_decision_given_current_information">approx_expected_value_of_decision_given_current_information</a></span>(
+<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdci">approx_evdci</a></span>(
         <span class="dt">site_data =</span> site_data,
         <span class="dt">feature_data =</span> feature_data,
         <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
@@ -244,6 +246,7 @@ ev_prime_current &lt;-
         <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
         <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
         <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+        <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
         <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
         <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
         <span class="dt">total_budget =</span> total_budget,
@@ -252,29 +255,29 @@ ev_prime_current &lt;-
         <span class="dt">seed =</span> <span class="dv">100</span>)
     <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
   }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">as_tibble</a></span>()
 
 <span class="co"># preview results</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
-<pre><code>## [1] 1.728281</code></pre>
+<pre><code>## [1] 4.650252</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_current)</code></pre></div>
 <pre><code>## # A tibble: 10 x 3
-##        n    mean           se
-##    &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;
-##  1    10 1.68029 0.0155333   
-##  2   123 1.72582 0.00346853  
-##  3   236 1.72448 0.00224911  
-##  4   348 1.72602 0.00227868  
-##  5   461 1.72650 0.00168336  
-##  6   573 1.72820 0.00114694  
-##  7   686 1.72734 0.00109281  
-##  8   798 1.72757 0.000795504 
-##  9   911 1.72838 0.000466555 
-## 10  1023 1.72822 0.0000643453</code></pre>
+##        n    mean          se
+##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+##  1    10 4.31353 0.102651   
+##  2   123 4.63132 0.0232484  
+##  3   236 4.62251 0.0151316  
+##  4   348 4.63425 0.0151433  
+##  5   461 4.63723 0.0114165  
+##  6   573 4.64937 0.00791264 
+##  7   686 4.64393 0.00749626 
+##  8   798 4.64541 0.00550044 
+##  9   911 4.65115 0.00327240 
+## 10  1023 4.64982 0.000446635</code></pre>
 <p>In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given perfect information using</span>
 <span class="co"># exact methods</span>
-ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/expected_value_of_decision_given_perfect_information">expected_value_of_decision_given_perfect_information</a></span>(
+ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdpi">evdpi</a></span>(
   <span class="dt">site_data =</span> site_data,
   <span class="dt">feature_data =</span> feature_data,
   <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
@@ -283,6 +286,7 @@ ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www
   <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+  <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
   <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
   <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
   <span class="dt">total_budget =</span> total_budget)
@@ -292,7 +296,7 @@ ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 ev_prime_certainty &lt;-
 <span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
     result &lt;-
-<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_expected_value_of_decision_given_perfect_information">approx_expected_value_of_decision_given_perfect_information</a></span>(
+<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdpi">approx_evdpi</a></span>(
         <span class="dt">site_data =</span> site_data,
         <span class="dt">feature_data =</span> feature_data,
         <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
@@ -301,6 +305,7 @@ ev_prime_certainty &lt;-
         <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
         <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
         <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
+        <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
         <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
         <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
         <span class="dt">total_budget =</span> total_budget,
@@ -309,35 +314,35 @@ ev_prime_certainty &lt;-
         <span class="dt">seed =</span> <span class="dv">100</span>)
     <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> result[[<span class="dv">1</span>]], <span class="dt">se =</span> result[[<span class="dv">2</span>]])
   }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">as_tibble</a></span>()
 
 <span class="co"># preview results</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_certainty)</code></pre></div>
-<pre><code>## [1] 1.746199</code></pre>
+<pre><code>## [1] 4.939601</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_certainty)</code></pre></div>
 <pre><code>## # A tibble: 10 x 3
-##        n    mean           se
-##    &lt;dbl&gt;   &lt;dbl&gt;        &lt;dbl&gt;
-##  1    10 1.69948 0.0272967   
-##  2   123 1.72835 0.0127688   
-##  3   236 1.73495 0.0108250   
-##  4   348 1.74638 0.00830249  
-##  5   461 1.74949 0.00660624  
-##  6   573 1.74801 0.00515168  
-##  7   686 1.74550 0.00420778  
-##  8   798 1.74309 0.00304518  
-##  9   911 1.74658 0.00135912  
-## 10  1023 1.74621 0.0000183758</code></pre>
+##        n    mean          se
+##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+##  1    10 4.89877 0.0933986  
+##  2   123 4.88369 0.0596912  
+##  3   236 4.92458 0.0405168  
+##  4   348 4.94957 0.0272840  
+##  5   461 4.95296 0.0240516  
+##  6   573 4.95063 0.0175104  
+##  7   686 4.94292 0.0140213  
+##  8   798 4.92987 0.00884085 
+##  9   911 4.93816 0.00459071 
+## 10  1023 4.93951 0.000171440</code></pre>
 <p>Now let’s create a plot to visualize the results. This plot has two panels. The top panel corresponds to the <em>expected value of the decision given current information</em> and the bottom panel corresponds to the <em>expected value of the decision given perfect information</em>. Within each panel, points correspond to mean estimates from the approximate method, error bars show standard errors associated with estimates from the approximation method, and the blue line shows the correct value calculated using the exact methods.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># prepare data for plotting</span>
 point_data &lt;-
 <span class="st">  </span>ev_prime_current <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
-<span class="st">            </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/bind">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
+<span class="st">            </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
                                   <span class="st">"perfect information"</span>))) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
-line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/mutate">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
+line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/dplyr/topics/reexports">tibble</a></span>(
   <span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"expected value of decision given current information"</span>,
              <span class="st">"expected value of decision given perfect information"</span>),
   <span class="dt">yint =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(ev_current, ev_certainty))

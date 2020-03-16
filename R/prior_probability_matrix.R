@@ -2,7 +2,7 @@
 #'
 #' Create prior probability matrix for the value of information analysis.
 #'
-#' @inheritParams expected_value_of_decision_given_current_information
+#' @inheritParams evdci
 #'
 #' @details The prior matrix is constructed using a combination of previous
 #'   survey results and modelled predictions for sites that have not been
@@ -16,8 +16,10 @@
 #'   in each site if they have been surveyed (using zeros or ones),
 #'   with unsurveyed sites denoted with -1 values
 #'   Let \eqn{{H'}_{ij}} indicate the modelled probability of each feature
-#'   occupying each site. Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
-#'   sensitivity and specificity of the model for feature \eqn{i \in I}.
+#'   occupying each site.
+#'   Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
+#'   sensitivity and specificity of the model for feature \eqn{i \in I}
+#'   (respectively).
 #'   Given such data, the (\eqn{P_{ij}}) prior probability of feature \eqn{i}
 #'   occupying site \eqn{j} is:
 #'
@@ -25,7 +27,8 @@
 #' P_{ij} = \\
 #' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 #' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i {H'}_{ij}, \text{ else if } D_j = 0 \space (j \text{ not surveyed)} \\
+#' {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+#' 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 #' }
 #'
 #' @return \code{matrix} object containing the prior probabilities of each
@@ -50,7 +53,8 @@
 #' # calculate prior probability matrix
 #' prior_matrix <- prior_probability_matrix(
 #'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-#'   "survey_sensitivity", "survey_specificity", "model_sensitivity")
+#'   "survey_sensitivity", "survey_specificity", "model_sensitivity",
+#'   "model_specificity")
 #'
 #' # preview prior probability matrix
 #' print(prior_matrix)
@@ -58,7 +62,7 @@
 prior_probability_matrix <- function(
   site_data, feature_data, site_occupancy_columns, site_probability_columns,
   feature_survey_sensitivity_column, feature_survey_specificity_column,
-  feature_model_sensitivity_column) {
+  feature_model_sensitivity_column, feature_model_specificity_column) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -98,7 +102,14 @@ prior_probability_matrix <- function(
     is.numeric(feature_data[[feature_model_sensitivity_column]]),
     assertthat::noNA(feature_data[[feature_model_sensitivity_column]]),
     all(feature_data[[feature_model_sensitivity_column]] >= 0),
-    all(feature_data[[feature_model_sensitivity_column]] <= 1))
+    all(feature_data[[feature_model_sensitivity_column]] <= 1),
+    ## feature_model_specificity_column
+    assertthat::is.string(feature_model_specificity_column),
+    all(assertthat::has_name(feature_data, feature_model_specificity_column)),
+    is.numeric(feature_data[[feature_model_specificity_column]]),
+    assertthat::noNA(feature_data[[feature_model_specificity_column]]),
+    all(feature_data[[feature_model_specificity_column]] >= 0),
+    all(feature_data[[feature_model_specificity_column]] <= 1))
   # drop spatial data
   if (inherits(site_data, "sf"))
     site_data <- st_drop_geometry(site_data)
@@ -118,10 +129,14 @@ prior_probability_matrix <- function(
       1 - feature_data[[feature_survey_specificity_column]][f]
   ## add in prior probabilities for sites units without surveys
   for (f in seq_len(nrow(rij))) {
-    ### add probabilities for modelled presences
+    ### add model sensitivity for predicted presence,
+    ### and 1 - model specificity for predicted absence
     pos <- which(is.na(rij[f, ]))
     prior[f, pos] <-
-      feature_data[[feature_model_sensitivity_column]][f] * mij[f, pos]
+      ((feature_data[[feature_model_sensitivity_column]][f]) *
+       (mij[f, pos] >= 0.5)) +
+      ((1 - feature_data[[feature_model_specificity_column]][f]) *
+       (mij[f, pos] < 0.5))
   }
   # return result
   rownames(prior) <- site_occupancy_columns

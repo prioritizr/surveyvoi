@@ -15,7 +15,7 @@ set of sites that could potentially be acquired for conservation management
 doing so could lead to vastly superior conservation management plans.
 Methods are provided to calculate the value of perfect information,
 and the value of sample information for a given survey scheme.
-Furthermore, by maximizing the value of sample informaiton, optimal
-survey schemes can also be identified. 
+Furthermore, by maximizing the value of sample information, optimal
+survey schemes can also be identified.
 This package requires the 'Gurobi' software suite (https://www.gurobi.com).
 }

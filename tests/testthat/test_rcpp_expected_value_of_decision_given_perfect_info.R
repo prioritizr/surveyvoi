@@ -20,6 +20,7 @@ test_that("correct result", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_data <- site_data[c(1, 2), ]
@@ -27,7 +28,7 @@ test_that("correct result", {
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_perfect_info(
     prior_data, site_data$management_cost, site_data$locked_in,
@@ -59,6 +60,7 @@ test_that("consistent results", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_data <- site_data[c(1, 2), ]
@@ -66,7 +68,7 @@ test_that("consistent results", {
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   # calculations
   r1 <- sapply(seq_len(50), function(i) {
     rcpp_expected_value_of_decision_given_perfect_info(

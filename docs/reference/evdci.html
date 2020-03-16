@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prior probability matrix — prior_probability_matrix • surveyvoi</title>
+<title>Expected value of the decision given current information — evdci • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -33,8 +33,11 @@
 
 
 
-<meta property="og:title" content="Prior probability matrix — prior_probability_matrix" />
-<meta property="og:description" content="Create prior probability matrix for the value of information analysis." />
+<meta property="og:title" content="Expected value of the decision given current information — evdci" />
+<meta property="og:description" content="Calculate the expected value of the conservation management decision
+given current information. This metric describes the value of the management
+decision that is expected when the decision maker is limited to
+existing biodiversity data (i.e. survey data and environmental niche models)." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -119,19 +122,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Prior probability matrix</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/prior_probability_matrix.R'><code>R/prior_probability_matrix.R</code></a></small>
-    <div class="hidden name"><code>prior_probability_matrix.Rd</code></div>
+    <h1>Expected value of the decision given current information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/evdci.R'><code>R/evdci.R</code></a></small>
+    <div class="hidden name"><code>evdci.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create prior probability matrix for the value of information analysis.</p>
+    <p>Calculate the <em>expected value of the conservation management decision
+given current information</em>. This metric describes the value of the management
+decision that is expected when the decision maker is limited to
+existing biodiversity data (i.e. survey data and environmental niche models).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>prior_probability_matrix</span>(<span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='no'>site_occupancy_columns</span>,
-  <span class='no'>site_probability_columns</span>, <span class='no'>feature_survey_sensitivity_column</span>,
-  <span class='no'>feature_survey_specificity_column</span>, <span class='no'>feature_model_sensitivity_column</span>,
-  <span class='no'>feature_model_specificity_column</span>)</pre>
+    <pre class="usage"><span class='fu'>evdci</span>(<span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='no'>site_occupancy_columns</span>,
+  <span class='no'>site_probability_columns</span>, <span class='no'>site_management_cost_column</span>,
+  <span class='no'>feature_survey_sensitivity_column</span>, <span class='no'>feature_survey_specificity_column</span>,
+  <span class='no'>feature_model_sensitivity_column</span>, <span class='no'>feature_model_specificity_column</span>,
+  <span class='no'>feature_alpha_column</span>, <span class='no'>feature_gamma_column</span>, <span class='no'>total_budget</span>,
+  <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,6 +171,14 @@ probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (<code>NA</code>)
 values are permitted in these columns.</p></td>
+    </tr>
+    <tr>
+      <th>site_management_cost_column</th>
+      <td><p><code>character</code> name of column in the
+argument to <code>site_data</code> that contains costs for managing each
+site for conservation. This column should have <code>numeric</code> values that
+are equal to or greater than zero. No missing (<code>NA</code>) values are
+permitted in this column.</p></td>
     </tr>
     <tr>
       <th>feature_survey_sensitivity_column</th>
@@ -201,33 +218,95 @@ This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
     </tr>
+    <tr>
+      <th>feature_alpha_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains the \(\alpha\)
+values used to parametrize
+the conservation benefit of managing of each feature.
+This column should have <code>numeric</code> values that
+are equal to or greater than zero. No missing (<code>NA</code>) values are
+permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_gamma_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains the \(\gamma\)
+values used to parametrize the conservation benefit of managing of each
+feature.
+This column should have <code>numeric</code> values that
+are equal to or greater than zero. No missing (<code>NA</code>) values are
+permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>total_budget</th>
+      <td><p><code>numeric</code> maximum expenditure permitted
+for conducting surveys and managing sites for conservation.</p></td>
+    </tr>
+    <tr>
+      <th>site_management_locked_in_column</th>
+      <td><p><code>character</code> name of the column
+in the argument to <code>site_data</code> that contains <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) values indicating which sites should
+be locked in for (<code>TRUE</code>) being managed for conservation or
+(<code>FALSE</code>) not. No missing (<code>NA</code>) values are permitted in this
+column. This is useful if some sites have already been earmarked for
+conservation, or if some sites are already being managed for conservation.
+Defaults to <code>NULL</code> such that no sites are locked in.</p></td>
+    </tr>
+    <tr>
+      <th>prior_matrix</th>
+      <td><p><code>numeric</code> <code>matrix</code> containing
+the prior probability of each feature occupying each site.
+Rows correspond to features, and columns correspond to sites.
+Defaults to <code>NULL</code> such that prior data is calculated automatically
+using <code>prior_probability_matrix</code>.</p></td>
+    </tr>
+    <tr>
+      <th>n_approx_obj_fun_points</th>
+      <td><p><code>integer</code> number of points to use
+for approximating the piecewise-linear components of the objective
+function. Greater values result in more precise calculations, but
+also incur more computational costs. Defaults to 1000.</p></td>
+    </tr>
+    <tr>
+      <th>optimality_gap</th>
+      <td><p><code>numeric</code> relative optimality gap for generating
+conservation prioritizations. A value of zero indicates that
+prioritizations must be solved to optimality. A value of 0.1 indicates
+prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>matrix</code> object containing the prior probabilities of each
-  feature occupying each site. Each row corresponds to a different
-  feature and each column corresponds to a different site.</p>
+    <p><code>numeric</code> value.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The prior matrix is constructed using a combination of previous
-  survey results and modelled predictions for sites that have not been
-  surveyed. Let \(I\) denote the set of features (indexed by \(i\)) and
-  let \(J\) denote the set of sites (indexed by \(j\)).
-  Let \(D_j\) indicate which sites have already been surveyed (using zeros
-  and ones).
-  Let \(S_i\) and \(N_i\) denote sensitivity and specificity
-  of the survey method for features \(i \in I\) (respectively).
-  Also let \(H_{ij}\) denote the presence or absence of each feature
-  in each site if they have been surveyed (using zeros or ones),
-  with unsurveyed sites denoted with -1 values
-  Let \({H'}_{ij}\) indicate the modelled probability of each feature
-  occupying each site.
-  Finally, let \({S'}_i\) and \({N'}_i\) denote
-  sensitivity and specificity of the model for feature \(i \in I\)
-  (respectively).
-  Given such data, the (\(P_{ij}\)) prior probability of feature \(i\)
-  occupying site \(j\) is:</p>
+    <p>Let \(I\) denote the set of feature (indexed by
+\(i\)) and \(J\) the set of planning units (indexed by \(j\)).
+To describe the results of previous surveys, let \(D_{ij}\) indicate the
+detection/non-detection of feature \(i \in I\) in planning unit
+\(j \in J\) during previous surveys using zeros and ones
+(specified via <code>site_occupancy_columns</code>).
+Also let \(U_j\) indicate if planning unit \(j \in J\) has previously
+been surveyed or not.
+To describe the accuracy of the surveys, let \(S_i\) denote the
+sensitivity and \(N_i\) denote the specificity of the surveying
+methodology for features \(i \in I\) (specified via
+<code>feature_survey_sensitivity_column</code> and
+<code>feature_survey_specificity_column</code> respectively).
+Next, let \(H_{ij}\) denote the modelled probabilities of
+the features \(i \in I\) occupying planning units \(j \in J\)
+(specified via <code>site_probability_columns</code>).
+To describe the accuracy of the environmental niche models, let \({S'}_i\)
+and \({N'}_i\) denote the sensitivity and specificity (respectively) of
+the models for features \(i \in I\) (specified
+via <code>feature_model_sensitivity_column</code> and
+<code>feature_model_specificity_column</code> respectively).
+We can calculate the prior probability of each feature \(i \in I\)
+occupying each site \(j \in J\) following
+(or manually specified via <code>prior_matrix</code>):</p>
 <p>$$
 P_{ij} = \\
 S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
@@ -235,6 +314,100 @@ S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 $$</p>
+<p>Since we do not know which features truly occur in which sites, let \(S\)
+denote the full range of possible states that affect the evaluation of the
+management action (indexed by \(s\)). Here, \(S\) represents all possible
+combinations of different species occurring in different sites.
+The total number of states \(s \in S\) is incredibly large for even a small
+conservation planning problem. For example, a conservation planning problem
+involving ten sites and four features (species) has approximately
+\(1.09 \times 10^{12}\) states. In other words, one trillion ninety-nine
+billion five hundred eleven million six hundred twenty-seven thousand seven
+hundred seventy-five states. Unfortunately, this means that it is not
+computationally feasible to calculate exact values of information for
+conservation problems involving many sites. Let \(G_{ijs}\) indicate which
+species \(i \in I\) occur in which planning units \(j \in J\) given
+state \(s \in S\). We calculate the prior probability of each state
+\(s \in S\) being the true state following:</p>
+<p>$$P_s = \\
+Q_{ij}, \text{ if } G_{ijs} = 1 \\
+1 - Q_{ij}, \text{ else } \\
+$$</p>
+<p>Here, the management action is to purchase a set of sites for
+protected area establishment. In other words, the management action is to
+implement a spatial prioritisation for protected area establishment. The
+management action is subject to a budget that limits the cost of purchasing
+sites. Let \(A_j\) denote the cost of acquiring each site
+\(j \in J\) (specified via <code>site_management_cost_column</code>),
+and \(b\) denote the total budget available for
+conservation (specified via <code>total_budget</code>). Furthermore,
+let \(T_j\) denote which sites \(j \in j\) are locked into the
+prioritization (e.g. sites in existing protected area system).
+Given these data, let \(Z\) denote the
+set of all possible management actions (indexed by \(z\)). To describe
+each of the possible management actions \(z \in Z\), let \(X_{jz}\)
+indicate which sites \(j \in J\) are purchased for protection (using zeros
+and ones) under a given management action \(z \in Z\). To evaluate the
+conservation value of a given management action, we will adopt equations
+used in the objective function of the <em>Zonation</em> decision support tool
+(Moilanen 2007). Let \(\alpha_i\) and \(\gamma_i\) denote scaling terms
+for species \(i \in I\) to parametrise trade-offs in the protection of
+different species. These scaling terms are crucial to ensure that competing
+management decisions are evaluated in a manner conforming to the principle
+of complementarity (Vane-Wright <em>et al.</em> 1991).
+The value of a management action (\(z\)) for a given state (\(s\)) is
+calculated following, wherein \(Y_j\) indicates
+if each site \(j \in J\) is selected in the (\(z\)) management action or
+not (using zeros and ones):</p>
+<p>$$
+V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
+$$</p>
+<p>We can now calculate the
+<em>expected value of the management decision given
+current information</em> (\(\text{EV}_{\text{current}}\)). To achieve this, we
+assume that the decision maker will act optimally. Thus the
+<em>expected value of the management decision given current information</em>
+is the <em>expected value of the best management action given current
+information</em>. Let \(z'\) denote an optimal management action
+\(z \in Z\) given current information. This can be expressed as follows:</p>
+<p>$$
+\text{EV}_{\text{current}} = \mathbb{E} \left[ V(z', S) \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S) \right] \\
+\mathbb{E} \left[ V(z, S) \right] = \sum_{s \in S} V(z, s) \times P_s \\
+$$</p>
+<p>Typically, the emphexpected value of the best management action given
+current information is calculated by iterating over every possible
+management action \(z \in Z\). However, this approach would be
+computationally expensive for even a small conservation planning problem.
+For example, a conservation planning problem involving 60 planning units has
+approximately \(1.52 \times 10^{18}\) different solutions (i.e.
+combinations of different planning units being selected). Therefore, we
+applied combinatorial optimization instead. Specifically, we identify the
+best management action by formulating an
+integer programming problem -- using piecewise linear constraints to
+linearise the objective function (precision controlled using
+<code>n_approx_n_approx_obj_fun_points</code>) -- and solving it to (near)
+optimality (controlled using
+<code>optimality_gap</code>) with the <span class="pkg">gurobi</span> package. Let \({X'}_j\)
+indicate if each planning unit \(j \in J\) is selected in the \(z'\) best
+management action given current information (using zeros and ones):</p>
+<p>$$
+\text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X'}_j Q_{ij} \right) ^{\gamma_i} \\
+\text{subject to } \sum_{j \in J} {{X'}_j} A_j \leq b \\
+{{X'}_j} \geq T_j \text{ } \forall j \in J \\
+{{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
+$$</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>Moilanen A (2007) Landscape zonation, benefit functions and target-based
+planning: unifying reserve selection strategies.
+<em>Biological Conservation</em>, <strong>134</strong>: 571--579.</p>
+<p>Vane-Wright RI, Humphries CJ, &amp; Williams PH (1991) What to
+protect? Systematics and the agony of choice.
+<em>Biological Conservation</em>, <strong>55</strong>: 235--254.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code>prior_probability_matrix</code>,
+<code>approx_evdci</code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -243,8 +416,7 @@ $$</p>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-                                <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
@@ -267,16 +439,19 @@ $$</p>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
 #&gt; </span><span style='color: #949494;'># ... with 3 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, alpha </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, gamma </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
-<span class='co'># calculate prior probability matrix</span>
-<span class='no'>prior_matrix</span> <span class='kw'>&lt;-</span> <span class='fu'>prior_probability_matrix</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
-  <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>,
-  <span class='st'>"model_specificity"</span>)
+<span class='co'># set total budget for managing sites for conservation</span>
+<span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
-<span class='co'># preview prior probability matrix</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>prior_matrix</span>)</div><div class='output co'>#&gt;         [,1]      [,2]      [,3]      [,4]      [,5]
-#&gt; f1 0.9554571 0.1784514 0.7748368 0.1044942 0.9554571
-#&gt; f2 0.9612699 0.1713662 0.1212766 0.7233379 0.9612699</div></span></pre>
+<span class='co'># calculate expected value of management decision given current information</span>
+<span class='co'># using exact method</span>
+<span class='no'>ev_current</span> <span class='kw'>&lt;-</span> <span class='fu'>evdci</span>(
+  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+  <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
+  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>)
+
+<span class='co'># print exact value</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 5.296916</div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -284,6 +459,8 @@ $$</p>
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
+      <li><a href="#references">References</a></li>
+      <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 

@@ -31,6 +31,9 @@ data:
 \item{\code{model_sensitivity}}{\code{numeric} specificity (true positive
   rate) of the occupancy models for each features.}
 
+\item{\code{model_specificity}}{\code{numeric} specificity (true negative
+  rate) of the occupancy models for each features.}
+
 \item{\code{alpha}}{\code{numeric} values used to parametrize
   the conservation benefit of managing of each feature.}
 

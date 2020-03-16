@@ -20,6 +20,7 @@ test_that("correct result (fixed states)", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_data <- site_data[c(1, 2), ]
@@ -27,7 +28,7 @@ test_that("correct result (fixed states)", {
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   states <- c(0, 1, 5, 10, 20, 23)
   # calculations
   r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
@@ -60,13 +61,14 @@ test_that("correct result (n states)", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   states <- 3
   reps <- 5
   # calculations
@@ -102,13 +104,14 @@ test_that("expected error", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   # tests
   expect_error({
     rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(

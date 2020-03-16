@@ -8,7 +8,7 @@
 #' makers, this metric is useful to provide an upper bound on the expected
 #' value of management decisions following additional data collection.
 #'
-#' @inheritParams approx_expected_value_of_decision_given_current_information
+#' @inheritParams approx_evdci
 #'
 #' @details
 #' Let \eqn{I} denote the set of feature (indexed by
@@ -28,17 +28,20 @@
 #' the features \eqn{i \in I} occupying planning units \eqn{j \in J}
 #' (specified via \code{site_probability_columns}).
 #' To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-#' denote the sensitivity of the models for features \eqn{i \in I} (specified
-#' via \code{feature_model_sensitivity_column}).
+#' and \eqn{{N'}_i} denote the sensitivity and specificity (respectively) of
+#' the models for features \eqn{i \in I} (specified
+#' via \code{feature_model_sensitivity_column} and
+#' \code{feature_model_specificity_column} respectively).
 #' We can calculate the prior probability of each feature \eqn{i \in I}
 #' occupying each site \eqn{j \in J} following
 #' (or manually specified via \code{prior_matrix}):
 #'
 #' \deqn{
-#' Q_{ij} = \\
+#' P_{ij} = \\
 #' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 #' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i {H'}_{ij}, \text{ else if } D_j = 0 \space (j \text{ not surveyed)} \\
+#' {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+#' 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 #' }
 #'
 #' Since we do not know which features truly occur in which sites, let \eqn{S}
@@ -162,19 +165,19 @@
 #'
 #' # calculate expected value of management decision given perfect information
 #' # using exact method
-#' ev_certainty <- expected_value_of_decision_given_perfect_information(
+#' ev_certainty <- evdpi(
 #'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-#'   "management_cost", "survey_sensitivity",
-#'   "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget)
+#'   "management_cost", "survey_sensitivity", "survey_specificity",
+#'   "model_sensitivity", "model_specificity", "alpha", "gamma", total_budget)
 #'
 #' # print exact value
 #' print(ev_certainty)
 #'
 #' @seealso \code{\link{prior_probability_matrix}},
-#' \code{\link{approx_expected_value_of_decision_given_perfect_information}}.
+#' \code{\link{approx_evdpi}}.
 #'
 #' @export
-expected_value_of_decision_given_perfect_information <- function(
+evdpi <- function(
   site_data,
   feature_data,
   site_occupancy_columns,
@@ -183,6 +186,7 @@ expected_value_of_decision_given_perfect_information <- function(
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
+  feature_model_specificity_column,
   feature_alpha_column,
   feature_gamma_column,
   total_budget,
@@ -235,6 +239,13 @@ expected_value_of_decision_given_perfect_information <- function(
     assertthat::noNA(feature_data[[feature_model_sensitivity_column]]),
     all(feature_data[[feature_model_sensitivity_column]] >= 0),
     all(feature_data[[feature_model_sensitivity_column]] <= 1),
+    ## feature_model_specificity_column
+    assertthat::is.string(feature_model_specificity_column),
+    all(assertthat::has_name(feature_data, feature_model_specificity_column)),
+    is.numeric(feature_data[[feature_model_specificity_column]]),
+    assertthat::noNA(feature_data[[feature_model_specificity_column]]),
+    all(feature_data[[feature_model_specificity_column]] >= 0),
+    all(feature_data[[feature_model_specificity_column]] <= 1),
     ## feature_alpha_column
     assertthat::is.string(feature_alpha_column),
     all(assertthat::has_name(feature_data, feature_alpha_column)),
@@ -287,7 +298,7 @@ expected_value_of_decision_given_perfect_information <- function(
     pij <- prior_probability_matrix(
       site_data, feature_data, site_occupancy_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
-      feature_model_sensitivity_column)
+      feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix

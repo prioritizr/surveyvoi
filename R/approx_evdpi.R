@@ -8,7 +8,7 @@
 #' makers, this metric is useful to provide an upper bound on the expected
 #' value of management decisions following additional data collection.
 #'
-#' @inheritParams approx_expected_value_of_decision_given_current_information
+#' @inheritParams approx_evdci
 #'
 #' @details
 #' Let \eqn{I} denote the set of feature (indexed by
@@ -28,17 +28,20 @@
 #' the features \eqn{i \in I} occupying planning units \eqn{j \in J}
 #' (specified via \code{site_probability_columns}).
 #' To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-#' denote the sensitivity of the models for features \eqn{i \in I} (specified
-#' via \code{feature_model_sensitivity_column}).
+#' and \eqn{{N'}_i} denote the sensitivity and specificity (respectively) of
+#' the models for features \eqn{i \in I} (specified
+#' via \code{feature_model_sensitivity_column} and
+#' \code{feature_model_specificity_column} respectively).
 #' We can calculate the prior probability of each feature \eqn{i \in I}
 #' occupying each site \eqn{j \in J} following
 #' (or manually specified via \code{prior_matrix}):
 #'
 #' \deqn{
-#' Q_{ij} = \\
+#' P_{ij} = \\
 #' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 #' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i {H'}_{ij}, \text{ else if } D_j = 0 \space (j \text{ not surveyed)} \\
+#' {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+#' 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 #' }
 #'
 #' Since we do not know which features truly occur in which sites, let \eqn{S}
@@ -52,7 +55,7 @@
 #' billion five hundred eleven million six hundred twenty-seven thousand seven
 #' hundred seventy-five states. Unfortunately, this means that it is not
 #' computationally feasible to calculate exact values of information for
-#' conservation problems involving many sites. Let \eqn{G_{ijs}} indicate which
+#' conservatiwon problems involving many sites. Let \eqn{G_{ijs}} indicate which
 #' species \eqn{i \in I} occur in which planning units \eqn{j \in J} given
 #' state \eqn{s \in S}. We calculate the prior probability of each state
 #' \eqn{s \in S} being the true state following:
@@ -156,7 +159,7 @@
 #' protect? Systematics and the agony of choice.
 #' \emph{Biological Conservation}, \strong{55}: 235--254.
 #'
-#' @inherit approx_expected_value_of_decision_given_current_information return
+#' @inherit approx_evdci return
 #'
 #' @examples
 #' # set seeds for reproducibility
@@ -178,22 +181,21 @@
 #'
 #' # calculate expected value of management decision given perfect information
 #' # using approximate method with 100 replicates and 50 states per replicate
-#' ev_prime_certainty <-
-#'   approx_expected_value_of_decision_given_perfect_information(
-#'     site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-#'     "management_cost", "survey_sensitivity",
-#'     "survey_specificity", "model_sensitivity", "alpha", "gamma",
-#'     total_budget, n_approx_replicates = 100,
-#'     n_approx_states_per_replicate = 50)
+#' ev_prime_certainty <- approx_evdci(
+#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   "management_cost", "survey_sensitivity", "survey_specificity",
+#'   "model_sensitivity", "model_specificity", "alpha", "gamma",
+#'   total_budget, n_approx_replicates = 100,
+#'   n_approx_states_per_replicate = 50)
 #'
 #' # print approximate value
 #' print(ev_prime_certainty)
 #'
 #' @seealso \code{\link{prior_probability_matrix}},
-#' \code{\link{expected_value_of_decision_given_perfect_information}}.
+#' \code{\link{evdpi}}.
 #'
 #' @export
-approx_expected_value_of_decision_given_perfect_information <- function(
+approx_evdpi <- function(
   site_data,
   feature_data,
   site_occupancy_columns,
@@ -202,6 +204,7 @@ approx_expected_value_of_decision_given_perfect_information <- function(
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
+  feature_model_specificity_column,
   feature_alpha_column,
   feature_gamma_column,
   total_budget,
@@ -258,6 +261,13 @@ approx_expected_value_of_decision_given_perfect_information <- function(
     assertthat::noNA(feature_data[[feature_model_sensitivity_column]]),
     all(feature_data[[feature_model_sensitivity_column]] >= 0),
     all(feature_data[[feature_model_sensitivity_column]] <= 1),
+    ## feature_model_sensitivity_column
+    assertthat::is.string(feature_model_specificity_column),
+    all(assertthat::has_name(feature_data, feature_model_specificity_column)),
+    is.numeric(feature_data[[feature_model_specificity_column]]),
+    assertthat::noNA(feature_data[[feature_model_specificity_column]]),
+    all(feature_data[[feature_model_specificity_column]] >= 0),
+    all(feature_data[[feature_model_specificity_column]] <= 1),
     ## feature_alpha_column
     assertthat::is.string(feature_alpha_column),
     all(assertthat::has_name(feature_data, feature_alpha_column)),
@@ -331,7 +341,7 @@ approx_expected_value_of_decision_given_perfect_information <- function(
     pij <- prior_probability_matrix(
       site_data, feature_data, site_occupancy_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
-      feature_model_sensitivity_column)
+      feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix

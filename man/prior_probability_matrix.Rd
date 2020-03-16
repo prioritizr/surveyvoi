@@ -6,7 +6,8 @@
 \usage{
 prior_probability_matrix(site_data, feature_data, site_occupancy_columns,
   site_probability_columns, feature_survey_sensitivity_column,
-  feature_survey_specificity_column, feature_model_sensitivity_column)
+  feature_survey_specificity_column, feature_model_sensitivity_column,
+  feature_model_specificity_column)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
@@ -49,6 +50,14 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
+
+\item{feature_model_specificity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of the initial models correctly predicting an absence of each
+feature in a given site (i.e. the specificity of the models).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.
+This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 }
 \value{
 \code{matrix} object containing the prior probabilities of each
@@ -71,8 +80,10 @@ The prior matrix is constructed using a combination of previous
   in each site if they have been surveyed (using zeros or ones),
   with unsurveyed sites denoted with -1 values
   Let \eqn{{H'}_{ij}} indicate the modelled probability of each feature
-  occupying each site. Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
-  sensitivity and specificity of the model for feature \eqn{i \in I}.
+  occupying each site.
+  Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
+  sensitivity and specificity of the model for feature \eqn{i \in I}
+  (respectively).
   Given such data, the (\eqn{P_{ij}}) prior probability of feature \eqn{i}
   occupying site \eqn{j} is:
 
@@ -80,7 +91,8 @@ The prior matrix is constructed using a combination of previous
 P_{ij} = \\
 S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-{S'}_i {H'}_{ij}, \text{ else if } D_j = 0 \space (j \text{ not surveyed)} \\
+{S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 }
 }
 \examples{
@@ -101,7 +113,8 @@ print(feature_data)
 # calculate prior probability matrix
 prior_matrix <- prior_probability_matrix(
   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-  "survey_sensitivity", "survey_specificity", "model_sensitivity")
+  "survey_sensitivity", "survey_specificity", "model_sensitivity",
+  "model_specificity")
 
 # preview prior probability matrix
 print(prior_matrix)

@@ -1,11 +1,125 @@
-#' Expected value of the decision given current information
+#' Approximate expected value of the decision given current information
 #'
 #' Calculate the \emph{expected value of the conservation management decision
 #' given current information}. This metric describes the value of the management
 #' decision that is expected when the decision maker is limited to
 #' existing biodiversity data (i.e. survey data and environmental niche models).
 #'
-#' @inheritParams approx_expected_value_of_decision_given_current_information
+#' @param site_data \code{\link[sf]{sf}} object with site data.
+#'
+#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
+#'
+#' @param site_occupancy_columns \code{character} names of \code{numeric}
+#'   columns in the
+#'   argument to \code{site_data} that contain presence/absence data.
+#'   Each column should correspond to a different feature, and contain
+#'   binary presence/absence data (zeros or ones) indicating if the
+#'   feature was detected in a previous survey or not. If a site has not
+#'   been surveyed before, then missing (\code{NA}) values should be used.
+#'
+#' @param site_probability_columns \code{character} names of \code{numeric}
+#'   columns in the argument to \code{site_data} that contain modelled
+#'   probabilities of occupancy for each feature in each site.
+#'   Each column should correspond to a different feature, and contain
+#'   probability data (values between zero and one). No missing (\code{NA})
+#'   values are permitted in these columns.
+#'
+#' @param site_management_cost_column \code{character} name of column in the
+#'   argument to \code{site_data} that contains costs for managing each
+#'   site for conservation. This column should have \code{numeric} values that
+#'   are equal to or greater than zero. No missing (\code{NA}) values are
+#'   permitted in this column.
+#'
+#' @param feature_survey_sensitivity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of future surveys correctly detecting a presence of each
+#'   feature in a given site (i.e. the sensitivity of the survey methodology).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
+#'
+#' @param feature_survey_specificity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of future surveys correctly detecting an absence of each
+#'   feature in a given site (i.e. the specificity of the survey methodology).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
+#'
+#' @param feature_model_sensitivity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of the initial models correctly predicting a presence of each
+#'   feature in a given site (i.e. the sensitivity of the models).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
+#'
+#' @param feature_model_specificity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of the initial models correctly predicting an absence of each
+#'   feature in a given site (i.e. the specificity of the models).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
+#'
+#' @param feature_alpha_column \code{character} name of the column in the
+#'   argument to \code{feature_data} that contains the \eqn{\alpha}
+#'   values used to parametrize
+#'   the conservation benefit of managing of each feature.
+#'   This column should have \code{numeric} values that
+#'   are equal to or greater than zero. No missing (\code{NA}) values are
+#'   permitted in this column.
+#'
+#' @param feature_gamma_column \code{character} name of the column in the
+#'   argument to \code{feature_data} that contains the \eqn{\gamma}
+#'   values used to parametrize the conservation benefit of managing of each
+#'   feature.
+#'   This column should have \code{numeric} values that
+#'   are equal to or greater than zero. No missing (\code{NA}) values are
+#'   permitted in this column.
+#'
+#' @param total_budget \code{numeric} maximum expenditure permitted
+#'   for conducting surveys and managing sites for conservation.
+#'
+#' @param site_management_locked_in_column \code{character} name of the column
+#'   in the argument to \code{site_data} that contains \code{logical}
+#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
+#'   be locked in for (\code{TRUE}) being managed for conservation or
+#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#'   column. This is useful if some sites have already been earmarked for
+#'   conservation, or if some sites are already being managed for conservation.
+#'   Defaults to \code{NULL} such that no sites are locked in.
+#'
+#' @param prior_matrix \code{numeric} \code{matrix} containing
+#'  the prior probability of each feature occupying each site.
+#'  Rows correspond to features, and columns correspond to sites.
+#'  Defaults to \code{NULL} such that prior data is calculated automatically
+#'  using \code{\link{prior_probability_matrix}}.
+#'
+#' @param n_approx_obj_fun_points \code{integer} number of points to use
+#'  for approximating the piecewise-linear components of the objective
+#'  function. Greater values result in more precise calculations, but
+#'  also incur more computational costs. Defaults to 1000.
+#'
+#' @param n_approx_replicates \code{integer} number of replicates to use for
+#'   approximating the expected value of a given management action.
+#'   Valid arguments include an integer value greater than zero (e.g.
+#'   100), or \code{NULL}. If \code{NULL} is supplied as an argument, then
+#'   the expected value of a given management action is calculated precisely
+#'   and not using approximation methods. Defaults to \code{NULL}.
+#'
+#' @param n_approx_states_per_replicate \code{integer} number of states to use
+#'   per replicate for approximating the expected value of a given management
+#'   action. Valid arguments include an integer value greater than zero (e.g.
+#'   10000), or \code{NULL}. If \code{NULL} is supplied as an argument, then
+#'   the expected value of a given management action is calculated precisely
+#'   and not using approximation methods. Defaults to \code{NULL}.
+#'
+#' @param optimality_gap \code{numeric} relative optimality gap for generating
+#'   conservation prioritizations. A value of zero indicates that
+#'   prioritizations must be solved to optimality. A value of 0.1 indicates
+#'   prioritizations must be within 10\% of optimality. Defaults to 0.
+#'
+#' @param seed \code{integer} random seed used for generating states. Defaults
+#'   to 500.
 #'
 #' @details
 #' Let \eqn{I} denote the set of feature (indexed by
@@ -25,17 +139,20 @@
 #' the features \eqn{i \in I} occupying planning units \eqn{j \in J}
 #' (specified via \code{site_probability_columns}).
 #' To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-#' denote the sensitivity of the models for features \eqn{i \in I} (specified
-#' via \code{feature_model_sensitivity_column}).
+#' and \eqn{{N'}_i} denote the sensitivity and specificity (respectively) of
+#' the models for features \eqn{i \in I} (specified
+#' via \code{feature_model_sensitivity_column} and
+#' \code{feature_model_specificity_column} respectively).
 #' We can calculate the prior probability of each feature \eqn{i \in I}
 #' occupying each site \eqn{j \in J} following
 #' (or manually specified via \code{prior_matrix}):
 #'
 #' \deqn{
-#' Q_{ij} = \\
+#' P_{ij} = \\
 #' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 #' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i {H'}_{ij}, \text{ else if } D_j = 0 \space (j \text{ not surveyed)} \\
+#' {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+#' 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 #' }
 #'
 #' Since we do not know which features truly occur in which sites, let \eqn{S}
@@ -57,6 +174,14 @@
 #' \deqn{P_s = \\
 #' Q_{ij}, \text{ if } G_{ijs} = 1 \\
 #' 1 - Q_{ij}, \text{ else } \\
+#' }
+#'
+#' Under the \emph{approximation method}, we define \eqn{S'} which contains a
+#' subset of sites \eqn{s \in S}. The prior probability of each state
+#' \eqn{s \in S'} being the true state is calculated following:
+#'
+#' \deqn{
+#' {P'}_s = \frac{P_s}{\sum_{k \in S'} P_k}
 #' }
 #'
 #' Here, the management action is to purchase a set of sites for
@@ -91,31 +216,25 @@
 #' }
 #'
 #' We can now calculate the
-#' \emph{expected value of the management decision given
-#' current information} (\eqn{\text{EV}_{\text{current}}}). To achieve this, we
+#' \emph{approximate expected value of the management decision given
+#' current information} (\eqn{\text{EV'}_{\text{current}}}). To achieve this, we
 #' assume that the decision maker will act optimally. Thus the
-#' \emph{expected value of the management decision given current information}
-#' is the \emph{expected value of the best management action given current
-#' information}. Let \eqn{z'} denote an optimal management action
-#' \eqn{z \in Z} given current information. This can be expressed as follows:
+#' \emph{approximate expected value of the management decision given current
+#' information} is the \emph{approximate expected value of the best management
+#' action given current information}. Let \eqn{z'} denote an optimal management
+#' action \eqn{z \in Z} given current information. This can be expressed as
+#' follows:
 #'
 #' \deqn{
-#' \text{EV}_{\text{current}} = \mathbb{E} \left[ V(z', S) \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S) \right] \\
-#' \mathbb{E} \left[ V(z, S) \right] = \sum_{s \in S} V(z, s) \times P_s \\
+#' \text{EV'}_{\text{current}} = \mathbb{E} \left[ V(z', S') \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S') \right] \\
+#' \mathbb{E} \left[ V(z, S') \right] = \sum_{s \in S'} V(z, s) \times {P'}_s \\
 #' }
 #'
-#' Typically, the emph{expected value of the best management action given
-#' current information} is calculated by iterating over every possible
-#' management action \eqn{z \in Z}. However, this approach would be
-#' computationally expensive for even a small conservation planning problem.
-#' For example, a conservation planning problem involving 60 planning units has
-#' approximately \eqn{1.52 \times 10^{18}} different solutions (i.e.
-#' combinations of different planning units being selected). Therefore, we
-#' applied combinatorial optimization instead. Specifically, we identify the
-#' best management action by formulating an
-#' integer programming problem -- using piecewise linear constraints to
-#' linearise the objective function (precision controlled using
-#' \code{n_approx_n_approx_obj_fun_points}) -- and solving it to (near)
+#' We use combinatorial optimization to identify the (\eqn{z'})
+#' best management action given current information. Specifically, we
+#' formulate an integer programming problem -- using piecewise linear
+#' constraints to linearise the objective function (precision controlled using
+#' \code{n_approx_n_approx_obj_fun_points}) -- and solve it to (near)
 #' optimality (controlled using
 #' \code{optimality_gap}) with the \pkg{gurobi} package. Let \eqn{{X'}_j}
 #' indicate if each planning unit \eqn{j \in J} is selected in the \eqn{z'} best
@@ -128,6 +247,20 @@
 #' {{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
 #' }
 #'
+#' The accuracy of the approximate method depends on which subset of states
+#' \eqn{s \in S'} are used for the calculations. As such, this function
+#' calculates multiple estimates of the  \emph{approximate expected value of
+#' the management decision given current information}
+#' (\eqn{\text{EV'}_{\text{current}}}) using multiple subsets of states \eqn{s
+#' \in S'} and reports the mean and standard error of these estimates. The
+#' number of estimates is controlled using the \code{n_replicates} parameter,
+#' and the number of states in \eqn{S'} is controlled using the
+#' \code{n_states_per_replicate} parameter. For a given replicate, the states
+#' are sampled randomly without replacement. This means that the
+#' \emph{approximation method} is equivalent to the \emph{exact method}
+#' when the argument to \code{n_states_per_replicate} is equal to the total
+#' number of states.
+#'
 #' @references
 #' Moilanen A (2007) Landscape zonation, benefit functions and target-based
 #' planning: unifying reserve selection strategies.
@@ -137,10 +270,11 @@
 #' protect? Systematics and the agony of choice.
 #' \emph{Biological Conservation}, \strong{55}: 235--254.
 #'
-#' @return \code{numeric} value.
+#' @return \code{numeric} \code{vector} containing the mean estimate and
+#'   standard error.
 #'
 #' @seealso \code{\link{prior_probability_matrix}},
-#' \code{\link{approx_expected_value_of_decision_given_current_information}}.
+#' \code{\link{evdci}}.
 #'
 #' @examples
 #' # set seeds for reproducibility
@@ -161,17 +295,19 @@
 #' total_budget <- sum(site_data$management_cost) * 0.5
 #'
 #' # calculate expected value of management decision given current information
-#' # using exact method
-#' ev_current <- expected_value_of_decision_given_current_information(
-#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-#'   "management_cost", "survey_sensitivity",
-#'   "survey_specificity", "model_sensitivity", "alpha", "gamma", total_budget)
+#' # using approximate method with 100 replicates and 50 states per replicate
+#' ev_prime_current <- approx_evdci(
+#'     site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'     "management_cost", "survey_sensitivity", "survey_specificity",
+#'     "model_sensitivity", "model_specificity", "alpha", "gamma",
+#'     total_budget, n_approx_replicates = 100,
+#'     n_approx_states_per_replicate = 50)
 #'
-#' # print exact value
-#' print(ev_current)
+#' # print approximate value
+#' print(ev_prime_current)
 #'
 #' @export
-expected_value_of_decision_given_current_information <- function(
+approx_evdci <- function(
   site_data,
   feature_data,
   site_occupancy_columns,
@@ -180,13 +316,18 @@ expected_value_of_decision_given_current_information <- function(
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
+  feature_model_specificity_column,
   feature_alpha_column,
   feature_gamma_column,
   total_budget,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
   n_approx_obj_fun_points = 1000,
-  optimality_gap = 0) {
+  optimality_gap = 0,
+  n_approx_replicates = 100,
+  n_approx_states_per_replicate =
+    min(1000, n_states(nrow(site_data), nrow(feature_data))),
+  seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -232,6 +373,13 @@ expected_value_of_decision_given_current_information <- function(
     assertthat::noNA(feature_data[[feature_model_sensitivity_column]]),
     all(feature_data[[feature_model_sensitivity_column]] >= 0),
     all(feature_data[[feature_model_sensitivity_column]] <= 1),
+    ## feature_model_specificity_column
+    assertthat::is.string(feature_model_specificity_column),
+    all(assertthat::has_name(feature_data, feature_model_specificity_column)),
+    is.numeric(feature_data[[feature_model_specificity_column]]),
+    assertthat::noNA(feature_data[[feature_model_specificity_column]]),
+    all(feature_data[[feature_model_specificity_column]] >= 0),
+    all(feature_data[[feature_model_specificity_column]] <= 1),
     ## feature_alpha_column
     assertthat::is.string(feature_alpha_column),
     all(assertthat::has_name(feature_data, feature_alpha_column)),
@@ -253,10 +401,17 @@ expected_value_of_decision_given_current_information <- function(
     assertthat::is.number(n_approx_obj_fun_points),
     assertthat::noNA(n_approx_obj_fun_points),
     isTRUE(n_approx_obj_fun_points > 0),
+    ## n_approx_replicates
+    inherits(n_approx_replicates, c("numeric", "NULL")),
+    ## n_approx_states_per_replicate
+    inherits(n_approx_states_per_replicate, c("numeric", "NULL")),
+    identical(class(n_approx_replicates), class(n_approx_states_per_replicate)),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0))
+    isTRUE(optimality_gap >= 0),
+    ## seed
+    assertthat::is.number(seed))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -269,6 +424,20 @@ expected_value_of_decision_given_current_information <- function(
           site_data[[site_management_cost_column]]) <=
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
+  }
+  ## validate n_approx_states_per_replicate
+  if (!is.null(n_approx_states_per_replicate)) {
+    assertthat::assert_that(
+      assertthat::is.count(n_approx_states_per_replicate),
+      assertthat::noNA(n_approx_states_per_replicate),
+      isTRUE(n_approx_states_per_replicate <=
+             rcpp_n_states(nrow(site_data) * nrow(feature_data))))
+  }
+  ## validate n_approx_replicates
+  if (!is.null(n_approx_replicates)) {
+    assertthat::assert_that(
+      assertthat::is.count(n_approx_replicates),
+      assertthat::noNA(n_approx_replicates))
   }
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
@@ -284,7 +453,7 @@ expected_value_of_decision_given_current_information <- function(
     pij <- prior_probability_matrix(
       site_data, feature_data, site_occupancy_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
-      feature_model_sensitivity_column)
+      feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix
@@ -297,8 +466,12 @@ expected_value_of_decision_given_current_information <- function(
     site_management_locked_in <- rep(FALSE, nrow(site_data))
   }
 
+  # set the seed
+  rng_state <- .Random.seed
+  set.seed(seed)
+
   # main calculation
-  out <- rcpp_expected_value_of_decision_given_current_info(
+  out <- rcpp_approx_expected_value_of_decision_given_current_info_n_states(
     pij = pij,
     pu_costs = site_data[[site_management_cost_column]],
     pu_locked_in = site_management_locked_in,
@@ -306,8 +479,14 @@ expected_value_of_decision_given_current_information <- function(
     gamma = feature_data[[feature_gamma_column]],
     n_approx_obj_fun_points = n_approx_obj_fun_points,
     budget = total_budget,
-    gap = optimality_gap)
+    gap = optimality_gap,
+    n_approx_replicates = n_approx_replicates,
+    n_approx_states_per_replicate = n_approx_states_per_replicate)
+
+  # restore the previous state
+  set.seed(rng_state)
 
   # return result
+  names(out) <- c("mean", "se")
   out
 }

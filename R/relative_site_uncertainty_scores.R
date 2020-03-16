@@ -9,7 +9,7 @@ NULL
 #' and uncertainty values calculated using different matrices cannot be
 #' compared to each other.
 #'
-#' @inheritParams expected_value_of_decision_given_current_information
+#' @inheritParams evdci
 #'
 #' @details
 #' The relative site uncertainty scores are calculated as joint Shannon's

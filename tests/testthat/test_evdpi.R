@@ -1,6 +1,6 @@
-context("approx_expected_value_of_decision_given_perfect_information")
+context("evdpi")
 
-test_that("expected result", {
+test_that("expected results", {
   # data
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -19,22 +19,22 @@ test_that("expected result", {
     sensitivity = c(0.5, 0.96),
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
+    model_specificity = c(0.92, 0.9),
     alpha = abs(rnorm(2)) + 1,
     gamma = runif(2))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   # calculations
-  set.seed(500)
-  r1 <- rcpp_approx_expected_value_of_decision_given_current_info_n_states(
+  r1 <- rcpp_expected_value_of_decision_given_perfect_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, 10, 20)
-  r2 <- approx_expected_value_of_decision_given_current_information(
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0)
+  r2 <- evdpi(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "alpha", "gamma", 301, "locked_in", NULL, 1000, 0, 10, 20, 500)
+    "model_specificity", "alpha", "gamma", 301, "locked_in", NULL, 1000, 0)
   # tests
-  expect_equal(setNames(r1, c("mean", "se")), r2)
+  expect_equal(r1, r2)
 })

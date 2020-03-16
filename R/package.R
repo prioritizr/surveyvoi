@@ -6,7 +6,6 @@ NULL
 
 #' \pkg{surveyvoi}
 #'
-#'
 #' The \pkg{surveyvoi} package is decision support tool that will prioritize
 #' sites for surveys based on their potential to improve conservation plans for
 #' managing biodiversity (e.g. plans for establishing protected areas). Given a
@@ -16,8 +15,8 @@ NULL
 #' doing so could lead to vastly superior conservation management plans.
 #' Methods are provided to calculate the value of perfect information,
 #' and the value of sample information for a given survey scheme.
-#' Furthermore, by maximizing the value of sample informaiton, optimal
-#' survey schemes can also be identified. 
+#' Furthermore, by maximizing the value of sample information, optimal
+#' survey schemes can also be identified.
 #' This package requires the 'Gurobi' software suite (https://www.gurobi.com).
 #'
 #' @name surveyvoi

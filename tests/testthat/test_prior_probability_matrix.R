@@ -19,6 +19,7 @@ test_that("correct result", {
     sensitivity = c(0.5, 0.96, 0.97),
     specificity = c(0.34, 0.92, 0.98),
     model_sensitivity = c(0.8, 0.7, 0.6),
+    model_specificity = c(0.91, 0.94, 0.55),
     alpha = abs(rnorm(3)) + 1,
     gamma = runif(3))
   site_occupancy_columns <- c("f1", "f2", "f3")
@@ -26,7 +27,7 @@ test_that("correct result", {
   # calculations
   pij <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity")
+    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
   # tests
   expect_is(pij, "matrix")
   expect_true(all(is.finite(pij)))
@@ -44,7 +45,11 @@ test_that("correct result", {
           correct[f, j] <- 1 - feature_data$specificity[f]
         }
       } else {
-        correct[f, j] <- feature_data$model_sensitivity[f] * m
+        if (m >= 0.5) {
+          correct[f, j] <- feature_data$model_sensitivity[f]
+        } else {
+          correct[f, j] <- 1 - feature_data$model_specificity[f]
+        }
       }
     }
   }

@@ -28,4 +28,8 @@ test_that("simulate_feature_data", {
   expect_gt(min(d$model_sensitivity), 0)
   expect_lt(min(d$model_sensitivity), 1)
   expect_true(all(is.finite(d$model_sensitivity)))
+  expect_is(d$model_specificity, "numeric")
+  expect_gt(min(d$model_specificity), 0)
+  expect_lt(min(d$model_specificity), 1)
+  expect_true(all(is.finite(d$model_specificity)))
 })

@@ -126,7 +126,7 @@ feature_data <- simulate_feature_data(
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` column denotes the sensitivity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
+The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
 
 ## Benchmark analysis
 
@@ -145,7 +145,7 @@ Next, we will benchmark the approximation methods for calculating the expected v
 ```{r}
 # calculate the correct value of the decision given current information using
 # exact methods
-ev_current <- expected_value_of_decision_given_current_information(
+ev_current <- evdci(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = "f1",
@@ -154,6 +154,7 @@ ev_current <- expected_value_of_decision_given_current_information(
   feature_survey_sensitivity_column = "survey_sensitivity",
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
+  feature_model_specificity_column = "model_specificity",
   feature_alpha_column = "alpha",
   feature_gamma_column = "gamma",
   total_budget = total_budget)
@@ -163,7 +164,7 @@ ev_current <- expected_value_of_decision_given_current_information(
 ev_prime_current <-
   plyr::ldply(n_approx_states, function(x) {
     result <-
-      approx_expected_value_of_decision_given_current_information(
+      approx_evdci(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
@@ -172,6 +173,7 @@ ev_prime_current <-
         feature_survey_sensitivity_column = "survey_sensitivity",
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
+        feature_model_specificity_column = "model_specificity",
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
@@ -192,7 +194,7 @@ In a similar manner, we will benchmark the approximation methods for calculating
 ```{r}
 # calculate the correct value of the decision given perfect information using
 # exact methods
-ev_certainty <- expected_value_of_decision_given_perfect_information(
+ev_certainty <- evdpi(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = "f1",
@@ -201,6 +203,7 @@ ev_certainty <- expected_value_of_decision_given_perfect_information(
   feature_survey_sensitivity_column = "survey_sensitivity",
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
+  feature_model_specificity_column = "model_specificity",
   feature_alpha_column = "alpha",
   feature_gamma_column = "gamma",
   total_budget = total_budget)
@@ -210,7 +213,7 @@ ev_certainty <- expected_value_of_decision_given_perfect_information(
 ev_prime_certainty <-
   plyr::ldply(n_approx_states, function(x) {
     result <-
-      approx_expected_value_of_decision_given_perfect_information(
+      approx_evdpi(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
@@ -219,6 +222,7 @@ ev_prime_certainty <-
         feature_survey_sensitivity_column = "survey_sensitivity",
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
+        feature_model_specificity_column = "model_specificity",
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
