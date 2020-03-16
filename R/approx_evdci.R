@@ -466,25 +466,20 @@ approx_evdci <- function(
     site_management_locked_in <- rep(FALSE, nrow(site_data))
   }
 
-  # set the seed
-  rng_state <- .Random.seed
-  set.seed(seed)
-
   # main calculation
-  out <- rcpp_approx_expected_value_of_decision_given_current_info_n_states(
-    pij = pij,
-    pu_costs = site_data[[site_management_cost_column]],
-    pu_locked_in = site_management_locked_in,
-    alpha = feature_data[[feature_alpha_column]],
-    gamma = feature_data[[feature_gamma_column]],
-    n_approx_obj_fun_points = n_approx_obj_fun_points,
-    budget = total_budget,
-    gap = optimality_gap,
-    n_approx_replicates = n_approx_replicates,
-    n_approx_states_per_replicate = n_approx_states_per_replicate)
-
-  # restore the previous state
-  set.seed(rng_state)
+  withr::with_seed(seed, {
+    out <- rcpp_approx_expected_value_of_decision_given_current_info_n_states(
+      pij = pij,
+      pu_costs = site_data[[site_management_cost_column]],
+      pu_locked_in = site_management_locked_in,
+      alpha = feature_data[[feature_alpha_column]],
+      gamma = feature_data[[feature_gamma_column]],
+      n_approx_obj_fun_points = n_approx_obj_fun_points,
+      budget = total_budget,
+      gap = optimality_gap,
+      n_approx_replicates = n_approx_replicates,
+      n_approx_states_per_replicate = n_approx_states_per_replicate)
+  })
 
   # return result
   out
