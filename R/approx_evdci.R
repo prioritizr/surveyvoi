@@ -251,10 +251,10 @@
 #' \eqn{s \in S'} are used for the calculations. As such, this function
 #' calculates multiple estimates of the  \emph{approximate expected value of
 #' the management decision given current information}
-#' (\eqn{\text{EV'}_{\text{current}}}) using multiple subsets of states \eqn{s
-#' \in S'} and reports the mean and standard error of these estimates. The
-#' number of estimates is controlled using the \code{n_replicates} parameter,
-#' and the number of states in \eqn{S'} is controlled using the
+#' (\eqn{\text{EV'}_{\text{current}}}) using a different subsets of states
+#' \eqn{s \in S'} for each replicate. The
+#' number of replicates is controlled using the \code{n_replicates} parameter,
+#' and the number of states per replicate in \eqn{S'} is controlled using the
 #' \code{n_states_per_replicate} parameter. For a given replicate, the states
 #' are sampled randomly without replacement. This means that the
 #' \emph{approximation method} is equivalent to the \emph{exact method}
@@ -270,8 +270,8 @@
 #' protect? Systematics and the agony of choice.
 #' \emph{Biological Conservation}, \strong{55}: 235--254.
 #'
-#' @return \code{numeric} \code{vector} containing the mean estimate and
-#'   standard error.
+#' @return \code{numeric} \code{vector} containing the estimate for each
+#'   replicate.
 #'
 #' @seealso \code{\link{prior_probability_matrix}},
 #' \code{\link{evdci}}.
@@ -487,6 +487,5 @@ approx_evdci <- function(
   set.seed(rng_state)
 
   # return result
-  names(out) <- c("mean", "se")
   out
 }

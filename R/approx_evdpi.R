@@ -140,10 +140,10 @@
 #' \eqn{s \in S'} are used for the calculations. As such, this function
 #' calculates multiple estimates of the  \emph{approximate expected value of
 #' the management decision given perfect information}
-#' (\eqn{\text{EV'}_{\text{certainty}}}) using multiple subsets of states \eqn{s
-#' \in S'} and reports the mean and standard error of these estimates. The
-#' number of estimates is controlled using the \code{n_replicates} parameter,
-#' and the number of states in \eqn{S'} is controlled using the
+#' (\eqn{\text{EV'}_{\text{perfect}}}) using a different subsets of states
+#' \eqn{s \in S'} for each replicate. The
+#' number of replicates is controlled using the \code{n_replicates} parameter,
+#' and the number of states per replicate in \eqn{S'} is controlled using the
 #' \code{n_states_per_replicate} parameter. For a given replicate, the states
 #' are sampled randomly without replacement. This means that the
 #' \emph{approximation method} is equivalent to the \emph{exact method}
@@ -375,6 +375,5 @@ approx_evdpi <- function(
   set.seed(rng_state)
 
   # return result
-  names(out) <- c("mean", "se")
   out
 }

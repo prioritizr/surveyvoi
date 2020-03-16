@@ -44,7 +44,7 @@ r_approx_expected_value_of_decision_given_current_info_n_states <- function(
       rcpp_sample_k_uniform_no_replacement_nth_states(
         n_states_per_replicate, prior_data))
   })
-  c(mean(value), se(value))
+  value
 }
 
 r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
@@ -80,7 +80,7 @@ r_approx_expected_value_of_decision_given_perfect_info_n_states <- function(
       rcpp_sample_k_uniform_no_replacement_nth_states(
         n_states_per_replicate, prior_data))
   })
-  c(mean(value), se(value))
+  value
 }
 
 se <- function(x) sqrt(var(x) / length(x))

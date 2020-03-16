@@ -20,7 +20,7 @@ Rcpp::NumericVector
   std::size_t n_approx_states_per_replicate) {
 
   // initialize
-  Eigen::VectorXd values(n_approx_replicates);
+  Rcpp::NumericVector out(n_approx_replicates);
   std::vector<mpz_t> states(n_approx_states_per_replicate);
   for (std::size_t j = 0; j < n_approx_states_per_replicate; ++j)
     mpz_init(states[j]);
@@ -44,18 +44,13 @@ Rcpp::NumericVector
     sample_k_uniform_no_replacement_nth_states(
       n_approx_states_per_replicate, pij, states);
     /// calculate result
-    values[i] = approx_expected_value_of_action(
+    out[i] = approx_expected_value_of_action(
         solution, pij, pij_log1m, alpha, gamma, states);
   }
 
   // clear memory
   for (std::size_t i = 0; i < n_approx_states_per_replicate; ++i)
     mpz_clear(states[i]);
-
-  // calculate mean and standard error
-  Rcpp::NumericVector out(2);
-  out[0] = mean_value(values);
-  out[1] = standard_error_value(values);
 
   // return result
   return out;
