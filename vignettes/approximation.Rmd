@@ -159,6 +159,9 @@ ev_current <- evdci(
   feature_gamma_column = "gamma",
   total_budget = total_budget)
 
+# define function for calculating standard error
+se <- function(x) sqrt(var(x) / length(x))
+
 # estimate the correct value of the decision given current information using
 # approximation methods
 ev_prime_current <-
@@ -180,7 +183,7 @@ ev_prime_current <-
         n_approx_replicates = 25,
         n_approx_states_per_replicate = x,
         seed = 100)
-    data.frame(n = x, mean = result[[1]], se = result[[2]])
+    data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
   as_tibble()
 
@@ -229,7 +232,7 @@ ev_prime_certainty <-
         n_approx_replicates = 25,
         n_approx_states_per_replicate = x,
         seed = 100)
-    data.frame(n = x, mean = result[[1]], se = result[[2]])
+    data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
   as_tibble()
 
