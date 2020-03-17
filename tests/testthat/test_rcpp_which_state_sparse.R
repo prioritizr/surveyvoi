@@ -21,6 +21,6 @@ test_that("correct full iteration", {
   out <- c()
   for (i in seq_len(15)) {
     expect_equal(
-      rcpp_which_state_sparse(rcpp_nth_state_sparse(i, m, idx), idx), i)
+      rcpp_which_state_sparse(rcpp_nth_state_sparse(i, idx, m), idx), i)
   }
 })

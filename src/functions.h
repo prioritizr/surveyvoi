@@ -5,6 +5,10 @@
 
 void factorial(std::size_t, mpz_t);
 
+void log_matrix(Eigen::MatrixXd&);
+
+void log_1m_matrix(Eigen::MatrixXd&);
+
 double log_sum(double, double);
 
 double log_sum(Eigen::VectorXd&);
@@ -32,7 +36,6 @@ inline void assert_gt_value(T x, T y, std::string msg) {
     Rcpp::stop(msg);
   return;
 }
-
 
 void extract_k_fold_indices(Rcpp::List&,
   std::vector<std::vector<std::vector<std::size_t>>>&);

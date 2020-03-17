@@ -41,12 +41,24 @@ rcpp_expected_value_of_decision_given_perfect_info <- function(pij, pu_costs, pu
     .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_perfect_info`, pij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap)
 }
 
+rcpp_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data_raw, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points, total_budget, optim_gap) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data_raw, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points, total_budget, optim_gap)
+}
+
 rcpp_feasible_actions_ilp_matrix <- function(x) {
     .Call(`_surveyvoi_rcpp_feasible_actions_ilp_matrix`, x)
 }
 
 rcpp_pmedian_constraint_matrix <- function(x, costs) {
     .Call(`_surveyvoi_rcpp_pmedian_constraint_matrix`, x, costs)
+}
+
+rcpp_posterior_probability_matrix <- function(rij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity, model_sensitivity, model_specificity) {
+    .Call(`_surveyvoi_rcpp_posterior_probability_matrix`, rij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity, model_sensitivity, model_specificity)
+}
+
+rcpp_predict_missing_rij_data <- function(rij, wij, pu_env_data_raw, survey_features, pu_model_prediction_idx, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds) {
+    .Call(`_surveyvoi_rcpp_predict_missing_rij_data`, rij, wij, pu_env_data_raw, survey_features, pu_model_prediction_idx, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds)
 }
 
 rcpp_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points, budget, gap, file_path) {
@@ -69,8 +81,16 @@ rcpp_probability_of_state <- function(sij, pij) {
     .Call(`_surveyvoi_rcpp_probability_of_state`, sij, pij)
 }
 
-rcpp_nth_state_sparse <- function(n, matrix, idx) {
-    .Call(`_surveyvoi_rcpp_nth_state_sparse`, n, matrix, idx)
+rcpp_total_probability_of_positive_model_result <- function(prior, sensitivity, specificity, feature_outcome_idx) {
+    .Call(`_surveyvoi_rcpp_total_probability_of_positive_model_result`, prior, sensitivity, specificity, feature_outcome_idx)
+}
+
+rcpp_total_probability_of_negative_model_result <- function(prior, sensitivity, specificity, feature_outcome_idx) {
+    .Call(`_surveyvoi_rcpp_total_probability_of_negative_model_result`, prior, sensitivity, specificity, feature_outcome_idx)
+}
+
+rcpp_nth_state_sparse <- function(n, idx, matrix) {
+    .Call(`_surveyvoi_rcpp_nth_state_sparse`, n, idx, matrix)
 }
 
 rcpp_nth_state <- function(n, matrix) {

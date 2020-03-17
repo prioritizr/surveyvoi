@@ -6,9 +6,11 @@
 
 void n_states(std::size_t, mpz_t);
 
+std::size_t n_states(std::size_t);
+
 void nth_state(mpz_t, Eigen::MatrixXd&);
 
-void nth_state_sparse(mpz_t, Eigen::MatrixXd&, std::vector<std::size_t>&);
+void nth_state_sparse(mpz_t, std::vector<std::size_t>&, Eigen::MatrixXd&);
 
 void which_state(Eigen::MatrixXd&, mpz_t);
 

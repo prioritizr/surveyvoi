@@ -14,6 +14,22 @@ void factorial(std::size_t x, mpz_t out) {
   }
 }
 
+void log_matrix(Eigen::MatrixXd &x) {
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wenum-compare"
+  x.array() = x.array().log();
+  #pragma GCC diagnostic pop
+  return;
+}
+
+void log_1m_matrix(Eigen::MatrixXd &x) {
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wenum-compare"
+  x.array() = (1.0 - x.array()).array().log();
+  #pragma GCC diagnostic pop
+  return;
+}
+
 double log_sum(double u, double v) {
   // https://statmodeling.stat.columbia.edu/2016/06/11/log-sum-of-exponentials
   const double m = std::max(u, v);

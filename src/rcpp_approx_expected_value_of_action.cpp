@@ -89,8 +89,8 @@ double rcpp_approx_expected_value_of_action(
   std::vector<std::size_t> states) {
   // calculate log pij
   Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
-  pij.array() = pij.array().log();
+  log_1m_matrix(pij_log1m);
+  log_matrix(pij);
 
   // convert state indices from std::size_t to mpz_t
   const std::size_t n = states.size();

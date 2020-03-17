@@ -26,8 +26,8 @@ double rcpp_expected_value_of_decision_given_current_info(
 
   // calculate log prior probabilities
   Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
-  pij.array() = pij.array().log();
+  log_1m_matrix(pij_log1m);
+  log_matrix(pij);
 
   // calculate expected value of management action
   return expected_value_of_action(solution, pij, pij_log1m, alpha, gamma);

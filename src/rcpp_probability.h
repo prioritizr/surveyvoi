@@ -14,6 +14,10 @@ void total_probability_of_positive_model_result(
   Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&,
   std::vector<std::size_t>&, Eigen::MatrixXd&);
 
+void total_probability_of_negative_model_result(
+  Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&,
+  std::vector<std::size_t>&, Eigen::MatrixXd&);
+
 double log_probability_of_outcome(
   Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&,
   std::vector<std::size_t>&);

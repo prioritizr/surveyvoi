@@ -35,8 +35,8 @@ Rcpp::NumericVector
 
   // calculate log prior probabilities
   Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
-  pij.array() = pij.array().log();
+  log_1m_matrix(pij_log1m);
+  log_matrix(pij);
 
   // main processing
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
@@ -85,8 +85,8 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
 
   // calculate log prior probabilities
   Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m.array() = (1.0 - pij_log1m.array()).array().log();
-  pij.array() = pij.array().log();
+  log_1m_matrix(pij_log1m);
+  log_matrix(pij);
 
   // calculate result
   double out = approx_expected_value_of_action(

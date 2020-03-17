@@ -81,6 +81,18 @@ double expected_value_of_action(
   return std::exp(out);
 }
 
+double expected_value_of_action(
+  std::vector<bool> &solution,
+  Eigen::MatrixXd &pij,
+  Eigen::VectorXd &alpha,
+  Eigen::VectorXd &gamma) {
+  // calculate log pij
+  Eigen::MatrixXd pij1m = pij;
+  log_1m_matrix(pij1m);
+  log_matrix(pij);
+  // return result
+  return expected_value_of_action(solution, pij, pij1m, alpha, gamma);
+}
 
 // [[Rcpp::export]]
 double rcpp_expected_value_of_action(
@@ -90,8 +102,8 @@ double rcpp_expected_value_of_action(
   Eigen::VectorXd gamma) {
   // calculate log pij
   Eigen::MatrixXd pij1m = pij;
-  pij1m.array() = (1.0 - pij1m.array()).array().log();
-  pij.array() = pij.array().log();
+  log_1m_matrix(pij1m);
+  log_matrix(pij);
   // return result
   return expected_value_of_action(solution, pij, pij1m, alpha, gamma);
 }

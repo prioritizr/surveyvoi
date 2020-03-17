@@ -27,9 +27,9 @@ double rcpp_expected_value_of_decision_given_perfect_info(
 
   /// create log version of probabilities
   Eigen::MatrixXd pij_log = pij;
-  pij_log = pij_log.array().log();
   Eigen::MatrixXd pij_log1m = pij;
-  pij_log1m = (1.0 - pij_log1m.array()).array().log();
+  log_matrix(pij_log);
+  log_1m_matrix(pij_log1m);
 
   /// initialize prioritization
   std::vector<bool> solution(n_pu);
