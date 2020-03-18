@@ -8,6 +8,8 @@ total_probability_of_positive_result <- function(
      (survey_sensitivity * pij[, i]) +
      ((1.0 - survey_specificity) * (1.0 - pij[, i]))
   }
+  out[] <- pmin(out[], 1.0 - 1e-10)
+  out[] <- pmax(out[], 1e-10)
   out
 }
 
@@ -21,6 +23,8 @@ total_probability_of_negative_result <- function(
      ((1 - survey_sensitivity) * pij[, i]) +
      (survey_specificity * (1.0 - pij[, i]))
   }
+  out[] <- pmin(out[], 1.0 - 1e-10)
+  out[] <- pmax(out[], 1e-10)
   out
 }
 
@@ -37,6 +41,8 @@ total_probability_of_positive_model_result <- function(
      ((1.0 - model_specificity[i, feature_outcome_idx[i]]) *
       (1.0 - pij_subset[i, j]))
   }}
+  out[] <- pmin(out[], 1.0 - 1e-10)
+  out[] <- pmax(out[], 1e-10)
   out
 }
 
@@ -53,5 +59,17 @@ total_probability_of_negative_model_result <- function(
      ((model_specificity[i, feature_outcome_idx[i]]) *
       (1.0 - pij_subset[i, j]))
   }}
+  out[] <- pmin(out[], 1.0 - 1e-10)
+  out[] <- pmax(out[], 1e-10)
   out
+}
+
+probability_of_outcome <- function(
+  oij, total_probability_of_survey_positive_log,
+  total_probability_of_survey_negative_log, idx) {
+  sum(
+    (oij[idx] *
+     total_probability_of_survey_positive_log[idx]) +
+    ((1 - oij[idx]) *
+     total_probability_of_survey_negative_log[idx]))
 }

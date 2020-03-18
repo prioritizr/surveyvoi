@@ -7,6 +7,8 @@ void total_probability_of_positive_result(
   for (std::size_t j = 0; j < n_pu; ++j)
     out.col(j) = (sensitivity.array() * prior.col(j).array()) +
                  ((1.0 - specificity.array()) * (1.0 - prior.col(j).array()));
+  out = out.cwiseMax(1.0e-10);
+  out = out.cwiseMin(1.0 - 1.0e-10);
   return;
 }
 
@@ -17,6 +19,8 @@ void total_probability_of_negative_result(
   for (std::size_t j = 0; j < n_pu; ++j)
     out.col(j) = (((1.0 - sensitivity.array())) * prior.col(j).array()) +
                  (specificity.array() * (1.0 - prior.col(j).array()));
+  out = out.cwiseMax(1.0e-10);
+  out = out.cwiseMin(1.0 - 1.0e-10);
   return;
 }
 
@@ -35,6 +39,8 @@ void total_probability_of_positive_model_result(
         ((1.0 - specificity(i, feature_outcome_idx[i])) * (1.0 - prior(i, j)));
     }
   }
+  out = out.cwiseMax(1.0e-10);
+  out = out.cwiseMin(1.0 - 1.0e-10);
   return;
 }
 
@@ -53,6 +59,8 @@ void total_probability_of_negative_model_result(
         (specificity(i, feature_outcome_idx[i]) * (1.0 - prior(i, j)));
     }
   }
+  out = out.cwiseMax(1.0e-10);
+  out = out.cwiseMin(1.0 - 1.0e-10);
   return;
 }
 

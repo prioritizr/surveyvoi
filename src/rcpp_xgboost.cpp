@@ -189,6 +189,13 @@ void xgboost_model_sensitivity_and_specificity(
     spec = static_cast<double>((yhat.array() < 0.5).count() == 0);
   }
 
+  // clamp values to (1e-10) and (1 - 1e-10) to avoid numerical issues
+  // with probabilities that are exactly zero and one
+  spec = std::max(spec, 1.0e-10);
+  sens = std::max(sens, 1.0e-10);
+  spec = std::min(spec, 1.0 - 1.0e-10);
+  sens = std::min(sens, 1.0 - 1.0e-10);
+
   // return void
   return;
 }

@@ -158,6 +158,10 @@ double expected_value_of_decision_given_survey_scheme(
   total_probability_of_negative_result(
     pij, survey_sensitivity, survey_specificity,
     total_probability_of_survey_negative);
+  total_probability_of_survey_positive_log =
+    total_probability_of_survey_positive;
+  total_probability_of_survey_negative_log =
+    total_probability_of_survey_negative;
   log_matrix(total_probability_of_survey_positive_log);
   log_matrix(total_probability_of_survey_negative_log);
 
@@ -262,7 +266,7 @@ double expected_value_of_decision_given_survey_scheme(
     /// calculate total probability of models' negative results
     total_probability_of_negative_model_result(
       pij_survey_species_subset, model_sensitivity, model_specificity,
-      feature_outcome_idx, curr_total_probability_of_model_positive);
+      feature_outcome_idx, curr_total_probability_of_model_negative);
     assert_valid_probability_data(curr_total_probability_of_model_negative,
                                   "issue calculating total model negatives");
 
@@ -270,7 +274,8 @@ double expected_value_of_decision_given_survey_scheme(
     posterior_probability_matrix(
       rij, pij, curr_oij,
       pu_survey_solution,
-      survey_features, survey_features_rev_idx, feature_outcome_idx,
+      survey_features,
+      feature_outcome_idx, survey_features_rev_idx,
       survey_sensitivity, survey_specificity,
       total_probability_of_survey_positive,
       total_probability_of_survey_negative,
@@ -278,6 +283,7 @@ double expected_value_of_decision_given_survey_scheme(
       curr_total_probability_of_model_positive,
       curr_total_probability_of_model_negative,
       curr_pij);
+
     assert_valid_probability_data(curr_pij,
                                   "issue calculating posterior probabilities");
 
@@ -344,7 +350,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd pu_survey_costs,
   Eigen::VectorXd pu_purchase_costs,
   Eigen::VectorXd pu_purchase_locked_in,
-  Eigen::MatrixXf pu_env_data_raw,
+  Eigen::MatrixXf pu_env_data,
   Rcpp::List xgb_parameters,
   Rcpp::List xgb_train_folds,
   Rcpp::List xgb_test_folds,
@@ -375,7 +381,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
 
   // convert environmental data to row major format
-  MatrixXfRM pu_env_data = pu_env_data_raw;
+  MatrixXfRM pu_env_data2 = pu_env_data;
 
   // calculate value of information
   return expected_value_of_decision_given_survey_scheme(
@@ -383,7 +389,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
     survey_features,
     survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_survey_status, pu_survey_costs,
-    pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
+    pu_purchase_costs, pu_purchase_locked_in, pu_env_data2,
     xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
     obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points, total_budget,

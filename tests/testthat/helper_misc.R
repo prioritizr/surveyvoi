@@ -10,3 +10,7 @@ calculate_survey_features_rev_idx <- function(x) {
   }
   out + 1
 }
+
+log_sum <- function(u, v) {
+  max(u, v) + log(exp(u - max(u, v)) + exp(v -max(u, v)))
+}
