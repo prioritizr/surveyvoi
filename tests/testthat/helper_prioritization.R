@@ -17,12 +17,17 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma,
   n_pu <- ncol(rij)
   n_f <- nrow(rij)
   # build pwl components
+  n_approx_points <- n_approx_points - 1
   obj_feature_held <- apply(rij, 1, function(x) {
     r1 <- min(x) * 0.99
     r2 <- sum(x) * 1.01
     seq(r1, r2, length.out = n_approx_points)
   })
-  obj_feature_benefit <- (alpha * obj_feature_held) ^ gamma
+  obj_feature_benefit <- obj_feature_held
+  {for (i in seq_len(ncol(obj_feature_benefit)))
+    obj_feature_benefit[, i] <-
+    (alpha[i] * obj_feature_benefit[, i]) ^ gamma[i]
+  }
   # build problem
   p <- list()
   p$modelsense <- "max"
@@ -62,7 +67,7 @@ brute_force_prioritization <- function(rij, alpha, gamma,
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
-    assertthat::is.number(alpha), assertthat::is.number(gamma),
+    is.numeric(alpha), is.numeric(gamma),
     is.numeric(pu_costs), length(pu_costs) == ncol(rij),
     assertthat::noNA(pu_costs),
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),

@@ -130,8 +130,8 @@ public:
     Eigen::VectorXd dummy_benefit(3);
     dummy_held[0] = 0.0;
     dummy_benefit[0] = 0.0;
-    dummy_held[1] = 0.5;
-    dummy_benefit[1] = 0.5;
+    dummy_held[2] = 100.0;
+    dummy_benefit[2] = 100.0;
     /// initialize variables
     double curr_value;
     Eigen::VectorXd min_feature_held = rij.rowwise().minCoeff();
@@ -170,11 +170,11 @@ public:
         if (obj_feature_benefit[1] > 1.0e-5) {
           // if the benefit function has constant values that are greater
           // than zero, then set this value as the maximum value
-          dummy_held[2] = obj_feature_held[1];
-          dummy_benefit[2] = obj_feature_benefit[1];
+          dummy_held[1] = obj_feature_held[1];
+          dummy_benefit[1] = obj_feature_benefit[1];
         } else {
-          dummy_held[2] = 1.0;
-          dummy_benefit[2] = 1.0;
+          dummy_held[1] = 1.0;
+          dummy_benefit[1] = 1.0;
         }
         GRBsetpwlobj(_model, _n_pu + j, 3, dummy_held.data(),
                      dummy_benefit.data());
