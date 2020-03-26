@@ -50,3 +50,20 @@ validate_prior_data <- function(prior_matrix, n_sites, n_features) {
     identical(ncol(prior_matrix), n_sites),
     identical(nrow(prior_matrix), n_features))
 }
+
+validate_site_weight_data <- function(site_data, site_occupancy_columns,
+  site_weight_columns) {
+  assertthat::assert_that(
+    is.character(site_weight_columns),
+    identical(length(site_weight_columns), length(site_occupancy_columns)),
+    all(assertthat::has_name(site_data, site_weight_columns)),
+    assertthat::noNA(site_weight_columns))
+  assertthat::assert_that(
+    all(sapply(site_weight_columns,
+               function(x) is.numeric(site_data[[x]]))),
+    msg = "site_data values in site_weight_columns must be numeric")
+  assertthat::assert_that(
+    all(sapply(site_weight_columns,
+               function(x) all(is.finite(site_data[[x]])))),
+    msg = "site_data values in site_weight_columns must not be NA")
+}

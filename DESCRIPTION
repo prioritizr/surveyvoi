@@ -56,7 +56,7 @@ SystemRequirements:
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Collate:
     'RcppExports.R'
     'approx_evdci.R'
@@ -65,6 +65,7 @@ Collate:
     'env_div_survey_scheme.R'
     'evdci.R'
     'evdpi.R'
+    'evdsi.R'
     'feasible_survey_schemes.R'
     'tune_occupancy_models.R'
     'fit_occupancy_models.R'
