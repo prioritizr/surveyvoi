@@ -227,6 +227,7 @@ create_folds <- function(x, n, index = seq_along(x), seed = 500,
     assertthat::is.flag(na.fail))
   if (na.fail)
     assertthat::assert_that(assertthat::noNA(x))
+
   # define functions for adding presence/absences to fold partitions
   add_idx <- function(i, x, type) {
     if (type == "presence") {
@@ -244,25 +245,26 @@ create_folds <- function(x, n, index = seq_along(x), seed = 500,
     }
     i
   }
+
   # generate folds
-  old_seed <- .Random.seed
-  set.seed(seed)
-  # create test folds
-  test <- rBayesianOptimization::KFold(x, nfolds = n, seed = 500,
-                                       stratified = FALSE)
-  # create train folds
-  train <- lapply(test, function(i) seq_along(x)[-i])
-  # make sure train/test partitions have at least one presence in all folds
-  train <- lapply(train, add_idx, x = x, type = "presence")
-  test <- lapply(test, add_idx, x = x, type = "presence")
-  # make sure train/test partitions have at least one presence in all folds
-  train <- lapply(train, add_idx, x = x, type = "absence")
-  test <- lapply(test, add_idx, x = x, type = "absence")
+  withr::with_seed(seed, {
+    # create test folds
+    test <- rBayesianOptimization::KFold(x, nfolds = n, seed = seed,
+                                         stratified = FALSE)
+    # create train folds
+    train <- lapply(test, function(i) seq_along(x)[-i])
+    # make sure train/test partitions have at least one presence in all folds
+    train <- lapply(train, add_idx, x = x, type = "presence")
+    test <- lapply(test, add_idx, x = x, type = "presence")
+    # make sure train/test partitions have at least one presence in all folds
+    train <- lapply(train, add_idx, x = x, type = "absence")
+    test <- lapply(test, add_idx, x = x, type = "absence")
+  })
+
   # convert to indices
   train <- lapply(train, function(i) index[i])
   test <- lapply(test, function(i) index[i])
-  # reset seed
-  set.seed(old_seed)
+
   # return result
   list(train = train, test = test)
 }
