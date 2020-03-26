@@ -71,8 +71,8 @@ test_that("equal weights", {
     n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
-
-  expect_equal(r1, r2);
+  # tests
+  expect_equal(r1, r2)
 })
 
 test_that("variables weights", {
@@ -146,6 +146,6 @@ test_that("variables weights", {
     n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
-
-  expect_equal(r1, r2);
+  # tests
+  expect_equal(r1, r2)
 })
