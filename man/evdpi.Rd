@@ -4,13 +4,24 @@
 \alias{evdpi}
 \title{Expected value of decision given perfect information}
 \usage{
-evdpi(site_data, feature_data, site_occupancy_columns,
-  site_probability_columns, site_management_cost_column,
-  feature_survey_sensitivity_column, feature_survey_specificity_column,
-  feature_model_sensitivity_column, feature_model_specificity_column,
-  feature_alpha_column, feature_gamma_column, total_budget,
-  site_management_locked_in_column = NULL, prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000, optimality_gap = 0)
+evdpi(
+  site_data,
+  feature_data,
+  site_occupancy_columns,
+  site_probability_columns,
+  site_management_cost_column,
+  feature_survey_sensitivity_column,
+  feature_survey_specificity_column,
+  feature_model_sensitivity_column,
+  feature_model_specificity_column,
+  feature_alpha_column,
+  feature_gamma_column,
+  total_budget,
+  site_management_locked_in_column = NULL,
+  prior_matrix = NULL,
+  n_approx_obj_fun_points = 1000,
+  optimality_gap = 0
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
@@ -125,128 +136,9 @@ makers, this metric is useful to provide an upper bound on the expected
 value of management decisions following additional data collection.
 }
 \details{
-Let \eqn{I} denote the set of feature (indexed by
-\eqn{i}) and \eqn{J} the set of planning units (indexed by \eqn{j}).
-To describe the results of previous surveys, let \eqn{D_{ij}} indicate the
-detection/non-detection of feature \eqn{i \in I} in planning unit
-\eqn{j \in J} during previous surveys using zeros and ones
-(specified via \code{site_occupancy_columns}).
-Also let \eqn{U_j} indicate if planning unit \eqn{j \in J} has previously
-been surveyed or not.
-To describe the accuracy of the surveys, let \eqn{S_i} denote the
-sensitivity and \eqn{N_i} denote the specificity of the surveying
-methodology for features \eqn{i \in I} (specified via
-\code{feature_survey_sensitivity_column} and
-\code{feature_survey_specificity_column} respectively).
-Next, let \eqn{H_{ij}} denote the modelled probabilities of
-the features \eqn{i \in I} occupying planning units \eqn{j \in J}
-(specified via \code{site_probability_columns}).
-To describe the accuracy of the environmental niche models, let \eqn{{S'}_i}
-and \eqn{{N'}_i} denote the sensitivity and specificity (respectively) of
-the models for features \eqn{i \in I} (specified
-via \code{feature_model_sensitivity_column} and
-\code{feature_model_specificity_column} respectively).
-We can calculate the prior probability of each feature \eqn{i \in I}
-occupying each site \eqn{j \in J} following
-(or manually specified via \code{prior_matrix}):
-
-\deqn{
-P_{ij} = \\
-S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
-1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-{S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
-}
-
-Since we do not know which features truly occur in which sites, let \eqn{S}
-denote the full range of possible states that affect the evaluation of the
-management action (indexed by \eqn{s}). Here, \eqn{S} represents all possible
-combinations of different species occurring in different sites.
-The total number of states \eqn{s \in S} is incredibly large for even a small
-conservation planning problem. For example, a conservation planning problem
-involving ten sites and four features (species) has approximately
-\eqn{1.09 \times 10^{12}} states. In other words, one trillion ninety-nine
-billion five hundred eleven million six hundred twenty-seven thousand seven
-hundred seventy-five states. Unfortunately, this means that it is not
-computationally feasible to calculate exact values of information for
-conservation problems involving many sites. Let \eqn{G_{ijs}} indicate which
-species \eqn{i \in I} occur in which planning units \eqn{j \in J} given
-state \eqn{s \in S}. We calculate the prior probability of each state
-\eqn{s \in S} being the true state following:
-
-\deqn{P_s = \\
-Q_{ij}, \text{ if } G_{ijs} = 1 \\
-1 - Q_{ij}, \text{ else } \\
-}
-
-Here, the management action is to purchase a set of sites for
-protected area establishment. In other words, the management action is to
-implement a spatial prioritisation for protected area establishment. The
-management action is subject to a budget that limits the cost of purchasing
-sites. Let \eqn{A_j} denote the cost of acquiring each site
-\eqn{j \in J} (specified via \code{site_management_cost_column}),
-and \eqn{b} denote the total budget available for
-conservation (specified via \code{total_budget}). Furthermore,
-let \eqn{T_j} denote which sites \eqn{j \in j} are locked into the
-prioritization (e.g. sites in existing protected area system).
-Given these data, let \eqn{Z} denote the
-set of all possible management actions (indexed by \eqn{z}). To describe
-each of the possible management actions \eqn{z \in Z}, let \eqn{X_{jz}}
-indicate which sites \eqn{j \in J} are purchased for protection (using zeros
-and ones) under a given management action \eqn{z \in Z}. To evaluate the
-conservation value of a given management action, we will adopt equations
-used in the objective function of the \emph{Zonation} decision support tool
-(Moilanen 2007). Let \eqn{\alpha_i} and \eqn{\gamma_i} denote scaling terms
-for species \eqn{i \in I} to parametrise trade-offs in the protection of
-different species. These scaling terms are crucial to ensure that competing
-management decisions are evaluated in a manner conforming to the principle
-of complementarity (Vane-Wright \emph{et al.} 1991).
-The value of a management action (\eqn{z}) for a given state (\eqn{s}) is
-calculated following, wherein \eqn{Y_j} indicates
-if each site \eqn{j \in J} is selected in the (\eqn{z}) management action or
-not (using zeros and ones):
-
-\deqn{
-V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
-}
-
-We can now calculate the \emph{expected value of the management
-decision given perfect information} (\eqn{\text{EV}_{\text{certainty}}}).
-To achieve this, we assume that the decision maker will act optimally based
-on their perfect knowledge. Thus the \emph{expected value of the management
-decision given perfect information} is the \emph{expected value of the best
-management action given perfect information}. Let \eqn{{z''}_s} denote an
-optimal management action \eqn{z \in Z} given state \eqn{s \in S}. This can
-be expressed as follows:
-
-\deqn{
-\text{EV}_{\text{certainty}} = \mathbb{E} \left[ \max_{z \in Z} V(z, S) \right] = \sum_{s \in S} \left[ \left\{ V({z''}_s , s) \right\} \times P_s \right]
-}
-
-Typically, the emph{expected value of the best management action given
-perfect information} is calculated by iterating over every possible
-management action \eqn{z \in Z}. However, this approach would be
-computationally expensive for even a small conservation planning problem.
-For example, a conservation planning problem involving 60 planning units has
-approximately \eqn{1.52 \times 10^{18}} different solutions (i.e.
-combinations of different planning units being selected). Therefore, we
-applied combinatorial optimization instead. Specifically, we identified the
-best management action by formulating the management action problem as an
-integer programming problem -- using piecewise linear constraints to
-linearise the objective function (precision controlled using
-\code{n_approx_n_approx_obj_fun_points}) -- and solving it to (near)
-optimality (controlled using
-\code{optimality_gap}) with the \pkg{gurobi} package. Let \eqn{{X''}_{js}}
-indicate if each planning unit \eqn{j \in J} is selected in the \eqn{z''}
-best management action given perfect information (using zeros and ones):
-
-\deqn{
-\text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X''}_{js}
-G_{ijs} \right) ^{\gamma_i} \\
-\text{subject to } \sum_{j \in J} {X''}_{js} A_j \leq b\\
-{{X''}_{js}} \geq T_j \text{ } \forall j \in J \\
-{X''}_{js} \in \{ 0, 1 \} \text{ } \forall j \in J
-}
+This function calculates the expected value and does not
+ use approximation methods. As such, this function can only be applied
+ to very small problems.
 }
 \examples{
 # set seeds for reproducibility
@@ -275,15 +167,6 @@ ev_certainty <- evdpi(
 # print exact value
 print(ev_certainty)
 
-}
-\references{
-Moilanen A (2007) Landscape zonation, benefit functions and target-based
-planning: unifying reserve selection strategies.
-\emph{Biological Conservation}, \strong{134}: 571--579.
-
-Vane-Wright RI, Humphries CJ, & Williams PH (1991) What to
-protect? Systematics and the agony of choice.
-\emph{Biological Conservation}, \strong{55}: 235--254.
 }
 \seealso{
 \code{\link{prior_probability_matrix}},
