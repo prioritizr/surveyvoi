@@ -4,9 +4,16 @@
 \alias{env_div_survey_scheme}
 \title{Environmental diversity survey scheme}
 \usage{
-env_div_survey_scheme(site_data, cost_column, survey_budget,
-  env_vars_columns, method = "mahalanobis", locked_in_column = NULL,
-  locked_out_column = NULL, verbose = FALSE)
+env_div_survey_scheme(
+  site_data,
+  cost_column,
+  survey_budget,
+  env_vars_columns,
+  method = "mahalanobis",
+  locked_in_column = NULL,
+  locked_out_column = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey

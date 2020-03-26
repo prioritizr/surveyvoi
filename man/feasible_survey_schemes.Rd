@@ -4,8 +4,14 @@
 \alias{feasible_survey_schemes}
 \title{Find all feasible survey schemes}
 \usage{
-feasible_survey_schemes(site_data, cost_column, survey_budget,
-  locked_in_column = NULL, locked_out_column = NULL, verbose = FALSE)
+feasible_survey_schemes(
+  site_data,
+  cost_column,
+  survey_budget,
+  locked_in_column = NULL,
+  locked_out_column = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey

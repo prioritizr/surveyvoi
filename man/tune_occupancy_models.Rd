@@ -4,11 +4,18 @@
 \alias{tune_occupancy_models}
 \title{Tune occupancy models}
 \usage{
-tune_occupancy_models(site_data, site_occupancy_columns,
-  site_env_vars_columns, parameters, n_folds = rep(ifelse(nrow(site_data)
-  > 1000, 10, 5), site_occupancy_columns),
-  n_random_search_iterations = 10000, early_stopping_rounds = 10,
-  site_weight_columns = NULL, n_threads = 1, verbose = FALSE)
+tune_occupancy_models(
+  site_data,
+  site_occupancy_columns,
+  site_env_vars_columns,
+  parameters,
+  n_folds = rep(ifelse(nrow(site_data) > 1000, 10, 5), site_occupancy_columns),
+  n_random_search_iterations = 10000,
+  early_stopping_rounds = 10,
+  site_weight_columns = NULL,
+  n_threads = 1,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}

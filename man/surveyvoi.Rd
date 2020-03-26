@@ -3,7 +3,6 @@
 \docType{package}
 \name{surveyvoi}
 \alias{surveyvoi}
-\alias{surveyvoi-package}
 \title{\pkg{surveyvoi}}
 \description{
 The \pkg{surveyvoi} package is decision support tool that will prioritize

@@ -4,10 +4,16 @@
 \alias{prior_probability_matrix}
 \title{Prior probability matrix}
 \usage{
-prior_probability_matrix(site_data, feature_data, site_occupancy_columns,
-  site_probability_columns, feature_survey_sensitivity_column,
-  feature_survey_specificity_column, feature_model_sensitivity_column,
-  feature_model_specificity_column)
+prior_probability_matrix(
+  site_data,
+  feature_data,
+  site_occupancy_columns,
+  site_probability_columns,
+  feature_survey_sensitivity_column,
+  feature_survey_specificity_column,
+  feature_model_sensitivity_column,
+  feature_model_specificity_column
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}

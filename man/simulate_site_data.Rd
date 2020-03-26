@@ -4,10 +4,17 @@
 \alias{simulate_site_data}
 \title{Simulate site data}
 \usage{
-simulate_site_data(n_sites, n_features, proportion_of_sites_missing_data,
-  n_env_vars = 3, survey_cost_intensity = 10,
-  survey_cost_radius = 0.5, management_cost_intensity = 100,
-  management_cost_radius = 0.5, output_probabilities = TRUE)
+simulate_site_data(
+  n_sites,
+  n_features,
+  proportion_of_sites_missing_data,
+  n_env_vars = 3,
+  survey_cost_intensity = 10,
+  survey_cost_radius = 0.5,
+  management_cost_intensity = 100,
+  management_cost_radius = 0.5,
+  output_probabilities = TRUE
+)
 }
 \arguments{
 \item{n_sites}{\code{integer} number of sites.}

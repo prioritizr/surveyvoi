@@ -4,10 +4,16 @@
 \alias{fit_occupancy_models}
 \title{Fit models to estimate probability of occupancy}
 \usage{
-fit_occupancy_models(site_data, site_occupancy_columns,
-  site_env_vars_columns, parameters, n_folds = rep(ifelse(nrow(site_data)
-  > 1000, 10, 5), length(site_occupancy_columns)),
-  site_weight_columns = NULL, n_threads = 1, verbose = FALSE)
+fit_occupancy_models(
+  site_data,
+  site_occupancy_columns,
+  site_env_vars_columns,
+  parameters,
+  n_folds = rep(ifelse(nrow(site_data) > 1000, 10, 5), length(site_occupancy_columns)),
+  site_weight_columns = NULL,
+  n_threads = 1,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}

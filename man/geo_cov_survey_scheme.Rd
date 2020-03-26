@@ -4,8 +4,14 @@
 \alias{geo_cov_survey_scheme}
 \title{Geographic coverage survey scheme}
 \usage{
-geo_cov_survey_scheme(site_data, cost_column, survey_budget,
-  locked_in_column = NULL, locked_out_column = NULL, verbose = FALSE)
+geo_cov_survey_scheme(
+  site_data,
+  cost_column,
+  survey_budget,
+  locked_in_column = NULL,
+  locked_out_column = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey

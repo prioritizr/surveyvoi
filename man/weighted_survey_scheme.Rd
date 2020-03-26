@@ -4,9 +4,15 @@
 \alias{weighted_survey_scheme}
 \title{Weighted survey scheme}
 \usage{
-weighted_survey_scheme(site_data, cost_column, survey_budget,
-  weight_column, locked_in_column = NULL, locked_out_column = NULL,
-  verbose = FALSE)
+weighted_survey_scheme(
+  site_data,
+  cost_column,
+  survey_budget,
+  weight_column,
+  locked_in_column = NULL,
+  locked_out_column = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey
