@@ -216,6 +216,7 @@ print(site_data)
 print(feature_data)
 
 # set total budget for managing sites for conservation
+ # (i.e. 50\% of the cost of managing all sites)
 total_budget <- sum(site_data$management_cost) * 0.5
 
 # create a survey scheme that samples the first two sites that

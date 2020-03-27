@@ -100,18 +100,14 @@
 #'  also incur more computational costs. Defaults to 1000.
 #'
 #' @param n_approx_replicates \code{integer} number of replicates to use for
-#'   approximating the expected value of a given management action.
-#'   Valid arguments include an integer value greater than zero (e.g.
-#'   100), or \code{NULL}. If \code{NULL} is supplied as an argument, then
-#'   the expected value of a given management action is calculated precisely
-#'   and not using approximation methods. Defaults to \code{NULL}.
+#'   approximating the expected value calculations. Defaults to 100.
 #'
 #' @param n_approx_states_per_replicate \code{integer} number of states to use
 #'   per replicate for approximating the expected value of a given management
-#'   action. Valid arguments include an integer value greater than zero (e.g.
-#'   10000), or \code{NULL}. If \code{NULL} is supplied as an argument, then
-#'   the expected value of a given management action is calculated precisely
-#'   and not using approximation methods. Defaults to \code{NULL}.
+#'   action. This number must be smaller than or equal to the total number of
+#'   presence absence states in the system
+#'   (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
+#'   Defaults to 1000.
 #'
 #' @param optimality_gap \code{numeric} relative optimality gap for generating
 #'   conservation prioritizations. A value of zero indicates that
@@ -184,8 +180,7 @@ approx_evdci <- function(
   n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   n_approx_replicates = 100,
-  n_approx_states_per_replicate =
-    min(1000, n_states(nrow(site_data), nrow(feature_data))),
+  n_approx_states_per_replicate = 1000,
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -261,10 +256,13 @@ approx_evdci <- function(
     assertthat::noNA(n_approx_obj_fun_points),
     isTRUE(n_approx_obj_fun_points > 0),
     ## n_approx_replicates
-    inherits(n_approx_replicates, c("numeric", "NULL")),
+    assertthat::is.count(n_approx_replicates),
+    assertthat::noNA(n_approx_replicates),
     ## n_approx_states_per_replicate
-    inherits(n_approx_states_per_replicate, c("numeric", "NULL")),
-    identical(class(n_approx_replicates), class(n_approx_states_per_replicate)),
+    assertthat::is.count(n_approx_states_per_replicate),
+    assertthat::noNA(n_approx_states_per_replicate),
+    isTRUE(n_approx_states_per_replicate <=
+           n_states(nrow(site_data), nrow(feature_data))),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),

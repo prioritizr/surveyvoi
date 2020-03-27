@@ -61,6 +61,7 @@ Collate:
     'RcppExports.R'
     'approx_evdci.R'
     'approx_evdpi.R'
+    'approx_evdsi.R'
     'internal.R'
     'env_div_survey_scheme.R'
     'evdci.R'

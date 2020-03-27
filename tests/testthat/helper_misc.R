@@ -14,3 +14,5 @@ calculate_survey_features_rev_idx <- function(x) {
 log_sum <- function(u, v) {
   max(u, v) + log(exp(u - max(u, v)) + exp(v -max(u, v)))
 }
+
+se <- function(x) sqrt(var(x) / length(x))

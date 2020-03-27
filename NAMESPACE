@@ -2,6 +2,7 @@
 
 export(approx_evdci)
 export(approx_evdpi)
+export(approx_evdsi)
 export(env_div_survey_scheme)
 export(evdci)
 export(evdpi)
