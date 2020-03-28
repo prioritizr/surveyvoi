@@ -21,9 +21,7 @@ Rcpp::NumericVector
 
   // initialize
   Rcpp::NumericVector out(n_approx_replicates);
-  std::vector<mpz_t> states(n_approx_states_per_replicate);
-  for (std::size_t j = 0; j < n_approx_states_per_replicate; ++j)
-    mpz_init(states[j]);
+  std::vector<mpz_class> states(n_approx_states_per_replicate);
 
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
@@ -48,10 +46,6 @@ Rcpp::NumericVector
         solution, pij, pij_log1m, alpha, gamma, states);
   }
 
-  // clear memory
-  for (std::size_t i = 0; i < n_approx_states_per_replicate; ++i)
-    mpz_clear(states[i]);
-
   // return result
   return out;
 }
@@ -69,11 +63,9 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   std::vector<std::size_t> states) {
   // initialize states
   const std::size_t n = states.size();
-  std::vector<mpz_t> states2(n);
-  for (std::size_t i = 0; i < n; ++i) {
-    mpz_init(states2[i]);
-    mpz_set_ui(states2[i], states[i]);
-  }
+  std::vector<mpz_class> states2(n);
+  for (std::size_t i = 0; i < n; ++i)
+    states2[i] = states[i];
 
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
@@ -91,10 +83,6 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   // calculate result
   double out = approx_expected_value_of_action(
     solution, pij, pij_log1m, alpha, gamma, states2);
-
-  // clear memory
-  for (std::size_t i = 0; i < n; ++i)
-    mpz_clear(states2[i]);
 
   // return result
   return out;

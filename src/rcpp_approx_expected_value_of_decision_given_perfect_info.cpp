@@ -11,7 +11,7 @@ double approx_expected_value_of_decision_given_perfect_info(
   Prioritization &p,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma,
-  std::vector<mpz_t> &states) {
+  std::vector<mpz_class> &states) {
 
   // initialization
   // constant variables
@@ -98,9 +98,7 @@ Rcpp::NumericVector
 
   // initialize
   Rcpp::NumericVector out(n_approx_replicates);
-  std::vector<mpz_t> states(n_approx_states_per_replicate);
-  for (std::size_t j = 0; j < n_approx_states_per_replicate; ++j)
-    mpz_init(states[j]);
+  std::vector<mpz_class> states(n_approx_states_per_replicate);
 
   /// initialize prioritization
   Prioritization p(
@@ -123,10 +121,6 @@ Rcpp::NumericVector
       pij_log, pij_log1m, p, alpha, gamma, states);
   }
 
-  // clear memory
-  for (std::size_t i = 0; i < n_approx_states_per_replicate; ++i)
-    mpz_clear(states[i]);
-
   // return result
   return out;
 }
@@ -144,9 +138,9 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
   std::vector<std::size_t> states) {
   // initialize states
   const std::size_t n = states.size();
-  std::vector<mpz_t> states2(n);
+  std::vector<mpz_class> states2(n);
   for (std::size_t i = 0; i < n; ++i)
-    mpz_init_set_ui(states2[i], states[i]);
+    states2[i] = states[i];
 
   /// initialize prioritization
   Prioritization p(
@@ -162,10 +156,6 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
   // calculate result
   double out = approx_expected_value_of_decision_given_perfect_info(
     pij_log, pij_log1m, p, alpha, gamma, states2);
-
-  // clear memory
-  for (std::size_t i = 0; i < n; ++i)
-    mpz_clear(states2[i]);
 
   // return result
   return out;

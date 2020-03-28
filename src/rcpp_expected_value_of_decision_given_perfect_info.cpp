@@ -37,18 +37,15 @@ double rcpp_expected_value_of_decision_given_perfect_info(
                    alpha, gamma, n_approx_obj_fun_points, budget, gap);
 
   /// determine number of states
-  mpz_t n;
-  mpz_init(n);
+  mpz_class n;
   n_states(curr_state.size(), n);
-  mpz_add_ui(n, n, 1);
+  n = n + 1;
 
   /// initialize loop iterator
-  mpz_t i;
-  mpz_init(i);
-  mpz_set_ui(i, 1);
+  mpz_class i = 1;
 
   // main processing
-  while (mpz_cmp(i, n) < 0) {
+  while (cmp(i, n) < 0) {
 
     /// generate the i'th state
     nth_state(i, curr_state);
@@ -84,12 +81,8 @@ double rcpp_expected_value_of_decision_given_perfect_info(
     }
 
     /// increment loop variable
-    mpz_add_ui(i, i, 1);
+    i = i + 1;
   }
-
-  // clear memory
-  mpz_clear(i);
-  mpz_clear(n);
 
   // return result
   return std::exp(out);

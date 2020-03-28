@@ -53,10 +53,10 @@ double expected_value_of_decision_given_survey_scheme(
   const std::size_t n_f_outcomes = n_states(n_pu_surveyed_in_scheme) + 1;
 
   /// calculate toal number of outcomes across all features
-  mpz_t n_outcomes;
-  mpz_init(n_outcomes);
+  mpz_class n_outcomes;
   n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
-  mpz_add_ui(n_outcomes, n_outcomes, 1); // increment to include final outcome
+  n_outcomes = n_outcomes + 1; // increment to include final outcome
+
   // data integrity checks
   /// calculate remaining budget
   double remaining_budget = total_budget;
@@ -205,12 +205,11 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd curr_outcome(1, n_pu_surveyed_in_scheme);
   std::vector<std::size_t> curr_outcome_idx(n_pu_surveyed_in_scheme);
   std::iota(curr_outcome_idx.begin(), curr_outcome_idx.end(), 0);
-  mpz_t tmp;
-  mpz_init(tmp);
+  mpz_class tmp;
   for (std::size_t o = 0; o < n_f_outcomes; ++o) {
     /// generate the i'th outcome from surveying the planning units
-    mpz_set_ui(tmp, o);
-    nth_state_sparse(tmp, curr_outcome_idx,  curr_outcome);
+    tmp = o;
+    nth_state_sparse(tmp, curr_outcome_idx, curr_outcome);
 
     /// create a copy of the oij matrix with prior-filled data
     /// with all the planning units for features that need surveying
@@ -235,10 +234,8 @@ double expected_value_of_decision_given_survey_scheme(
                                 "issue calculating model specificities");
 
   // main processing
-  mpz_t o;
-  mpz_init(o);
-  mpz_set_ui(o, 0);
-  while (mpz_cmp(o, n_outcomes) < 0) {
+  mpz_class o = 0;
+  while (cmp(o, n_outcomes) < 0) {
     /// generate the o'th outcome from surveying the planning units across
     /// all species
     nth_state_sparse(o, rij_outcome_idx, curr_oij);
@@ -322,13 +319,10 @@ double expected_value_of_decision_given_survey_scheme(
           if (survey_features[i])
             curr_oij(i, j) = -1.0;
     /// increment o loop variable
-    mpz_add_ui(o, o, 1);
+    o = o + 1;
   }
 
   // clean-up
-  mpz_clear(o);
-  mpz_clear(n_outcomes);
-  mpz_clear(tmp);
   for (std::size_t i = 0; i < (n_f_outcomes * n_f_survey); ++i)
     for (std::size_t k = 0; k < model_beta(i).size(); ++k)
       XGBoosterFree(model_beta(i)[k]);
