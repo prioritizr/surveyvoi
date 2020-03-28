@@ -6,7 +6,7 @@ double approx_expected_value_of_action(
   Eigen::MatrixXd &pij_log1m,
   Eigen::VectorXd &alpha,
   Eigen::VectorXd &gamma,
-  std::vector<mpz_t> &states) {
+  std::vector<mpz_class> &states) {
   // initialization
   const std::size_t n_pu = pij_log.cols();
   const std::size_t solution_size =
@@ -92,21 +92,15 @@ double rcpp_approx_expected_value_of_action(
   log_1m_matrix(pij_log1m);
   log_matrix(pij);
 
-  // convert state indices from std::size_t to mpz_t
+  // convert state indices from std::size_t to mpz_class
   const std::size_t n = states.size();
-  std::vector<mpz_t> states2(n);
-  for (std::size_t i = 0; i < n; ++i) {
-    mpz_init(states2[i]);
-    mpz_set_ui(states2[i], states[i]);
-  }
+  std::vector<mpz_class> states2(n);
+  for (std::size_t i = 0; i < n; ++i)
+    states2[i] = states[i];
 
   // calculate result
   double out = approx_expected_value_of_action(
     solution, pij, pij_log1m, alpha, gamma, states2);
-
-  // clear memory
-  for (std::size_t i = 0; i < n; ++i)
-    mpz_clear(states2[i]);
 
   // return result
   return out;
