@@ -82,7 +82,7 @@ public:
 
     // set parameters for solving problem
     GRBsetdblparam(GRBgetenv(_model), "MIPGap", gap); // optimal solutions
-    GRBsetintparam(GRBgetenv(_model), "Presolve", 2); // enable presolve
+    GRBsetintparam(GRBgetenv(_model), "Presolve", -1); // enable presolve
     GRBsetintparam(GRBgetenv(_model), "Threads", 1);  // disable multi-threads
     GRBsetintparam(GRBgetenv(_model), "NumericFocus", 0);  // default precision
     GRBsetintparam(GRBgetenv(_model), "OutputFlag", 0);  // disable output
