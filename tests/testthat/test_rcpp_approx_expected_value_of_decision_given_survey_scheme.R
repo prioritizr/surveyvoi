@@ -9,11 +9,11 @@ test_that("correct result", {
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  n_reps <- 3
-  n_states_per_rep <- 4
+  n_reps <- 4
+  n_states_per_rep <- 5
   # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
+  site_occ_columns <- paste0("f", seq_len(n_f))
+  site_prb_columns <- paste0("p", seq_len(n_f))
   site_env_columns <- c("e1", "e2", "e3")
   rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
   pij <- prior_probability_matrix(

@@ -96,9 +96,13 @@ Rcpp::NumericVector
   std::size_t n_approx_replicates,
   std::size_t n_approx_states_per_replicate) {
 
-  // initialize
-  Rcpp::NumericVector out(n_approx_replicates);
-  std::vector<mpz_class> states(n_approx_states_per_replicate);
+  // initialize states
+  std::vector<std::vector<mpz_class>> states(n_approx_replicates);
+  for (std::size_t i = 0; i < n_approx_replicates; ++i) {
+    states[i].resize(n_approx_states_per_replicate);
+    sample_k_uniform_no_replacement_nth_states(
+      n_approx_states_per_replicate, pij, states[i]);
+  }
 
   /// initialize prioritization
   Prioritization p(
@@ -112,13 +116,11 @@ Rcpp::NumericVector
   log_1m_matrix(pij_log1m);
 
   // main processing
+  Rcpp::NumericVector out(n_approx_replicates);
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
-    /// generate states
-    sample_k_uniform_no_replacement_nth_states(
-      n_approx_states_per_replicate, pij, states);
     /// calculate result
     out[i] = approx_expected_value_of_decision_given_perfect_info(
-      pij_log, pij_log1m, p, alpha, gamma, states);
+      pij_log, pij_log1m, p, alpha, gamma, states[i]);
   }
 
   // return result
