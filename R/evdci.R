@@ -166,7 +166,7 @@ evdci <- function(
     pij <- prior_probability_matrix(
       site_data, feature_data, site_occupancy_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
-      feature_model_sensitivity_column, feature_survey_specificity_column)
+      feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix
