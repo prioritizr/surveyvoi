@@ -213,8 +213,8 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       remaining_budget, optim_gap, "")$x
 
     ## calculate approximate expected value of the prioritisation
-    curr_value <- r_approx_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_alpha, obj_fun_gamma, states)
+    curr_value <- log(r_approx_expected_value_of_action(
+      curr_solution, curr_postij, obj_fun_alpha, obj_fun_gamma, states))
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

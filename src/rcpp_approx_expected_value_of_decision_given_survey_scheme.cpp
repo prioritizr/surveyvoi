@@ -308,9 +308,9 @@ Rcpp::NumericVector
       log_matrix(curr_pij_log);
       log_1m_matrix(curr_pij_log_1m);
       curr_expected_value_of_action_given_outcome =
-        approx_expected_value_of_action(
+        std::log(approx_expected_value_of_action(
           curr_solution, curr_pij_log, curr_pij_log_1m, obj_fun_alpha,
-          obj_fun_gamma, states[r]);
+          obj_fun_gamma, states[r]));
 
       /// calculate likelihood of outcome
       curr_probability_of_outcome = log_probability_of_outcome(

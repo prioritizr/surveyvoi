@@ -147,8 +147,8 @@ r_expected_value_of_decision_given_survey_scheme <- function(
       remaining_budget, optim_gap, "")$x
 
     ## calculate expected value of the prioritisation
-    curr_value <- r_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_alpha, obj_fun_gamma)
+    curr_value <- log(r_expected_value_of_action(
+      curr_solution, curr_postij, obj_fun_alpha, obj_fun_gamma))
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

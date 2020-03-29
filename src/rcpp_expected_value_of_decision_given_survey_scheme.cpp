@@ -291,8 +291,8 @@ double expected_value_of_decision_given_survey_scheme(
 
     /// calculate expected value of the prioritisation
     curr_expected_value_of_action_given_outcome =
-      expected_value_of_action(
-        curr_solution, curr_pij, obj_fun_alpha, obj_fun_gamma);
+      std::log(expected_value_of_action(
+        curr_solution, curr_pij, obj_fun_alpha, obj_fun_gamma));
 
     /// calculate likelihood of outcome
     curr_probability_of_outcome = log_probability_of_outcome(
