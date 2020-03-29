@@ -4,7 +4,7 @@ test_that("equal weights", {
   # data
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
+  site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
@@ -81,11 +81,11 @@ test_that("equal weights", {
   expect_equal(r1, r2)
 })
 
-test_that("variables weights", {
+test_that("variable weights", {
   # data
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
+  site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
