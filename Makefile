@@ -17,6 +17,8 @@ vigns:
 	rm -f vignettes/*.html
 	rm -f inst/doc/*.html
 	R --slave -e "devtools::build_vignettes(install = FALSE)"
+	rm -f vignettes/*.utf8.md
+	rm -f vignettes/*.md
 	cp -R doc inst/
 	touch inst/doc/.gitkeep
 
