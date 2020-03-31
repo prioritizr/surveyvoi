@@ -105,6 +105,10 @@ rcpp_sample_n_uniform_states_without_replacement <- function(k, pij) {
     .Call(`_surveyvoi_rcpp_sample_n_uniform_states_without_replacement`, k, pij)
 }
 
+rcpp_sample_n_weighted_states_without_replacement <- function(k, pij) {
+    .Call(`_surveyvoi_rcpp_sample_n_weighted_states_without_replacement`, k, pij)
+}
+
 rcpp_nth_state_sparse <- function(n, idx, matrix) {
     .Call(`_surveyvoi_rcpp_nth_state_sparse`, n, idx, matrix)
 }

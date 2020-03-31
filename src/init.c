@@ -33,6 +33,7 @@ extern SEXP _surveyvoi_rcpp_probability_of_state(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_sample_n_uniform_states_with_replacement(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_sample_n_uniform_states_without_replacement(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_sample_n_weighted_states_with_replacement(SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_sample_n_weighted_states_without_replacement(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_standard_error_value(SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_negative_model_result(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_negative_result(SEXP, SEXP, SEXP);
@@ -68,6 +69,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_sample_n_uniform_states_with_replacement",                          (DL_FUNC) &_surveyvoi_rcpp_sample_n_uniform_states_with_replacement,                           2},
     {"_surveyvoi_rcpp_sample_n_uniform_states_without_replacement",                       (DL_FUNC) &_surveyvoi_rcpp_sample_n_uniform_states_without_replacement,                        2},
     {"_surveyvoi_rcpp_sample_n_weighted_states_with_replacement",                         (DL_FUNC) &_surveyvoi_rcpp_sample_n_weighted_states_with_replacement,                          2},
+    {"_surveyvoi_rcpp_sample_n_weighted_states_without_replacement",                      (DL_FUNC) &_surveyvoi_rcpp_sample_n_weighted_states_without_replacement,                       2},
     {"_surveyvoi_rcpp_standard_error_value",                                              (DL_FUNC) &_surveyvoi_rcpp_standard_error_value,                                               1},
     {"_surveyvoi_rcpp_total_probability_of_negative_model_result",                        (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_negative_model_result,                         4},
     {"_surveyvoi_rcpp_total_probability_of_negative_result",                              (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_negative_result,                               3},
