@@ -9,50 +9,40 @@ double approx_expected_value_of_action(
   std::vector<mpz_class> &states) {
   // initialization
   const std::size_t n_pu = pij_log.cols();
-  const std::size_t solution_size =
-    std::accumulate(solution.begin(), solution.end(), 0);
-  Eigen::MatrixXd sub_pij_log(pij_log.rows(), solution_size);
-  Eigen::MatrixXd sub_pij_log1m(pij_log1m.rows(), solution_size);
-
-  // preliminary processing
-  /// subset planning units selected in the solution
-  {
-    std::size_t i = 0;
-    for (std::size_t j = 0; j < n_pu; ++j) {
-      if (solution[j]) {
-        sub_pij_log.col(i) = pij_log.col(j);
-        sub_pij_log1m.col(i) = pij_log1m.col(j);
-        ++i;
-      }
-    }
-  }
+  const std::size_t n_approx_states = states.size();
 
   // main processing
-  /// determine number of states that affect the solution
-  const std::size_t n_approx_states = states.size();
   /// initialize loop variables
-  double v;
+  double v, p;
   std::size_t k = 0;
-  Eigen::MatrixXd curr_state(sub_pij_log.rows(), sub_pij_log.cols());
+  Eigen::MatrixXd curr_state(pij_log.rows(), pij_log.cols());
+  Eigen::MatrixXd curr_rij(pij_log.rows(), pij_log.cols());
   std::vector<double> value_given_state_occurring;
   std::vector<double> prob_of_state_occurring;
+  std::vector<double> all_prob_of_state_occurring;
   value_given_state_occurring.reserve(n_approx_states);
   prob_of_state_occurring.reserve(n_approx_states);
+  all_prob_of_state_occurring.reserve(n_approx_states);
 
   /// iterate over each state
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     //// generate the i'th state
     nth_state(states[i], curr_state);
+    /// create matrix only containing feature data for selected planning units
+    curr_rij = curr_state;
+    for (std::size_t j = 0; j < n_pu; ++j)
+      curr_rij.col(j) *= solution[j];
     //// calculate the value of the prioritization given the state
-    v = alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+    v = alpha.cwiseProduct(curr_rij.rowwise().sum()).array().
         pow(gamma.array()).sum();
+    /// calculate probability of the state occurring
+    p = log_probability_of_state(curr_state, pij_log, pij_log1m);
+    /// store probability of state occurring
+    all_prob_of_state_occurring.push_back(p);
+    /// store values if non-zero benefit
     if (v > 1.0e-10) {
-      /// store value if the priorititization has a non-zero benefit
       value_given_state_occurring.push_back(v);
-      /// calculate probability of the state occurring
-      prob_of_state_occurring.push_back(
-        log_probability_of_state(curr_state, sub_pij_log, sub_pij_log1m));
-      /// increment counter
+      prob_of_state_occurring.push_back(p);
       ++k;
     }
   }
@@ -68,9 +58,12 @@ double approx_expected_value_of_action(
   Eigen::VectorXd prob_of_state_occurring2 =
     Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
       prob_of_state_occurring.data(), k);
+  Eigen::VectorXd all_prob_of_state_occurring2 =
+    Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+      all_prob_of_state_occurring.data(), n_approx_states);
 
   // rescale probabilities
-  prob_of_state_occurring2.array() -= log_sum(prob_of_state_occurring2);
+  prob_of_state_occurring2.array() -= log_sum(all_prob_of_state_occurring2);
 
   // calculate values weighted by probabilities
   prob_of_state_occurring2.array() +=
