@@ -46,7 +46,7 @@ validate_prior_data <- function(prior_matrix, n_sites, n_features) {
   assertthat::assert_that(
     is.matrix(prior_matrix), is.numeric(prior_matrix),
     all(is.finite(c(prior_matrix)),
-    all(prior_matrix >= 0), all(prior_matrix <= 1)),
+    all(prior_matrix > 0), all(prior_matrix < 1)),
     identical(ncol(prior_matrix), n_sites),
     identical(nrow(prior_matrix), n_features))
 }
