@@ -26,7 +26,7 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 devtools::load_all()
 ```
 
-Here we will verify that the approximation methods are valid for value of information analyses. To achieve this, we will compare estimates from the approximation methods against the correct values from the exact methods. We will also examine how the number of approximation states affects the quality of the estimate.
+Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of states to _approximate_ the full set of states, and so we will investigate several different methods for generating states. We will also examine how the number of approximation states affects the quality of the estimate.
 
 ## Setup
 
@@ -126,7 +126,7 @@ feature_data <- simulate_feature_data(
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` column denotes the sensitivity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
+The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
 
 ## Benchmark analysis
 
@@ -140,12 +140,12 @@ n_approx_states <- ceiling(seq(10, n_states(1, 10), length.out = 10))
 print(n_approx_states)
 ```
 
-Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 25 replicates per number of approximation states.
+This benchmark analysis will examine various approaches for approximating the _expected value of the decision given current information_. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.
 
 ```{r}
 # calculate the correct value of the decision given current information using
 # exact methods
-ev_current <- expected_value_of_decision_given_current_information(
+ev_current <- evdci(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = "f1",
@@ -154,16 +154,33 @@ ev_current <- expected_value_of_decision_given_current_information(
   feature_survey_sensitivity_column = "survey_sensitivity",
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
+  feature_model_specificity_column = "model_specificity",
   feature_alpha_column = "alpha",
   feature_gamma_column = "gamma",
   total_budget = total_budget)
+
+# print value
+print(ev_current)
+```
+
+Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating states: _uniform with replacement_, _uniform without replacement_, _weighted with replacement_, and _weighted without replacement_. The uniform methods randomly sample states and do not consider the prior probability of each state occurring. The weighted methods, on the other hand, are select states that have a greater chance of occurring. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 25 replicates per number of approximation states. Furthermore since the _weighted without replacement_ method is computationally inefficient for generating subsets that contain a high proportion of the total states, we will not explore the full range of subsets for this method.
+
+```{r}
+# define function for calculating standard error
+se <- function(x) sqrt(var(x) / length(x))
 
 # estimate the correct value of the decision given current information using
 # approximation methods
 ev_prime_current <-
-  plyr::ldply(n_approx_states, function(x) {
+  expand.grid(method =
+    c("uniform_with_replacement", "uniform_without_replacement",
+      "weighted_with_replacement", "weighted_without_replacement"),
+  n = n_approx_states) %>%
+  filter(!((method == "weighted_without_replacement") &
+           (n >= (max(n_approx_states) * 0.5)))) %>%
+  plyr::ddply(c("method", "n"), function(x) {
     result <-
-      approx_expected_value_of_decision_given_current_information(
+      approx_evdci(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
@@ -172,96 +189,34 @@ ev_prime_current <-
         feature_survey_sensitivity_column = "survey_sensitivity",
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
+        feature_model_specificity_column = "model_specificity",
         feature_alpha_column = "alpha",
         feature_gamma_column = "gamma",
         total_budget = total_budget,
         n_approx_replicates = 25,
-        n_approx_states_per_replicate = x,
+        n_approx_states_per_replicate = x$n,
+        method_approx_states = as.character(x$method),
         seed = 100)
-    data.frame(n = x, mean = result[[1]], se = result[[2]])
+    data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
-  as_tibble()
-
-# preview results
-print(ev_current)
-print(ev_prime_current)
+  as_tibble() %>%
+  mutate(lower = mean - se, upper = mean + se) %>%
+  mutate(method = gsub("_", " ", method, fixed = TRUE))
 ```
 
-In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.
-
-```{r}
-# calculate the correct value of the decision given perfect information using
-# exact methods
-ev_certainty <- expected_value_of_decision_given_perfect_information(
-  site_data = site_data,
-  feature_data = feature_data,
-  site_occupancy_columns = "f1",
-  site_probability_columns = "p1",
-  site_management_cost_column = "management_cost",
-  feature_survey_sensitivity_column = "survey_sensitivity",
-  feature_survey_specificity_column = "survey_specificity",
-  feature_model_sensitivity_column = "model_sensitivity",
-  feature_alpha_column = "alpha",
-  feature_gamma_column = "gamma",
-  total_budget = total_budget)
-
-# estimate the correct value of the decision given perfect information using
-# approximation methods
-ev_prime_certainty <-
-  plyr::ldply(n_approx_states, function(x) {
-    result <-
-      approx_expected_value_of_decision_given_perfect_information(
-        site_data = site_data,
-        feature_data = feature_data,
-        site_occupancy_columns = "f1",
-        site_probability_columns = "p1",
-        site_management_cost_column = "management_cost",
-        feature_survey_sensitivity_column = "survey_sensitivity",
-        feature_survey_specificity_column = "survey_specificity",
-        feature_model_sensitivity_column = "model_sensitivity",
-        feature_alpha_column = "alpha",
-        feature_gamma_column = "gamma",
-        total_budget = total_budget,
-        n_approx_replicates = 25,
-        n_approx_states_per_replicate = x,
-        seed = 100)
-    data.frame(n = x, mean = result[[1]], se = result[[2]])
-  }) %>%
-  as_tibble()
-
-# preview results
-print(ev_certainty)
-print(ev_prime_certainty)
-```
-
-Now let's create a plot to visualize the results. This plot has two panels. The top panel corresponds to the _expected value of the decision given current information_ and the bottom panel corresponds to the _expected value of the decision given perfect information_. Within each panel, points correspond to mean estimates from the approximate method, error bars show standard errors associated with estimates from the approximation method, and the blue line shows the correct value calculated using the exact methods.
+Now, let's visualize the results.
 
 ```{r, fig.height = h * 2, fig.width = w * 1.5}
-# prepare data for plotting
-point_data <-
-  ev_prime_current %>%
-  mutate(metric = "expected value of decision given current information") %>%
-  bind_rows(ev_prime_certainty %>%
-            mutate(metric = paste("expected value of decision given",
-                                  "perfect information"))) %>%
-  mutate(lower = mean - se, upper = mean + se)
-line_data <- tibble(
-  metric = c("expected value of decision given current information",
-             "expected value of decision given perfect information"),
-  yint = c(ev_current, ev_certainty))
-
 # create plot
 ggplot() +
-geom_point(aes(x = n, y = mean), point_data) +
-geom_errorbar(aes(x = n, ymin = lower, ymax = upper), point_data) +
-geom_hline(aes(yintercept = yint), line_data, colour = "#3366FF") +
-facet_wrap(~ metric, ncol = 1) +
+geom_hline(yintercept = ev_current, colour = "#3366FF") +
+geom_point(aes(x = n, y = mean), ev_prime_current) +
+geom_errorbar(aes(x = n, ymin = lower, ymax = upper), ev_prime_current) +
+facet_wrap(~ method, ncol = 1) +
 xlab("Number of states used in approximation calculations") +
-ylab("Expected value") +
+ylab("Expected value of the decision given current information") +
 theme(strip.background = element_rect(color = "black", fill = "black"),
       strip.text = element_text(color = "white", size = 12))
 ```
 
-We can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). These results demonstrate that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.
-
-## References
+Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods -- except for the _weighted with replacement_ method which performs really poorly -- and shows that most the approximation method is more accurate when we use a greater number of states for the calculations. In particular, we can see that the _weighted without replacement_ method is the most useful because it converges to the correct value (blue line) with the fewest approximation states.
