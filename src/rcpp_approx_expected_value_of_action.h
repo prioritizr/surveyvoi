@@ -4,6 +4,7 @@
 #include "package.h"
 #include "functions.h"
 #include "rcpp_states.h"
+#include "rcpp_sample_states.h"
 #include "rcpp_probability.h"
 
 double approx_expected_value_of_action(

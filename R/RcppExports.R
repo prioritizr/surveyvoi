@@ -93,6 +93,18 @@ rcpp_total_probability_of_negative_model_result <- function(prior, sensitivity, 
     .Call(`_surveyvoi_rcpp_total_probability_of_negative_model_result`, prior, sensitivity, specificity, feature_outcome_idx)
 }
 
+rcpp_sample_n_weighted_states_with_replacement <- function(k, pij) {
+    .Call(`_surveyvoi_rcpp_sample_n_weighted_states_with_replacement`, k, pij)
+}
+
+rcpp_sample_n_uniform_states_with_replacement <- function(k, pij) {
+    .Call(`_surveyvoi_rcpp_sample_n_uniform_states_with_replacement`, k, pij)
+}
+
+rcpp_sample_n_uniform_states_without_replacement <- function(k, pij) {
+    .Call(`_surveyvoi_rcpp_sample_n_uniform_states_without_replacement`, k, pij)
+}
+
 rcpp_nth_state_sparse <- function(n, idx, matrix) {
     .Call(`_surveyvoi_rcpp_nth_state_sparse`, n, idx, matrix)
 }
@@ -111,18 +123,6 @@ rcpp_which_state_sparse <- function(matrix, idx) {
 
 rcpp_which_state <- function(matrix) {
     .Call(`_surveyvoi_rcpp_which_state`, matrix)
-}
-
-rcpp_sample_k_weighted_nth_states <- function(k, pij) {
-    .Call(`_surveyvoi_rcpp_sample_k_weighted_nth_states`, k, pij)
-}
-
-rcpp_sample_k_uniform_nth_states <- function(k, pij) {
-    .Call(`_surveyvoi_rcpp_sample_k_uniform_nth_states`, k, pij)
-}
-
-rcpp_sample_k_uniform_no_replacement_nth_states <- function(k, pij) {
-    .Call(`_surveyvoi_rcpp_sample_k_uniform_no_replacement_nth_states`, k, pij)
 }
 
 rcpp_fit_xgboost_models_and_assess_performance <- function(rij, wij, pu_env_data_raw, survey_features, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds) {

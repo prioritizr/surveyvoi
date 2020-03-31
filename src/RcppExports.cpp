@@ -395,6 +395,42 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_sample_n_weighted_states_with_replacement
+std::vector<std::size_t> rcpp_sample_n_weighted_states_with_replacement(std::size_t k, Eigen::MatrixXd& pij);
+RcppExport SEXP _surveyvoi_rcpp_sample_n_weighted_states_with_replacement(SEXP kSEXP, SEXP pijSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sample_n_weighted_states_with_replacement(k, pij));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_sample_n_uniform_states_with_replacement
+std::vector<std::size_t> rcpp_sample_n_uniform_states_with_replacement(std::size_t k, Eigen::MatrixXd& pij);
+RcppExport SEXP _surveyvoi_rcpp_sample_n_uniform_states_with_replacement(SEXP kSEXP, SEXP pijSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sample_n_uniform_states_with_replacement(k, pij));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_sample_n_uniform_states_without_replacement
+std::vector<std::size_t> rcpp_sample_n_uniform_states_without_replacement(std::size_t k, Eigen::MatrixXd& pij);
+RcppExport SEXP _surveyvoi_rcpp_sample_n_uniform_states_without_replacement(SEXP kSEXP, SEXP pijSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_sample_n_uniform_states_without_replacement(k, pij));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_nth_state_sparse
 Eigen::MatrixXd rcpp_nth_state_sparse(std::size_t n, std::vector<std::size_t> idx, Eigen::MatrixXd matrix);
 RcppExport SEXP _surveyvoi_rcpp_nth_state_sparse(SEXP nSEXP, SEXP idxSEXP, SEXP matrixSEXP) {
@@ -451,42 +487,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type matrix(matrixSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_which_state(matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_sample_k_weighted_nth_states
-std::vector<std::size_t> rcpp_sample_k_weighted_nth_states(std::size_t k, Eigen::MatrixXd& pij);
-RcppExport SEXP _surveyvoi_rcpp_sample_k_weighted_nth_states(SEXP kSEXP, SEXP pijSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_sample_k_weighted_nth_states(k, pij));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_sample_k_uniform_nth_states
-std::vector<std::size_t> rcpp_sample_k_uniform_nth_states(std::size_t k, Eigen::MatrixXd& pij);
-RcppExport SEXP _surveyvoi_rcpp_sample_k_uniform_nth_states(SEXP kSEXP, SEXP pijSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_sample_k_uniform_nth_states(k, pij));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_sample_k_uniform_no_replacement_nth_states
-std::vector<std::size_t> rcpp_sample_k_uniform_no_replacement_nth_states(std::size_t k, Eigen::MatrixXd& pij);
-RcppExport SEXP _surveyvoi_rcpp_sample_k_uniform_no_replacement_nth_states(SEXP kSEXP, SEXP pijSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::size_t >::type k(kSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type pij(pijSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_sample_k_uniform_no_replacement_nth_states(k, pij));
     return rcpp_result_gen;
 END_RCPP
 }

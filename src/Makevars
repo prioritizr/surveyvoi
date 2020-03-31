@@ -36,6 +36,7 @@ PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
 # define objects
 OBJECTS =\
   $(PKGROOT)/init.o\
+  $(PKGROOT)/rcpp_sample_states.o\
   $(PKGROOT)/rcpp_approx_expected_value_of_decision_given_survey_scheme.o\
   $(PKGROOT)/rcpp_expected_value_of_action.o\
   $(PKGROOT)/rcpp_expected_value_of_decision_given_survey_scheme.o\

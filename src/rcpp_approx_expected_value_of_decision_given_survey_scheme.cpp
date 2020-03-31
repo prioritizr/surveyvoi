@@ -1,6 +1,7 @@
 #include "package.h"
 #include "functions.h"
 #include "rcpp_states.h"
+#include "rcpp_sample_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
 #include "rcpp_posterior_probability_matrix.h"
@@ -48,7 +49,7 @@ Rcpp::NumericVector
   std::vector<std::vector<mpz_class>> states(n_approx_replicates);
   for (std::size_t r = 0; r < n_approx_replicates; ++r) {
     states[r].resize(n_approx_states_per_replicate);
-    sample_k_uniform_no_replacement_nth_states(
+    sample_n_uniform_states_without_replacement(
       n_approx_states_per_replicate, pij, states[r]);
   }
 
