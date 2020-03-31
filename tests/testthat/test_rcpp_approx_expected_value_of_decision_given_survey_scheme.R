@@ -2,6 +2,7 @@ context("rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states")
 
 test_that("correct result", {
   # data
+  RandomFields::RFoptions(seed = 505)
   set.seed(500)
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
