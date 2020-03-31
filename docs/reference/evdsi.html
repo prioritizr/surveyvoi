@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Expected value of the decision given current information — evdci • surveyvoi</title>
+<title>Expected value of the decision given survey information — evdsi • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -33,11 +33,11 @@
 
 
 
-<meta property="og:title" content="Expected value of the decision given current information — evdci" />
+<meta property="og:title" content="Expected value of the decision given survey information — evdsi" />
 <meta property="og:description" content="Calculate the expected value of the conservation management decision
-given current information. This metric describes the value of the management
-decision that is expected when the decision maker is limited to
-existing biodiversity data (i.e. survey data and environmental niche models)." />
+given survey information. This metric describes the value of the management
+decision that is expected when the decision maker conducts a surveys a
+set of sites to inform the decision." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -122,24 +122,28 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Expected value of the decision given current information</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/evdci.R'><code>R/evdci.R</code></a></small>
-    <div class="hidden name"><code>evdci.Rd</code></div>
+    <h1>Expected value of the decision given survey information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/evdsi.R'><code>R/evdsi.R</code></a></small>
+    <div class="hidden name"><code>evdsi.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Calculate the <em>expected value of the conservation management decision
-given current information</em>. This metric describes the value of the management
-decision that is expected when the decision maker is limited to
-existing biodiversity data (i.e. survey data and environmental niche models).</p>
+given survey information</em>. This metric describes the value of the management
+decision that is expected when the decision maker conducts a surveys a
+set of sites to inform the decision.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evdci</span>(
+    <pre class="usage"><span class='fu'>evdsi</span>(
   <span class='no'>site_data</span>,
   <span class='no'>feature_data</span>,
   <span class='no'>site_occupancy_columns</span>,
   <span class='no'>site_probability_columns</span>,
+  <span class='no'>site_env_vars_columns</span>,
   <span class='no'>site_management_cost_column</span>,
+  <span class='no'>site_survey_scheme_column</span>,
+  <span class='no'>site_survey_cost_column</span>,
+  <span class='no'>feature_survey_column</span>,
   <span class='no'>feature_survey_sensitivity_column</span>,
   <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>feature_model_sensitivity_column</span>,
@@ -147,10 +151,14 @@ existing biodiversity data (i.e. survey data and environmental niche models).</p
   <span class='no'>feature_alpha_column</span>,
   <span class='no'>feature_gamma_column</span>,
   <span class='no'>total_budget</span>,
+  <span class='no'>xgb_parameters</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>
+  <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -184,12 +192,48 @@ probability data (values between zero and one). No missing (<code>NA</code>)
 values are permitted in these columns.</p></td>
     </tr>
     <tr>
+      <th>site_env_vars_columns</th>
+      <td><p><code>character</code> names of columns in the
+argument to  <code>site_data</code> that contain environmental information
+for fitting updated occupancy models based on possible survey outcomes.
+Each column should correspond to a different environmental variable,
+and contain <code>numeric</code>, <code>factor</code>, or <code>character</code> data.
+No missing (<code>NA</code>) values are permitted in these columns.</p></td>
+    </tr>
+    <tr>
       <th>site_management_cost_column</th>
       <td><p><code>character</code> name of column in the
 argument to <code>site_data</code> that contains costs for managing each
 site for conservation. This column should have <code>numeric</code> values that
 are equal to or greater than zero. No missing (<code>NA</code>) values are
 permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>site_survey_scheme_column</th>
+      <td><p><code>character</code> name of <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) column in the argument to <code>site_data</code>
+that indicates which sites are selected in the scheme or not.
+No missing <code>NA</code> values are permitted. Additionally, only sites
+that are missing data can be selected or surveying (as per the
+argument to <code>site_occupancy_columns</code>).</p></td>
+    </tr>
+    <tr>
+      <th>site_survey_cost_column</th>
+      <td><p><code>character</code> name of column in the
+argument to  <code>site_data</code> that contains costs for surveying each
+site. This column should have <code>numeric</code> values that are equal to
+or greater than zero. No missing (<code>NA</code>) values are permitted in this
+column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_survey_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains <code>logical</code> (<code>TRUE</code> /
+<code>FALSE</code>) values indicating if the feature will be surveyed in
+the planned surveys or not. Note that considering additional features will
+rapidly increase computational burden, and so it is only recommended to
+consider features that are of specific conservation interest.
+No missing (<code>NA</code>) values are permitted in this column.</p></td>
     </tr>
     <tr>
       <th>feature_survey_sensitivity_column</th>
@@ -255,6 +299,16 @@ permitted in this column.</p></td>
 for conducting surveys and managing sites for conservation.</p></td>
     </tr>
     <tr>
+      <th>xgb_parameters</th>
+      <td><p><code>list</code> of <code>list</code> objects
+containing the parameters for fitting models for each
+feature. See documentation for the <code>params</code> argument in
+<code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for available parameters. Ideally,
+these parameters would be determined using the
+<code>tune_occupancy_models</code> function. Note that arguments must
+have a <code>nrounds</code> element (see example below).</p></td>
+    </tr>
+    <tr>
       <th>site_management_locked_in_column</th>
       <td><p><code>character</code> name of the column
 in the argument to <code>site_data</code> that contains <code>logical</code>
@@ -287,6 +341,32 @@ conservation prioritizations. A value of zero indicates that
 prioritizations must be solved to optimality. A value of 0.1 indicates
 prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
     </tr>
+    <tr>
+      <th>site_weight_columns</th>
+      <td><p><code>character</code> name of columns in
+<code>site_data</code> containing weights for model fitting for each
+feature. These columns must contain <code>numeric</code> values greater
+than or equal to zero. No missing (<code>NA</code>) values are
+permitted. Defaults to <code>NULL</code> such that all data are given
+equal weight when fitting models.</p></td>
+    </tr>
+    <tr>
+      <th>xgb_n_folds</th>
+      <td><p><code>integer</code> vector containing the number of
+ k-fold cross-validation folds to use for fitting models and
+ assessing model performance for each feature. Ideally, the number of folds
+ should be exactly the same as the number used for tuning the
+ model parameters (i.e. same parameter to the <code>n_folds</code>
+ argument in tune_occupancy_models when generating parameters
+for <code>xgb_parameters</code>).</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p><code>integer</code> state of the random number generator for
+partitioning data into folds cross-validation and fitting <span class="pkg">xgboost</span>
+models. This parameter must remain the same to compare results for
+different survey schemes. Defaults to 500.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -299,8 +379,7 @@ prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
  to very small problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>prior_probability_matrix</code>,
-<code>approx_evdci</code>.</p></div>
+    <div class='dont-index'><p><code>prior_probability_matrix</code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -309,41 +388,63 @@ prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 15 features and 9 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
+#&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9568333 ymax: 0.9942698
 #&gt; epsg (SRID):    NA
 #&gt; proj4string:    NA
-#&gt; <span style='color: #949494;'># A tibble: 5 x 10</span><span>
-#&gt;   survey_cost management_cost     e1     e2     e3    f1    f2    p1     p2
-#&gt;         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>        8.13            73.9 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08      1     1 0.950 0.940 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>        6.07            69.7 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span>     0     0 0.229 0.362 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
+#&gt; <span style='color: #949494;'># A tibble: 15 x 10</span><span>
+#&gt;    survey_cost management_cost       e1     e2      e3    f1    f2     p1
+#&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>        5.73            64.1 -</span><span style='color: #BB0000;'>0.149</span><span>    0.803  0.298     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.888 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>        3.50            65.9 -</span><span style='color: #BB0000;'>0.004</span><span style='color: #BB0000;text-decoration: underline;'>13</span><span> -</span><span style='color: #BB0000;'>0.437</span><span> -</span><span style='color: #BB0000;'>1.99</span><span>       0     0 0.045</span><span style='text-decoration: underline;'>5</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>        6.23            67.0  1.71     1.27  -</span><span style='color: #BB0000;'>0.120</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.438 
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>        4.24            69.0 -</span><span style='color: #BB0000;'>0.412</span><span>   -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.88</span><span>       0     0 0.030</span><span style='text-decoration: underline;'>7</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>        6.19            67.2 -</span><span style='color: #BB0000;'>0.733</span><span>   -</span><span style='color: #BB0000;'>0.930</span><span>  1.87       0     1 0.803 
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>        6.15            61.7  0.956    0.297 -</span><span style='color: #BB0000;'>0.288</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.237 
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>        7.01            67.0 -</span><span style='color: #BB0000;'>0.503</span><span>    0.229  0.341     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.825 
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>        4.45            64.4 -</span><span style='color: #BB0000;'>1.00</span><span>    -</span><span style='color: #BB0000;'>1.54</span><span>   0.147     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.219 
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>        6.47            66.6 -</span><span style='color: #BB0000;'>1.03</span><span>     0.707  1.05      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.982 
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>        6.92            66.8 -</span><span style='color: #BB0000;'>0.152</span><span>    0.489  0.240      1     0 0.805 
+#&gt; </span><span style='color: #BCBCBC;'>11</span><span>        4.60            70.8 -</span><span style='color: #BB0000;'>0.954</span><span>   -</span><span style='color: #BB0000;'>1.74</span><span>   0.633      1     1 0.238 
+#&gt; </span><span style='color: #BCBCBC;'>12</span><span>        6.71            71.4  0.177    0.509  0.021</span><span style='text-decoration: underline;'>0</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.673 
+#&gt; </span><span style='color: #BCBCBC;'>13</span><span>        5.96            70.3 -</span><span style='color: #BB0000;'>0.714</span><span>   -</span><span style='color: #BB0000;'>0.541</span><span> -</span><span style='color: #BB0000;'>0.077</span><span style='color: #BB0000;text-decoration: underline;'>7</span><span>     1     0 0.486 
+#&gt; </span><span style='color: #BCBCBC;'>14</span><span>        3.64            67.7  0.481    0.271 -</span><span style='color: #BB0000;'>0.868</span><span>      0     0 0.238 
+#&gt; </span><span style='color: #BCBCBC;'>15</span><span>        7.95            72.8  2.33     1.64   0.629     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.595 
+#&gt; </span><span style='color: #949494;'># ... with 2 more variables: p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.964            0.827            0.703
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.960            0.835            0.800
 #&gt; </span><span style='color: #949494;'># ... with 3 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, alpha </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, gamma </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
+ <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
-<span class='co'># calculate expected value of management decision given current information</span>
-<span class='co'># using exact method</span>
-<span class='no'>ev_current</span> <span class='kw'>&lt;-</span> <span class='fu'>evdci</span>(
+<span class='co'># create a survey scheme that samples the first two sites that</span>
+<span class='co'># are missing data</span>
+<span class='no'>site_data</span>$<span class='no'>survey_site</span> <span class='kw'>&lt;-</span> <span class='fl'>FALSE</span>
+<span class='no'>site_data</span>$<span class='no'>survey_site</span>[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>site_data</span>$<span class='no'>f1</span>))[<span class='fl'>1</span>:<span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
+
+<span class='co'># define xgboost tuning parameters</span>
+<span class='no'>xgb_parameters</span> <span class='kw'>&lt;-</span>
+ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
+
+<span class='co'># calculate expected value of management decision given the survey</span>
+<span class='co'># information using exact method</span>
+<span class='no'>ev_survey</span> <span class='kw'>&lt;-</span> <span class='fu'>evdsi</span>(
   <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
-  <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>)
+  <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>), <span class='st'>"management_cost"</span>, <span class='st'>"survey_site"</span>,
+  <span class='st'>"survey_cost"</span>, <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
+  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
+  <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>, <span class='no'>xgb_parameters</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 5.296916</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_survey</span>)</div><div class='output co'>#&gt; [1] 14.65903</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

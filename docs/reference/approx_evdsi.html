@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Approximate expected value of decision given perfect information — approx_evdpi • surveyvoi</title>
+<title>Expected value of the decision given survey information — approx_evdsi • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -33,14 +33,11 @@
 
 
 
-<meta property="og:title" content="Approximate expected value of decision given perfect information — approx_evdpi" />
+<meta property="og:title" content="Expected value of the decision given survey information — approx_evdsi" />
 <meta property="og:description" content="Calculate the expected value of the conservation management decision
-given perfect information. This metric describes the value of the management
-decision that is expected when the decision maker is omniscient (i.e. they
-know exactly which features occur in which sites). Although real-world
-conservation planing scenarios rarely involve such omniscient decision
-makers, this metric is useful to provide an upper bound on the expected
-value of management decisions following additional data collection." />
+given survey information. This metric describes the value of the management
+decision that is expected when the decision maker conducts a surveys a
+set of sites to inform the decision." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -125,27 +122,28 @@ value of management decisions following additional data collection." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Approximate expected value of decision given perfect information</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/approx_evdpi.R'><code>R/approx_evdpi.R</code></a></small>
-    <div class="hidden name"><code>approx_evdpi.Rd</code></div>
+    <h1>Expected value of the decision given survey information</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/approx_evdsi.R'><code>R/approx_evdsi.R</code></a></small>
+    <div class="hidden name"><code>approx_evdsi.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Calculate the <em>expected value of the conservation management decision
-given perfect information</em>. This metric describes the value of the management
-decision that is expected when the decision maker is omniscient (i.e. they
-know exactly which features occur in which sites). Although real-world
-conservation planing scenarios rarely involve such omniscient decision
-makers, this metric is useful to provide an upper bound on the expected
-value of management decisions following additional data collection.</p>
+given survey information</em>. This metric describes the value of the management
+decision that is expected when the decision maker conducts a surveys a
+set of sites to inform the decision.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>approx_evdpi</span>(
+    <pre class="usage"><span class='fu'>approx_evdsi</span>(
   <span class='no'>site_data</span>,
   <span class='no'>feature_data</span>,
   <span class='no'>site_occupancy_columns</span>,
   <span class='no'>site_probability_columns</span>,
+  <span class='no'>site_env_vars_columns</span>,
   <span class='no'>site_management_cost_column</span>,
+  <span class='no'>site_survey_scheme_column</span>,
+  <span class='no'>site_survey_cost_column</span>,
+  <span class='no'>feature_survey_column</span>,
   <span class='no'>feature_survey_sensitivity_column</span>,
   <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>feature_model_sensitivity_column</span>,
@@ -153,10 +151,13 @@ value of management decisions following additional data collection.</p>
   <span class='no'>feature_alpha_column</span>,
   <span class='no'>feature_gamma_column</span>,
   <span class='no'>total_budget</span>,
+  <span class='no'>xgb_parameters</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
   <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
   <span class='kw'>method_approx_states</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
@@ -194,12 +195,48 @@ probability data (values between zero and one). No missing (<code>NA</code>)
 values are permitted in these columns.</p></td>
     </tr>
     <tr>
+      <th>site_env_vars_columns</th>
+      <td><p><code>character</code> names of columns in the
+argument to  <code>site_data</code> that contain environmental information
+for fitting updated occupancy models based on possible survey outcomes.
+Each column should correspond to a different environmental variable,
+and contain <code>numeric</code>, <code>factor</code>, or <code>character</code> data.
+No missing (<code>NA</code>) values are permitted in these columns.</p></td>
+    </tr>
+    <tr>
       <th>site_management_cost_column</th>
       <td><p><code>character</code> name of column in the
 argument to <code>site_data</code> that contains costs for managing each
 site for conservation. This column should have <code>numeric</code> values that
 are equal to or greater than zero. No missing (<code>NA</code>) values are
 permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>site_survey_scheme_column</th>
+      <td><p><code>character</code> name of <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) column in the argument to <code>site_data</code>
+that indicates which sites are selected in the scheme or not.
+No missing <code>NA</code> values are permitted. Additionally, only sites
+that are missing data can be selected or surveying (as per the
+argument to <code>site_occupancy_columns</code>).</p></td>
+    </tr>
+    <tr>
+      <th>site_survey_cost_column</th>
+      <td><p><code>character</code> name of column in the
+argument to  <code>site_data</code> that contains costs for surveying each
+site. This column should have <code>numeric</code> values that are equal to
+or greater than zero. No missing (<code>NA</code>) values are permitted in this
+column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_survey_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains <code>logical</code> (<code>TRUE</code> /
+<code>FALSE</code>) values indicating if the feature will be surveyed in
+the planned surveys or not. Note that considering additional features will
+rapidly increase computational burden, and so it is only recommended to
+consider features that are of specific conservation interest.
+No missing (<code>NA</code>) values are permitted in this column.</p></td>
     </tr>
     <tr>
       <th>feature_survey_sensitivity_column</th>
@@ -265,6 +302,16 @@ permitted in this column.</p></td>
 for conducting surveys and managing sites for conservation.</p></td>
     </tr>
     <tr>
+      <th>xgb_parameters</th>
+      <td><p><code>list</code> of <code>list</code> objects
+containing the parameters for fitting models for each
+feature. See documentation for the <code>params</code> argument in
+<code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for available parameters. Ideally,
+these parameters would be determined using the
+<code>tune_occupancy_models</code> function. Note that arguments must
+have a <code>nrounds</code> element (see example below).</p></td>
+    </tr>
+    <tr>
       <th>site_management_locked_in_column</th>
       <td><p><code>character</code> name of the column
 in the argument to <code>site_data</code> that contains <code>logical</code>
@@ -298,6 +345,25 @@ prioritizations must be solved to optimality. A value of 0.1 indicates
 prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
     </tr>
     <tr>
+      <th>site_weight_columns</th>
+      <td><p><code>character</code> name of columns in
+<code>site_data</code> containing weights for model fitting for each
+feature. These columns must contain <code>numeric</code> values greater
+than or equal to zero. No missing (<code>NA</code>) values are
+permitted. Defaults to <code>NULL</code> such that all data are given
+equal weight when fitting models.</p></td>
+    </tr>
+    <tr>
+      <th>xgb_n_folds</th>
+      <td><p><code>integer</code> vector containing the number of
+ k-fold cross-validation folds to use for fitting models and
+ assessing model performance for each feature. Ideally, the number of folds
+ should be exactly the same as the number used for tuning the
+ model parameters (i.e. same parameter to the <code>n_folds</code>
+ argument in tune_occupancy_models when generating parameters
+for <code>xgb_parameters</code>).</p></td>
+    </tr>
+    <tr>
       <th>n_approx_replicates</th>
       <td><p><code>integer</code> number of replicates to use for
 approximating the expected value calculations. Defaults to 100.</p></td>
@@ -312,21 +378,12 @@ presence absence states in the system
 Defaults to 1000.</p></td>
     </tr>
     <tr>
-      <th>method_approx_states</th>
-      <td><p><code>character</code> name of method that is
-used to sample states for approximating the expected value
-calculations. Available options are:
-<code>"uniform_with_replacement"</code>, <code>"uniform_without_replacement"</code>,
-<code>"weighted_with_replacement"</code>, <code>"weighted_without_replacement"</code>.
-Uniform sampling methods have an equal chance of returning each
-state, and weighted sampling methods are more likely to return
-states with a higher prior probability of occurring.
-Defaults to <code>"weighted_without_replacement"</code>.</p></td>
-    </tr>
-    <tr>
       <th>seed</th>
-      <td><p><code>integer</code> random seed used for generating states. Defaults
-to 500.</p></td>
+      <td><p><code>integer</code> state of the random number generator for
+partitioning data into folds cross-validation and fitting <span class="pkg">xgboost</span>
+models. It is also used for generating states.
+This parameter must remain the same to compare results from different
+functions using the approximation methods. Defaults to 500.</p></td>
     </tr>
     </table>
 
@@ -345,8 +402,7 @@ to 500.</p></td>
   so you may need to increase these parameters for large problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code>prior_probability_matrix</code>,
-<code>evdpi</code>.</p></div>
+    <div class='dont-index'><p><code>prior_probability_matrix</code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -355,55 +411,75 @@ to 500.</p></td>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 15 features and 9 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
+#&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9568333 ymax: 0.9942698
 #&gt; epsg (SRID):    NA
 #&gt; proj4string:    NA
-#&gt; <span style='color: #949494;'># A tibble: 5 x 10</span><span>
-#&gt;   survey_cost management_cost     e1     e2     e3    f1    f2    p1     p2
-#&gt;         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>        8.13            73.9 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08      1     1 0.950 0.940 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>        6.07            69.7 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span>     0     0 0.229 0.362 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
+#&gt; <span style='color: #949494;'># A tibble: 15 x 10</span><span>
+#&gt;    survey_cost management_cost       e1     e2      e3    f1    f2     p1
+#&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>        5.73            64.1 -</span><span style='color: #BB0000;'>0.149</span><span>    0.803  0.298     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.888 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>        3.50            65.9 -</span><span style='color: #BB0000;'>0.004</span><span style='color: #BB0000;text-decoration: underline;'>13</span><span> -</span><span style='color: #BB0000;'>0.437</span><span> -</span><span style='color: #BB0000;'>1.99</span><span>       0     0 0.045</span><span style='text-decoration: underline;'>5</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>        6.23            67.0  1.71     1.27  -</span><span style='color: #BB0000;'>0.120</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.438 
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>        4.24            69.0 -</span><span style='color: #BB0000;'>0.412</span><span>   -</span><span style='color: #BB0000;'>1.04</span><span>  -</span><span style='color: #BB0000;'>1.88</span><span>       0     0 0.030</span><span style='text-decoration: underline;'>7</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>        6.19            67.2 -</span><span style='color: #BB0000;'>0.733</span><span>   -</span><span style='color: #BB0000;'>0.930</span><span>  1.87       0     1 0.803 
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>        6.15            61.7  0.956    0.297 -</span><span style='color: #BB0000;'>0.288</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.237 
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>        7.01            67.0 -</span><span style='color: #BB0000;'>0.503</span><span>    0.229  0.341     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.825 
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>        4.45            64.4 -</span><span style='color: #BB0000;'>1.00</span><span>    -</span><span style='color: #BB0000;'>1.54</span><span>   0.147     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.219 
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>        6.47            66.6 -</span><span style='color: #BB0000;'>1.03</span><span>     0.707  1.05      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.982 
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span>        6.92            66.8 -</span><span style='color: #BB0000;'>0.152</span><span>    0.489  0.240      1     0 0.805 
+#&gt; </span><span style='color: #BCBCBC;'>11</span><span>        4.60            70.8 -</span><span style='color: #BB0000;'>0.954</span><span>   -</span><span style='color: #BB0000;'>1.74</span><span>   0.633      1     1 0.238 
+#&gt; </span><span style='color: #BCBCBC;'>12</span><span>        6.71            71.4  0.177    0.509  0.021</span><span style='text-decoration: underline;'>0</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.673 
+#&gt; </span><span style='color: #BCBCBC;'>13</span><span>        5.96            70.3 -</span><span style='color: #BB0000;'>0.714</span><span>   -</span><span style='color: #BB0000;'>0.541</span><span> -</span><span style='color: #BB0000;'>0.077</span><span style='color: #BB0000;text-decoration: underline;'>7</span><span>     1     0 0.486 
+#&gt; </span><span style='color: #BCBCBC;'>14</span><span>        3.64            67.7  0.481    0.271 -</span><span style='color: #BB0000;'>0.868</span><span>      0     0 0.238 
+#&gt; </span><span style='color: #BCBCBC;'>15</span><span>        7.95            72.8  2.33     1.64   0.629     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.595 
+#&gt; </span><span style='color: #949494;'># ... with 2 more variables: p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.964            0.827            0.703
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.960            0.835            0.800
 #&gt; </span><span style='color: #949494;'># ... with 3 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, alpha </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, gamma </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
+ <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
-<span class='co'># calculate expected value of management decision given perfect information</span>
-<span class='co'># using approximate method with 100 replicates and 50 states per replicate</span>
-<span class='no'>ev_prime_certainty</span> <span class='kw'>&lt;-</span> <span class='fu'>approx_evdci</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
-  <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>,
-  <span class='no'>total_budget</span>, <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>50</span>)
+<span class='co'># create a survey scheme that samples the first two sites that</span>
+<span class='co'># are missing data</span>
+<span class='no'>site_data</span>$<span class='no'>survey_site</span> <span class='kw'>&lt;-</span> <span class='fl'>FALSE</span>
+<span class='no'>site_data</span>$<span class='no'>survey_site</span>[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>site_data</span>$<span class='no'>f1</span>))[<span class='fl'>1</span>:<span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
 
-<span class='co'># print approximate value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_certainty</span>)</div><div class='output co'>#&gt;   [1] 5.392555 5.399130 5.414355 5.418971 5.389343 5.424460 5.399895 5.413548
-#&gt;   [9] 5.397006 5.394531 5.406037 5.396230 5.412920 5.403086 5.411976 5.403576
-#&gt;  [17] 5.399046 5.408552 5.411949 5.392600 5.392223 5.388512 5.397222 5.393049
-#&gt;  [25] 5.400384 5.395685 5.405935 5.395829 5.386738 5.407900 5.414019 5.397095
-#&gt;  [33] 5.401837 5.379786 5.408712 5.384775 5.405045 5.401245 5.398388 5.389401
-#&gt;  [41] 5.393010 5.379834 5.404883 5.389982 5.390929 5.407749 5.389306 5.395268
-#&gt;  [49] 5.400662 5.399678 5.385298 5.396284 5.420821 5.385989 5.386998 5.396892
-#&gt;  [57] 5.398668 5.381943 5.395783 5.411545 5.384924 5.406831 5.411214 5.391906
-#&gt;  [65] 5.379184 5.403415 5.394731 5.401737 5.394057 5.389606 5.390340 5.410049
-#&gt;  [73] 5.409020 5.382300 5.411980 5.393135 5.411174 5.406593 5.420510 5.418735
-#&gt;  [81] 5.414151 5.404688 5.393989 5.392761 5.396202 5.400871 5.390927 5.390087
-#&gt;  [89] 5.420103 5.387052 5.393977 5.392368 5.405617 5.387707 5.384335 5.378350
-#&gt;  [97] 5.400965 5.389608 5.418459 5.395731</div><div class='input'>
+<span class='co'># define xgboost tuning parameters</span>
+<span class='no'>xgb_parameters</span> <span class='kw'>&lt;-</span>
+ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
+
+<span class='co'># calculate expected value of management decision given the survey</span>
+<span class='co'># information using exact method</span>
+<span class='no'>approx_ev_survey</span> <span class='kw'>&lt;-</span> <span class='fu'>approx_evdsi</span>(
+  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+  <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>), <span class='st'>"management_cost"</span>, <span class='st'>"survey_site"</span>,
+  <span class='st'>"survey_cost"</span>, <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
+  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
+  <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>, <span class='no'>xgb_parameters</span>)
+
+<span class='co'># print exact value</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>approx_ev_survey</span>)</div><div class='output co'>#&gt;   [1] 15.11702 15.44390 15.39380 15.02590 14.80172 15.23351 15.20531 14.96200
+#&gt;   [9] 14.78599 15.27915 15.32149 14.95848 15.00355 14.64026 15.09183 15.32712
+#&gt;  [17] 15.11939 15.45784 15.14687 15.44040 14.96794 15.34661 14.84210 15.20964
+#&gt;  [25] 15.13109 15.08198 15.50679 15.00066 15.14489 14.91493 15.20229 15.38903
+#&gt;  [33] 15.00516 15.14007 15.10604 15.18023 15.31863 15.12966 15.49747 15.19567
+#&gt;  [41] 15.15142 14.90756 15.30312 15.11541 15.28136 15.11084 14.93179 15.48732
+#&gt;  [49] 15.08971 15.24142 15.46737 15.13866 15.15392 15.26294 15.72592 15.01191
+#&gt;  [57] 15.35033 15.20458 15.16349 15.29620 15.24580 14.87185 15.22910 15.06293
+#&gt;  [65] 15.29647 15.14684 15.05170 14.84190 15.25252 15.04402 15.37098 15.12296
+#&gt;  [73] 15.26747 15.22508 15.16586 15.09839 14.86883 15.18265 14.98904 15.10585
+#&gt;  [81] 15.39267 14.61317 15.05315 15.06516 15.32581 15.37693 14.77549 14.97404
+#&gt;  [89] 15.33367 14.98848 14.70328 14.90659 14.71961 15.07088 14.93924 15.28843
+#&gt;  [97] 14.94476 14.96872 14.79137 15.49079</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

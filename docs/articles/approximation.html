@@ -93,7 +93,7 @@
 
     
     
-<p>Here we will verify that the approximation methods are valid for value of information analyses. To achieve this, we will compare estimates from the approximation methods against the correct values from the exact methods. We will also examine how the number of approximation states affects the quality of the estimate.</p>
+<p>Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of states to <em>approximate</em> the full set of states, and so we will investigate several different methods for generating states. We will also examine how the number of approximation states affects the quality of the estimate.</p>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h2>
@@ -215,7 +215,7 @@ n_approx_states &lt;-<span class="st"> </span><span class="kw"><a href="https://
 <span class="co"># print states</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(n_approx_states)</code></pre></div>
 <pre><code>##  [1]   10  123  236  348  461  573  686  798  911 1023</code></pre>
-<p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data and these varying numbers of approximation states. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states.</p>
+<p>This benchmark analysis will examine various approaches for approximating the <em>expected value of the decision given current information</em>. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given current information using</span>
 <span class="co"># exact methods</span>
 ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdci">evdci</a></span>(
@@ -232,13 +232,23 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
   <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
   <span class="dt">total_budget =</span> total_budget)
 
-<span class="co"># define function for calculating standard error</span>
+<span class="co"># print value</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
+<pre><code>## [1] 4.650252</code></pre>
+<p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating states: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample states and do not consider the prior probability of each state occurring. The weighted methods, on the other hand, are select states that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total states, we will not explore the full range of subsets for this method.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define function for calculating standard error</span>
 se &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">sqrt</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var</a></span>(x) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x))
 
 <span class="co"># estimate the correct value of the decision given current information using</span>
 <span class="co"># approximation methods</span>
 ev_prime_current &lt;-
-<span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="dt">method =</span>
+    <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"uniform_with_replacement"</span>, <span class="st">"uniform_without_replacement"</span>,
+      <span class="st">"weighted_with_replacement"</span>, <span class="st">"weighted_without_replacement"</span>),
+  <span class="dt">n =</span> n_approx_states) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="op">!</span>((method <span class="op">==</span><span class="st"> "weighted_without_replacement"</span>) <span class="op">&amp;</span>
+<span class="st">           </span>(n <span class="op">&gt;=</span><span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">max</a></span>(n_approx_states) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span>)))) <span class="op">%&gt;%</span>
+<span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ddply">ddply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"method"</span>, <span class="st">"n"</span>), <span class="cf">function</span>(x) {
     result &lt;-
 <span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdci">approx_evdci</a></span>(
         <span class="dt">site_data =</span> site_data,
@@ -254,114 +264,27 @@ ev_prime_current &lt;-
         <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
         <span class="dt">total_budget =</span> total_budget,
         <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
-        <span class="dt">n_approx_states_per_replicate =</span> x,
+        <span class="dt">n_approx_states_per_replicate =</span> x<span class="op">$</span>n,
+        <span class="dt">method_approx_states =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(x<span class="op">$</span>method),
         <span class="dt">seed =</span> <span class="dv">100</span>)
     <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(result), <span class="dt">se =</span> <span class="kw">se</span>(result))
   }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
-
-<span class="co"># preview results</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
-<pre><code>## [1] 4.650252</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_current)</code></pre></div>
-<pre><code>## # A tibble: 10 x 3
-##        n    mean          se
-##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
-##  1    10 4.31353 0.102651   
-##  2   123 4.63132 0.0232484  
-##  3   236 4.62251 0.0151316  
-##  4   348 4.63425 0.0151433  
-##  5   461 4.63723 0.0114165  
-##  6   573 4.64937 0.00791264 
-##  7   686 4.64393 0.00749626 
-##  8   798 4.64541 0.00550044 
-##  9   911 4.65115 0.00327240 
-## 10  1023 4.64982 0.000446635</code></pre>
-<p>In a similar manner, we will benchmark the approximation methods for calculating the expected value of the decision given perfect information.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given perfect information using</span>
-<span class="co"># exact methods</span>
-ev_certainty &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdpi">evdpi</a></span>(
-  <span class="dt">site_data =</span> site_data,
-  <span class="dt">feature_data =</span> feature_data,
-  <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
-  <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
-  <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
-  <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
-  <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
-  <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
-  <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
-  <span class="dt">total_budget =</span> total_budget)
-
-<span class="co"># estimate the correct value of the decision given perfect information using</span>
-<span class="co"># approximation methods</span>
-ev_prime_certainty &lt;-
-<span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ldply">ldply</a></span>(n_approx_states, <span class="cf">function</span>(x) {
-    result &lt;-
-<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdpi">approx_evdpi</a></span>(
-        <span class="dt">site_data =</span> site_data,
-        <span class="dt">feature_data =</span> feature_data,
-        <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
-        <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
-        <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
-        <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
-        <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
-        <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
-        <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-        <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-        <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
-        <span class="dt">total_budget =</span> total_budget,
-        <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
-        <span class="dt">n_approx_states_per_replicate =</span> x,
-        <span class="dt">seed =</span> <span class="dv">100</span>)
-    <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(result), <span class="dt">se =</span> <span class="kw">se</span>(result))
-  }) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>()
-
-<span class="co"># preview results</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_certainty)</code></pre></div>
-<pre><code>## [1] 4.939601</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_prime_certainty)</code></pre></div>
-<pre><code>## # A tibble: 10 x 3
-##        n    mean          se
-##    &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;
-##  1    10 4.89877 0.0933986  
-##  2   123 4.88369 0.0596912  
-##  3   236 4.92458 0.0405168  
-##  4   348 4.94957 0.0272840  
-##  5   461 4.95296 0.0240516  
-##  6   573 4.95063 0.0175104  
-##  7   686 4.94292 0.0140213  
-##  8   798 4.92987 0.00884085 
-##  9   911 4.93816 0.00459071 
-## 10  1023 4.93951 0.000171440</code></pre>
-<p>Now let’s create a plot to visualize the results. This plot has two panels. The top panel corresponds to the <em>expected value of the decision given current information</em> and the bottom panel corresponds to the <em>expected value of the decision given perfect information</em>. Within each panel, points correspond to mean estimates from the approximate method, error bars show standard errors associated with estimates from the approximation method, and the blue line shows the correct value calculated using the exact methods.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># prepare data for plotting</span>
-point_data &lt;-
-<span class="st">  </span>ev_prime_current <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="st">"expected value of decision given current information"</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span>(ev_prime_certainty <span class="op">%&gt;%</span>
-<span class="st">            </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste</a></span>(<span class="st">"expected value of decision given"</span>,
-                                  <span class="st">"perfect information"</span>))) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se)
-line_data &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(
-  <span class="dt">metric =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"expected value of decision given current information"</span>,
-             <span class="st">"expected value of decision given perfect information"</span>),
-  <span class="dt">yint =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(ev_current, ev_certainty))
-
-<span class="co"># create plot</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">lower =</span> mean <span class="op">-</span><span class="st"> </span>se, <span class="dt">upper =</span> mean <span class="op">+</span><span class="st"> </span>se) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">method =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/grep">gsub</a></span>(<span class="st">"_"</span>, <span class="st">" "</span>, method, <span class="dt">fixed =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<p>Now, let’s visualize the results.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create plot</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">y =</span> mean), point_data) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), point_data) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">yintercept =</span> yint), line_data, <span class="dt">colour =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>metric, <span class="dt">ncol =</span> <span class="dv">1</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="dt">yintercept =</span> ev_current, <span class="dt">colour =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">y =</span> mean), ev_prime_current) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), ev_prime_current) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>method, <span class="dt">ncol =</span> <span class="dv">1</span>) <span class="op">+</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Number of states used in approximation calculations"</span>) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected value"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected value of the decision given current information"</span>) <span class="op">+</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">strip.background =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span>(<span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">fill =</span> <span class="st">"black"</span>),
       <span class="dt">strip.text =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">color =</span> <span class="st">"white"</span>, <span class="dt">size =</span> <span class="dv">12</span>))</code></pre></div>
 <p><img src="approximation_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>We can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). These results demonstrate that the approximation method is more accurate when we use a greater number of states for the calculations. Indeed, the approximation method yields roughly equivalent values to the exact method when using a large number of states for the calculations.</p>
+<p>Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods – except for the <em>weighted with replacement</em> method which performs really poorly – and shows that most the approximation method is more accurate when we use a greater number of states for the calculations. In particular, we can see that the <em>weighted without replacement</em> method is the most useful because it converges to the correct value (blue line) with the fewest approximation states.</p>
 </div>
   </div>
 

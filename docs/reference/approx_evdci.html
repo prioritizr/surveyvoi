@@ -134,15 +134,28 @@ decision that is expected when the decision maker is limited to
 existing biodiversity data (i.e. survey data and environmental niche models).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>approx_evdci</span>(<span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='no'>site_occupancy_columns</span>,
-  <span class='no'>site_probability_columns</span>, <span class='no'>site_management_cost_column</span>,
-  <span class='no'>feature_survey_sensitivity_column</span>, <span class='no'>feature_survey_specificity_column</span>,
-  <span class='no'>feature_model_sensitivity_column</span>, <span class='no'>feature_model_specificity_column</span>,
-  <span class='no'>feature_alpha_column</span>, <span class='no'>feature_gamma_column</span>, <span class='no'>total_budget</span>,
-  <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Extremes'>min</a></span>(<span class='fl'>1000</span>,
-  <span class='fu'>n_states</span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>site_data</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>))), <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>)</pre>
+    <pre class="usage"><span class='fu'>approx_evdci</span>(
+  <span class='no'>site_data</span>,
+  <span class='no'>feature_data</span>,
+  <span class='no'>site_occupancy_columns</span>,
+  <span class='no'>site_probability_columns</span>,
+  <span class='no'>site_management_cost_column</span>,
+  <span class='no'>feature_survey_sensitivity_column</span>,
+  <span class='no'>feature_survey_specificity_column</span>,
+  <span class='no'>feature_model_sensitivity_column</span>,
+  <span class='no'>feature_model_specificity_column</span>,
+  <span class='no'>feature_alpha_column</span>,
+  <span class='no'>feature_gamma_column</span>,
+  <span class='no'>total_budget</span>,
+  <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
+  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>method_approx_states</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -281,20 +294,28 @@ prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
     <tr>
       <th>n_approx_replicates</th>
       <td><p><code>integer</code> number of replicates to use for
-approximating the expected value of a given management action.
-Valid arguments include an integer value greater than zero (e.g.
-100), or <code>NULL</code>. If <code>NULL</code> is supplied as an argument, then
-the expected value of a given management action is calculated precisely
-and not using approximation methods. Defaults to <code>NULL</code>.</p></td>
+approximating the expected value calculations. Defaults to 100.</p></td>
     </tr>
     <tr>
       <th>n_approx_states_per_replicate</th>
       <td><p><code>integer</code> number of states to use
 per replicate for approximating the expected value of a given management
-action. Valid arguments include an integer value greater than zero (e.g.
-10000), or <code>NULL</code>. If <code>NULL</code> is supplied as an argument, then
-the expected value of a given management action is calculated precisely
-and not using approximation methods. Defaults to <code>NULL</code>.</p></td>
+action. This number must be smaller than or equal to the total number of
+presence absence states in the system
+(i.e. <code>n_states(nrow(site_data), nrow(feature_data))</code>)
+Defaults to 1000.</p></td>
+    </tr>
+    <tr>
+      <th>method_approx_states</th>
+      <td><p><code>character</code> name of method that is
+used to sample states for approximating the expected value
+calculations. Available options are:
+<code>"uniform_with_replacement"</code>, <code>"uniform_without_replacement"</code>,
+<code>"weighted_with_replacement"</code>, <code>"weighted_without_replacement"</code>.
+Uniform sampling methods have an equal chance of returning each
+state, and weighted sampling methods are more likely to return
+states with a higher prior probability of occurring.
+Defaults to <code>"weighted_without_replacement"</code>.</p></td>
     </tr>
     <tr>
       <th>seed</th>
@@ -305,144 +326,17 @@ to 500.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>numeric</code> <code>vector</code> containing the mean estimate and
-  standard error.</p>
+    <p><code>numeric</code> <code>vector</code> containing the estimate for each
+  replicate.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Let \(I\) denote the set of feature (indexed by
-\(i\)) and \(J\) the set of planning units (indexed by \(j\)).
-To describe the results of previous surveys, let \(D_{ij}\) indicate the
-detection/non-detection of feature \(i \in I\) in planning unit
-\(j \in J\) during previous surveys using zeros and ones
-(specified via <code>site_occupancy_columns</code>).
-Also let \(U_j\) indicate if planning unit \(j \in J\) has previously
-been surveyed or not.
-To describe the accuracy of the surveys, let \(S_i\) denote the
-sensitivity and \(N_i\) denote the specificity of the surveying
-methodology for features \(i \in I\) (specified via
-<code>feature_survey_sensitivity_column</code> and
-<code>feature_survey_specificity_column</code> respectively).
-Next, let \(H_{ij}\) denote the modelled probabilities of
-the features \(i \in I\) occupying planning units \(j \in J\)
-(specified via <code>site_probability_columns</code>).
-To describe the accuracy of the environmental niche models, let \({S'}_i\)
-and \({N'}_i\) denote the sensitivity and specificity (respectively) of
-the models for features \(i \in I\) (specified
-via <code>feature_model_sensitivity_column</code> and
-<code>feature_model_specificity_column</code> respectively).
-We can calculate the prior probability of each feature \(i \in I\)
-occupying each site \(j \in J\) following
-(or manually specified via <code>prior_matrix</code>):</p>
-<p>$$
-P_{ij} = \\
-S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
-1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-{S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
-$$</p>
-<p>Since we do not know which features truly occur in which sites, let \(S\)
-denote the full range of possible states that affect the evaluation of the
-management action (indexed by \(s\)). Here, \(S\) represents all possible
-combinations of different species occurring in different sites.
-The total number of states \(s \in S\) is incredibly large for even a small
-conservation planning problem. For example, a conservation planning problem
-involving ten sites and four features (species) has approximately
-\(1.09 \times 10^{12}\) states. In other words, one trillion ninety-nine
-billion five hundred eleven million six hundred twenty-seven thousand seven
-hundred seventy-five states. Unfortunately, this means that it is not
-computationally feasible to calculate exact values of information for
-conservation problems involving many sites. Let \(G_{ijs}\) indicate which
-species \(i \in I\) occur in which planning units \(j \in J\) given
-state \(s \in S\). We calculate the prior probability of each state
-\(s \in S\) being the true state following:</p>
-<p>$$P_s = \\
-Q_{ij}, \text{ if } G_{ijs} = 1 \\
-1 - Q_{ij}, \text{ else } \\
-$$</p>
-<p>Under the <em>approximation method</em>, we define \(S'\) which contains a
-subset of sites \(s \in S\). The prior probability of each state
-\(s \in S'\) being the true state is calculated following:</p>
-<p>$$
-{P'}_s = \frac{P_s}{\sum_{k \in S'} P_k}
-$$</p>
-<p>Here, the management action is to purchase a set of sites for
-protected area establishment. In other words, the management action is to
-implement a spatial prioritisation for protected area establishment. The
-management action is subject to a budget that limits the cost of purchasing
-sites. Let \(A_j\) denote the cost of acquiring each site
-\(j \in J\) (specified via <code>site_management_cost_column</code>),
-and \(b\) denote the total budget available for
-conservation (specified via <code>total_budget</code>). Furthermore,
-let \(T_j\) denote which sites \(j \in j\) are locked into the
-prioritization (e.g. sites in existing protected area system).
-Given these data, let \(Z\) denote the
-set of all possible management actions (indexed by \(z\)). To describe
-each of the possible management actions \(z \in Z\), let \(X_{jz}\)
-indicate which sites \(j \in J\) are purchased for protection (using zeros
-and ones) under a given management action \(z \in Z\). To evaluate the
-conservation value of a given management action, we will adopt equations
-used in the objective function of the <em>Zonation</em> decision support tool
-(Moilanen 2007). Let \(\alpha_i\) and \(\gamma_i\) denote scaling terms
-for species \(i \in I\) to parametrise trade-offs in the protection of
-different species. These scaling terms are crucial to ensure that competing
-management decisions are evaluated in a manner conforming to the principle
-of complementarity (Vane-Wright <em>et al.</em> 1991).
-The value of a management action (\(z\)) for a given state (\(s\)) is
-calculated following, wherein \(Y_j\) indicates
-if each site \(j \in J\) is selected in the (\(z\)) management action or
-not (using zeros and ones):</p>
-<p>$$
-V(z, s) = \sum_{i \in I} \alpha_i \left( \sum_{j \in J} Y_{j} G_{ijs} \right) ^{\gamma_i} \\
-$$</p>
-<p>We can now calculate the
-<em>approximate expected value of the management decision given
-current information</em> (\(\text{EV'}_{\text{current}}\)). To achieve this, we
-assume that the decision maker will act optimally. Thus the
-<em>approximate expected value of the management decision given current
-information</em> is the <em>approximate expected value of the best management
-action given current information</em>. Let \(z'\) denote an optimal management
-action \(z \in Z\) given current information. This can be expressed as
-follows:</p>
-<p>$$
-\text{EV'}_{\text{current}} = \mathbb{E} \left[ V(z', S') \right] = \max_{z \in Z} \mathbb{E} \left[ V(z, S') \right] \\
-\mathbb{E} \left[ V(z, S') \right] = \sum_{s \in S'} V(z, s) \times {P'}_s \\
-$$</p>
-<p>We use combinatorial optimization to identify the (\(z'\))
-best management action given current information. Specifically, we
-formulate an integer programming problem -- using piecewise linear
-constraints to linearise the objective function (precision controlled using
-<code>n_approx_n_approx_obj_fun_points</code>) -- and solve it to (near)
-optimality (controlled using
-<code>optimality_gap</code>) with the <span class="pkg">gurobi</span> package. Let \({X'}_j\)
-indicate if each planning unit \(j \in J\) is selected in the \(z'\) best
-management action given current information (using zeros and ones):</p>
-<p>$$
-\text{maximize } \sum_{i \in I} \alpha_i \left( \sum_{j \in J} {X'}_j Q_{ij} \right) ^{\gamma_i} \\
-\text{subject to } \sum_{j \in J} {{X'}_j} A_j \leq b \\
-{{X'}_j} \geq T_j \text{ } \forall j \in J \\
-{{X'}_j} \in \{ 0, 1 \} \text{ } \forall j \in J
-$$</p>
-<p>The accuracy of the approximate method depends on which subset of states
-\(s \in S'\) are used for the calculations. As such, this function
-calculates multiple estimates of the  <em>approximate expected value of
-the management decision given current information</em>
-(\(\text{EV'}_{\text{current}}\)) using multiple subsets of states \(s
-\in S'\) and reports the mean and standard error of these estimates. The
-number of estimates is controlled using the <code>n_replicates</code> parameter,
-and the number of states in \(S'\) is controlled using the
-<code>n_states_per_replicate</code> parameter. For a given replicate, the states
-are sampled randomly without replacement. This means that the
-<em>approximation method</em> is equivalent to the <em>exact method</em>
-when the argument to <code>n_states_per_replicate</code> is equal to the total
-number of states.</p>
-    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
-
-    <p>Moilanen A (2007) Landscape zonation, benefit functions and target-based
-planning: unifying reserve selection strategies.
-<em>Biological Conservation</em>, <strong>134</strong>: 571--579.</p>
-<p>Vane-Wright RI, Humphries CJ, &amp; Williams PH (1991) What to
-protect? Systematics and the agony of choice.
-<em>Biological Conservation</em>, <strong>55</strong>: 235--254.</p>
+    <p>This function uses approximation methods to estimate the
+  expected value calculations. As such, you will need to ensure that
+  the same seed is used when comparing results to other functions that
+  use approximation methods. Additionally, the accuracy of these
+  calculations depend on the arguments to
+  <code>n_approx_replicates</code> and <code>n_approx_states_per_replicate</code>, and
+  so you may need to increase these parameters for large problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>prior_probability_matrix</code>,
@@ -493,19 +387,19 @@ protect? Systematics and the agony of choice.
     <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>50</span>)
 
 <span class='co'># print approximate value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_current</span>)</div><div class='output co'>#&gt;   [1] 5.257948 5.268949 5.076086 5.311225 5.270498 5.013506 4.984978 5.245544
-#&gt;   [9] 5.274660 5.253368 5.324316 5.096529 5.196068 5.238679 5.136699 5.285208
-#&gt;  [17] 5.280123 5.249547 5.325205 5.211823 5.405049 5.310683 5.202448 5.200951
-#&gt;  [25] 4.979316 5.358222 5.222401 5.332026 5.299542 5.159650 5.382077 5.280566
-#&gt;  [33] 5.258336 4.995365 5.449690 5.296921 4.327927 5.271039 5.176513 5.403976
-#&gt;  [41] 5.162444 5.029173 5.407650 5.161348 5.297715 5.403019 5.377093 5.324529
-#&gt;  [49] 5.309338 5.309081 5.369413 5.256179 5.318448 4.204293 5.309229 5.247825
-#&gt;  [57] 5.348056 5.389953 5.278698 5.013264 5.067286 5.366988 5.357762 5.285609
-#&gt;  [65] 5.156600 5.346482 5.315566 5.365432 5.312733 5.353947 5.316221 5.270933
-#&gt;  [73] 5.390656 5.276575 5.174468 5.296787 5.389758 5.343357 5.238931 5.195727
-#&gt;  [81] 5.325147 5.364135 5.364868 5.391050 5.388370 5.305879 5.133709 5.354336
-#&gt;  [89] 5.197784 5.235783 5.288661 5.321727 5.244270 5.369888 5.413943 5.018611
-#&gt;  [97] 5.369152 5.334605 5.112121 5.379914</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_current</span>)</div><div class='output co'>#&gt;   [1] 5.392555 5.399130 5.414355 5.418971 5.389343 5.424460 5.399895 5.413548
+#&gt;   [9] 5.397006 5.394531 5.406037 5.396230 5.412920 5.403086 5.411976 5.403576
+#&gt;  [17] 5.399046 5.408552 5.411949 5.392600 5.392223 5.388512 5.397222 5.393049
+#&gt;  [25] 5.400384 5.395685 5.405935 5.395829 5.386738 5.407900 5.414019 5.397095
+#&gt;  [33] 5.401837 5.379786 5.408712 5.384775 5.405045 5.401245 5.398388 5.389401
+#&gt;  [41] 5.393010 5.379834 5.404883 5.389982 5.390929 5.407749 5.389306 5.395268
+#&gt;  [49] 5.400662 5.399678 5.385298 5.396284 5.420821 5.385989 5.386998 5.396892
+#&gt;  [57] 5.398668 5.381943 5.395783 5.411545 5.384924 5.406831 5.411214 5.391906
+#&gt;  [65] 5.379184 5.403415 5.394731 5.401737 5.394057 5.389606 5.390340 5.410049
+#&gt;  [73] 5.409020 5.382300 5.411980 5.393135 5.411174 5.406593 5.420510 5.418735
+#&gt;  [81] 5.414151 5.404688 5.393989 5.392761 5.396202 5.400871 5.390927 5.390087
+#&gt;  [89] 5.420103 5.387052 5.393977 5.392368 5.405617 5.387707 5.384335 5.378350
+#&gt;  [97] 5.400965 5.389608 5.418459 5.395731</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -514,7 +408,6 @@ protect? Systematics and the agony of choice.
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
-      <li><a href="#references">References</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
