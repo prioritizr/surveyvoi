@@ -138,6 +138,9 @@ prior_probability_matrix <- function(
       ((1 - feature_data[[feature_model_specificity_column]][f]) *
        (mij[f, pos] < 0.5))
   }
+  # clamp values that are exactly zero or one
+  prior[] <- pmin(prior[], 1 - 1e-10)
+  prior[] <- pmax(prior[], 1e-10) 
   # return result
   rownames(prior) <- site_occupancy_columns
   prior
