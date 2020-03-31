@@ -38,6 +38,12 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 devtools::load_all()
 ```
 
+## Introduction
+
+The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- that prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (i.e. surveying sites to refine estimates of which species are present inside them). However, this is further complicated by the fact that surveying sites consumes limited resources that could be used to manage sites for conservation. Thus decision makers need to strategically prioritize sites for surveys, based on the possibility that such surveys will substantially improve subsequent spatial prioritisations---this is not a trivial task.
+
+The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans. Methods are provided to calculate the _expected value of the decision (i.e. spatial prioritization) given current information_ (`evdci` function), the _expected value of the decision given perfect information_ (`evdpi` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by exploring various survey schemes and computing the expected value of the decision associated with each scheme, optimal survey schemes can be identified (`optimal_survey_scheme` function). This package requires the [_Gurobi_ software suite](https://www.gurobi.com). In this vignette, we will use a simulated dataset to explore these methods.
+
 ## Setup
 
 Let's start by setting up our R session. Here we will load some R packages and pre-set the random number generators for reproducibility.
@@ -61,20 +67,14 @@ RFoptions(seed = 505)
 options(pillar.sigfig = 6)
 ```
 
-## Introduction
-
-The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- that prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (i.e. surveying sites to refine estimates of which species are present inside them). However, this is further complicated by the fact that surveying sites consumes limited resources that could be used to manage sites for conservation. Thus decision makers need to strategically prioritize sites for surveys, based on the possibility that such surveys will substantially improve subsequent spatial prioritisations---this is not a trivial task.
-
-The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans. Methods are provided to calculate the _expected value of the decision (i.e. spatial prioritization) given current information_ (`evdci` function), the _expected value of the decision given perfect information_ (`evdpi` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by exploring various survey schemes and computing the expected value of the decision associated with each scheme, optimal survey schemes can be identified (`optimal_survey_scheme` function). This package requires the [_Gurobi_ software suite](https://www.gurobi.com). In this vignette, we will use a simulated dataset to explore these methods.
-
 ## Simulate data
 
-Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites---meaning that half of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
+Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 20 sites---meaning that 10 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
 
 ```{r}
 # simulate site data
 site_data <- simulate_site_data(
-  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 0.5,
+  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 10 / 30,
   n_env_vars = 2, output_probabilities = FALSE)
 
 # print site data
@@ -161,11 +161,11 @@ str(candidate_xgb_params)
 # ideally, we would set n_random_search_iterations much higher (e.g. 10000),
 # but we will keep it low to reduce processing time for this example
 xgb_params <- tune_occupancy_models(site_data, "f1", c("e1", "e2"),
-                                   n_folds = 2,
-                                   n_random_search_iterations = 1000,
-                                   early_stopping_rounds = 10,
-                                   parameters = candidate_xgb_params,
-                                   n_threads = 1)
+                                    n_folds = 2,
+                                    n_random_search_iterations = 1000,
+                                    early_stopping_rounds = 10,
+                                    parameters = candidate_xgb_params,
+                                    n_threads = 1)
 
 # print best parameters
 print(xgb_params)
@@ -180,8 +180,8 @@ xgb_model <- fit_occupancy_models(site_data, "f1", c("e1", "e2"),
                                   parameters = xgb_params)
 
 # print model performance (AUC value)
-# since this value is greater than 0.7, our model is "good enough"
-stopifnot(xgb_model$performance$test_auc_mean >= 0.7)
+# since this value is greater than 0.8, our model is "good enough"
+stopifnot(xgb_model$performance$test_auc_mean >= 0.8)
 print(xgb_model$performance$test_auc_mean)
 
 # store predicted probabilities values in the site_data object
@@ -260,21 +260,18 @@ approx_evd_current <- approx_evdci(
   feature_alpha_column = "alpha",
   feature_gamma_column = "gamma",
   total_budget = total_budget,
-  n_approx_replicates = 10,
-  n_approx_states_per_replicate = 10)
+  n_approx_replicates = 1,
+  n_approx_states_per_replicate = 4)
 
-# preview values
-str(approx_evd_current)
-
-# print average value
-print(mean(approx_evd_current))
+# print value
+print(approx_evd_current)
 ```
 
-We can potentially improve the _expected value of the decision given current information_ by learning more about which sites are more likely or less likely to contain the conservation.
+We can potentially improve the _expected value of the decision given current information_ by learning more about which sites are more likely (and less likely) to contain the conservation feature.
 
 ## Expected value given perfect information
 
-We can also explore what happen if we had perfect information. That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contained the feature and which planning units did not? This value is termed the _expected value of the decision given perfect information_. Although we would rarely have perfect information -- even after conducting additional surveys -- this metric is useful to understand the limit of how much the management decision could potentially improved given budgetary constraints. Indeed, the _expected value of the decision given current information_ can be very similar to _expected value of the decision given perfect information_ in some situations. Similar to before, this metric can only be calculated for very small problems, and so we will estimate it using the _approximation method_.
+We can also explore what happen if we had perfect information. That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contain the feature and which planning units do not? This value is termed the _expected value of the decision given perfect information_. Although we would rarely have perfect information -- even after conducting additional surveys -- this metric is useful to understand the limit of how much the management decision could potentially be improved given budgetary constraints. Indeed, the _expected value of the decision given current information_ can be very similar to _expected value of the decision given perfect information_ in some situations. Similar to before, this metric can only be calculated for very small problems, and so we will estimate it using the _approximation method_.
 
 ```{r}
 # approximate expected value of the decision given perfect information
@@ -291,29 +288,26 @@ approx_evd_perfect <- approx_evdpi(
   feature_alpha_column = "alpha",
   feature_gamma_column = "gamma",
   total_budget = total_budget,
-  n_approx_replicates = 10,
-  n_approx_states_per_replicate = 10)
+  n_approx_replicates = 1,
+  n_approx_states_per_replicate = 4)
 
-# preview values
-str(approx_evd_perfect)
-
-# print average value
-print(mean(approx_evd_perfect))
+# print value
+print(approx_evd_perfect)
 
 # estimate how much perfect information would improve the decision
-mean_improvement_given_perfect <- mean(approx_evd_perfect - approx_evd_current)
-print(mean_improvement_given_perfect)
+approx_roi_perfect <- approx_evd_perfect - approx_evd_current
+print(approx_roi_perfect)
 ```
 
 ```{r, include = FALSE}
 stopifnot(all(approx_evd_perfect >= approx_evd_current))
 ```
 
-Although the _approximate expected value of the decision given perfect information_ tells us the likely performance of the management decision given omniscient knowledge, it doesn't actually tell us which sites we should survey to improve the expected value of the management decision.
+Although the _approximate expected value of the decision given perfect information_ tells us the likely performance of the management decision given omniscient knowledge, it doesn't actually tell us which sites we should survey to improve the _expected value of the management decision_.
 
 ## Survey schemes
 
-Now we will generate some candidate survey schemes for potentially improving the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. `survey_budget`) will be set as 40% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.
+Now we will generate some candidate survey schemes to see if we can improve the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. `survey_budget`) will be set as 40% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.
 
 ```{r}
 # calculate budget for surveying sites
@@ -422,7 +416,7 @@ approx_evd_survey_schemes <-
                   "rich_scheme"))
 
 # approximate expected value of the decision given each survey scheme
-approx_evd_survey_schemes$value <- lapply(
+approx_evd_survey_schemes$value <- sapply(
   approx_evd_survey_schemes$name, function(x) {
   approx_evdsi(
     site_data = site_data,
@@ -442,20 +436,17 @@ approx_evd_survey_schemes$value <- lapply(
     feature_gamma_column = "gamma",
     total_budget = total_budget,
     xgb_parameters = xgb_params,
-    n_approx_obj_fun_points = 100,
     xgb_n_folds = 2,
-    n_approx_replicates = 10,
-    n_approx_states_per_replicate = 10)
+    n_approx_replicates = 1,
+    n_approx_states_per_replicate = 4)
 })
 
 # estimate the return on investment for each survey scheme
 # specifically, how much the information gained from each survey scheme is
 # expected to improve management decision based on current information,
 # whilst accounting for survey costs
-approx_evd_survey_schemes$mean_improvement <-
-  sapply(seq_len(nrow(approx_evd_survey_schemes)), function(i) {
-    mean(approx_evd_survey_schemes$value[[i]] - approx_evd_current)
-})
+approx_evd_survey_schemes$roi <-
+  approx_evd_survey_schemes$value - approx_evd_current
 
 # print values
 print(approx_evd_survey_schemes)
@@ -465,10 +456,10 @@ print(approx_evd_survey_schemes)
 # red dashed line shows improvement given perfect information
 approx_evd_survey_schemes %>%
   mutate(name = factor(name, levels = name),
-         is_best = mean_improvement == max(mean_improvement)) %>%
-  ggplot(aes(x = name, y = mean_improvement)) +
+         is_best = roi == max(roi)) %>%
+  ggplot(aes(x = name, y = roi)) +
     geom_col(aes(fill = is_best, color = is_best)) +
-    geom_hline(yintercept = mean_improvement_given_perfect,
+    geom_hline(yintercept = approx_roi_perfect,
                color = "red", linetype = "dashed") +
     xlab("Survey scheme") +
     ylab("Return on investment") +
@@ -478,11 +469,11 @@ approx_evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes that survey at least one site (i.e. `cheap_scheme`, `geo_scheme`, `env_scheme`) have greater return on investment values than the scheme that does not survey any sites (`none_scheme`). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes that survey at least one site (`rich_scheme`, `unc_scheme`) have smaller values than the scheme that does not survey any sites (`none_scheme`). Moreover, of the six scheme that we investigated, we can see that the scheme generated by surveying sites with distinct environmental conditions (`env_scheme`) is the best approach. But is it the best possible -- the optimal -- survey scheme?
+In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. `geo_scheme`, `unc_scheme`, `cheap_scheme`) have positive return on investment values-0-meaning that the _expected value of the management decision_ is greater when we conduct these surveys (even accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (`env_scheme`, `rich_scheme`) have negative values. But what is the best possible -- the optimal -- survey scheme?
 
 ## Optimal survey scheme
 
-Now let's identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the _expected value of the decision for a given survey scheme_ within a short period of time and so we use the approximation method to achieve this.
+Now let's identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the _expected value of the decision for a given survey scheme_ within a short period of time and so we will use the approximation method to achieve this.
 
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 # generate optimal survey scheme(s) using approximation method
@@ -505,8 +496,8 @@ opt_scheme <- approx_optimal_survey_scheme(
     survey_budget = survey_budget,
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
-    n_approx_replicates = 10,
-    n_approx_states_per_replicate = 10)
+    n_approx_replicates = 1,
+    n_approx_states_per_replicate = 4)
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.5}
@@ -516,9 +507,9 @@ print(nrow(opt_scheme))
 # add optimal scheme to site data
 site_data$opt_scheme <- c(opt_scheme[1, ])
 
-# plot optimal scheme and the environmental diversity scheme
+# plot optimal scheme and the geographic coverage scheme
 site_data %>%
-  select(opt_scheme, env_scheme) %>%
+  select(opt_scheme, geo_scheme) %>%
   gather(name, value, -geometry) %>%
   mutate_if(is.logical, as.character) %>%
   mutate(name = factor(name, levels = unique(name))) %>%
@@ -528,11 +519,11 @@ site_data %>%
     scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"))
 ```
 
-We can see that the optimal survey scheme (`opt_scheme`) is different to the scheme based on surveying sites with distinct environmental conditions (`env_scheme`). Interestingly, the optimal scheme selects fewer sites than the other schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.
+We can see that the optimal survey scheme (`opt_scheme`) is different to the scheme based on surveying sites to increase geographic coverage (`geo_scheme`). Interestingly, the optimal scheme selects fewer sites than the other schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # calculate return on investment of the optimal scheme
-evd_opt <- approx_evdsi(
+approx_evd_opt <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = "f1",
@@ -544,40 +535,37 @@ evd_opt <- approx_evdsi(
     feature_survey_column = "survey",
     feature_survey_sensitivity_column = "survey_sensitivity",
     feature_survey_specificity_column = "survey_specificity",
-    model_survey_sensitivity_column = "model_sensitivity",
-    model_survey_specificity_column = "model_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
     feature_alpha_column = "alpha",
     feature_gamma_column = "gamma",
     total_budget = total_budget,
     xgb_parameters = xgb_params,
-    xgb_n_folds = 2
-    n_approx_replicates = 10,
-    n_approx_states_per_replicate = 10)
+    xgb_n_folds = 2,
+    n_approx_replicates = 1,
+    n_approx_states_per_replicate = 4)
 
-# preview values
-str(evd_opt)
-
-# calculate average value
-mean(evd_opt)
+# calculate value
+print(approx_evd_opt)
 
 # append optimal results to results table
-evd_survey_schemes <- rbind(
-  evd_survey_schemes,
-  tibble(name = "opt_scheme", value = list(evd_opt),
-         mean_improvement = mean(evd_opt - approx_evd_current)))
+approx_evd_survey_schemes <- rbind(
+  approx_evd_survey_schemes,
+  tibble(name = "opt_scheme", value = approx_evd_opt,
+         roi = approx_evd_opt - approx_evd_current))
 
 # print updated results table
-print(evd_survey_schemes)
+print(approx_evd_survey_schemes)
 
 # visualize return on investment values
 # color the best survey scheme in blue
 # red dashed line shows improvement given perfect information
-evd_survey_schemes %>%
+approx_evd_survey_schemes %>%
   mutate(name = factor(name, levels = name),
-         is_best = mean_improvement == max(mean_improvement)) %>%
-  ggplot(aes(x = name, y = mean_improvement)) +
+         is_best = roi == max(roi)) %>%
+  ggplot(aes(x = name, y = roi)) +
     geom_col(aes(fill = is_best, color = is_best)) +
-    geom_hline(yintercept = mean_improvement_given_perfect,
+    geom_hline(yintercept = approx_roi_perfect,
                color = "red", linetype = "dashed") +
     xlab("Survey scheme") +
     ylab("Return on investment") +
@@ -587,19 +575,20 @@ evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-We can see that the optimal survey scheme has the highest return on investment of all the candidate survey schemes. To understand how suboptimal the candidate survey schemes actually are, let's compute their relative optimality and visualize them.
+We can see that the optimal survey scheme has the highest return on investment of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let's compute their relative optimality and visualize them.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # express values in terms of optimality
-evd_survey_schemes$optimality <-
-  ((max(evd_survey_schemes$mean_improvement) -
-    evd_survey_schemes$mean_improvement) /
-   evd_survey_schemes$mean_improvement) * 100
+approx_evd_survey_schemes$optimality <-
+  ((max(approx_evd_survey_schemes$roi) -
+    approx_evd_survey_schemes$roi) /
+   approx_evd_survey_schemes$roi) * 100
 
 # visualize relative optimality
 # zero = optimal, and increasing values indicate greater sub-optimality
-evd_survey_schemes %>%
+approx_evd_survey_schemes %>%
   mutate(name = factor(name, levels = name),
+         optimality = abs(optimality),
          is_best = optimality == min(optimality)) %>%
   ggplot(aes(x = name, y = optimality)) +
     geom_point(aes(fill = is_best, color = is_best)) +
