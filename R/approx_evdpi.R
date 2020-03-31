@@ -64,8 +64,8 @@ approx_evdpi <- function(
   n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   n_approx_replicates = 100,
-  n_approx_states_per_replicate =
-    min(1000, n_states(nrow(site_data), nrow(feature_data))),
+  n_approx_states_per_replicate = 1000,
+  method_approx_states = "weighted_without_replacement",
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -145,6 +145,12 @@ approx_evdpi <- function(
     ## n_approx_states_per_replicate
     inherits(n_approx_states_per_replicate, c("numeric", "NULL")),
     identical(class(n_approx_replicates), class(n_approx_states_per_replicate)),
+    ## method_approx_states
+    assertthat::is.string(method_approx_states),
+    assertthat::noNA(method_approx_states),
+    isTRUE(method_approx_states %in%
+      c("uniform_with_replacement", "uniform_without_replacement",
+        "weighted_with_replacement", "weighted_without_replacement")),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -217,7 +223,8 @@ approx_evdpi <- function(
       budget = total_budget,
       gap = optimality_gap,
       n_approx_replicates = n_approx_replicates,
-      n_approx_states_per_replicate = n_approx_states_per_replicate)
+      n_approx_states_per_replicate = n_approx_states_per_replicate,
+      method_approx_states = method_approx_states)
   })
 
   # return result

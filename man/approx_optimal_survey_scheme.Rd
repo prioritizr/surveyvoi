@@ -29,9 +29,10 @@ approx_optimal_survey_scheme(
   optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
-  seed = 500,
   n_approx_replicates = 100,
   n_approx_states_per_replicate = 1000,
+  method_approx_states = "weighted_without_replacement",
+  seed = 500,
   n_threads = 1
 )
 }
@@ -192,12 +193,6 @@ equal weight when fitting models.}
  argument in \link{tune_occupancy_models} when generating parameters
 for \code{xgb_parameters}).}
 
-\item{seed}{\code{integer} state of the random number generator for
-partitioning data into folds cross-validation and fitting \pkg{xgboost}
-models. It is also used for generating states.
-This parameter must remain the same to compare results from different
-functions using the approximation methods. Defaults to 500.}
-
 \item{n_approx_replicates}{\code{integer} number of replicates to use for
 approximating the expected value calculations. Defaults to 100.}
 
@@ -207,6 +202,12 @@ action. This number must be smaller than or equal to the total number of
 presence absence states in the system
 (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
 Defaults to 1000.}
+
+\item{seed}{\code{integer} state of the random number generator for
+partitioning data into folds cross-validation and fitting \pkg{xgboost}
+models. It is also used for generating states.
+This parameter must remain the same to compare results from different
+functions using the approximation methods. Defaults to 500.}
 
 \item{n_threads}{\code{integer} number of threads to use for computation.}
 }

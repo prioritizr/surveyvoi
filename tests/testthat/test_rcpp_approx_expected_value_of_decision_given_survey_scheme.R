@@ -83,7 +83,8 @@ test_that("correct result", {
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_states = "weighted_without_replacement")
   # tests
   expect_equal(r1, r2)
 })

@@ -10,10 +10,10 @@
 /* .Call calls */
 extern SEXP _surveyvoi_rcpp_approx_expected_value_of_action(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_action(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_decision_given_current_info(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_decision_given_perfect_info(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -46,10 +46,10 @@ extern SEXP _surveyvoi_rcpp_xgboost(SEXP, SEXP, SEXP, SEXP, SEXP);
 static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_approx_expected_value_of_action",                                   (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_action,                                    5},
     {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states,  9},
-    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states",     (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states,     10},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states",     (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states,     11},
     {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states,  9},
-    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states",     (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states,     10},
-    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states",    (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states,    23},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states",     (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states,     11},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states",    (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states,    24},
     {"_surveyvoi_rcpp_expected_value_of_action",                                          (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_action,                                           4},
     {"_surveyvoi_rcpp_expected_value_of_decision_given_current_info",                     (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_decision_given_current_info,                      8},
     {"_surveyvoi_rcpp_expected_value_of_decision_given_perfect_info",                     (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_decision_given_perfect_info,                      8},

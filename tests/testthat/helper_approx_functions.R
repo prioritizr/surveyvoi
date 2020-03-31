@@ -41,7 +41,7 @@ r_approx_expected_value_of_decision_given_current_info_n_states <- function(
     budget, gap, "")$x
   # generate states
   states <- lapply(seq_len(n_replicates), function(i) {
-    rcpp_sample_n_uniform_states_without_replacement(
+    rcpp_sample_n_weighted_states_without_replacement(
       n_states_per_replicate, prior_data)
   })
   # calculate expected value
@@ -83,7 +83,7 @@ r_approx_expected_value_of_decision_given_perfect_info_n_states <- function(
   budget, gap, n_replicates, n_states_per_replicate) {
   # generate states
   states <- lapply(seq_len(n_replicates), function(i) {
-    rcpp_sample_n_uniform_states_without_replacement(
+    rcpp_sample_n_weighted_states_without_replacement(
       n_states_per_replicate, prior_data)
   })
   # run calculations
@@ -104,7 +104,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
     n_approx_replicates, n_approx_states_per_replicate) {
   # generate states
   states <- lapply(seq_len(n_approx_replicates), function(i) {
-    rcpp_sample_n_uniform_states_without_replacement(
+    rcpp_sample_n_weighted_states_without_replacement(
       n_approx_states_per_replicate, pij)
   })
   # run calculations

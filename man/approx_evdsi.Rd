@@ -30,6 +30,7 @@ approx_evdsi(
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
   n_approx_states_per_replicate = 1000,
+  method_approx_states = "weighted_without_replacement",
   seed = 500
 )
 }

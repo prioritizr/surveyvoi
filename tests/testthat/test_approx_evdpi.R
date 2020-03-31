@@ -31,13 +31,14 @@ test_that("expected results", {
   set.seed(500)
   r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, 5, 10)
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, 5, 10,
+    method_approx_states = "weighted_without_replacement")
   set.seed(500)
   r2 <- approx_evdpi(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
     "model_specificity", "alpha", "gamma", 301, "locked_in", NULL, 1000, 0, 5,
-    10, 500)
+    10, 500, method_approx_states = "weighted_without_replacement")
   # tests
   expect_equal(r1, r2)
 })

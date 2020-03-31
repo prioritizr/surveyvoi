@@ -109,6 +109,16 @@
 #'   (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
 #'   Defaults to 1000.
 #'
+#' @param method_approx_states \code{character} name of method that is
+#'   used to sample states for approximating the expected value
+#'   calculations. Available options are:
+#'   \code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
+#'   \code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
+#'   Uniform sampling methods have an equal chance of returning each
+#'   state, and weighted sampling methods are more likely to return
+#'   states with a higher prior probability of occurring.
+#'   Defaults to \code{"weighted_without_replacement"}.
+#'
 #' @param optimality_gap \code{numeric} relative optimality gap for generating
 #'   conservation prioritizations. A value of zero indicates that
 #'   prioritizations must be solved to optimality. A value of 0.1 indicates
@@ -181,6 +191,7 @@ approx_evdci <- function(
   optimality_gap = 0,
   n_approx_replicates = 100,
   n_approx_states_per_replicate = 1000,
+  method_approx_states = "weighted_without_replacement",
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -263,6 +274,12 @@ approx_evdci <- function(
     assertthat::noNA(n_approx_states_per_replicate),
     isTRUE(n_approx_states_per_replicate <=
            n_states(nrow(site_data), nrow(feature_data))),
+    ## method_approx_states
+    assertthat::is.string(method_approx_states),
+    assertthat::noNA(method_approx_states),
+    isTRUE(method_approx_states %in%
+      c("uniform_with_replacement", "uniform_without_replacement",
+        "weighted_with_replacement", "weighted_without_replacement")),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -335,7 +352,8 @@ approx_evdci <- function(
       budget = total_budget,
       gap = optimality_gap,
       n_approx_replicates = n_approx_replicates,
-      n_approx_states_per_replicate = n_approx_states_per_replicate)
+      n_approx_states_per_replicate = n_approx_states_per_replicate,
+      method_approx_states = method_approx_states)
   })
 
   # return result

@@ -33,7 +33,8 @@ Rcpp::NumericVector
   double total_budget,
   double optim_gap,
   std::size_t n_approx_replicates,
-  std::size_t n_approx_states_per_replicate) {
+  std::size_t n_approx_states_per_replicate,
+  std::string method_approx_states) {
 
   // initialization
   /// constant parameters
@@ -45,12 +46,13 @@ Rcpp::NumericVector
     std::accumulate(pu_survey_solution.begin(), pu_survey_solution.end(), 0);
   const std::size_t n_pu_surveyed_already =
     static_cast<std::size_t>((pu_survey_status.array()).sum());
+
   /// initialize states
   std::vector<std::vector<mpz_class>> states(n_approx_replicates);
-  for (std::size_t r = 0; r < n_approx_replicates; ++r) {
-    states[r].resize(n_approx_states_per_replicate);
-    sample_n_uniform_states_without_replacement(
-      n_approx_states_per_replicate, pij, states[r]);
+  for (std::size_t i = 0; i < n_approx_replicates; ++i) {
+    states[i].resize(n_approx_states_per_replicate);
+    sample_n_states(n_approx_states_per_replicate, pij, method_approx_states,
+                    states[i]);
   }
 
   /// format xgboost parameters

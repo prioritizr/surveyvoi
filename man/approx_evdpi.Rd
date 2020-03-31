@@ -22,8 +22,8 @@ approx_evdpi(
   n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   n_approx_replicates = 100,
-  n_approx_states_per_replicate = min(1000, n_states(nrow(site_data),
-    nrow(feature_data))),
+  n_approx_states_per_replicate = 1000,
+  method_approx_states = "weighted_without_replacement",
   seed = 500
 )
 }
@@ -136,6 +136,16 @@ action. This number must be smaller than or equal to the total number of
 presence absence states in the system
 (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
 Defaults to 1000.}
+
+\item{method_approx_states}{\code{character} name of method that is
+used to sample states for approximating the expected value
+calculations. Available options are:
+\code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
+\code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
+Uniform sampling methods have an equal chance of returning each
+state, and weighted sampling methods are more likely to return
+states with a higher prior probability of occurring.
+Defaults to \code{"weighted_without_replacement"}.}
 
 \item{seed}{\code{integer} random seed used for generating states. Defaults
 to 500.}

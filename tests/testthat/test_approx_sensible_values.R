@@ -52,7 +52,8 @@ test_that("lower voi when most of budget spent on surveys", {
     optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -76,7 +77,8 @@ test_that("lower voi when most of budget spent on surveys", {
     optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -137,7 +139,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     optimality_gap = 5,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -161,7 +164,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -220,7 +224,8 @@ test_that("different voi when xgboost models trained with different weights", {
     optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -245,7 +250,8 @@ test_that("different voi when xgboost models trained with different weights", {
     optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -305,7 +311,8 @@ test_that("identical outputs given identical inputs", {
       optimality_gap = 0,
       seed = 1,
       n_approx_replicates = n_reps,
-      n_approx_states_per_replicate = n_states_per_rep)
+      n_approx_states_per_replicate = n_states_per_rep,
+      method_approx_state = "uniform_without_replacement")
   })
   # tests
   for (i in seq_along(r)) {
@@ -344,7 +351,7 @@ test_that("current = optimal info = perfect info, when all pu selected", {
                               objective = "binary:logistic"))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
-  n_states_per_rep <- min(ceiling(n_states(6, 2) * 0.9), 1e+4)
+  n_states_per_rep <- 20
   # calculate expected values
   evd_current <- approx_evdci(
     site_data = site_data,
@@ -363,7 +370,8 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     n_approx_obj_fun_points = 1000,
     optimality_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -386,7 +394,8 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     n_approx_obj_fun_points = 1000,
     optimality_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   evd_perfect <- approx_evdpi(
     site_data = site_data,
     feature_data = feature_data,
@@ -404,7 +413,8 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     n_approx_obj_fun_points = 1000,
     optimality_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_equal(evd_current, evd_perfect)
   expect_equal(attr(evd_ss, "ev")[1, ], evd_current)
@@ -441,8 +451,8 @@ test_that("current < optimal info < perfect info, some pu selected", {
   budget <- 25
   gap <- 1e-4
   # set approximation values
-  n_reps <- 10
-  n_states_per_rep <- min(ceiling(n_states(5, 2) * 0.9), 1e+4)
+  n_reps <- 3
+  n_states_per_rep <- 1000
   # calculate expected values
   evd_current <- approx_evdci(
     site_data = site_data,
@@ -459,7 +469,10 @@ test_that("current < optimal info < perfect info, some pu selected", {
     total_budget = budget,
     site_management_locked_in_column = "locked_in",
     n_approx_obj_fun_points = 100,
-    optimality_gap = gap)
+    optimality_gap = gap,
+    n_approx_replicates = n_reps,
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -482,7 +495,8 @@ test_that("current < optimal info < perfect info, some pu selected", {
     n_approx_obj_fun_points = 100,
     optimality_gap = gap,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   evd_perfect <- approx_evdpi(
     site_data = site_data,
     feature_data = feature_data,
@@ -500,7 +514,8 @@ test_that("current < optimal info < perfect info, some pu selected", {
     n_approx_obj_fun_points = 100,
     optimality_gap = gap,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_states_per_replicate = n_states_per_rep,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_true(all(evd_current < evd_perfect))
   expect_true(all(attr(evd_ss, "ev")[1, ] > evd_current))

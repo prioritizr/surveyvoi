@@ -75,7 +75,8 @@ test_that("correct result (n states)", {
   set.seed(100)
   r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states)
+    feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states,
+    method_approx_states = "weighted_without_replacement")
   set.seed(100)
   r2 <- r_approx_expected_value_of_decision_given_perfect_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,

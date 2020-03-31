@@ -1,5 +1,24 @@
 #include "rcpp_sample_states.h"
 
+void sample_n_states(
+  std::size_t k, Eigen::MatrixXd &pij, std::string &method,
+  std::vector<mpz_class> &out) {
+  // sample states according to specififed method
+  if (method == "weighted_without_replacement") {
+    sample_n_weighted_states_without_replacement(k, pij, out);
+  } else if (method == "weighted_with_replacement") {
+    sample_n_weighted_states_with_replacement(k, pij, out);
+  } else if (method == "uniform_with_replacement") {
+    sample_n_uniform_states_with_replacement(k, pij, out);
+  } else if (method == "uniform_without_replacement") {
+    sample_n_uniform_states_without_replacement(k, pij, out);
+  } else {
+    Rcpp::stop("method not recognized");
+  }
+  // return void
+  return;
+}
+
 void sample_n_weighted_states_with_replacement(
   std::size_t k, Eigen::MatrixXd &pij, std::vector<mpz_class> &out) {
   // init

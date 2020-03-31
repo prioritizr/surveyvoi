@@ -53,7 +53,8 @@ test_that("expected results", {
     n_approx_obj_fun_points = 1000,
     optimality_gap = 0,
     n_approx_replicates = 10,
-    n_approx_states_per_replicate = 30000)
+    n_approx_states_per_replicate = 30000,
+    method_approx_state = "uniform_without_replacement")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -148,7 +149,8 @@ test_that("consistent results (multiple threads)", {
         total_budget = total_budget,
         xgb_parameters = xgb_params,
         n_approx_replicates = 10,
-        n_approx_states_per_replicate = 100)
+        n_approx_states_per_replicate = 100,
+        method_approx_state = "uniform_without_replacement")
     })
   })
   # verify that all repeat calculations are identical
