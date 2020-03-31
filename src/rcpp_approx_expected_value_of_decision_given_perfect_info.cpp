@@ -36,10 +36,12 @@ double approx_expected_value_of_decision_given_perfect_info(
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     /// generate the i'th state
     nth_state(states[i], curr_state);
+
     /// generate solution for state
     p.add_rij_data(curr_state);
     p.solve();
     p.get_solution(solution);
+    
     /// create matrix only containing feature data for selected planning units
     curr_rij = curr_state;
     for (std::size_t j = 0; j < n_pu; ++j)
