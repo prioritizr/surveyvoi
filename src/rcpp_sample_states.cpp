@@ -142,9 +142,6 @@ void sample_n_weighted_states_without_replacement(
        itr2 != state_set.end(); ++itr2, ++itr)
     *itr = *itr2;
 
-  for (std::size_t i = 0; i < out.size(); ++i)
-    Rcout << "stored state = " << out[i].get_ui() << std::endl;
-
   // return void
   return;
 }
