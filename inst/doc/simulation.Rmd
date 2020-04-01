@@ -40,9 +40,9 @@ devtools::load_all()
 
 ## Introduction
 
-The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- that prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (i.e. surveying sites to refine estimates of which species are present inside them). However, this is further complicated by the fact that surveying sites consumes limited resources that could be used to manage sites for conservation. Thus decision makers need to strategically prioritize sites for surveys, based on the possibility that such surveys will substantially improve subsequent spatial prioritisations---this is not a trivial task.
+The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations---this is not a trivial task.
 
-The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans. Methods are provided to calculate the _expected value of the decision (i.e. spatial prioritization) given current information_ (`evdci` function), the _expected value of the decision given perfect information_ (`evdpi` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by exploring various survey schemes and computing the expected value of the decision associated with each scheme, optimal survey schemes can be identified (`optimal_survey_scheme` function). This package requires the [_Gurobi_ software suite](https://www.gurobi.com). In this vignette, we will use a simulated dataset to explore these methods.
+The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management _decision_). Methods are provided to calculate the _expected value of the decision given current information_ (`evdci` function), the _expected value of the decision given perfect information_ (`evdpi` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (`optimal_survey_scheme` function). This package requires the [_Gurobi_ software suite](https://www.gurobi.com). In this vignette, we will use a simulated dataset to explore these methods.
 
 ## Setup
 
@@ -86,7 +86,7 @@ ggplot(site_data) +
   ggtitle("sites")
 ```
 
-The `site_data` object is a spatially explicit dataset (i.e. `sf`) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. The `e1` and `e2` columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let's create some visualizations.
+The `site_data` object is a spatially explicit dataset (i.e. `sf` object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. The `e1` and `e2` columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let's create some visualizations.
 
 ```{r, fig.height = h, fig.width = w}
 # plot site occupancy data from previous surveys
@@ -138,11 +138,11 @@ feature_data <- simulate_feature_data(
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
+The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
 
 ## Modelling probability of occupancy
 
-After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we don't really need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/) -- using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches. Since gradient boosted regression trees have many parameters that influence model performance, we will first run a calibration procedure to identify suitable parameters.
+After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/) -- using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches. Since gradient boosted regression trees have many parameters that influence their performance, we will first run a calibration procedure to identify suitable parameters.
 
 Our calibration procedure will use a random search method to identify suitable parameters. Given candidate values for different parameters, this method explores a predetermined number of randomly selected combinations of parameters (set using the `n_random_search_iterations` parameter). Ideally, we would examine all possible combinations of tuning parameters but this is not computationally feasible and the random search method is often "good enough". For a given combination of tuning parameters, the parameters are used to fit a model along with _k_-fold cross-validation, and the area under the curve (AUC) statistic derived from the held out data is used to assess model performance. After evaluating the predetermined number of parameter combinations, this function returns the best parameter combination (i.e. the parameters producing a model with the greatest AUC statistic).
 
@@ -171,7 +171,7 @@ xgb_params <- tune_occupancy_models(site_data, "f1", c("e1", "e2"),
 print(xgb_params)
 ```
 
-Now that we have identified suitable parameters for fitting the occupancy model, we will use these parameters to predict the probability that the feature occurs in the sites.
+Now that we have identified suitable parameters for fitting the occupancy model, we will use these parameters to predict the probability that the feature occurs in each site.
 
 ```{r}
 # fit model
@@ -205,12 +205,12 @@ stopifnot(all(feature_data$model_specificity > 0.5))
 
 ## Expected value given current information
 
-After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation benefit of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence/absence of the conservation feature in each site. Here, current information corresponds to our existing survey data and also our modelled probabilities of occupancy for the conservation feature.
+After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation benefit of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Before we can compute the _expected value of the decision given current information_, we first need to decide how well will measure the value (or conservation_benefit) of a given management decision.
 
-The ($B$) conservation benefit accrued by managing sites for conservation is calculated using the follow equation. Note that this benefit corresponds to sites prioritised for conservation management, and not sites prioritised for surveys. In this equation, let $J$ denote the set of sites (indexed by $j$), and $I$ denote the set of feature (indexed by $i$). Also let $X_j$ contain binary (0/1) values indicating if each site $i \in I$ is prioritized for conservation management or not, $P_{ij}$ denote the probability of features $i \in I$ occurring in sites $j \in J$ (which we will estimate below), $\alpha_i$ denote the `alpha` column value(s), and $\gamma_i$ denote the `gamma` column value(s). This equation represents the objective function of the conservation prioritization component of the value of information calculations. It is conceptually similar to the objective function used in the Zonation decision support tool [@r1].
+Here, we will use the following equation to parametrise the ($B$) conservation benefit associated with managing a set of sites for conservation. Crucially, this benefit equation corresponds to sites prioritised for conservation management and not sites prioritised for surveys---meaning that we derive zero benefit if we only survey sites and don't manage any sites. To interpret this equation, let $J$ denote the set of sites (indexed by $j$), and $I$ denote the set of features (indexed by $i$). Also let $X_j$ contain binary (i.e. zero or one) values indicating if each site $i \in I$ is prioritized for conservation management or not, $Z_{ij}$ contain binary values indicating the presence or absence of features $i \in I$ occurring in sites $j \in J$, $\alpha_i$ denote the `alpha` column value(s), and $\gamma_i$ denote the `gamma` column value(s). This equation represents the objective function of the spatial prioritization component of the value of information calculations. It is conceptually similar to the objective function used in the Zonation decision support tool [@r1].
 
 $$
-B = \sum_{i \in I} \alpha_i \times \big( \sum_{j \in J} P_{ij} X_j \big) ^{\gamma_i}
+B = \sum_{i \in I} \alpha_i \times \big( \sum_{j \in J} Z_{ij} X_j \big) ^{\gamma_i}
 $$
 
 We can visualize this equation with a graph.
@@ -223,12 +223,12 @@ eqn_data <- tibble(x = seq(0, nrow(site_data), length.out = 1000),
 # create plot
 ggplot(eqn_data, aes(x = x, y = y)) +
   geom_line(color = "#3366FF") +
-  xlab("Sum(probabilities) held in conservation prioritization") +
+  xlab("Number of sites containing the feature held in prioritization") +
   ylab("Conservation benefit") +
   labs()
 ```
 
-We can see that conservation benefit increases with the expected amount of the conservation feature held in the prioritization (i.e. the line is always increasing). We can also see that the line has a bend in it, and so the rate of conservation benefit accrued decreases as more of the feature is conserved. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved "enough" of one feature that it can then focus on other features (broadly speaking).
+We can see that conservation benefit increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). We can also see that the line has a bend in it, and so the rate of conservation benefit accrued decreases as more of the feature is conserved. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved "enough" of one feature that it can then focus on other features (broadly speaking).
 
 Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.
 
@@ -240,12 +240,12 @@ total_budget <- sum(site_data$management_cost) * 0.8
 print(total_budget)
 ```
 
-Given the total budget, we now have the data needed to calculate the _expected value of the decision given current information_. Unfortunately, we can only calculate this value exactly for very small problems (e.g. less than 10 planning units and one feature). Therefore, we will estimate this value using the _approximation_ method. This method provides multiple estimates that we can use to calculate the _approximate expected value of the decision given current information_.
+Given the total budget, we now have the data needed to calculate the _expected value of the decision given current information_. Unfortunately, we can only calculate this value exactly for very small problems (e.g. less than 10 planning units and one feature). Therefore, we will estimate this value using the _approximation_ method to calculate the _approximate expected value of the decision given current information_.
 
 ```{r}
 # approximate expected value of the decision given current information
-# here, we will use 10 replicates, and for each replicate we will use
-# 10'000 different combinations of presence/absences of the feature in the
+# here, we will use 1 replicates, and for each replicate we will use
+# 1,000 different combinations of presence/absences of the feature in the
 # sites to estimate this value
 approx_evd_current <- approx_evdci(
   site_data = site_data,
@@ -261,7 +261,7 @@ approx_evd_current <- approx_evdci(
   feature_gamma_column = "gamma",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 4)
+  n_approx_states_per_replicate = 1000)
 
 # print value
 print(approx_evd_current)
@@ -271,7 +271,7 @@ We can potentially improve the _expected value of the decision given current inf
 
 ## Expected value given perfect information
 
-We can also explore what happen if we had perfect information. That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contain the feature and which planning units do not? This value is termed the _expected value of the decision given perfect information_. Although we would rarely have perfect information -- even after conducting additional surveys -- this metric is useful to understand the limit of how much the management decision could potentially be improved given budgetary constraints. Indeed, the _expected value of the decision given current information_ can be very similar to _expected value of the decision given perfect information_ in some situations. Similar to before, this metric can only be calculated for very small problems, and so we will estimate it using the _approximation method_.
+We can also explore what would happen if we had "perfect information". That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contain the feature and which planning units do not? This value is termed the _expected value of the decision given perfect information_. Although we would rarely have perfect information -- even after conducting additional surveys -- this metric is useful to understand the limit of how much the management decision could potentially be improved given budgetary constraints. Indeed, the _expected value of the decision given current information_ can be very similar to _expected value of the decision given perfect information_ in some situations. Similar to before, this metric can only be calculated for very small problems. Thus we will estimate it using the _approximation method_ and calculate the _approximate expected value of the decision given current information_.
 
 ```{r}
 # approximate expected value of the decision given perfect information
@@ -289,11 +289,15 @@ approx_evd_perfect <- approx_evdpi(
   feature_gamma_column = "gamma",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 4)
+  n_approx_states_per_replicate = 1000)
 
 # print value
 print(approx_evd_perfect)
+```
 
+We can also estimate how much perfect information would improve the management decision compared with using current information.
+
+```{r}
 # estimate how much perfect information would improve the decision
 approx_roi_perfect <- approx_evd_perfect - approx_evd_current
 print(approx_roi_perfect)
@@ -336,7 +340,7 @@ print(total_budget)
 stopifnot(total_budget >= survey_budget)
 ```
 
-Now will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; @r2], (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).
+We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; @r2], (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).
 
 ```{r}
 # (i) generate survey scheme to increase geographic coverage
@@ -381,7 +385,7 @@ rich_scheme <- weighted_survey_scheme(site_data, "new_survey_cost",
 assertthat::assert_that(!all(c(env_scheme) == c(geo_scheme)))
 ```
 
-Now let's visualize the different schemes.
+Let's visualize the different survey schemes.
 
 ```{r, fig.height = h * 1.5, fig.width = w * 1.8}
 # add schemes to site_data
@@ -407,7 +411,7 @@ We can see that different approaches yield different survey schemes -- but which
 
 ## Expected value of the decision given the candidate survey schemes
 
-Now that we've generated the survey schemes, let's calculate their return on investment using value of information analyses.
+Now that we've generated the survey schemes, let's calculate the _expected value of the decision_ given each survey scheme.
 
 ```{r, fig.height = h, fig.width = w * 2.0}
 # create table to store results
@@ -438,13 +442,17 @@ approx_evd_survey_schemes$value <- sapply(
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 4)
+    n_approx_states_per_replicate = 1000)
 })
 
+# print values
+print(approx_evd_survey_schemes)
+```
+
+Similar to before with perfect information, we can also estimate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the _return on investment_ for each survey scheme.
+
+```{r}
 # estimate the return on investment for each survey scheme
-# specifically, how much the information gained from each survey scheme is
-# expected to improve management decision based on current information,
-# whilst accounting for survey costs
 approx_evd_survey_schemes$roi <-
   approx_evd_survey_schemes$value - approx_evd_current
 
@@ -469,11 +477,11 @@ approx_evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. `geo_scheme`, `unc_scheme`, `cheap_scheme`) have positive return on investment values-0-meaning that the _expected value of the management decision_ is greater when we conduct these surveys (even accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (`env_scheme`, `rich_scheme`) have negative values. But what is the best possible -- the optimal -- survey scheme?
+In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. `geo_scheme`, `unc_scheme`, `cheap_scheme`) have positive return on investment values---meaning that the _expected value of the management decision_ is greater when we conduct these surveys (even when accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (i.e. `env_scheme`, `rich_scheme`) have negative values. But what is the best possible -- the optimal -- survey scheme?
 
 ## Optimal survey scheme
 
-Now let's identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the _expected value of the decision for a given survey scheme_ within a short period of time and so we will use the approximation method to achieve this.
+Now let's identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the expected value of the decision within a short period of time and so we will use the approximation method to achieve this.
 
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 # generate optimal survey scheme(s) using approximation method
@@ -497,7 +505,7 @@ opt_scheme <- approx_optimal_survey_scheme(
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 4)
+    n_approx_states_per_replicate = 1000)
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.5}
@@ -543,7 +551,7 @@ approx_evd_opt <- approx_evdsi(
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 4)
+    n_approx_states_per_replicate = 1000)
 
 # calculate value
 print(approx_evd_opt)
@@ -575,14 +583,14 @@ approx_evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-We can see that the optimal survey scheme has the highest return on investment of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let's compute their relative optimality and visualize them.
+We can see that the optimal survey scheme has the highest _return on investment_ of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let's compute their relative optimality and visualize them.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # express values in terms of optimality
 approx_evd_survey_schemes$optimality <-
   ((max(approx_evd_survey_schemes$roi) -
     approx_evd_survey_schemes$roi) /
-   approx_evd_survey_schemes$roi) * 100
+   max(approx_evd_survey_schemes$roi)) * 100
 
 # visualize relative optimality
 # zero = optimal, and increasing values indicate greater sub-optimality
@@ -600,6 +608,6 @@ approx_evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-We can see that the relative return on investment for each of these different survey schemes are fairly comparable. All of the survey schemes are less than 5% from optimality. This result means that none of these schemes are especially bad for this particular simulation. However, in general, we would be best off identifying the optimal survey scheme by directly maximizing return on investment.
+We can see that the optimal survey scheme performs much better than all the other survey schemes. This result shows that value of information analyses can potentially improve management decisions by strategically allocating funds to surveys and conservation management.
 
 ## References
