@@ -16,7 +16,6 @@ double approx_expected_value_of_action(
   double v, p;
   std::size_t k = 0;
   Eigen::MatrixXd curr_state(pij_log.rows(), pij_log.cols());
-  Eigen::MatrixXd curr_rij(pij_log.rows(), pij_log.cols());
   std::vector<double> value_given_state_occurring;
   std::vector<double> prob_of_state_occurring;
   std::vector<double> all_prob_of_state_occurring;
@@ -28,15 +27,14 @@ double approx_expected_value_of_action(
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     //// generate the i'th state
     nth_state(states[i], curr_state);
-    /// create matrix only containing feature data for selected planning units
-    curr_rij = curr_state;
-    for (std::size_t j = 0; j < n_pu; ++j)
-      curr_rij.col(j) *= solution[j];
-    //// calculate the value of the prioritization given the state
-    v = alpha.cwiseProduct(curr_rij.rowwise().sum()).array().
-        pow(gamma.array()).sum();
     /// calculate probability of the state occurring
     p = log_probability_of_state(curr_state, pij_log, pij_log1m);
+    /// create matrix only containing feature data for selected planning units
+    for (std::size_t j = 0; j < n_pu; ++j)
+      curr_state.col(j) *= solution[j];
+    //// calculate the value of the prioritization given the state
+    v = alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+        pow(gamma.array()).sum();
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(p);
     /// store values if non-zero benefit

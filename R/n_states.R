@@ -20,5 +20,5 @@ n_states <- function(n_sites, n_features) {
     assertthat::is.count(n_sites), assertthat::noNA(n_sites),
     assertthat::is.count(n_features), assertthat::noNA(n_features))
   # return result
-  rcpp_n_states(n_sites * n_features)
+  rcpp_n_states(n_sites * n_features) + 1
 }

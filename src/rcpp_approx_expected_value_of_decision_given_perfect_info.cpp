@@ -29,7 +29,6 @@ double approx_expected_value_of_decision_given_perfect_info(
   prob_of_state_occurring.reserve(n_approx_states);
   all_prob_of_state_occurring.reserve(n_approx_states);
   Eigen::MatrixXd curr_state(pij_log.rows(), pij_log.cols());
-  Eigen::MatrixXd curr_rij(pij_log.rows(), pij_log.cols());
   std::size_t k = 0;
 
   // main processing
@@ -41,20 +40,19 @@ double approx_expected_value_of_decision_given_perfect_info(
     p.add_rij_data(curr_state);
     p.solve();
     p.get_solution(solution);
-    
-    /// create matrix only containing feature data for selected planning units
-    curr_rij = curr_state;
-    for (std::size_t j = 0; j < n_pu; ++j)
-      curr_rij.col(j) *= solution[j];
-
-    /// calculate the value of the prioritization given the state
-    curr_value_given_state_occurring =
-      alpha.cwiseProduct(curr_rij.rowwise().sum()).array().
-        pow(gamma.array()).sum();
 
     /// calculate probability of state occurring
     curr_prob_of_state_occurring =
       log_probability_of_state(curr_state, pij_log, pij_log1m);
+
+    /// create matrix only containing feature data for selected planning units
+    for (std::size_t j = 0; j < n_pu; ++j)
+      curr_state.col(j) *= solution[j];
+
+    /// calculate the value of the prioritization given the state
+    curr_value_given_state_occurring =
+      alpha.cwiseProduct(curr_state.rowwise().sum()).array().
+        pow(gamma.array()).sum();
 
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(curr_prob_of_state_occurring);

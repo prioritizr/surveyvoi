@@ -65,7 +65,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   ## calculate remaining budget
   remaining_budget <- total_budget - sum(pu_survey_costs * pu_survey_solution)
   ## calculate total outcomes
-  total_outcomes <- n_states(sum(pu_survey_solution), n_f_survey)
+  total_outcomes <- n_states(sum(pu_survey_solution), n_f_survey) - 1
   ## planning unit indices
   pu_survey_solution_idx <- which(pu_survey_solution > 0.5)
   pu_survey_status_idx <- which(pu_survey_status > 0.5)
@@ -114,7 +114,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
   # main processing
   out <- Inf
-  for (i in c(0, seq_len(total_outcomes))) {
+  for (i in seq(0, total_outcomes)) {
     ## generate state
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
 

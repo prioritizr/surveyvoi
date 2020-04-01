@@ -299,20 +299,6 @@ approx_evdci <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
-  ## validate n_approx_states_per_replicate
-  if (!is.null(n_approx_states_per_replicate)) {
-    assertthat::assert_that(
-      assertthat::is.count(n_approx_states_per_replicate),
-      assertthat::noNA(n_approx_states_per_replicate),
-      isTRUE(n_approx_states_per_replicate <=
-             rcpp_n_states(nrow(site_data) * nrow(feature_data))))
-  }
-  ## validate n_approx_replicates
-  if (!is.null(n_approx_replicates)) {
-    assertthat::assert_that(
-      assertthat::is.count(n_approx_replicates),
-      assertthat::noNA(n_approx_replicates))
-  }
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values

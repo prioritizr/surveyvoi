@@ -2,16 +2,17 @@ context("evdsi")
 
 test_that("equal weights", {
   # data
+  RandomFields::RFoptions(seed = 800)
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
+  site_data <- simulate_site_data(n_sites = 15, n_features = n_f, 0.5)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
-  total_budget <- sum(site_data$management_cost * 0.8)
+  total_budget <- sum(site_data$management_cost) * 0.4
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
+  site_occ_columns <- paste0("f", seq_len(n_f))
+  site_prb_columns <- paste0("p", seq_len(n_f))
   site_env_columns <- c("e1", "e2", "e3")
   rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
   pij <- prior_probability_matrix(
@@ -83,6 +84,7 @@ test_that("equal weights", {
 
 test_that("variable weights", {
   # data
+  RandomFields::RFoptions(seed = 501)
   set.seed(500)
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
