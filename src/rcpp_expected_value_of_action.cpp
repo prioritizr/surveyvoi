@@ -4,8 +4,9 @@ double expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::MatrixXd &pij_log1m,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma) {
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target) {
 
   // initialization
   const std::size_t n_pu = pij_log.cols();
@@ -46,8 +47,7 @@ double expected_value_of_action(
     nth_state(i, curr_state);
     //// caculculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      alpha.cwiseProduct(curr_state.rowwise().sum()).array().
-        pow(gamma.array()).sum();
+      conservation_benefit_state(curr_state, preweight, postweight, target);
     /// if prioritization has a non-zero value then proceed with remaining
     /// calculations for this state
     if (curr_value_given_state_occurring > 1.0e-10) {
@@ -77,26 +77,30 @@ double expected_value_of_action(
 double expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma) {
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target) {
   // calculate log pij
   Eigen::MatrixXd pij1m = pij;
   log_1m_matrix(pij1m);
   log_matrix(pij);
   // return result
-  return expected_value_of_action(solution, pij, pij1m, alpha, gamma);
+  return expected_value_of_action(
+    solution, pij, pij1m, preweight, postweight, target);
 }
 
 // [[Rcpp::export]]
 double rcpp_expected_value_of_action(
   std::vector<bool> solution,
   Eigen::MatrixXd pij,
-  Eigen::VectorXd alpha,
-  Eigen::VectorXd gamma) {
+  Eigen::VectorXd preweight,
+  Eigen::VectorXd postweight,
+  Eigen::VectorXd target) {
   // calculate log pij
   Eigen::MatrixXd pij1m = pij;
   log_1m_matrix(pij1m);
   log_matrix(pij);
   // return result
-  return expected_value_of_action(solution, pij, pij1m, alpha, gamma);
+  return expected_value_of_action(
+    solution, pij, pij1m, preweight, postweight, target);
 }

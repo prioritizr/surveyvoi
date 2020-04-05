@@ -5,8 +5,9 @@ test_that("expected result", {
   set.seed(123)
   n_pu <- 100
   n_f <- 20
-  a <- 4
-  g <- 0.2
+  prew <- 200
+  postw <- 30
+  target <- 10
   n_approx_points <- 1000
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
@@ -15,19 +16,22 @@ test_that("expected result", {
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points, budget, gap, "r1.lp")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points,
-    budget, gap, "r2.lp")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
   # tests
-  objval <- sum((a * rowSums(matrix(r1$x, ncol = n_pu, nrow = n_f,
-                                    byrow = TRUE) * rij)) ^ g)
+  objval <-
+    r_conservation_benefit_state(
+      matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
+      rep(prew, n_f), rep(postw, n_f), rep(target, n_f))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)
   # clean up
- unlink("r1.lp")
- unlink("r2.lp")
+  unlink("r1.lp")
+  unlink("r2.lp")
 })
 
 test_that("correct result", {
@@ -35,8 +39,9 @@ test_that("correct result", {
   set.seed(123)
   n_pu <- 8
   n_f <- 5
-  a <- 4
-  g <- 0.2
+  prew <- 200
+  postw <- 0.1
+  target <- 10
   n_approx_points <- 1000
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
@@ -45,13 +50,14 @@ test_that("correct result", {
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points,
-    budget, gap, "")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points,
-    budget, gap, "")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "")
   r3 <- brute_force_prioritization(
-    rij, a, g, pu_costs, pu_locked_in, budget)
+    rij, rep(prew, n_f), rep(postw, n_f), rep(target, n_f), pu_costs,
+    pu_locked_in, budget)
   # tests
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
@@ -64,8 +70,9 @@ test_that("expected result (one feature has all zeros)", {
   set.seed(123)
   n_pu <- 5
   n_f <- 2
-  a <- 4
-  g <- 0.2
+  prew <- 200
+  postw <- 0.1
+  target <- 10
   n_approx_points <- 1000
   rij <- matrix(0, ncol = n_pu, nrow = n_f)
   rij[1, ] <- 1
@@ -75,14 +82,16 @@ test_that("expected result (one feature has all zeros)", {
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points,
-    budget, gap, "r1.lp")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(a, n_f), rep(g, n_f), n_approx_points,
-    budget, gap, "r2.lp")
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
   # tests
-  objval <- sum((a * rowSums(matrix(r1$x, ncol = n_pu, nrow = n_f,
-                                    byrow = TRUE) * rij)) ^ g)
+  objval <-
+    r_conservation_benefit_state(
+      matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
+      rep(prew, n_f), rep(postw, n_f), rep(target, n_f))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)
@@ -96,8 +105,9 @@ test_that("expected result (one feature has all zeros)", {
 test_that("complex example", {
   # data
   set.seed(123)
-  alpha <- c(2.348694, 2.453980)
-  gamma <- c(0.007071096, 0.799745903)
+  preweight <- c(2.348694, 2.453980) * 200
+  postweight <- c(0.007071096, 0.799745903)
+  target <- c(2.5, 2.5)
   rij <- matrix(c(
     0.8887591, 0.8642433, 0.1467236, 0.9039545, 0.8795562,  0.002713299,
       0.7849601, 0.14347625,
@@ -111,11 +121,13 @@ test_that("complex example", {
   pu_locked_in <- rep(0, ncol(rij))
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, alpha, gamma, 1000, budget, gap, "r1.lp")
+    rij, pu_costs, pu_locked_in, preweight, postweight, target, 1000, budget,
+    gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, alpha, gamma, 1000, budget, gap, "r2.lp")
+    rij, pu_costs, pu_locked_in, preweight, postweight, target, 1000, budget,
+    gap, "r2.lp")
   r3 <- brute_force_prioritization(
-    rij, alpha, gamma, pu_costs, pu_locked_in, budget)
+    rij, preweight, postweight, target, pu_costs, pu_locked_in, budget)
   # tests
   expect_lte(abs(r1$objval - r3$objval), 1e-4)
   expect_lte(abs(r2$objval - r3$objval), 1e-4)

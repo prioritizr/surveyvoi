@@ -5,13 +5,15 @@
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
 #include "rcpp_approx_expected_value_of_action.h"
+#include "rcpp_conservation_benefit.h"
 
 double approx_expected_value_of_decision_given_perfect_info(
   Eigen::MatrixXd &pij_log,
   Eigen::MatrixXd &pij_log1m,
   Prioritization &p,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::vector<mpz_class> &states) {
 
   // initialization
@@ -51,8 +53,7 @@ double approx_expected_value_of_decision_given_perfect_info(
 
     /// calculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      alpha.cwiseProduct(curr_state.rowwise().sum()).array().
-        pow(gamma.array()).sum();
+      conservation_benefit_state(curr_state, preweight, postweight, target);
 
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(curr_prob_of_state_occurring);
@@ -61,8 +62,10 @@ double approx_expected_value_of_decision_given_perfect_info(
     if (curr_value_given_state_occurring > 1.0e-10) {
       /// store value given state
       value_given_state_occurring.push_back(curr_value_given_state_occurring);
+
       /// store probability of state occurring
       prob_of_state_occurring.push_back(curr_prob_of_state_occurring);
+      
       /// increment counter
       ++k;
     }
@@ -100,8 +103,9 @@ Rcpp::NumericVector
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
@@ -119,8 +123,8 @@ Rcpp::NumericVector
 
   /// initialize prioritization
   Prioritization p(
-    pij.cols(), pij.rows(), pu_costs, pu_locked_in, alpha, gamma,
-    n_approx_obj_fun_points, budget, gap);
+    pij.cols(), pij.rows(), pu_costs, pu_locked_in, preweight, postweight,
+    target, n_approx_obj_fun_points, budget, gap);
 
   /// create log version of probabilities
   Eigen::MatrixXd pij_log = pij;
@@ -133,7 +137,7 @@ Rcpp::NumericVector
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
     /// calculate result
     out[i] = approx_expected_value_of_decision_given_perfect_info(
-      pij_log, pij_log1m, p, alpha, gamma, states[i]);
+      pij_log, pij_log1m, p, preweight, postweight, target, states[i]);
   }
 
   // return result
@@ -145,8 +149,9 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
@@ -160,7 +165,7 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
   /// initialize prioritization
   Prioritization p(
     pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-    alpha, gamma, n_approx_obj_fun_points, budget, gap);
+    preweight, postweight, target, n_approx_obj_fun_points, budget, gap);
 
   /// create log version of probabilities
   Eigen::MatrixXd pij_log = pij;
@@ -170,7 +175,7 @@ double rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
 
   // calculate result
   double out = approx_expected_value_of_decision_given_perfect_info(
-    pij_log, pij_log1m, p, alpha, gamma, states2);
+    pij_log, pij_log1m, p, preweight, postweight, target, states2);
 
   // return result
   return out;

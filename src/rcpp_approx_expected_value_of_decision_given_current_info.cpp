@@ -12,8 +12,9 @@ Rcpp::NumericVector
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
@@ -32,7 +33,8 @@ Rcpp::NumericVector
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
+                   preweight, postweight, target, n_approx_obj_fun_points,
+                   budget, gap);
   p.add_rij_data(pij);
   p.solve();
   p.get_solution(solution);
@@ -47,7 +49,7 @@ Rcpp::NumericVector
   for (std::size_t i = 0; i < n_approx_replicates; ++i) {
     /// calculate result
     out[i] = approx_expected_value_of_action(
-      solution, pij, pij_log1m, alpha, gamma, states[i]);
+      solution, pij, pij_log1m, preweight, postweight, target, states[i]);
   }
 
   // return result
@@ -59,8 +61,9 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
@@ -74,7 +77,8 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
+                   preweight, postweight, target, n_approx_obj_fun_points,
+                   budget, gap);
   p.add_rij_data(pij);
   p.solve();
   p.get_solution(solution);
@@ -86,7 +90,7 @@ double rcpp_approx_expected_value_of_decision_given_current_info_fixed_states(
 
   // calculate result
   double out = approx_expected_value_of_action(
-    solution, pij, pij_log1m, alpha, gamma, states2);
+    solution, pij, pij_log1m, preweight, postweight, target, states2);
 
   // return result
   return out;

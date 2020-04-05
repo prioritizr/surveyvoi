@@ -21,8 +21,9 @@ test_that("correct result (fixed states)", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    alpha = abs(rnorm(2)) + 1,
-    gamma = runif(2))
+    preweight = runif(2, 100, 200),
+    postweight = runif(2, 5, 20),
+    target = c(1, 1))
   site_data <- site_data[c(1, 2), ]
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
@@ -33,10 +34,12 @@ test_that("correct result (fixed states)", {
   # calculations
   r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+    feature_data$preweight, feature_data$postweight, feature_data$target,
+    1000, 301, 0, states)
   r2 <- r_approx_expected_value_of_decision_given_perfect_info_fixed_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, states)
+    feature_data$preweight, feature_data$postweight, feature_data$target,
+    1000, 301, 0, states)
   # tests
   expect_equal(r1, r2)
 })
@@ -62,8 +65,9 @@ test_that("correct result (n states)", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    alpha = abs(rnorm(2)) + 1,
-    gamma = runif(2))
+    preweight = runif(2, 100, 200),
+    postweight = runif(2, 5, 20),
+    target = c(1, 1))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
@@ -75,12 +79,14 @@ test_that("correct result (n states)", {
   set.seed(100)
   r1 <- rcpp_approx_expected_value_of_decision_given_perfect_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states,
+    feature_data$preweight, feature_data$postweight, feature_data$target,
+    1000, 301, 0, reps, states,
     method_approx_states = "weighted_without_replacement")
   set.seed(100)
   r2 <- r_approx_expected_value_of_decision_given_perfect_info_n_states(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$alpha, feature_data$gamma, 1000, 301, 0, reps, states)
+    feature_data$preweight, feature_data$postweight, feature_data$target,
+    1000, 301, 0, reps, states)
   # tests
   expect_lte(max(abs(c(r1 - r2))), 1e-15)
 })
@@ -106,8 +112,9 @@ test_that("expected error", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    alpha = abs(rnorm(2)) + 1,
-    gamma = runif(2))
+    preweight = runif(2, 100, 200),
+    postweight = runif(2, 5, 20),
+    target = c(1, 1))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
@@ -117,6 +124,7 @@ test_that("expected error", {
   expect_error({
     rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states(
       prior_data, site_data$management_cost, site_data$locked_in,
-      feature_data$alpha, feature_data$gamma, 1000, 301, 0, 0)
+      feature_data$preweight, feature_data$postweight, feature_data$target,
+      1000, 301, 0, 0)
   })
 })

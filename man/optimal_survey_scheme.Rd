@@ -17,8 +17,9 @@ optimal_survey_scheme(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   survey_budget,
   xgb_parameters,
@@ -110,16 +111,24 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_alpha_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\alpha}
-values used to parametrize
-the conservation benefit of managing of each feature.
+\item{feature_preweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{preweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
 This column should have \code{numeric} values that
 are equal to or greater than zero. No missing (\code{NA}) values are
 permitted in this column.}
 
-\item{feature_gamma_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\gamma}
+\item{feature_postweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{postweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
+This column should have \code{numeric} values that
+are equal to or greater than zero. No missing (\code{NA}) values are
+permitted in this column.}
+
+\item{feature_target_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
 feature.
 This column should have \code{numeric} values that
@@ -254,7 +263,8 @@ opt_survey <- optimal_survey_scheme(
   "management_cost", "survey_cost",
   "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "alpha", "gamma", total_budget, survey_budget, xgb_parameters)
+  "preweight", "postweight", "target",
+  total_budget, survey_budget, xgb_parameters)
 
 # print result
 print(opt_survey)

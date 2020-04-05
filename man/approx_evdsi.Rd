@@ -18,8 +18,9 @@ approx_evdsi(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
@@ -118,16 +119,24 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_alpha_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\alpha}
-values used to parametrize
-the conservation benefit of managing of each feature.
+\item{feature_preweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{preweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
 This column should have \code{numeric} values that
 are equal to or greater than zero. No missing (\code{NA}) values are
 permitted in this column.}
 
-\item{feature_gamma_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\gamma}
+\item{feature_postweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{postweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
+This column should have \code{numeric} values that
+are equal to or greater than zero. No missing (\code{NA}) values are
+permitted in this column.}
+
+\item{feature_target_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
 feature.
 This column should have \code{numeric} values that
@@ -195,6 +204,16 @@ presence absence states in the system
 (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
 Defaults to 1000.}
 
+\item{method_approx_states}{\code{character} name of method that is
+used to sample states for approximating the expected value
+calculations. Available options are:
+\code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
+\code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
+Uniform sampling methods have an equal chance of returning each
+state, and weighted sampling methods are more likely to return
+states with a higher prior probability of occurring.
+Defaults to \code{"weighted_without_replacement"}.}
+
 \item{seed}{\code{integer} state of the random number generator for
 partitioning data into folds cross-validation and fitting \pkg{xgboost}
 models. It is also used for generating states.
@@ -254,7 +273,8 @@ approx_ev_survey <- approx_evdsi(
   c("e1", "e2", "e3"), "management_cost", "survey_site",
   "survey_cost", "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "alpha", "gamma", total_budget, xgb_parameters)
+  "preweight", "postweight", "target",
+  total_budget, xgb_parameters)
 
 # print exact value
 print(approx_ev_survey)

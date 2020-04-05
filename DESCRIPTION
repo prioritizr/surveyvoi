@@ -28,7 +28,8 @@ Imports:
     doParallel (>= 1.0.15),
     RandomFields (>= 3.3.7),
     vegan (>= 2.5-6),
-    RcppAlgos (>= 2.3.6)
+    RcppAlgos (>= 2.3.6),
+    ggplot2 (>= 3.2.1)
 Suggests:
     testthat (>= 2.0.0),
     knitr (>= 1.20),
@@ -49,6 +50,7 @@ LinkingTo:
     RcppNumerical (>= 0.3-3)
 License: GPL-3
 LazyData: true
+OS_type: unix
 SystemRequirements:
     C++11,
     gurobi (>= 8.1.0),
@@ -75,6 +77,7 @@ Collate:
     'n_states.R'
     'optimal_survey_scheme.R'
     'package.R'
+    'plot_conservation_benefit.R'
     'prior_probability_matrix.R'
     'relative_site_richness_scores.R'
     'relative_site_uncertainty_scores.R'

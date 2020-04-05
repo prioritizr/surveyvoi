@@ -75,7 +75,8 @@ NULL
 #'   "management_cost", "survey_cost",
 #'   "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "alpha", "gamma", total_budget, survey_budget, xgb_parameters)
+#'   "preweight", "postweight", "target",
+#'   total_budget, survey_budget, xgb_parameters)
 #'
 #' # print result
 #' print(opt_survey)
@@ -94,8 +95,9 @@ optimal_survey_scheme <- function(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   survey_budget,
   xgb_parameters,
@@ -175,18 +177,24 @@ optimal_survey_scheme <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_alpha_column
-    assertthat::is.string(feature_alpha_column),
-    all(assertthat::has_name(feature_data, feature_alpha_column)),
-    is.numeric(feature_data[[feature_alpha_column]]),
-    assertthat::noNA(feature_data[[feature_alpha_column]]),
-    all(feature_data[[feature_alpha_column]] >= 0),
-    ## feature_gamma_column
-    assertthat::is.string(feature_gamma_column),
-    all(assertthat::has_name(feature_data, feature_gamma_column)),
-    is.numeric(feature_data[[feature_gamma_column]]),
-    assertthat::noNA(feature_data[[feature_gamma_column]]),
-    all(feature_data[[feature_gamma_column]] >= 0),
+    ## feature_preweight_column
+    assertthat::is.string(feature_preweight_column),
+    all(assertthat::has_name(feature_data, feature_preweight_column)),
+    is.numeric(feature_data[[feature_preweight_column]]),
+    assertthat::noNA(feature_data[[feature_preweight_column]]),
+    all(feature_data[[feature_preweight_column]] >= 0),
+    ## feature_postweight_column
+    assertthat::is.string(feature_postweight_column),
+    all(assertthat::has_name(feature_data, feature_postweight_column)),
+    is.numeric(feature_data[[feature_postweight_column]]),
+    assertthat::noNA(feature_data[[feature_postweight_column]]),
+    all(feature_data[[feature_postweight_column]] >= 0),
+    ## feature_target_column
+    assertthat::is.string(feature_target_column),
+    all(assertthat::has_name(feature_data, feature_target_column)),
+    is.numeric(feature_data[[feature_target_column]]),
+    assertthat::noNA(feature_data[[feature_target_column]]),
+    all(feature_data[[feature_target_column]] >= 0),
     ## total_budget
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
@@ -334,8 +342,9 @@ optimal_survey_scheme <- function(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
-      alpha = feature_data[[feature_alpha_column]],
-      gamma = feature_data[[feature_gamma_column]],
+      preweight = feature_data[[feature_preweight_column]],
+      postweight = feature_data[[feature_postweight_column]],
+      target = feature_data[[feature_target_column]],
       n_approx_obj_fun_points = n_approx_obj_fun_points,
       budget = total_budget,
       gap = optimality_gap)
@@ -380,8 +389,9 @@ optimal_survey_scheme <- function(
         xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
         xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
         n_xgb_nrounds = xgb_nrounds,
-        obj_fun_alpha = feature_data[[feature_alpha_column]],
-        obj_fun_gamma = feature_data[[feature_gamma_column]],
+        obj_fun_preweight = feature_data[[feature_preweight_column]],
+        obj_fun_postweight = feature_data[[feature_postweight_column]],
+        obj_fun_target = feature_data[[feature_target_column]],
         n_approx_obj_fun_points = n_approx_obj_fun_points,
         total_budget = total_budget,
         optim_gap = optimality_gap)

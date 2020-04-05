@@ -2,6 +2,7 @@
 #define PRIORITIZATION_H
 
 #include "package.h"
+#include "rcpp_conservation_benefit.h"
 #include "gurobi_c.h"
 
 class Prioritization
@@ -13,8 +14,9 @@ public:
   std::size_t _n_vars;  // number of variables in problem
   std::size_t _n_lcs;   // number of linear constraints in problem
   std::size_t _n_approx_obj_fun_points; // number of approximation points
-  double *_alpha; // objective function scaling parameter
-  double *_gamma; // objective function scaling parameter
+  double *_preweight; // objective function scaling parameter
+  double *_postweight; // objective function scaling parameter
+  double *_target; // objective function scaling parameter
   std::vector<int> _update_constraints_idx; // update indices for rij
   std::vector<int> _update_vars_idx;        // update indices for rij
 
@@ -25,8 +27,9 @@ public:
   Prioritization(std::size_t n_pu, std::size_t n_f,
                  Eigen::VectorXd &pu_costs,
                  Eigen::VectorXd &pu_locked_in,
-                 Eigen::VectorXd &alpha,
-                 Eigen::VectorXd &gamma,
+                 Eigen::VectorXd &preweight,
+                 Eigen::VectorXd &postweight,
+                 Eigen::VectorXd &target,
                  std::size_t n_approx_obj_fun_points,
                  double budget, double gap) :
                  _env(NULL), _model(NULL) {
@@ -36,8 +39,9 @@ public:
     _n_vars = n_pu + n_f;
     _n_lcs = n_f + 1;
     _n_approx_obj_fun_points = n_approx_obj_fun_points;
-    _alpha = alpha.data();
-    _gamma = gamma.data();
+    _preweight = preweight.data();
+    _postweight = postweight.data();
+    _target = target.data();
 
     // create update indices for rij data
     /// add constraint matrix row numbers
@@ -154,8 +158,11 @@ public:
         curr_value += incr_feature_held[j];
       }
       /// calculate benefit values
-      obj_feature_benefit =
-        (*(_alpha + j) * obj_feature_held.array()).pow(*(_gamma + j));
+      for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
+        obj_feature_benefit[k] =  conservation_benefit_amount(
+          obj_feature_held[k], *(_preweight + j),
+          *(_postweight + j), *(_target + j));
+      }
       obj_feature_benefit[0] = 0.0;
       /// add component
       if ((obj_feature_benefit.maxCoeff() - obj_feature_benefit[0]) > 1.0e-5) {

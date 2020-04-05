@@ -5,58 +5,7 @@
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
-#' @inheritParams approx_evdci
-#'
-#' @param site_survey_scheme_column \code{character} name of \code{logical}
-#'  (\code{TRUE} / \code{FALSE}) column in the argument to \code{site_data}
-#'  that indicates which sites are selected in the scheme or not.
-#'  No missing \code{NA} values are permitted. Additionally, only sites
-#'  that are missing data can be selected or surveying (as per the
-#'  argument to \code{site_occupancy_columns}).
-#'
-#' @param feature_survey_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains \code{logical} (\code{TRUE} /
-#'   \code{FALSE}) values indicating if the feature will be surveyed in
-#'   the planned surveys or not. Note that considering additional features will
-#'   rapidly increase computational burden, and so it is only recommended to
-#'   consider features that are of specific conservation interest.
-#'   No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param site_survey_cost_column \code{character} name of column in the
-#'   argument to  \code{site_data} that contains costs for surveying each
-#'   site. This column should have \code{numeric} values that are equal to
-#'   or greater than zero. No missing (\code{NA}) values are permitted in this
-#'   column.
-#'
-#' @param site_env_vars_columns \code{character} names of columns in the
-#'   argument to  \code{site_data} that contain environmental information
-#'   for fitting updated occupancy models based on possible survey outcomes.
-#'   Each column should correspond to a different environmental variable,
-#'   and contain \code{numeric}, \code{factor}, or \code{character} data.
-#'   No missing (\code{NA}) values are permitted in these columns.
-#'
-#' @param site_weight_columns \code{character} name of columns in
-#'  \code{site_data} containing weights for model fitting for each
-#'  feature. These columns must contain \code{numeric} values greater
-#'  than or equal to zero. No missing (\code{NA}) values are
-#'  permitted. Defaults to \code{NULL} such that all data are given
-#'  equal weight when fitting models.
-#'
-#' @param xgb_parameters \code{list} of \code{list} objects
-#'   containing the parameters for fitting models for each
-#'   feature. See documentation for the \code{params} argument in
-#'   \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
-#'   these parameters would be determined using the
-#'   \code{\link{tune_occupancy_models}} function. Note that arguments must
-#'   have a \code{nrounds} element (see example below).
-#'
-#' @param xgb_n_folds \code{integer} vector containing the number of
-#'   k-fold cross-validation folds to use for fitting models and
-#'   assessing model performance for each feature. Ideally, the number of folds
-#'   should be exactly the same as the number used for tuning the
-#'   model parameters (i.e. same parameter to the \code{n_folds}
-#'   argument in \link{tune_occupancy_models} when generating parameters
-#'  for \code{xgb_parameters}).
+#' @inheritParams approx_evdsi
 #'
 #' @param seed \code{integer} state of the random number generator for
 #'  partitioning data into folds cross-validation and fitting \pkg{xgboost}
@@ -101,7 +50,8 @@
 #'   c("e1", "e2", "e3"), "management_cost", "survey_site",
 #'   "survey_cost", "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "alpha", "gamma", total_budget, xgb_parameters)
+#'   "preweight", "postweight", "target",
+#'   total_budget, xgb_parameters)
 #'
 #' # print exact value
 #' print(ev_survey)
@@ -121,8 +71,9 @@ evdsi <- function(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
@@ -205,18 +156,24 @@ evdsi <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_alpha_column
-    assertthat::is.string(feature_alpha_column),
-    all(assertthat::has_name(feature_data, feature_alpha_column)),
-    is.numeric(feature_data[[feature_alpha_column]]),
-    assertthat::noNA(feature_data[[feature_alpha_column]]),
-    all(feature_data[[feature_alpha_column]] >= 0),
-    ## feature_gamma_column
-    assertthat::is.string(feature_gamma_column),
-    all(assertthat::has_name(feature_data, feature_gamma_column)),
-    is.numeric(feature_data[[feature_gamma_column]]),
-    assertthat::noNA(feature_data[[feature_gamma_column]]),
-    all(feature_data[[feature_gamma_column]] >= 0),
+    ## feature_preweight_column
+    assertthat::is.string(feature_preweight_column),
+    all(assertthat::has_name(feature_data, feature_preweight_column)),
+    is.numeric(feature_data[[feature_preweight_column]]),
+    assertthat::noNA(feature_data[[feature_preweight_column]]),
+    all(feature_data[[feature_preweight_column]] >= 0),
+    ## feature_postweight_column
+    assertthat::is.string(feature_postweight_column),
+    all(assertthat::has_name(feature_data, feature_postweight_column)),
+    is.numeric(feature_data[[feature_postweight_column]]),
+    assertthat::noNA(feature_data[[feature_postweight_column]]),
+    all(feature_data[[feature_postweight_column]] >= 0),
+    ## feature_target_column
+    assertthat::is.string(feature_target_column),
+    all(assertthat::has_name(feature_data, feature_target_column)),
+    is.numeric(feature_data[[feature_target_column]]),
+    assertthat::noNA(feature_data[[feature_target_column]]),
+    all(feature_data[[feature_target_column]] >= 0),
     ## total_budget
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
@@ -353,8 +310,9 @@ evdsi <- function(
       xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
       xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
       n_xgb_nrounds = xgb_nrounds,
-      obj_fun_alpha = feature_data[[feature_alpha_column]],
-      obj_fun_gamma = feature_data[[feature_gamma_column]],
+      obj_fun_preweight = feature_data[[feature_preweight_column]],
+      obj_fun_postweight = feature_data[[feature_postweight_column]],
+      obj_fun_target = feature_data[[feature_target_column]],
       n_approx_obj_fun_points = n_approx_obj_fun_points,
       total_budget = total_budget,
       optim_gap = optimality_gap)

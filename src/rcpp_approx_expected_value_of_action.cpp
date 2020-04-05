@@ -4,8 +4,9 @@ double approx_expected_value_of_action(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::MatrixXd &pij_log1m,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::vector<mpz_class> &states) {
   // initialization
   const std::size_t n_pu = pij_log.cols();
@@ -22,7 +23,6 @@ double approx_expected_value_of_action(
   value_given_state_occurring.reserve(n_approx_states);
   prob_of_state_occurring.reserve(n_approx_states);
   all_prob_of_state_occurring.reserve(n_approx_states);
-
   /// iterate over each state
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     //// generate the i'th state
@@ -33,8 +33,7 @@ double approx_expected_value_of_action(
     for (std::size_t j = 0; j < n_pu; ++j)
       curr_state.col(j) *= solution[j];
     //// calculate the value of the prioritization given the state
-    v = alpha.cwiseProduct(curr_state.rowwise().sum()).array().
-        pow(gamma.array()).sum();
+    v = conservation_benefit_state(curr_state, preweight, postweight, target);
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(p);
     /// store values if non-zero benefit
@@ -75,8 +74,9 @@ double approx_expected_value_of_action(
 double rcpp_approx_expected_value_of_action(
   std::vector<bool> solution,
   Eigen::MatrixXd pij,
-  Eigen::VectorXd alpha,
-  Eigen::VectorXd gamma,
+  Eigen::VectorXd preweight,
+  Eigen::VectorXd postweight,
+  Eigen::VectorXd target,
   std::vector<std::size_t> states) {
   // calculate log pij
   Eigen::MatrixXd pij_log1m = pij;
@@ -91,7 +91,7 @@ double rcpp_approx_expected_value_of_action(
 
   // calculate result
   double out = approx_expected_value_of_action(
-    solution, pij, pij_log1m, alpha, gamma, states2);
+    solution, pij, pij_log1m, preweight, postweight, target, states2);
 
   // return result
   return out;

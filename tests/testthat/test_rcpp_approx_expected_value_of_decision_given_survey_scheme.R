@@ -2,16 +2,18 @@ context("rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states")
 
 test_that("correct result", {
   # data
-  RandomFields::RFoptions(seed = 505)
+  RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
+  site_data <- simulate_site_data(n_sites = 5, n_features = n_f, 0.5)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data$preweight = round(feature_data$preweight)
+  feature_data$postweight = round(feature_data$postweight)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  n_reps <- 4
-  n_states_per_rep <- 5
+  n_reps <- 1
+  n_states_per_rep <- 4
   # prepare data
   site_occ_columns <- paste0("f", seq_len(n_f))
   site_prb_columns <- paste0("p", seq_len(n_f))
@@ -54,9 +56,10 @@ test_that("correct result", {
     xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_alpha = feature_data$alpha,
-    obj_fun_gamma = feature_data$gamma,
-    n_approx_obj_fun_points = 1000,
+    obj_fun_preweight = feature_data$preweight,
+    obj_fun_postweight = feature_data$postweight,
+    obj_fun_target = feature_data$target,
+    n_approx_obj_fun_points = 100,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
@@ -77,9 +80,10 @@ test_that("correct result", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_alpha = feature_data$alpha,
-    obj_fun_gamma = feature_data$gamma,
-    n_approx_obj_fun_points = 1000,
+    obj_fun_preweight = feature_data$preweight,
+    obj_fun_postweight = feature_data$postweight,
+    obj_fun_target = feature_data$target,
+    n_approx_obj_fun_points = 100,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,

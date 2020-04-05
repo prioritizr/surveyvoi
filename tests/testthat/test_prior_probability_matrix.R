@@ -19,9 +19,7 @@ test_that("correct result", {
     sensitivity = c(0.5, 0.96, 0.97),
     specificity = c(0.34, 0.92, 0.98),
     model_sensitivity = c(0.8, 0.7, 0.6),
-    model_specificity = c(0.91, 0.94, 0.55),
-    alpha = abs(rnorm(3)) + 1,
-    gamma = runif(3))
+    model_specificity = c(0.91, 0.94, 0.55))
   site_occupancy_columns <- c("f1", "f2", "f3")
   site_probability_columns <-  c("p1", "p2", "p3")
   # calculations

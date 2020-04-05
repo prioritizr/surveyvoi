@@ -31,10 +31,13 @@ NULL
 #' \item{\code{model_specificity}}{\code{numeric} specificity (true negative
 #'   rate) of the occupancy models for each features.}
 #'
-#' \item{\code{alpha}}{\code{numeric} values used to parametrize
+#' \item{\code{preweight}}{\code{numeric} weight values used to parametrize
 #'   the conservation benefit of managing of each feature.}
 #'
-#' \item{\code{gamma}}{\code{numeric} values used to parametrize
+#' \item{\code{postweight}}{\code{numeric} weight values used to parametrize
+#'   the conservation benefit of managing of each feature.}
+#'
+#' \item{\code{target}}{\code{numeric} target values used to parametrize
 #'   the conservation benefit of managing of each feature.}
 #'
 #' }
@@ -73,6 +76,7 @@ simulate_feature_data <- function(n_features, proportion_of_survey_features) {
     survey_specificity = runif(n_features, 0.8, 0.9),
     model_sensitivity = runif(n_features, 0.7, 0.8),
     model_specificity = runif(n_features, 0.8, 0.9),
-    alpha = abs(rnorm(n_features)) + 1,
-    gamma = runif(n_features))
+    preweight = runif(n_features, 100, 200),
+    postweight = runif(n_features, 0.1, 0.3),
+    target = ceiling(runif(n_features, 5, 20)))
 }

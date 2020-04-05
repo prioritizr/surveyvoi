@@ -5,135 +5,10 @@
 #' decision that is expected when the decision maker is limited to
 #' existing biodiversity data (i.e. survey data and environmental niche models).
 #'
-#' @param site_data \code{\link[sf]{sf}} object with site data.
-#'
-#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
-#'
-#' @param site_occupancy_columns \code{character} names of \code{numeric}
-#'   columns in the
-#'   argument to \code{site_data} that contain presence/absence data.
-#'   Each column should correspond to a different feature, and contain
-#'   binary presence/absence data (zeros or ones) indicating if the
-#'   feature was detected in a previous survey or not. If a site has not
-#'   been surveyed before, then missing (\code{NA}) values should be used.
-#'
-#' @param site_probability_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain modelled
-#'   probabilities of occupancy for each feature in each site.
-#'   Each column should correspond to a different feature, and contain
-#'   probability data (values between zero and one). No missing (\code{NA})
-#'   values are permitted in these columns.
-#'
-#' @param site_management_cost_column \code{character} name of column in the
-#'   argument to \code{site_data} that contains costs for managing each
-#'   site for conservation. This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_survey_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting a presence of each
-#'   feature in a given site (i.e. the sensitivity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param feature_survey_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting an absence of each
-#'   feature in a given site (i.e. the specificity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param feature_model_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of the initial models correctly predicting a presence of each
-#'   feature in a given site (i.e. the sensitivity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
-#'
-#' @param feature_model_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of the initial models correctly predicting an absence of each
-#'   feature in a given site (i.e. the specificity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
-#'
-#' @param feature_alpha_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{\alpha}
-#'   values used to parametrize
-#'   the conservation benefit of managing of each feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_gamma_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{\gamma}
-#'   values used to parametrize the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param total_budget \code{numeric} maximum expenditure permitted
-#'   for conducting surveys and managing sites for conservation.
-#'
-#' @param site_management_locked_in_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked in for (\code{TRUE}) being managed for conservation or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
-#'   column. This is useful if some sites have already been earmarked for
-#'   conservation, or if some sites are already being managed for conservation.
-#'   Defaults to \code{NULL} such that no sites are locked in.
-#'
-#' @param prior_matrix \code{numeric} \code{matrix} containing
-#'  the prior probability of each feature occupying each site.
-#'  Rows correspond to features, and columns correspond to sites.
-#'  Defaults to \code{NULL} such that prior data is calculated automatically
-#'  using \code{\link{prior_probability_matrix}}.
-#'
-#' @param n_approx_obj_fun_points \code{integer} number of points to use
-#'  for approximating the piecewise-linear components of the objective
-#'  function. Greater values result in more precise calculations, but
-#'  also incur more computational costs. Defaults to 1000.
-#'
-#' @param n_approx_replicates \code{integer} number of replicates to use for
-#'   approximating the expected value calculations. Defaults to 100.
-#'
-#' @param n_approx_states_per_replicate \code{integer} number of states to use
-#'   per replicate for approximating the expected value of a given management
-#'   action. This number must be smaller than or equal to the total number of
-#'   presence absence states in the system
-#'   (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
-#'   Defaults to 1000.
-#'
-#' @param method_approx_states \code{character} name of method that is
-#'   used to sample states for approximating the expected value
-#'   calculations. Available options are:
-#'   \code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
-#'   \code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
-#'   Uniform sampling methods have an equal chance of returning each
-#'   state, and weighted sampling methods are more likely to return
-#'   states with a higher prior probability of occurring.
-#'   Defaults to \code{"weighted_without_replacement"}.
-#'
-#' @param optimality_gap \code{numeric} relative optimality gap for generating
-#'   conservation prioritizations. A value of zero indicates that
-#'   prioritizations must be solved to optimality. A value of 0.1 indicates
-#'   prioritizations must be within 10\% of optimality. Defaults to 0.
+#' @inheritParams approx_evdsi
 #'
 #' @param seed \code{integer} random seed used for generating states. Defaults
 #'   to 500.
-#'
-#' @details This function uses approximation methods to estimate the
-#'   expected value calculations. As such, you will need to ensure that
-#'   the same seed is used when comparing results to other functions that
-#'   use approximation methods. Additionally, the accuracy of these
-#'   calculations depend on the arguments to
-#'   \code{n_approx_replicates} and \code{n_approx_states_per_replicate}, and
-#'   so you may need to increase these parameters for large problems.
 #'
 #' @return \code{numeric} \code{vector} containing the estimate for each
 #'   replicate.
@@ -164,7 +39,8 @@
 #' ev_prime_current <- approx_evdci(
 #'     site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
 #'     "management_cost", "survey_sensitivity", "survey_specificity",
-#'     "model_sensitivity", "model_specificity", "alpha", "gamma",
+#'     "model_sensitivity", "model_specificity",
+#'     "preweight", "postweight", "target",
 #'     total_budget, n_approx_replicates = 100,
 #'     n_approx_states_per_replicate = 50)
 #'
@@ -182,8 +58,9 @@ approx_evdci <- function(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
@@ -245,18 +122,24 @@ approx_evdci <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_alpha_column
-    assertthat::is.string(feature_alpha_column),
-    all(assertthat::has_name(feature_data, feature_alpha_column)),
-    is.numeric(feature_data[[feature_alpha_column]]),
-    assertthat::noNA(feature_data[[feature_alpha_column]]),
-    all(feature_data[[feature_alpha_column]] >= 0),
-    ## feature_gamma_column
-    assertthat::is.string(feature_gamma_column),
-    all(assertthat::has_name(feature_data, feature_gamma_column)),
-    is.numeric(feature_data[[feature_gamma_column]]),
-    assertthat::noNA(feature_data[[feature_gamma_column]]),
-    all(feature_data[[feature_gamma_column]] >= 0),
+    ## feature_preweight_column
+    assertthat::is.string(feature_preweight_column),
+    all(assertthat::has_name(feature_data, feature_preweight_column)),
+    is.numeric(feature_data[[feature_preweight_column]]),
+    assertthat::noNA(feature_data[[feature_preweight_column]]),
+    all(feature_data[[feature_preweight_column]] >= 0),
+    ## feature_postweight_column
+    assertthat::is.string(feature_postweight_column),
+    all(assertthat::has_name(feature_data, feature_postweight_column)),
+    is.numeric(feature_data[[feature_postweight_column]]),
+    assertthat::noNA(feature_data[[feature_postweight_column]]),
+    all(feature_data[[feature_postweight_column]] >= 0),
+    ## feature_target_column
+    assertthat::is.string(feature_target_column),
+    all(assertthat::has_name(feature_data, feature_target_column)),
+    is.numeric(feature_data[[feature_target_column]]),
+    assertthat::noNA(feature_data[[feature_target_column]]),
+    all(feature_data[[feature_target_column]] >= 0),
     ## total_budget
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
@@ -332,8 +215,9 @@ approx_evdci <- function(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
-      alpha = feature_data[[feature_alpha_column]],
-      gamma = feature_data[[feature_gamma_column]],
+      preweight = feature_data[[feature_preweight_column]],
+      postweight = feature_data[[feature_postweight_column]],
+      target = feature_data[[feature_target_column]],
       n_approx_obj_fun_points = n_approx_obj_fun_points,
       budget = total_budget,
       gap = optimality_gap,

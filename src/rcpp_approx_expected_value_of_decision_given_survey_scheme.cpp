@@ -27,8 +27,9 @@ Rcpp::NumericVector
   Rcpp::List xgb_train_folds,
   Rcpp::List xgb_test_folds,
   std::vector<std::size_t> n_xgb_nrounds,
-  Eigen::VectorXd obj_fun_alpha,
-  Eigen::VectorXd obj_fun_gamma,
+  Eigen::VectorXd obj_fun_preweight,
+  Eigen::VectorXd obj_fun_postweight,
+  Eigen::VectorXd obj_fun_target,
   std::size_t n_approx_obj_fun_points,
   double total_budget,
   double optim_gap,
@@ -181,8 +182,9 @@ Rcpp::NumericVector
   /// initialize prioritization object
   Prioritization prioritize(
     rij.cols(), rij.rows(), pu_purchase_costs, pu_purchase_locked_in,
-    obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points,
-    remaining_budget, optim_gap);
+    obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+    n_approx_obj_fun_points, remaining_budget, optim_gap);
+
   /// overwrite missing data for feature we are not interested in surveying
   /// using the prior data
   for (std::size_t j = 0; j < n_pu; ++j)
@@ -312,8 +314,8 @@ Rcpp::NumericVector
       log_1m_matrix(curr_pij_log_1m);
       curr_expected_value_of_action_given_outcome =
         std::log(approx_expected_value_of_action(
-          curr_solution, curr_pij_log, curr_pij_log_1m, obj_fun_alpha,
-          obj_fun_gamma, states[r]));
+          curr_solution, curr_pij_log, curr_pij_log_1m, obj_fun_preweight,
+          obj_fun_postweight, obj_fun_target, states[r]));
 
       /// calculate likelihood of outcome
       curr_probability_of_outcome = log_probability_of_outcome(

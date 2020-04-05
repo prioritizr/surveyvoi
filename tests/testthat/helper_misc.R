@@ -16,3 +16,23 @@ log_sum <- function(u, v) {
 }
 
 se <- function(x) sqrt(var(x) / length(x))
+
+r_conservation_benefit_state <- function(state, preweight, postweight, target) {
+  v <- rowSums(state)
+  sum(ifelse(
+    v < target,
+    preweight * (v / target),
+    preweight + (postweight * (v - target))))
+}
+
+r_conservation_benefit_amount <- function(amount, preweight, postweight,
+  target) {
+  assertthat::assert_that(is.numeric(amount),
+  assertthat::is.number(preweight), assertthat::is.number(postweight),
+  assertthat::is.number(target))
+  ifelse(amount < target,
+    preweight * (amount / target),
+    preweight + (postweight * (amount - target)))
+}
+
+wrap <- function(x) return(x)

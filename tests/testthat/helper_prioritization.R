@@ -1,10 +1,11 @@
-r_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma,
-  n_approx_points, budget, gap, file_path) {
+r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
+  postweight, target, n_approx_points, budget, gap, file_path) {
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
-    is.numeric(alpha), is.numeric(gamma),
-    length(alpha) == nrow(rij), length(alpha) == nrow(rij),
+    is.numeric(preweight), is.numeric(postweight), is.numeric(target),
+    length(preweight) == nrow(rij), length(postweight) == nrow(rij),
+    length(target) == nrow(rij),
     is.numeric(pu_costs), length(pu_costs) == ncol(rij),
     assertthat::noNA(pu_costs),
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
@@ -24,10 +25,11 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma,
     seq(r1, r2, length.out = n_approx_points)
   })
   obj_feature_benefit <- obj_feature_held
-  {for (i in seq_len(ncol(obj_feature_benefit)))
+  {for (i in seq_len(ncol(obj_feature_benefit))) {
     obj_feature_benefit[, i] <-
-    (alpha[i] * obj_feature_benefit[, i]) ^ gamma[i]
-  }
+      r_conservation_benefit_amount(obj_feature_held[, i],
+        preweight[i], postweight[i], target[i])
+  }}
   # build problem
   p <- list()
   p$modelsense <- "max"
@@ -53,7 +55,7 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma,
     o
   })
   # solve problem
-  g <- gurobi::gurobi(p, list(MIPGap = gap, Presolve = 2, OutputFlag = 0))
+  g <- gurobi::gurobi(p, list(MIPGap = gap, Presolve = -1, OutputFlag = 0))
   assertthat::assert_that(identical(g$status, "OPTIMAL"))
   # write problem to disk if needed
   if (nchar(file_path) > 0)
@@ -62,12 +64,12 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, alpha, gamma,
   list(x = as.logical(g$x[seq_len(n_pu)]), objval = g$objval, full_x = g$x)
 }
 
-brute_force_prioritization <- function(rij, alpha, gamma,
+brute_force_prioritization <- function(rij, preweight, postweight, target,
                                        pu_costs, pu_locked_in, budget) {
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
-    is.numeric(alpha), is.numeric(gamma),
+    is.numeric(preweight), is.numeric(postweight), is.numeric(target),
     is.numeric(pu_costs), length(pu_costs) == ncol(rij),
     assertthat::noNA(pu_costs),
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
@@ -90,7 +92,8 @@ brute_force_prioritization <- function(rij, alpha, gamma,
     if (sum(x * pu_costs) > budget)
       return(-Inf)
     # if feasible solution then return objective function
-    sum((alpha * rowSums(x[rep(1, n_f), ] * rij)) ^ gamma)
+    r_conservation_benefit_state(
+      x[rep(1, n_f), ] * rij, preweight, postweight, target)
   })
   # find best solution
   list(x = as.logical(c(rcpp_nth_state(which.max(objs), m))),

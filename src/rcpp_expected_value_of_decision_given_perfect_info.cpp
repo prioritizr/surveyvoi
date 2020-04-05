@@ -9,12 +9,12 @@ double rcpp_expected_value_of_decision_given_perfect_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
-  Eigen::VectorXd &alpha,
-  Eigen::VectorXd &gamma,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
   std::size_t n_approx_obj_fun_points,
   double budget,
   double gap) {
-
   // initialization
   /// initialize loop variables
   const std::size_t n_pu = pij.cols();
@@ -34,7 +34,8 @@ double rcpp_expected_value_of_decision_given_perfect_info(
   /// initialize prioritization
   std::vector<bool> solution(n_pu);
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   alpha, gamma, n_approx_obj_fun_points, budget, gap);
+                   preweight, postweight, target, n_approx_obj_fun_points,
+                   budget, gap);
 
   /// determine number of states
   mpz_class n;
@@ -46,7 +47,6 @@ double rcpp_expected_value_of_decision_given_perfect_info(
 
   // main processing
   while (cmp(i, n) < 0) {
-
     /// generate the i'th state
     nth_state(i, curr_state);
     /// generate solution for state
@@ -59,19 +59,20 @@ double rcpp_expected_value_of_decision_given_perfect_info(
       curr_rij.col(j).array() *= static_cast<double>(solution[j]);
     /// calculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      alpha.cwiseProduct(curr_rij.rowwise().sum()).array().
-        pow(gamma.array()).sum();
+      conservation_benefit_state(curr_rij, preweight, postweight, target);
     /// if prioritization has a non-zero value then proceed with remaining
     /// calculations for this state
     if (curr_value_given_state_occurring > 1.0e-10) {
       /// calculate probability of the state occurring
       curr_probability_of_state_occurring =
         log_probability_of_state(curr_state, pij_log, pij_log1m);
+
       /// add the value of the prioritization given the state,
       /// weighted by the probability of the state occuring
       curr_expected_value_given_state =
         std::log(curr_value_given_state_occurring) +
         curr_probability_of_state_occurring;
+
       /// calculate expected value of action
       if (std::isinf(out)) {
         out = curr_expected_value_given_state;

@@ -34,10 +34,13 @@ data:
 \item{\code{model_specificity}}{\code{numeric} specificity (true negative
   rate) of the occupancy models for each features.}
 
-\item{\code{alpha}}{\code{numeric} values used to parametrize
+\item{\code{preweight}}{\code{numeric} weight values used to parametrize
   the conservation benefit of managing of each feature.}
 
-\item{\code{gamma}}{\code{numeric} values used to parametrize
+\item{\code{postweight}}{\code{numeric} weight values used to parametrize
+  the conservation benefit of managing of each feature.}
+
+\item{\code{target}}{\code{numeric} target values used to parametrize
   the conservation benefit of managing of each feature.}
 
 }

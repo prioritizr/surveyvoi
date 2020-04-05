@@ -26,8 +26,9 @@ test_that("expected results", {
     survey_specificity = rep(0.9, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
-    alpha = abs(rnorm(3)) + 1,
-    gamma = runif(3))
+    preweight = runif(3, 100, 200),
+    postweight = runif(3, 5, 20),
+    target = c(1, 1, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
                               objective = "binary:logistic"))[rep(1, 3)]
   # generate prioritisation
@@ -44,8 +45,9 @@ test_that("expected results", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = 49,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
@@ -93,8 +95,9 @@ test_that("consistent results", {
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
         feature_model_specificity_column = "model_specificity",
-        feature_alpha_column = "alpha",
-        feature_gamma_column = "gamma",
+        feature_preweight_column = "preweight",
+        feature_postweight_column = "postweight",
+        feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
         xgb_parameters = xgb_params)
@@ -138,8 +141,9 @@ test_that("consistent results (multiple threads)", {
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
         feature_model_specificity_column = "model_specificity",
-        feature_alpha_column = "alpha",
-        feature_gamma_column = "gamma",
+        feature_preweight_column = "preweight",
+        feature_postweight_column = "postweight",
+        feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
         xgb_parameters = xgb_params)

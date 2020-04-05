@@ -1,5 +1,5 @@
 r_expected_value_of_action <- function(
-  solution, prior_data, alpha, gamma) {
+  solution, prior_data, preweight, postweight, target) {
   # initialization
   sub_prior_data <- prior_data[, solution, drop = FALSE]
   sub_prior_data_log <- log(sub_prior_data)
@@ -8,7 +8,7 @@ r_expected_value_of_action <- function(
   states <- seq(1, rcpp_n_states(length(sub_prior_data)))
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, sub_prior_data)
-    v <- sum((alpha * rowSums(s)) ^ gamma)
+    v <- r_conservation_benefit_state(s, preweight, postweight, target)
     p <- sum(s[] * sub_prior_data_log[]) +
          sum((1 - s[]) * sub_prior_data_log1m[])
     v * exp(p)
@@ -17,19 +17,20 @@ r_expected_value_of_action <- function(
 }
 
 r_expected_value_of_decision_given_current_info <- function(
-  prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
-  budget, gap) {
+  prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
+  n_approx_obj_fun_points, budget, gap) {
   # find optimal solution
   solution <- rcpp_prioritization(
-    prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
-    budget, gap, "")$x
+    prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
+    n_approx_obj_fun_points, budget, gap, "")$x
   # calculate expected value
-  r_expected_value_of_action(solution, prior_data, alpha, gamma)
+  r_expected_value_of_action(
+    solution, prior_data, preweight, postweight, target)
 }
 
 r_expected_value_of_decision_given_perfect_info <- function(
-  prior_data, pu_costs, pu_locked_in, alpha, gamma, n_approx_obj_fun_points,
-  budget, gap) {
+  prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
+  n_approx_obj_fun_points, budget, gap) {
   # calculate log of prior data
   prior_data_log <- log(prior_data)
   prior_data_log1m <- log(1 - prior_data)
@@ -38,9 +39,10 @@ r_expected_value_of_decision_given_perfect_info <- function(
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, prior_data)
     solution <- r_prioritization(
-      s, pu_costs, as.numeric(pu_locked_in), alpha, gamma,
+      s, pu_costs, as.numeric(pu_locked_in), preweight, postweight, target,
       n_approx_obj_fun_points, budget, gap, "")$x
-    v <- sum((alpha * rowSums(s[, solution, drop = FALSE])) ^ gamma)
+    v <- r_conservation_benefit_state(
+      s[, solution, drop = FALSE], preweight, postweight, target)
     if (v < 1e-10) return(NA_real_)
     p <- sum(s[] * prior_data_log[]) +
          sum((1 - s[]) * prior_data_log1m[])
@@ -54,8 +56,9 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
   pu_survey_solution, pu_survey_status, pu_survey_costs,
   pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
-  xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds, obj_fun_alpha,
-  obj_fun_gamma, n_approx_obj_fun_points, total_budget, optim_gap) {
+  xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
+  obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+  n_approx_obj_fun_points, total_budget, optim_gap) {
   # init
   ## constants
   n_pu <- ncol(rij)
@@ -143,12 +146,13 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     ## generate prioritisation
     curr_solution <- r_prioritization(
       curr_postij, pu_purchase_costs, as.numeric(pu_purchase_locked_in),
-      obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points,
-      remaining_budget, optim_gap, "")$x
+      obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+      n_approx_obj_fun_points, remaining_budget, optim_gap, "")$x
 
     ## calculate expected value of the prioritisation
     curr_value <- log(r_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_alpha, obj_fun_gamma))
+      curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
+      obj_fun_target))
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

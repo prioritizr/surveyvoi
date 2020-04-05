@@ -28,8 +28,9 @@ double expected_value_of_decision_given_survey_scheme(
   std::vector<std::size_t> &n_xgb_nrounds,  // xgboost training rounds
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_train_folds,
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
-  Eigen::VectorXd &obj_fun_alpha,  // objective function calculation term
-  Eigen::VectorXd &obj_fun_gamma,  // objective function calculation term
+  Eigen::VectorXd &obj_fun_preweight,  // objective function calculation term
+  Eigen::VectorXd &obj_fun_postweight,  // objective function calculation term
+  Eigen::VectorXd &obj_fun_target,  // objective function calculation term
   std::size_t n_approx_obj_fun_points, // number of approximate points
   double total_budget, // total budget for surveying + monitor costs
   double optim_gap    // optimality gap for prioritizations
@@ -168,8 +169,8 @@ double expected_value_of_decision_given_survey_scheme(
   /// initialize prioritization object
   Prioritization prioritize(
     rij.cols(), rij.rows(), pu_purchase_costs, pu_purchase_locked_in,
-    obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points,
-    remaining_budget, optim_gap);
+    obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+    n_approx_obj_fun_points, remaining_budget, optim_gap);
 
   /// overwrite missing data for feature we are not interested in surveying
   /// using the prior data
@@ -292,7 +293,8 @@ double expected_value_of_decision_given_survey_scheme(
     /// calculate expected value of the prioritisation
     curr_expected_value_of_action_given_outcome =
       std::log(expected_value_of_action(
-        curr_solution, curr_pij, obj_fun_alpha, obj_fun_gamma));
+        curr_solution, curr_pij, obj_fun_preweight, obj_fun_postweight,
+        obj_fun_target));
 
     /// calculate likelihood of outcome
     curr_probability_of_outcome = log_probability_of_outcome(
@@ -349,8 +351,9 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   Rcpp::List xgb_train_folds,
   Rcpp::List xgb_test_folds,
   std::vector<std::size_t> n_xgb_nrounds,
-  Eigen::VectorXd obj_fun_alpha,
-  Eigen::VectorXd obj_fun_gamma,
+  Eigen::VectorXd obj_fun_preweight,
+  Eigen::VectorXd obj_fun_postweight,
+  Eigen::VectorXd obj_fun_target,
   std::size_t n_approx_obj_fun_points,
   double total_budget,
   double optim_gap) {
@@ -386,6 +389,6 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data2,
     xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
-    obj_fun_alpha, obj_fun_gamma, n_approx_obj_fun_points, total_budget,
-    optim_gap);
+    obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+    n_approx_obj_fun_points, total_budget, optim_gap);
 }

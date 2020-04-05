@@ -14,8 +14,9 @@ evdpi(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_alpha_column,
-  feature_gamma_column,
+  feature_preweight_column,
+  feature_postweight_column,
+  feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
@@ -79,16 +80,24 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_alpha_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\alpha}
-values used to parametrize
-the conservation benefit of managing of each feature.
+\item{feature_preweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{preweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
 This column should have \code{numeric} values that
 are equal to or greater than zero. No missing (\code{NA}) values are
 permitted in this column.}
 
-\item{feature_gamma_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{\gamma}
+\item{feature_postweight_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{postweight}
+values used to parametrize  the conservation benefit of managing of each
+feature.
+This column should have \code{numeric} values that
+are equal to or greater than zero. No missing (\code{NA}) values are
+permitted in this column.}
+
+\item{feature_target_column}{\code{character} name of the column in the
+argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
 feature.
 This column should have \code{numeric} values that
@@ -162,7 +171,8 @@ total_budget <- sum(site_data$management_cost) * 0.5
 ev_certainty <- evdpi(
   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
   "management_cost", "survey_sensitivity", "survey_specificity",
-  "model_sensitivity", "model_specificity", "alpha", "gamma", total_budget)
+  "model_sensitivity", "model_specificity",
+  "preweight", "postweight", "target", total_budget)
 
 # print exact value
 print(ev_certainty)

@@ -6,9 +6,10 @@
 #include "rcpp_states.h"
 #include "rcpp_sample_states.h"
 #include "rcpp_probability.h"
+#include "rcpp_conservation_benefit.h"
 
 double approx_expected_value_of_action(
   std::vector<bool>&, Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&,
-  Eigen::VectorXd&, std::vector<mpz_class>&);
+  Eigen::VectorXd&, Eigen::VectorXd&, std::vector<mpz_class>&);
 
 #endif

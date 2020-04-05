@@ -26,9 +26,7 @@ test_that("correct result", {
     sensitivity = c(0.7, 0.96, 0.8),
     specificity = c(0.54, 0.92, 0.6),
     model_sensitivity = c(0.8, 0.7, 0.657),
-    model_specificity = c(0.92, 0.9, 0.65),
-    alpha = abs(rnorm(3)) + 1,
-    gamma = runif(3))
+    model_specificity = c(0.92, 0.9, 0.65))
   site_occ_columns <- c("f1", "f2", "f3")
   site_prb_columns <- c("p1", "p2", "p3")
   site_out_columns <- c("o1", "o2", "o3") # combination of outcome/new models

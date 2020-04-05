@@ -2,6 +2,7 @@ context("approx_evdsi")
 
 test_that("equal weights", {
   # data
+  RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
@@ -52,8 +53,9 @@ test_that("equal weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
     n_approx_obj_fun_points = 1000,
@@ -79,8 +81,9 @@ test_that("equal weights", {
     xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_alpha = feature_data$alpha,
-    obj_fun_gamma = feature_data$gamma,
+    obj_fun_preweight = feature_data$preweight,
+    obj_fun_postweight = feature_data$postweight,
+    obj_fun_target = feature_data$target,
     n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0,
@@ -92,6 +95,7 @@ test_that("equal weights", {
 
 test_that("variable weights", {
   # data
+  RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
@@ -145,8 +149,9 @@ test_that("variable weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
     n_approx_obj_fun_points = 1000,
@@ -172,8 +177,9 @@ test_that("variable weights", {
     xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_alpha = feature_data$alpha,
-    obj_fun_gamma = feature_data$gamma,
+    obj_fun_preweight = feature_data$preweight,
+    obj_fun_postweight = feature_data$postweight,
+    obj_fun_target = feature_data$target,
     n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0,
