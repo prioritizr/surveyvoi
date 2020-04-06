@@ -144,8 +144,9 @@ existing biodiversity data (i.e. survey data and environmental niche models).</p
   <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>feature_model_sensitivity_column</span>,
   <span class='no'>feature_model_specificity_column</span>,
-  <span class='no'>feature_alpha_column</span>,
-  <span class='no'>feature_gamma_column</span>,
+  <span class='no'>feature_preweight_column</span>,
+  <span class='no'>feature_postweight_column</span>,
+  <span class='no'>feature_target_column</span>,
   <span class='no'>total_budget</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -230,19 +231,29 @@ one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
     </tr>
     <tr>
-      <th>feature_alpha_column</th>
+      <th>feature_preweight_column</th>
       <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(\alpha\)
-values used to parametrize
-the conservation benefit of managing of each feature.
+argument to <code>feature_data</code> that contains the \(preweight\)
+values used to parametrize  the conservation benefit of managing of each
+feature.
 This column should have <code>numeric</code> values that
 are equal to or greater than zero. No missing (<code>NA</code>) values are
 permitted in this column.</p></td>
     </tr>
     <tr>
-      <th>feature_gamma_column</th>
+      <th>feature_postweight_column</th>
       <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(\gamma\)
+argument to <code>feature_data</code> that contains the \(postweight\)
+values used to parametrize  the conservation benefit of managing of each
+feature.
+This column should have <code>numeric</code> values that
+are equal to or greater than zero. No missing (<code>NA</code>) values are
+permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_target_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains the \(target\)
 values used to parametrize the conservation benefit of managing of each
 feature.
 This column should have <code>numeric</code> values that
@@ -326,12 +337,13 @@ prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
 #&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
-#&gt; </span><span style='color: #949494;'># ... with 3 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, alpha </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, gamma </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+#&gt; #   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
@@ -340,10 +352,11 @@ prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
 <span class='no'>ev_current</span> <span class='kw'>&lt;-</span> <span class='fu'>evdci</span>(
   <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>, <span class='no'>total_budget</span>)
+  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
+  <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>, <span class='no'>total_budget</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 5.296916</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 26.59227</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

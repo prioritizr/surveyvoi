@@ -197,24 +197,24 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 
 <span class="co"># print feature data</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(feature_data)</code></pre></div>
-<pre><code>## # A tibble: 1 x 8
+<pre><code>## # A tibble: 1 x 9
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 f1    TRUE           0.982836         0.861585         0.713643
-## # … with 3 more variables: model_specificity &lt;dbl&gt;, alpha &lt;dbl&gt;,
-## #   gamma &lt;dbl&gt;</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>alpha</code> and <code>gamma</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
+## # … with 4 more variables: model_specificity &lt;dbl&gt;, preweight &lt;dbl&gt;,
+## #   postweight &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>preweight</code>, <code>postweight</code>, and <code>target</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
 </div>
 <div id="benchmark-analysis" class="section level2">
 <h2 class="hasAnchor">
 <a href="#benchmark-analysis" class="anchor"></a>Benchmark analysis</h2>
-<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of 1023 states. Since we are interested in understanding how the number states in the approximation method affects its accuracy, we will create a set of containing different numbers of states (i.e. <code>n_approx_states</code>).</p>
+<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of 1024 states. Since we are interested in understanding how the number states in the approximation method affects its accuracy, we will create a set of containing different numbers of states (i.e. <code>n_approx_states</code>).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create set of number of approximation states</span>
 n_approx_states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">ceiling</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">10</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/n_states">n_states</a></span>(<span class="dv">1</span>, <span class="dv">10</span>), <span class="dt">length.out =</span> <span class="dv">10</span>))
 
 <span class="co"># print states</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(n_approx_states)</code></pre></div>
-<pre><code>##  [1]   10  123  236  348  461  573  686  798  911 1023</code></pre>
+<pre><code>##  [1]   10  123  236  348  461  574  686  799  912 1024</code></pre>
 <p>This benchmark analysis will examine various approaches for approximating the <em>expected value of the decision given current information</em>. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given current information using</span>
 <span class="co"># exact methods</span>
@@ -228,13 +228,14 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
   <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+  <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+  <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+  <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
   <span class="dt">total_budget =</span> total_budget)
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
-<pre><code>## [1] 4.650252</code></pre>
+<pre><code>## [1] 31.28657</code></pre>
 <p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating states: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample states and do not consider the prior probability of each state occurring. The weighted methods, on the other hand, are select states that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total states, we will not explore the full range of subsets for this method.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define function for calculating standard error</span>
 se &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">sqrt</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var</a></span>(x) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x))
@@ -260,8 +261,9 @@ ev_prime_current &lt;-
         <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
         <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
         <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-        <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-        <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+        <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+        <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+        <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
         <span class="dt">total_budget =</span> total_budget,
         <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
         <span class="dt">n_approx_states_per_replicate =</span> x<span class="op">$</span>n,

@@ -96,8 +96,8 @@
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
-<p>The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – that prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (i.e. surveying sites to refine estimates of which species are present inside them). However, this is further complicated by the fact that surveying sites consumes limited resources that could be used to manage sites for conservation. Thus decision makers need to strategically prioritize sites for surveys, based on the possibility that such surveys will substantially improve subsequent spatial prioritisations—this is not a trivial task.</p>
-<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans. Methods are provided to calculate the <em>expected value of the decision (i.e. spatial prioritization) given current information</em> (<code>evdci</code> function), the <em>expected value of the decision given perfect information</em> (<code>evdpi</code> function), and the <em>expected value of the decision given a survey scheme</em> (<code>evdsi</code> function). Furthermore, by exploring various survey schemes and computing the expected value of the decision associated with each scheme, optimal survey schemes can be identified (<code>optimal_survey_scheme</code> function). This package requires the <a href="https://www.gurobi.com"><em>Gurobi</em> software suite</a>. In this vignette, we will use a simulated dataset to explore these methods.</p>
+<p>The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations—this is not a trivial task.</p>
+<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management <em>decision</em>). Methods are provided to calculate the <em>expected value of the decision given current information</em> (<code>evdci</code> function), the <em>expected value of the decision given perfect information</em> (<code>evdpi</code> function), and the <em>expected value of the decision given a survey scheme</em> (<code>evdsi</code> function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (<code>optimal_survey_scheme</code> function). This package requires the <a href="https://www.gurobi.com"><em>Gurobi</em> software suite</a>. In this vignette, we will use a simulated dataset to explore these methods.</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
@@ -156,7 +156,7 @@ site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"sites"</span>)</code></pre></div>
 <p><img src="simulation_files/figure-html/unnamed-chunk-6-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code>) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>survey_cost</code> column contains the cost for surveying each site, and the <code>management_cost</code> column contains the cost for managing each site for conservation. The <code>e1</code> and <code>e2</code> columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let’s create some visualizations.</p>
+<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>survey_cost</code> column contains the cost for surveying each site, and the <code>management_cost</code> column contains the cost for managing each site for conservation. The <code>e1</code> and <code>e2</code> columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let’s create some visualizations.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot site occupancy data from previous surveys</span>
 site_data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">f1 =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(f1)) <span class="op">%&gt;%</span>
@@ -197,18 +197,18 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 
 <span class="co"># print feature data</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(feature_data)</code></pre></div>
-<pre><code>## # A tibble: 1 x 8
+<pre><code>## # A tibble: 1 x 9
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 f1    TRUE           0.952171         0.815544         0.731463
-## # … with 3 more variables: model_specificity &lt;dbl&gt;, alpha &lt;dbl&gt;,
-## #   gamma &lt;dbl&gt;</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>alpha</code> and <code>gamma</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the <code>sensitivity</code> and <code>specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.</p>
+## # … with 4 more variables: model_specificity &lt;dbl&gt;, preweight &lt;dbl&gt;,
+## #   postweight &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>preweight</code>, <code>postweight</code>, and <code>target</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the <code>sensitivity</code> and <code>specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.</p>
 </div>
 <div id="modelling-probability-of-occupancy" class="section level2">
 <h2 class="hasAnchor">
 <a href="#modelling-probability-of-occupancy" class="anchor"></a>Modelling probability of occupancy</h2>
-<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we don’t really need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches. Since gradient boosted regression trees have many parameters that influence model performance, we will first run a calibration procedure to identify suitable parameters.</p>
+<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches. Since gradient boosted regression trees have many parameters that influence their performance, we will first run a calibration procedure to identify suitable parameters.</p>
 <p>Our calibration procedure will use a random search method to identify suitable parameters. Given candidate values for different parameters, this method explores a predetermined number of randomly selected combinations of parameters (set using the <code>n_random_search_iterations</code> parameter). Ideally, we would examine all possible combinations of tuning parameters but this is not computationally feasible and the random search method is often “good enough”. For a given combination of tuning parameters, the parameters are used to fit a model along with <em>k</em>-fold cross-validation, and the area under the curve (AUC) statistic derived from the held out data is used to assess model performance. After evaluating the predetermined number of parameter combinations, this function returns the best parameter combination (i.e. the parameters producing a model with the greatest AUC statistic).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create list of candidate parameter value for calibration procedure</span>
 candidate_xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
@@ -260,7 +260,7 @@ xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 ## 
 ## [[1]]$objective
 ## [1] "binary:logistic"</code></pre>
-<p>Now that we have identified suitable parameters for fitting the occupancy model, we will use these parameters to predict the probability that the feature occurs in the sites.</p>
+<p>Now that we have identified suitable parameters for fitting the occupancy model, we will use these parameters to predict the probability that the feature occurs in each site.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit model</span>
 xgb_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/fit_occupancy_models">fit_occupancy_models</a></span>(site_data, <span class="st">"f1"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
                                   <span class="dt">n_folds =</span> <span class="dv">2</span>,
@@ -288,24 +288,28 @@ feature_data<span class="op">$</span>model_specificity &lt;-<span class="st"> </
 <div id="expected-value-given-current-information" class="section level2">
 <h2 class="hasAnchor">
 <a href="#expected-value-given-current-information" class="anchor"></a>Expected value given current information</h2>
-<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation benefit of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence/absence of the conservation feature in each site. Here, current information corresponds to our existing survey data and also our modelled probabilities of occupancy for the conservation feature.</p>
-<p>The (<span class="math inline">\(B\)</span>) conservation benefit accrued by managing sites for conservation is calculated using the follow equation. Note that this benefit corresponds to sites prioritised for conservation management, and not sites prioritised for surveys. In this equation, let <span class="math inline">\(J\)</span> denote the set of sites (indexed by <span class="math inline">\(j\)</span>), and <span class="math inline">\(I\)</span> denote the set of feature (indexed by <span class="math inline">\(i\)</span>). Also let <span class="math inline">\(X_j\)</span> contain binary (0/1) values indicating if each site <span class="math inline">\(i \in I\)</span> is prioritized for conservation management or not, <span class="math inline">\(P_{ij}\)</span> denote the probability of features <span class="math inline">\(i \in I\)</span> occurring in sites <span class="math inline">\(j \in J\)</span> (which we will estimate below), <span class="math inline">\(\alpha_i\)</span> denote the <code>alpha</code> column value(s), and <span class="math inline">\(\gamma_i\)</span> denote the <code>gamma</code> column value(s). This equation represents the objective function of the conservation prioritization component of the value of information calculations. It is conceptually similar to the objective function used in the Zonation decision support tool <span class="citation">(Moilanen 2007)</span>.</p>
+<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation benefit of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Before we can compute the <em>expected value of the decision given current information</em>, we first need to decide how well will measure the value (or conservation_benefit) of a given management decision.</p>
+<p>We will use an equation based on the Zonation decision support tool <span class="citation">(Moilanen 2007)</span> to parametrise the conservation benefit associated with managing a set of sites for conservation. It represents the objective function of the spatial prioritization component of the value of information calculations. To interpret this equation, let <span class="math inline">\(J\)</span> denote the set of sites (indexed by <span class="math inline">\(j\)</span>), and <span class="math inline">\(I\)</span> denote the set of features (indexed by <span class="math inline">\(i\)</span>). Also let <span class="math inline">\(X_j\)</span> contain binary (i.e. zero or one) values indicating if each site <span class="math inline">\(i \in I\)</span> is prioritized for conservation management or not, <span class="math inline">\(Z_{ij}\)</span> contain binary values indicating the presence or absence of features <span class="math inline">\(i \in I\)</span> occurring in sites <span class="math inline">\(j \in J\)</span>, <span class="math inline">\(\alpha_i\)</span> denote the <code>preweight</code> column value(s), <span class="math inline">\(\gamma_i\)</span> denote the <code>postweight</code> column value(s), and <span class="math inline">\(\tau_i\)</span> denote the <code>target</code> column value(s). Furthermore, let <span class="math inline">\(H_i\)</span> denote the total number of occupied sites for features <span class="math inline">\(i \in I\)</span>, and let <span class="math inline">\(T\)</span> denote the total number of sites <span class="math inline">\(j \in J\)</span>.</p>
 <p><span class="math display">\[
-B = \sum_{i \in I} \alpha_i \times \big( \sum_{j \in J} P_{ij} X_j \big) ^{\gamma_i}
+H_i = \sum_{j \in J} X_j Z_{ij} \\
+T =  \sum_{j \in J} 1 \\
+B = \sum_{i \in I}
+\begin{cases}
+\alpha \times \frac{H_i}{\tau_i}, \text{ if } H_i &lt; \tau_i \\
+\alpha + \left( \gamma \times \frac{H_i - \tau_i}{T - \tau_i} \right), \text{ else } \\
+\end{cases}
 \]</span></p>
-<p>We can visualize this equation with a graph.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create table with plotting values</span>
-eqn_data &lt;-<span class="st"> </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="dt">x =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">0</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(site_data), <span class="dt">length.out =</span> <span class="dv">1000</span>),
-                   <span class="dt">y =</span> feature_data<span class="op">$</span>alpha <span class="op">*</span><span class="st"> </span>x <span class="op">^</span><span class="st"> </span>feature_data<span class="op">$</span>gamma)
-
-<span class="co"># create plot</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(eqn_data, <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="dt">color =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Sum(probabilities) held in conservation prioritization"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Conservation benefit"</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>()</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-14-1.png" width="336" style="display: block; margin: auto;"></p>
-<p>We can see that conservation benefit increases with the expected amount of the conservation feature held in the prioritization (i.e. the line is always increasing). We can also see that the line has a bend in it, and so the rate of conservation benefit accrued decreases as more of the feature is conserved. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved “enough” of one feature that it can then focus on other features (broadly speaking).</p>
+<p>Let’s visualize this benefit function equation by making a graph. Here, the x-axis shows the amount of</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the benefit function</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/plot_conservation_benefit">plot_conservation_benefit</a></span>(
+  <span class="dt">site_data =</span> site_data,
+  <span class="dt">feature_data =</span> feature_data,
+  <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
+  <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+  <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+  <span class="dt">feature_target_column =</span> <span class="st">"target"</span>)</code></pre></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;"></p>
+<p>We can see that conservation benefit increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). This is important because it means that we will always consider it more beneficial to protect more sites that contain the conservation features. Additionally, we can also see that the line has a bend in it – specified using value(s) in the <code>target</code> column – and so the rate of conservation benefit accrued is much slower after crossing a the target threshold. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved “enough” of one feature (specified using the <code>target</code> column) that it can then focus on other features (broadly speaking). Furthermore, the solid line represents the range of conservation benefit values that we could obtain if we protected sites that have <em>observed</em> presences, and the dashed line represents the <em>potential</em> benefit values we could obtain if we also protected unsurveyed sites and those unsurveyed sites contained the feature.</p>
 <p>Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate total budget for surveying and managing sites</span>
 total_budget &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(site_data<span class="op">$</span>management_cost) <span class="op">*</span><span class="st"> </span><span class="fl">0.8</span>
@@ -313,10 +317,10 @@ total_budget &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 <span class="co"># print total budget</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(total_budget)</code></pre></div>
 <pre><code>## [1] 1600.412</code></pre>
-<p>Given the total budget, we now have the data needed to calculate the <em>expected value of the decision given current information</em>. Unfortunately, we can only calculate this value exactly for very small problems (e.g. less than 10 planning units and one feature). Therefore, we will estimate this value using the <em>approximation</em> method. This method provides multiple estimates that we can use to calculate the <em>approximate expected value of the decision given current information</em>.</p>
+<p>Given the total budget, we now have the data needed to calculate the <em>expected value of the decision given current information</em>. Unfortunately, we can only calculate this value exactly for very small problems (e.g. less than 10 planning units and one feature). Therefore, we will estimate this value using the <em>approximation</em> method to calculate the <em>approximate expected value of the decision given current information</em>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># approximate expected value of the decision given current information</span>
-<span class="co"># here, we will use 10 replicates, and for each replicate we will use</span>
-<span class="co"># 10'000 different combinations of presence/absences of the feature in the</span>
+<span class="co"># here, we will use 1 replicates, and for each replicate we will use</span>
+<span class="co"># 1,000 different combinations of presence/absences of the feature in the</span>
 <span class="co"># sites to estimate this value</span>
 approx_evd_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdci">approx_evdci</a></span>(
   <span class="dt">site_data =</span> site_data,
@@ -328,21 +332,22 @@ approx_evd_current &lt;-<span class="st"> </span><span class="kw"><a href="https
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
   <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+  <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+  <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+  <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
   <span class="dt">total_budget =</span> total_budget,
   <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">4</span>)
+  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_current)</code></pre></div>
-<pre><code>## [1] 1.078739</code></pre>
+<pre><code>## [1] 176.521</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="expected-value-given-perfect-information" class="section level2">
 <h2 class="hasAnchor">
 <a href="#expected-value-given-perfect-information" class="anchor"></a>Expected value given perfect information</h2>
-<p>We can also explore what happen if we had perfect information. That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contain the feature and which planning units do not? This value is termed the <em>expected value of the decision given perfect information</em>. Although we would rarely have perfect information – even after conducting additional surveys – this metric is useful to understand the limit of how much the management decision could potentially be improved given budgetary constraints. Indeed, the <em>expected value of the decision given current information</em> can be very similar to <em>expected value of the decision given perfect information</em> in some situations. Similar to before, this metric can only be calculated for very small problems, and so we will estimate it using the <em>approximation method</em>.</p>
+<p>We can also explore what would happen if we had “perfect information”. That is, how good would our management decision be if we had omniscient knowledge and knew exactly which planning units contain the feature and which planning units do not? This value is termed the <em>expected value of the decision given perfect information</em>. Although we would rarely have perfect information – even after conducting additional surveys – this metric is useful to understand the limit of how much the management decision could potentially be improved given budgetary constraints. Indeed, the <em>expected value of the decision given current information</em> can be very similar to <em>expected value of the decision given perfect information</em> in some situations. Similar to before, this metric can only be calculated for very small problems. Thus we will estimate it using the <em>approximation method</em> and calculate the <em>approximate expected value of the decision given current information</em>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># approximate expected value of the decision given perfect information</span>
 approx_evd_perfect &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdpi">approx_evdpi</a></span>(
   <span class="dt">site_data =</span> site_data,
@@ -354,19 +359,21 @@ approx_evd_perfect &lt;-<span class="st"> </span><span class="kw"><a href="https
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
   <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-  <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-  <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+  <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+  <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+  <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
   <span class="dt">total_budget =</span> total_budget,
   <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">4</span>)
+  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_perfect)</code></pre></div>
-<pre><code>## [1] 1.079408</code></pre>
+<pre><code>## [1] 177.4706</code></pre>
+<p>We can also estimate how much perfect information would improve the management decision compared with using current information.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate how much perfect information would improve the decision</span>
 approx_roi_perfect &lt;-<span class="st"> </span>approx_evd_perfect <span class="op">-</span><span class="st"> </span>approx_evd_current
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_roi_perfect)</code></pre></div>
-<pre><code>## [1] 0.000668724</code></pre>
+<pre><code>## [1] 0.9496427</code></pre>
 <p>Although the <em>approximate expected value of the decision given perfect information</em> tells us the likely performance of the management decision given omniscient knowledge, it doesn’t actually tell us which sites we should survey to improve the <em>expected value of the management decision</em>.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -398,7 +405,7 @@ survey_budget &lt;-<span class="st"> </span>total_cost_of_surveying_remaining_si
 <pre><code>## [1] 1600.412</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># check that total_budget &gt;= survey budget</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(total_budget <span class="op">&gt;=</span><span class="st"> </span>survey_budget)</code></pre></div>
-<p>Now will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites <span class="citation">(i.e. environmental diversity; Faith &amp; Walker 1996)</span>, (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).</p>
+<p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites <span class="citation">(i.e. environmental diversity; Faith &amp; Walker 1996)</span>, (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># (i) generate survey scheme to increase geographic coverage</span>
 geo_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/geo_cov_survey_scheme">geo_cov_survey_scheme</a></span>(site_data, <span class="st">"new_survey_cost"</span>, survey_budget,
                                     <span class="dt">locked_out =</span> <span class="st">"surveyed"</span>)
@@ -435,7 +442,7 @@ site_data<span class="op">$</span>richness_score &lt;-<span class="st"> </span><
 rich_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/weighted_survey_scheme">weighted_survey_scheme</a></span>(site_data, <span class="st">"new_survey_cost"</span>,
                                       survey_budget, <span class="st">"richness_score"</span>,
                                       <span class="dt">locked_out =</span> <span class="st">"surveyed"</span>)</code></pre></div>
-<p>Now let’s visualize the different schemes.</p>
+<p>Let’s visualize the different survey schemes.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add schemes to site_data</span>
 site_data<span class="op">$</span>geo_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(geo_scheme)
 site_data<span class="op">$</span>env_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(env_scheme)
@@ -453,13 +460,13 @@ site_data <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> value)) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>name, <span class="dt">nrow =</span> <span class="dv">2</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"TRUE"</span> =<span class="st"> "red"</span>, <span class="st">"FALSE"</span> =<span class="st"> "black"</span>))</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-22-1.png" width="604.8" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-23-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <p>We can see that different approaches yield different survey schemes – but which survey scheme is the best?</p>
 </div>
 <div id="expected-value-of-the-decision-given-the-candidate-survey-schemes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#expected-value-of-the-decision-given-the-candidate-survey-schemes" class="anchor"></a>Expected value of the decision given the candidate survey schemes</h2>
-<p>Now that we’ve generated the survey schemes, let’s calculate their return on investment using value of information analyses.</p>
+<p>Now that we’ve generated the survey schemes, let’s calculate the <em>expected value of the decision</em> given each survey scheme.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create table to store results</span>
 approx_evd_survey_schemes &lt;-
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="dt">name =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
@@ -482,32 +489,41 @@ approx_evd_survey_schemes<span class="op">$</span>value &lt;-<span class="st"> <
     <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
     <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
     <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-    <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-    <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+    <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+    <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+    <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
     <span class="dt">xgb_parameters =</span> xgb_params,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">4</span>)
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
 })
 
-<span class="co"># estimate the return on investment for each survey scheme</span>
-<span class="co"># specifically, how much the information gained from each survey scheme is</span>
-<span class="co"># expected to improve management decision based on current information,</span>
-<span class="co"># whilst accounting for survey costs</span>
+<span class="co"># print values</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_survey_schemes)</code></pre></div>
+<pre><code>## # A tibble: 5 x 2
+##   name           value
+##   &lt;chr&gt;          &lt;dbl&gt;
+## 1 geo_scheme   176.600
+## 2 env_scheme   176.478
+## 3 unc_scheme   176.600
+## 4 cheap_scheme 176.600
+## 5 rich_scheme  176.640</code></pre>
+<p>Similar to before with perfect information, we can also estimate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate the return on investment for each survey scheme</span>
 approx_evd_survey_schemes<span class="op">$</span>roi &lt;-
 <span class="st">  </span>approx_evd_survey_schemes<span class="op">$</span>value <span class="op">-</span><span class="st"> </span>approx_evd_current
 
 <span class="co"># print values</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_survey_schemes)</code></pre></div>
 <pre><code>## # A tibble: 5 x 3
-##   name           value           roi
-##   &lt;chr&gt;          &lt;dbl&gt;         &lt;dbl&gt;
-## 1 geo_scheme   1.07880  0.0000575722
-## 2 env_scheme   1.07784 -0.000894732 
-## 3 unc_scheme   1.07880  0.0000575722
-## 4 cheap_scheme 1.07880  0.0000575722
-## 5 rich_scheme  1.07889  0.000147343</code></pre>
+##   name           value        roi
+##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+## 1 geo_scheme   176.600  0.0785989
+## 2 env_scheme   176.478 -0.0434866
+## 3 unc_scheme   176.600  0.0785989
+## 4 cheap_scheme 176.600  0.0785989
+## 5 rich_scheme  176.640  0.119281</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>
@@ -524,13 +540,13 @@ approx_evd_survey_schemes <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"TRUE"</span> =<span class="st"> "#3366FF"</span>, <span class="st">"FALSE"</span> =<span class="st"> "black"</span>)) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">30</span>, <span class="dt">vjust =</span> <span class="fl">0.65</span>),
           <span class="dt">legend.position =</span> <span class="st">"none"</span>)</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. <code>geo_scheme</code>, <code>unc_scheme</code>, <code>cheap_scheme</code>) have positive return on investment values-0-meaning that the <em>expected value of the management decision</em> is greater when we conduct these surveys (even accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (<code>env_scheme</code>, <code>rich_scheme</code>) have negative values. But what is the best possible – the optimal – survey scheme?</p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-25-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. <code>geo_scheme</code>, <code>unc_scheme</code>, <code>cheap_scheme</code>) have positive return on investment values—meaning that the <em>expected value of the management decision</em> is greater when we conduct these surveys (even when accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (i.e. <code>env_scheme</code>, <code>rich_scheme</code>) have negative values. But what is the best possible – the optimal – survey scheme?</p>
 </div>
 <div id="optimal-survey-scheme" class="section level2">
 <h2 class="hasAnchor">
 <a href="#optimal-survey-scheme" class="anchor"></a>Optimal survey scheme</h2>
-<p>Now let’s identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the <em>expected value of the decision for a given survey scheme</em> within a short period of time and so we will use the approximation method to achieve this.</p>
+<p>Now let’s identify the optimal survey scheme by directly maximizing the expected value of the decision given a survey scheme. As discussed earlier, we this problem is too large to calculate the expected value of the decision within a short period of time and so we will use the approximation method to achieve this.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generate optimal survey scheme(s) using approximation method</span>
 opt_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_optimal_survey_scheme">approx_optimal_survey_scheme</a></span>(
     <span class="dt">site_data =</span> site_data,
@@ -545,14 +561,15 @@ opt_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
     <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
     <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
     <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-    <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-    <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+    <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+    <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+    <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
     <span class="dt">survey_budget =</span> survey_budget,
     <span class="dt">xgb_parameters =</span> xgb_params,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">4</span>)</code></pre></div>
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print number of optimal survey schemes</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(opt_scheme))</code></pre></div>
 <pre><code>## [1] 1</code></pre>
@@ -569,7 +586,7 @@ site_data <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">color =</span> value)) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>name, <span class="dt">nrow =</span> <span class="dv">1</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"TRUE"</span> =<span class="st"> "red"</span>, <span class="st">"FALSE"</span> =<span class="st"> "black"</span>))</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme (<code>opt_scheme</code>) is different to the scheme based on surveying sites to increase geographic coverage (<code>geo_scheme</code>). Interestingly, the optimal scheme selects fewer sites than the other schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate return on investment of the optimal scheme</span>
 approx_evd_opt &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdsi">approx_evdsi</a></span>(
@@ -586,17 +603,18 @@ approx_evd_opt &lt;-<span class="st"> </span><span class="kw"><a href="https://w
     <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
     <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
     <span class="dt">feature_model_specificity_column =</span> <span class="st">"model_specificity"</span>,
-    <span class="dt">feature_alpha_column =</span> <span class="st">"alpha"</span>,
-    <span class="dt">feature_gamma_column =</span> <span class="st">"gamma"</span>,
+    <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
+    <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
+    <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
     <span class="dt">xgb_parameters =</span> xgb_params,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">4</span>)
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
 
 <span class="co"># calculate value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_opt)</code></pre></div>
-<pre><code>## [1] 1.079772</code></pre>
+<pre><code>## [1] 177.411</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># append optimal results to results table</span>
 approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(
   approx_evd_survey_schemes,
@@ -606,14 +624,14 @@ approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href
 <span class="co"># print updated results table</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_survey_schemes)</code></pre></div>
 <pre><code>## # A tibble: 6 x 3
-##   name           value           roi
-##   &lt;chr&gt;          &lt;dbl&gt;         &lt;dbl&gt;
-## 1 geo_scheme   1.07880  0.0000575722
-## 2 env_scheme   1.07784 -0.000894732 
-## 3 unc_scheme   1.07880  0.0000575722
-## 4 cheap_scheme 1.07880  0.0000575722
-## 5 rich_scheme  1.07889  0.000147343 
-## 6 opt_scheme   1.07977  0.00103283</code></pre>
+##   name           value        roi
+##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
+## 1 geo_scheme   176.600  0.0785989
+## 2 env_scheme   176.478 -0.0434866
+## 3 unc_scheme   176.600  0.0785989
+## 4 cheap_scheme 176.600  0.0785989
+## 5 rich_scheme  176.640  0.119281 
+## 6 opt_scheme   177.411  0.890031</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>
@@ -630,13 +648,13 @@ approx_evd_survey_schemes <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"TRUE"</span> =<span class="st"> "#3366FF"</span>, <span class="st">"FALSE"</span> =<span class="st"> "black"</span>)) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">30</span>, <span class="dt">vjust =</span> <span class="fl">0.65</span>),
           <span class="dt">legend.position =</span> <span class="st">"none"</span>)</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>We can see that the optimal survey scheme has the highest return on investment of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let’s compute their relative optimality and visualize them.</p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-28-1.png" width="504" style="display: block; margin: auto;"></p>
+<p>We can see that the optimal survey scheme has the highest <em>return on investment</em> of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let’s compute their relative optimality and visualize them.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># express values in terms of optimality</span>
 approx_evd_survey_schemes<span class="op">$</span>optimality &lt;-
 <span class="st">  </span>((<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">max</a></span>(approx_evd_survey_schemes<span class="op">$</span>roi) <span class="op">-</span>
 <span class="st">    </span>approx_evd_survey_schemes<span class="op">$</span>roi) <span class="op">/</span>
-<span class="st">   </span>approx_evd_survey_schemes<span class="op">$</span>roi) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
+<span class="st">   </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">max</a></span>(approx_evd_survey_schemes<span class="op">$</span>roi)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>
 
 <span class="co"># visualize relative optimality</span>
 <span class="co"># zero = optimal, and increasing values indicate greater sub-optimality</span>
@@ -652,8 +670,8 @@ approx_evd_survey_schemes <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="dt">values =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"TRUE"</span> =<span class="st"> "#3366FF"</span>, <span class="st">"FALSE"</span> =<span class="st"> "black"</span>)) <span class="op">+</span>
 <span class="st">    </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">axis.text.x =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">angle =</span> <span class="dv">30</span>, <span class="dt">vjust =</span> <span class="fl">0.65</span>),
           <span class="dt">legend.position =</span> <span class="st">"none"</span>)</code></pre></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>We can see that the relative return on investment for each of these different survey schemes are fairly comparable. All of the survey schemes are less than 5% from optimality. This result means that none of these schemes are especially bad for this particular simulation. However, in general, we would be best off identifying the optimal survey scheme by directly maximizing return on investment.</p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;"></p>
+<p>We can see that the optimal survey scheme performs much better than all the other survey schemes. This result shows that value of information analyses can potentially improve management decisions by strategically allocating funds to surveys and conservation management.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">

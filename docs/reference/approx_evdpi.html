@@ -150,8 +150,9 @@ value of management decisions following additional data collection.</p>
   <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>feature_model_sensitivity_column</span>,
   <span class='no'>feature_model_specificity_column</span>,
-  <span class='no'>feature_alpha_column</span>,
-  <span class='no'>feature_gamma_column</span>,
+  <span class='no'>feature_preweight_column</span>,
+  <span class='no'>feature_postweight_column</span>,
+  <span class='no'>feature_target_column</span>,
   <span class='no'>total_budget</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -240,19 +241,29 @@ one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
     </tr>
     <tr>
-      <th>feature_alpha_column</th>
+      <th>feature_preweight_column</th>
       <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(\alpha\)
-values used to parametrize
-the conservation benefit of managing of each feature.
+argument to <code>feature_data</code> that contains the \(preweight\)
+values used to parametrize  the conservation benefit of managing of each
+feature.
 This column should have <code>numeric</code> values that
 are equal to or greater than zero. No missing (<code>NA</code>) values are
 permitted in this column.</p></td>
     </tr>
     <tr>
-      <th>feature_gamma_column</th>
+      <th>feature_postweight_column</th>
       <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(\gamma\)
+argument to <code>feature_data</code> that contains the \(postweight\)
+values used to parametrize  the conservation benefit of managing of each
+feature.
+This column should have <code>numeric</code> values that
+are equal to or greater than zero. No missing (<code>NA</code>) values are
+permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_target_column</th>
+      <td><p><code>character</code> name of the column in the
+argument to <code>feature_data</code> that contains the \(target\)
 values used to parametrize the conservation benefit of managing of each
 feature.
 This column should have <code>numeric</code> values that
@@ -334,15 +345,6 @@ to 500.</p></td>
 
     <p><code>numeric</code> <code>vector</code> containing the estimate for each
   replicate.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>This function uses approximation methods to estimate the
-  expected value calculations. As such, you will need to ensure that
-  the same seed is used when comparing results to other functions that
-  use approximation methods. Additionally, the accuracy of these
-  calculations depend on the arguments to
-  <code>n_approx_replicates</code> and <code>n_approx_states_per_replicate</code>, and
-  so you may need to increase these parameters for large problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code>prior_probability_matrix</code>,
@@ -372,12 +374,13 @@ to 500.</p></td>
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
 #&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 8</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
-#&gt; </span><span style='color: #949494;'># ... with 3 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, alpha </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, gamma </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+#&gt; #   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
@@ -386,24 +389,25 @@ to 500.</p></td>
 <span class='no'>ev_prime_certainty</span> <span class='kw'>&lt;-</span> <span class='fu'>approx_evdci</span>(
   <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>, <span class='st'>"alpha"</span>, <span class='st'>"gamma"</span>,
+  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
+  <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
   <span class='no'>total_budget</span>, <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>50</span>)
 
 <span class='co'># print approximate value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_certainty</span>)</div><div class='output co'>#&gt;   [1] 5.392555 5.399130 5.414355 5.418971 5.389343 5.424460 5.399895 5.413548
-#&gt;   [9] 5.397006 5.394531 5.406037 5.396230 5.412920 5.403086 5.411976 5.403576
-#&gt;  [17] 5.399046 5.408552 5.411949 5.392600 5.392223 5.388512 5.397222 5.393049
-#&gt;  [25] 5.400384 5.395685 5.405935 5.395829 5.386738 5.407900 5.414019 5.397095
-#&gt;  [33] 5.401837 5.379786 5.408712 5.384775 5.405045 5.401245 5.398388 5.389401
-#&gt;  [41] 5.393010 5.379834 5.404883 5.389982 5.390929 5.407749 5.389306 5.395268
-#&gt;  [49] 5.400662 5.399678 5.385298 5.396284 5.420821 5.385989 5.386998 5.396892
-#&gt;  [57] 5.398668 5.381943 5.395783 5.411545 5.384924 5.406831 5.411214 5.391906
-#&gt;  [65] 5.379184 5.403415 5.394731 5.401737 5.394057 5.389606 5.390340 5.410049
-#&gt;  [73] 5.409020 5.382300 5.411980 5.393135 5.411174 5.406593 5.420510 5.418735
-#&gt;  [81] 5.414151 5.404688 5.393989 5.392761 5.396202 5.400871 5.390927 5.390087
-#&gt;  [89] 5.420103 5.387052 5.393977 5.392368 5.405617 5.387707 5.384335 5.378350
-#&gt;  [97] 5.400965 5.389608 5.418459 5.395731</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_prime_certainty</span>)</div><div class='output co'>#&gt;   [1] 27.16712 27.23450 27.31186 27.31336 27.16887 27.36405 27.20167 27.36456
+#&gt;   [9] 27.24082 27.16902 27.22147 27.21514 27.31831 27.23862 27.28213 27.19937
+#&gt;  [17] 27.18638 27.24782 27.26162 27.16070 27.17609 27.16298 27.21706 27.18931
+#&gt;  [25] 27.24178 27.19772 27.25706 27.18566 27.14838 27.29333 27.28450 27.18872
+#&gt;  [33] 27.22379 27.09731 27.25328 27.14261 27.27162 27.23463 27.22539 27.15424
+#&gt;  [41] 27.19488 27.10314 27.22263 27.16217 27.15964 27.27873 27.16303 27.18776
+#&gt;  [49] 27.23535 27.20835 27.13136 27.21959 27.36306 27.14237 27.12986 27.19522
+#&gt;  [57] 27.21227 27.10798 27.18715 27.27769 27.12803 27.28120 27.25832 27.17789
+#&gt;  [65] 27.09634 27.21861 27.19615 27.19496 27.19873 27.15497 27.18141 27.25063
+#&gt;  [73] 27.24024 27.12954 27.30984 27.18960 27.28053 27.24902 27.34193 27.32329
+#&gt;  [81] 27.28894 27.24825 27.19682 27.18428 27.19049 27.20612 27.15817 27.16242
+#&gt;  [89] 27.30135 27.12682 27.17040 27.16666 27.23513 27.16413 27.12130 27.09635
+#&gt;  [97] 27.26411 27.17272 27.38791 27.20376</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -411,7 +415,6 @@ to 500.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
