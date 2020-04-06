@@ -138,7 +138,7 @@ feature_data <- simulate_feature_data(
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `alpha` and `gamma` columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
+The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `preweight`, `postweight`, and `target` columns contain values that specify the conservation benefit gained when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
 
 ## Modelling probability of occupancy
 
@@ -207,28 +207,32 @@ stopifnot(all(feature_data$model_specificity > 0.5))
 
 After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation benefit of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Before we can compute the _expected value of the decision given current information_, we first need to decide how well will measure the value (or conservation_benefit) of a given management decision.
 
-Here, we will use the following equation to parametrise the ($B$) conservation benefit associated with managing a set of sites for conservation. Crucially, this benefit equation corresponds to sites prioritised for conservation management and not sites prioritised for surveys---meaning that we derive zero benefit if we only survey sites and don't manage any sites. To interpret this equation, let $J$ denote the set of sites (indexed by $j$), and $I$ denote the set of features (indexed by $i$). Also let $X_j$ contain binary (i.e. zero or one) values indicating if each site $i \in I$ is prioritized for conservation management or not, $Z_{ij}$ contain binary values indicating the presence or absence of features $i \in I$ occurring in sites $j \in J$, $\alpha_i$ denote the `alpha` column value(s), and $\gamma_i$ denote the `gamma` column value(s). This equation represents the objective function of the spatial prioritization component of the value of information calculations. It is conceptually similar to the objective function used in the Zonation decision support tool [@r1].
+We will use an equation based on the Zonation decision support tool [@r1] to parametrise the conservation benefit associated with managing a set of sites for conservation. It represents the objective function of the spatial prioritization component of the value of information calculations. To interpret this equation, let $J$ denote the set of sites (indexed by $j$), and $I$ denote the set of features (indexed by $i$). Also let $X_j$ contain binary (i.e. zero or one) values indicating if each site $i \in I$ is prioritized for conservation management or not, $Z_{ij}$ contain binary values indicating the presence or absence of features $i \in I$ occurring in sites $j \in J$, $\alpha_i$ denote the `preweight` column value(s), $\gamma_i$ denote the `postweight` column value(s), and $\tau_i$ denote the `target` column value(s). Furthermore, let $H_i$ denote the total number of occupied sites for features $i \in I$, and let $T$ denote the total number of sites $j \in J$.
 
 $$
-B = \sum_{i \in I} \alpha_i \times \big( \sum_{j \in J} Z_{ij} X_j \big) ^{\gamma_i}
+H_i = \sum_{j \in J} X_j Z_{ij} \\
+T =  \sum_{j \in J} 1 \\
+B = \sum_{i \in I}
+\begin{cases}
+\alpha \times \frac{H_i}{\tau_i}, \text{ if } H_i < \tau_i \\
+\alpha + \left( \gamma \times \frac{H_i - \tau_i}{T - \tau_i} \right), \text{ else } \\
+\end{cases}
 $$
 
-We can visualize this equation with a graph.
+Let's visualize this benefit function equation by making a graph. Here, the x-axis shows the amount of
 
-```{r, fig.height = h, fig.width = w}
-# create table with plotting values
-eqn_data <- tibble(x = seq(0, nrow(site_data), length.out = 1000),
-                   y = feature_data$alpha * x ^ feature_data$gamma)
-
-# create plot
-ggplot(eqn_data, aes(x = x, y = y)) +
-  geom_line(color = "#3366FF") +
-  xlab("Number of sites containing the feature held in prioritization") +
-  ylab("Conservation benefit") +
-  labs()
+```{r, fig.height = h, fig.width = w * 2}
+# plot the benefit function
+plot_conservation_benefit(
+  site_data = site_data,
+  feature_data = feature_data,
+  site_occupancy_columns = "f1",
+  feature_preweight_column = "preweight",
+  feature_postweight_column = "postweight",
+  feature_target_column = "target")
 ```
 
-We can see that conservation benefit increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). We can also see that the line has a bend in it, and so the rate of conservation benefit accrued decreases as more of the feature is conserved. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved "enough" of one feature that it can then focus on other features (broadly speaking).
+We can see that conservation benefit increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). This is important because it means that we will always consider it more beneficial to protect more sites that contain the conservation features. Additionally, we can also see that the line has a bend in it -- specified using value(s) in the `target` column -- and so the rate of conservation benefit accrued is much slower after crossing a the target threshold. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved "enough" of one feature (specified using the `target` column) that it can then focus on other features (broadly speaking). Furthermore, the solid line represents the range of conservation benefit values that we could obtain if we protected sites that have _observed_ presences, and the dashed line represents the _potential_ benefit values we could obtain if we also protected unsurveyed sites and those unsurveyed sites contained the feature.
 
 Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.
 
@@ -257,11 +261,12 @@ approx_evd_current <- approx_evdci(
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
   feature_model_specificity_column = "model_specificity",
-  feature_alpha_column = "alpha",
-  feature_gamma_column = "gamma",
+  feature_preweight_column = "preweight",
+  feature_postweight_column = "postweight",
+  feature_target_column = "target",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 1000)
+  n_approx_states_per_replicate = 10000)
 
 # print value
 print(approx_evd_current)
@@ -285,11 +290,12 @@ approx_evd_perfect <- approx_evdpi(
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
   feature_model_specificity_column = "model_specificity",
-  feature_alpha_column = "alpha",
-  feature_gamma_column = "gamma",
+  feature_preweight_column = "preweight",
+  feature_postweight_column = "postweight",
+  feature_target_column = "target",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 1000)
+  n_approx_states_per_replicate = 10000)
 
 # print value
 print(approx_evd_perfect)
@@ -436,13 +442,14 @@ approx_evd_survey_schemes$value <- sapply(
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 })
 
 # print values
@@ -498,14 +505,15 @@ opt_scheme <- approx_optimal_survey_scheme(
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = total_budget,
     survey_budget = survey_budget,
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.5}
@@ -545,13 +553,14 @@ approx_evd_opt <- approx_evdsi(
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_alpha_column = "alpha",
-    feature_gamma_column = "gamma",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_params,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 
 # calculate value
 print(approx_evd_opt)
