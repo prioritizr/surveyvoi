@@ -115,13 +115,15 @@ plot_conservation_benefit <- function(
       survey_held, rcpp_conservation_benefit_amount, numeric(1),
       preweight = feature_data[[feature_preweight_column]][[i]],
       postweight = feature_data[[feature_postweight_column]][[i]],
-      target = feature_data[[feature_target_column]][[i]])
+      target = feature_data[[feature_target_column]][[i]],
+      total = nrow(site_data))
     unsurveyed_held <- seq(n_survey_held[i], n_unsurveyed_held[i])
     unsurveyed_benefit <- vapply(
       unsurveyed_held, rcpp_conservation_benefit_amount, numeric(1),
       preweight = feature_data[[feature_preweight_column]][[i]],
       postweight = feature_data[[feature_postweight_column]][[i]],
-      target = feature_data[[feature_target_column]][[i]])
+      target = feature_data[[feature_target_column]][[i]],
+      total = nrow(site_data))
   tibble::tibble(feature = as.character(i),
                  held = c(survey_held, unsurveyed_held),
                  benefit = c(survey_benefit, unsurveyed_benefit),

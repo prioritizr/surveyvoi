@@ -18,6 +18,7 @@ double rcpp_expected_value_of_decision_given_perfect_info(
   // initialization
   /// initialize loop variables
   const std::size_t n_pu = pij.cols();
+  const double total = static_cast<double>(n_pu);
   double out = std::numeric_limits<double>::infinity();
   double curr_value_given_state_occurring;
   double curr_probability_of_state_occurring;
@@ -59,7 +60,8 @@ double rcpp_expected_value_of_decision_given_perfect_info(
       curr_rij.col(j).array() *= static_cast<double>(solution[j]);
     /// calculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      conservation_benefit_state(curr_rij, preweight, postweight, target);
+      conservation_benefit_state(
+        curr_rij, preweight, postweight, target, total);
     /// if prioritization has a non-zero value then proceed with remaining
     /// calculations for this state
     if (curr_value_given_state_occurring > 1.0e-10) {

@@ -10,6 +10,7 @@ double expected_value_of_action(
 
   // initialization
   const std::size_t n_pu = pij_log.cols();
+  const double total = static_cast<double>(n_pu);
   const std::size_t solution_size =
     std::accumulate(solution.begin(), solution.end(), 0);
   Eigen::MatrixXd sub_pij_log(pij_log.rows(), solution_size);
@@ -47,7 +48,8 @@ double expected_value_of_action(
     nth_state(i, curr_state);
     //// caculculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      conservation_benefit_state(curr_state, preweight, postweight, target);
+      conservation_benefit_state(
+        curr_state, preweight, postweight, target, total);
     /// if prioritization has a non-zero value then proceed with remaining
     /// calculations for this state
     if (curr_value_given_state_occurring > 1.0e-10) {

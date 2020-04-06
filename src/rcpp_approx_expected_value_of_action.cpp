@@ -10,6 +10,7 @@ double approx_expected_value_of_action(
   std::vector<mpz_class> &states) {
   // initialization
   const std::size_t n_pu = pij_log.cols();
+  const double total = static_cast<double>(n_pu);
   const std::size_t n_approx_states = states.size();
 
   // main processing
@@ -23,6 +24,7 @@ double approx_expected_value_of_action(
   value_given_state_occurring.reserve(n_approx_states);
   prob_of_state_occurring.reserve(n_approx_states);
   all_prob_of_state_occurring.reserve(n_approx_states);
+
   /// iterate over each state
   for (std::size_t i = 0; i < n_approx_states; ++i) {
     //// generate the i'th state
@@ -33,7 +35,8 @@ double approx_expected_value_of_action(
     for (std::size_t j = 0; j < n_pu; ++j)
       curr_state.col(j) *= solution[j];
     //// calculate the value of the prioritization given the state
-    v = conservation_benefit_state(curr_state, preweight, postweight, target);
+    v = conservation_benefit_state(
+    curr_state, preweight, postweight, target, total);
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(p);
     /// store values if non-zero benefit

@@ -28,7 +28,7 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   {for (i in seq_len(ncol(obj_feature_benefit))) {
     obj_feature_benefit[, i] <-
       r_conservation_benefit_amount(obj_feature_held[, i],
-        preweight[i], postweight[i], target[i])
+        preweight[i], postweight[i], target[i], n_pu)
   }}
   # build problem
   p <- list()
@@ -80,6 +80,7 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
   n_pu <- ncol(rij)
   n_f <- nrow(rij)
   m <- matrix(0, ncol = n_pu, nrow = 1)
+  total <- ncol(rij)
   # brute force all combinations
   objs <- vapply(seq_len(rcpp_n_states(ncol(rij))), FUN.VALUE = numeric(1),
                  function(i) {
@@ -93,7 +94,7 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
       return(-Inf)
     # if feasible solution then return objective function
     r_conservation_benefit_state(
-      x[rep(1, n_f), ] * rij, preweight, postweight, target)
+      x[rep(1, n_f), ] * rij, preweight, postweight, target, total)
   })
   # find best solution
   list(x = as.logical(c(rcpp_nth_state(which.max(objs), m))),

@@ -77,6 +77,6 @@ simulate_feature_data <- function(n_features, proportion_of_survey_features) {
     model_sensitivity = runif(n_features, 0.7, 0.8),
     model_specificity = runif(n_features, 0.8, 0.9),
     preweight = runif(n_features, 100, 200),
-    postweight = runif(n_features, 0.1, 0.3),
+    postweight = runif(n_features, 5, 30),
     target = ceiling(runif(n_features, 5, 20)))
 }

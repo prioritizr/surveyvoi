@@ -161,7 +161,7 @@ public:
       for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
         obj_feature_benefit[k] =  conservation_benefit_amount(
           obj_feature_held[k], *(_preweight + j),
-          *(_postweight + j), *(_target + j));
+          *(_postweight + j), *(_target + j), static_cast<double>(_n_pu));
       }
       obj_feature_benefit[0] = 0.0;
       /// add component

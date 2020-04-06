@@ -1,6 +1,7 @@
 r_expected_value_of_action <- function(
   solution, prior_data, preweight, postweight, target) {
   # initialization
+  total <- ncol(prior_data)
   sub_prior_data <- prior_data[, solution, drop = FALSE]
   sub_prior_data_log <- log(sub_prior_data)
   sub_prior_data_log1m <- log(1 - sub_prior_data)
@@ -8,7 +9,7 @@ r_expected_value_of_action <- function(
   states <- seq(1, rcpp_n_states(length(sub_prior_data)))
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, sub_prior_data)
-    v <- r_conservation_benefit_state(s, preweight, postweight, target)
+    v <- r_conservation_benefit_state(s, preweight, postweight, target, total)
     p <- sum(s[] * sub_prior_data_log[]) +
          sum((1 - s[]) * sub_prior_data_log1m[])
     v * exp(p)
@@ -34,6 +35,7 @@ r_expected_value_of_decision_given_perfect_info <- function(
   # calculate log of prior data
   prior_data_log <- log(prior_data)
   prior_data_log1m <- log(1 - prior_data)
+  total <- ncol(prior_data)
   # calculate expected value for each state
   states <- seq(1, rcpp_n_states(length(prior_data)))
   out <- sapply(states, function(i) {
@@ -42,7 +44,7 @@ r_expected_value_of_decision_given_perfect_info <- function(
       s, pu_costs, as.numeric(pu_locked_in), preweight, postweight, target,
       n_approx_obj_fun_points, budget, gap, "")$x
     v <- r_conservation_benefit_state(
-      s[, solution, drop = FALSE], preweight, postweight, target)
+      s[, solution, drop = FALSE], preweight, postweight, target, total)
     if (v < 1e-10) return(NA_real_)
     p <- sum(s[] * prior_data_log[]) +
          sum((1 - s[]) * prior_data_log1m[])

@@ -1,13 +1,14 @@
 r_approx_expected_value_of_action <- function(
   solution, prior_data, preweight, postweight, target, states) {
   # initialization
+  total <- ncol(prior_data)
   prior_data_log <- log(prior_data)
   prior_data_log1m <- log(1 - prior_data)
   # calculate value and prob given each state
   out <- sapply(states, function(i) {
     s <- rcpp_nth_state(i, prior_data)
     rij <- sweep(s, 2, solution, "*")
-    v <- r_conservation_benefit_state(rij, preweight, postweight, target)
+    v <- r_conservation_benefit_state(rij, preweight, postweight, target, total)
     p <- sum(s[] * prior_data_log[]) +
          sum((1 - s[]) * prior_data_log1m[])
     c(v, p)
@@ -56,6 +57,7 @@ r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
   prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
   n_approx_obj_fun_points, budget, gap, states) {
   # initialization
+  total <- ncol(prior_data)
   prior_data_log <- log(prior_data)
   prior_data_log1m <- log(1 - prior_data)
   # calculate expected value for each state
@@ -65,7 +67,7 @@ r_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(
       s, pu_costs, as.numeric(pu_locked_in), preweight, postweight, target,
       n_approx_obj_fun_points, budget, gap, "")$x
     rij <- sweep(s, 2, solution, "*")
-    v <- r_conservation_benefit_state(rij, preweight, postweight, target)
+    v <- r_conservation_benefit_state(rij, preweight, postweight, target, total)
     p <- sum(s[] * prior_data_log[]) +
          sum((1 - s[]) * prior_data_log1m[])
     c(v, p)

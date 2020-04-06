@@ -25,7 +25,7 @@ test_that("expected result", {
   objval <-
     r_conservation_benefit_state(
       matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
-      rep(prew, n_f), rep(postw, n_f), rep(target, n_f))
+      rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)
@@ -91,7 +91,7 @@ test_that("expected result (one feature has all zeros)", {
   objval <-
     r_conservation_benefit_state(
       matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
-      rep(prew, n_f), rep(postw, n_f), rep(target, n_f))
+      rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)

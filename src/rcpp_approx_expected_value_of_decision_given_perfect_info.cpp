@@ -20,6 +20,8 @@ double approx_expected_value_of_decision_given_perfect_info(
   // constant variables
   const std::size_t n_pu = pij_log.cols();
   const std::size_t n_approx_states = states.size();
+  const double total = static_cast<double>(n_pu);
+
 
   /// initialize loop variables
   double curr_value_given_state_occurring, curr_prob_of_state_occurring;
@@ -53,7 +55,8 @@ double approx_expected_value_of_decision_given_perfect_info(
 
     /// calculate the value of the prioritization given the state
     curr_value_given_state_occurring =
-      conservation_benefit_state(curr_state, preweight, postweight, target);
+      conservation_benefit_state(
+        curr_state, preweight, postweight, target, total);
 
     /// store probability of state occurring
     all_prob_of_state_occurring.push_back(curr_prob_of_state_occurring);
@@ -65,7 +68,7 @@ double approx_expected_value_of_decision_given_perfect_info(
 
       /// store probability of state occurring
       prob_of_state_occurring.push_back(curr_prob_of_state_occurring);
-      
+
       /// increment counter
       ++k;
     }

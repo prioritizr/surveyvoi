@@ -164,8 +164,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_conservation_benefit_state
-double rcpp_conservation_benefit_state(Eigen::MatrixXd x, Eigen::VectorXd preweight, Eigen::VectorXd postweight, Eigen::VectorXd target);
-RcppExport SEXP _surveyvoi_rcpp_conservation_benefit_state(SEXP xSEXP, SEXP preweightSEXP, SEXP postweightSEXP, SEXP targetSEXP) {
+double rcpp_conservation_benefit_state(Eigen::MatrixXd x, Eigen::VectorXd preweight, Eigen::VectorXd postweight, Eigen::VectorXd target, double total);
+RcppExport SEXP _surveyvoi_rcpp_conservation_benefit_state(SEXP xSEXP, SEXP preweightSEXP, SEXP postweightSEXP, SEXP targetSEXP, SEXP totalSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -173,13 +173,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type preweight(preweightSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type postweight(postweightSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type target(targetSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_conservation_benefit_state(x, preweight, postweight, target));
+    Rcpp::traits::input_parameter< double >::type total(totalSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_conservation_benefit_state(x, preweight, postweight, target, total));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_conservation_benefit_amount
-double rcpp_conservation_benefit_amount(double x, double preweight, double postweight, double target);
-RcppExport SEXP _surveyvoi_rcpp_conservation_benefit_amount(SEXP xSEXP, SEXP preweightSEXP, SEXP postweightSEXP, SEXP targetSEXP) {
+double rcpp_conservation_benefit_amount(double x, double preweight, double postweight, double target, double total);
+RcppExport SEXP _surveyvoi_rcpp_conservation_benefit_amount(SEXP xSEXP, SEXP preweightSEXP, SEXP postweightSEXP, SEXP targetSEXP, SEXP totalSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -187,7 +188,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type preweight(preweightSEXP);
     Rcpp::traits::input_parameter< double >::type postweight(postweightSEXP);
     Rcpp::traits::input_parameter< double >::type target(targetSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_conservation_benefit_amount(x, preweight, postweight, target));
+    Rcpp::traits::input_parameter< double >::type total(totalSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_conservation_benefit_amount(x, preweight, postweight, target, total));
     return rcpp_result_gen;
 END_RCPP
 }
