@@ -73,7 +73,7 @@ test_that("correct result (n states)", {
   prior_data <- prior_probability_matrix(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "sensitivity", "specificity", "model_sensitivity", "model_specificity")
-  states <- 3
+  states <- 10
   reps <- 5
   # calculations
   set.seed(100)

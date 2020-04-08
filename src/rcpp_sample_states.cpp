@@ -144,8 +144,8 @@ void sample_n_weighted_states_without_replacement(
   // generate states
   while(n_unique_states < k) {
     // generate new state
-    for (std::size_t j = 0; j < n_v; ++j)
-      states(j) = Rcpp::rbinom(n_v, 1, pij(j))[0];
+    std::transform(pij.data(), pij.data() + pij.size(), states.data(),
+                   [=](double p){ return R::rbinom(1, p); });
     // identify state index
     state_id = 0;
     which_state(states, state_id);
