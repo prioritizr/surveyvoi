@@ -83,7 +83,7 @@ site occupancy.
 A random search method is used to tune the model
  parameters. For a given set of tuning parameters, models are fit
  using k-fold cross-validation (via \code{\link[xgboost]{xgb.cv}}) and the
- average area under the curve statistic calculated using the data held
+ binary classification error rate calculated using the data held
  out from each fold is used to quantify the performance. In the event
  that the number of folds for a given feature exceeds the number of sites
  where it was recorded as present or absent, then a randomly selected

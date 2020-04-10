@@ -13,22 +13,22 @@ NULL
 #'  feature. Ideally, these parameters would be determined using the
 #'  \code{\link{tune_occupancy_models}} function. Note that arguments must
 #'  have a \code{nrounds} element (see example below).
-#'  Valid parameters include: \code{"max_depth"}, \code{"eta"},
-#'  \code{"nrounds"}, \code{"lambda"}, \code{"subsample"},
-#'  \code{"colsample_bytree"}, and \code{"objective"}.
+#'  Valid parameters include:
+#'  \code{"max_depth"}, \code{"eta"}, \code{"lambda"}, \code{"subsample"},
+#'  \code{"colsample_bytree"}, \code{"nrounds"}, \code{"scale_pos_weight"},
+#'  \code{"objective"}, and \code{"seed"}.
 #'  See documentation for the \code{params} argument in
 #'  \code{\link[xgboost]{xgb.train}} for more information.
 #'
 #' @details The models are fitted using the specified tuning parameters and
-#'  automatically calibrated \code{scale_pos_weight}
-#'  \code{\link[xgboost]{xgboost}} parameters
-#'  (i.e. number of absence divided by number of presences per feature)
-#'  to account for unbalanced datasets. After the models are fitted, they
-#'  are used to make probability of occupancy predictions (via
-#'  \code{\link[xgboost]{xgboost}}). The average sensitivity, specificity,
-#'  and area under the curve (AUC) statistics are calculated using the data held
-#'  are then reported to assess model performance. Note that each feature
-#'  is run with the same seed to ensure reproducibility.
+#' trained using area under the receiver operating curve (AUC) statistic.
+#' After the models are fitted, they
+#' are used to make probability of occupancy predictions (via
+#' \code{\link[xgboost]{xgboost}}). The average sensitivity, specificity,
+#' and area under the curve (AUC) statistics are calculated using the data held
+#' are then reported to assess model performance (using model weights if
+#' supplied).
+#' Note that each feature is run with the same seed to ensure reproducibility.
 #'
 #' @return \code{list} object containing the following elements:
 #'  \describe{
@@ -68,9 +68,7 @@ NULL
 #' @export
 fit_occupancy_models <- function(
   site_data, site_occupancy_columns, site_env_vars_columns, parameters,
-  n_folds = rep(ifelse(nrow(site_data) > 1000, 10, 5),
-                length(site_occupancy_columns)),
-  site_weight_columns = NULL, n_threads = 1, verbose = FALSE) {
+  n_folds = 10, site_weight_columns = NULL, n_threads = 1, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     inherits(site_data, "sf"), nrow(site_data) > 0, ncol(site_data) > 0,
@@ -138,12 +136,14 @@ fit_occupancy_models <- function(
                                nrow = nrow(site_data))
   }
 
-  # store seed so that each species is run with the same seed
-  seed <- .Random.seed
-
   # fit models separately for each species
-  m <- lapply(seq_along(site_occupancy_columns), function(f) {
-    set.seed(seed)
+  is_parallel <- (n_threads > 1) && (length(site_occupancy_columns) > 1)
+  if (is_parallel) {
+    cl <- parallel::makeCluster(n_threads, "FORK")
+    doParallel::registerDoParallel(cl)
+  }
+  m <- plyr::llply(seq_along(site_occupancy_columns), .parallel = is_parallel,
+                   function(f) {
     fit_model(y = site_data[[site_occupancy_columns[f]]],
               x = site_env_data,
               w = site_weight_data[, f],
@@ -151,6 +151,10 @@ fit_occupancy_models <- function(
               parameters = parameters[[f]],
               verbose = verbose)
   })
+  if (is_parallel) {
+    cl <- parallel::stopCluster(cl)
+    doParallel::stopImplicitCluster()
+  }
   # return results
   pij <- vapply(m, `[[`, numeric(nrow(site_data)), "predictions")
   colnames(pij) <- site_occupancy_columns
@@ -174,18 +178,27 @@ fit_model <- function(y, x, w, n_folds = 10, parameters = list(), n_threads = 1,
   train_idx <- which(!is.na(y))
   assertthat::assert_that(length(train_idx) > 0,
     msg = "a species is missing data for all planning units")
+  ## check for nrounds
+  if (is.null(parameters$nrounds)) {
+    stop("nrounds parameter not specified for model fitting")
+  }
   ## add objective if missing
   if (is.null(parameters$objective)) {
     parameters$objective <- "binary:logistic"
-    warning(paste("no objective specified for model fitting,",
+    warning(paste("objective parameter not specified for model fitting,",
                   "assuming binary:logistic"))
   }
   # subset data for model fitting and evaluation
   y_sub <- y[train_idx]
   x_sub <- x[train_idx, , drop = FALSE]
   w_sub <- w[train_idx]
+  # subset parameters for model fitting
+  xgb_fit_parameters <-
+    parameters[!names(parameters) %in% c("seed", "scale_pos_weight", "nrounds")]
   # create folds
-  xgb_folds <- create_folds(y_sub, n = n_folds)
+  withr::with_seed(parameters$seed, {
+    xgb_folds <- create_folds(y_sub, n = n_folds, seed = parameters$seed)
+  })
   # generate model predictions k-fold cross-validation
   xgb_models <- lapply(seq_len(n_folds), function(i) {
     # create data for model fitting and tuning
@@ -193,46 +206,49 @@ fit_model <- function(y, x, w, n_folds = 10, parameters = list(), n_threads = 1,
       x_sub[xgb_folds$train[[i]], , drop = FALSE],
       label = y_sub[xgb_folds$train[[i]]],
       weight = w_sub[xgb_folds$train[[i]]])
-    # calculate scale pos weight
-    spw <- sum(xgboost::getinfo(xgb_data, "label") < 0.5) /
-           sum(xgboost::getinfo(xgb_data, "label") > 0.5)
     # fit model
-    do.call(xgboost::xgboost,
-            append(parameters,
-                   list(data = xgb_data,
-                        nthread = n_threads,
-                        metrics = "auc",
-                        eval_metric = "auc",
-                        scale_pos_weight = spw,
-                        verbose = as.numeric(verbose))))
+    withr::with_seed(parameters$seed, {
+      do.call(xgboost::xgb.train,
+        append(xgb_fit_parameters,
+          list(data = xgb_data,
+               nthread = 1,
+               metrics = "auc",
+               eval_metric = "auc",
+               scale_pos_weight = parameters$scale_pos_weight[[i]],
+               nrounds = parameters$nrounds[[i]],
+               verbose = as.numeric(verbose))))
+    })
   })
   # calculate model performance
-  fold_perf <- plyr::ldply(seq_along(xgb_folds), function(i) {
+  fold_perf <- plyr::ldply(seq_len(n_folds), function(i) {
     ## extract data
     m <- xgb_models[[i]]
-    ## create predictions
-    p_train <-
-      withr::with_package("xgboost",
-        stats::predict(m, x_sub[xgb_folds$train[[i]], , drop = FALSE]))
-    p_test <-
-      withr::with_package("xgboost",
-        stats::predict(m, x_sub[xgb_folds$test[[i]], , drop = FALSE]))
-    ## subset observations
+    x_train <- x_sub[xgb_folds$train[[i]], , drop = FALSE]
+    x_test <- x_sub[xgb_folds$test[[i]], , drop = FALSE]
+    w_train <- w_sub[xgb_folds$train[[i]]]
+    w_test <- w_sub[xgb_folds$test[[i]]]
     y_train <- y_sub[xgb_folds$train[[i]]]
     y_test <- y_sub[xgb_folds$test[[i]]]
+    ## create predictions
+    suppressWarnings({
+      p_train <- withr::with_package("xgboost", stats::predict(m, x_train))
+      p_test <- withr::with_package("xgboost", stats::predict(m, x_test))
+    })
     ## calculate performance
     data.frame(
-      train_sensitivity = sensitivity(y_train, p_train),
-      train_specificity = specificity(y_train, p_train),
-      train_auc = Metrics::auc(y_train, p_train),
-      test_sensitivity = sensitivity(y_test, p_test),
-      test_specificity = specificity(y_test, p_test),
-      test_auc = Metrics::auc(y_test, p_test))
+      train_sensitivity = sensitivity(y_train, p_train, w_train),
+      train_specificity = specificity(y_train, p_train, w_train),
+      train_auc = weighted_auc(y_train, p_train, w_train),
+      test_sensitivity = sensitivity(y_test, p_test, w_test),
+      test_specificity = specificity(y_test, p_test, w_test),
+      test_auc = weighted_auc(y_test, p_test, w_test))
   })
   # calculate average predictions
   fold_pred <- lapply(xgb_models, function(m) {
     matrix(withr::with_package("xgboost", stats::predict(m, x)), nrow = 1)
   })
+  o3 <<- fold_perf
+  o4 <<- fold_pred
   # calculate average predictions across k-folds
   avg_pred <- colMeans(do.call(rbind, fold_pred))
   # calculate mean performance across k-folds
@@ -246,28 +262,48 @@ fit_model <- function(y, x, w, n_folds = 10, parameters = list(), n_threads = 1,
   ord2 <- sort(grep("test", names(perf), value = TRUE))
   perf <- perf[, c(ord1, ord2)]
   # return results
-  list(predictions = avg_pred,
-       performance = perf)
+  list(predictions = avg_pred, performance = perf)
 }
 
 #' @noRd
-sensitivity <- function(actual, predicted) {
+sensitivity <- function(actual, predicted, weights = rep(1, length(actual))) {
   assertthat::assert_that(
     is.numeric(actual), assertthat::noNA(actual),
-    is.numeric(predicted), assertthat::noNA(predicted))
+    is.numeric(predicted), assertthat::noNA(predicted),
+    is.numeric(weights), assertthat::noNA(weights),
+    identical(length(actual), length(predicted)),
+    identical(length(actual), length(weights)))
   # if there are no positives, then return if the predictions were all correct
   if (sum(actual > 0.5) == 0)
     return(as.numeric(all(round(actual) == round(predicted))))
-  sum((predicted > 0.5) & (actual > 0.5)) / sum(actual > 0.5)
+  # calculate weighted sensitivity
+  sum(weights * ((predicted >= 0.5) & (actual >= 0.5))) /
+  sum(weights * (actual >= 0.5))
 }
 
 #' @noRd
-specificity <- function(actual, predicted) {
+specificity <- function(actual, predicted, weights = rep(1, length(actual))) {
   assertthat::assert_that(
     is.numeric(actual), assertthat::noNA(actual),
-    is.numeric(predicted), assertthat::noNA(predicted))
+    is.numeric(predicted), assertthat::noNA(predicted),
+    is.numeric(weights), assertthat::noNA(weights),
+    identical(length(actual), length(predicted)),
+    identical(length(actual), length(weights)))
   # if there are no negatives, then return if the predictions were all correct
   if (sum(actual < 0.5) == 0)
     return(as.numeric(all(round(actual) == round(predicted))))
-  sum((predicted < 0.5) & (actual < 0.5)) / sum(actual < 0.5)
+  # calculate weighted specificity
+  sum(weights * ((predicted < 0.5) & (actual < 0.5))) /
+  sum(weights * (actual < 0.5))
+}
+
+#' @noRd
+weighted_auc <- function(actual, predicted, weights = rep(1, length(actual))) {
+  assertthat::assert_that(
+    is.numeric(actual), assertthat::noNA(actual),
+    is.numeric(predicted), assertthat::noNA(predicted),
+    is.numeric(weights), assertthat::noNA(weights),
+    identical(length(actual), length(predicted)),
+    identical(length(actual), length(weights)))
+  WeightedROC::WeightedAUC(WeightedROC::WeightedROC(predicted, actual, weights))
 }

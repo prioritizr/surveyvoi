@@ -85,6 +85,7 @@ planning units.
 }
 \details{
 The models are fitted using the specified tuning parameters and
+trained using the binary classification error rate. They are also
  automatically calibrated \code{scale_pos_weight}
  \code{\link[xgboost]{xgboost}} parameters
  (i.e. number of absence divided by number of presences per feature)

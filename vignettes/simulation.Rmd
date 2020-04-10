@@ -150,9 +150,8 @@ Our calibration procedure will use a random search method to identify suitable p
 # create list of candidate parameter value for calibration procedure
 candidate_xgb_params <- list(
   max_depth = seq(1, 10, 1), eta = seq(0.1, 0.5, 0.1),
-  nrounds = seq(1, 100, 10), lambda = 10 ^ seq(-1.0, 0.0, 0.25),
-  subsample = seq(0.5, 1.0, 0.1), colsample_bytree = seq(0.4, 1.0, 0.1),
-  objective = "binary:logistic")
+  lambda = 10 ^ seq(-1.0, 0.0, 0.25), subsample = seq(0.5, 1.0, 0.1),
+  colsample_bytree = seq(0.4, 1.0, 0.1), objective = "binary:logistic")
 
 # preview candidate parameters
 str(candidate_xgb_params)
@@ -164,6 +163,7 @@ xgb_params <- tune_occupancy_models(site_data, "f1", c("e1", "e2"),
                                     n_folds = 2,
                                     n_random_search_iterations = 1000,
                                     early_stopping_rounds = 10,
+                                    n_rounds = 1000,
                                     parameters = candidate_xgb_params,
                                     n_threads = 1)
 

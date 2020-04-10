@@ -67,3 +67,38 @@ validate_site_weight_data <- function(site_data, site_occupancy_columns,
                function(x) all(is.finite(site_data[[x]])))),
     msg = "site_data values in site_weight_columns must not be NA")
 }
+
+validate_xgb_parameters <- function(x, n_folds) {
+  vapply(seq_along(xgb_parameters), FUN.VALUE = logival(1), function(i) {
+    out <- xgb_parameters[[i]]$nrounds
+    if (is.null(out))
+      stop(paste0("argument to xgb_parameters[[", i,
+                  "]] is missing nrounds element"))
+    if (!identical(length(out), n_folds[[i]]))
+      stop(paste0("argument to xgb_parameters[[", i,
+                  "]]$nrounds does not have a value for each training fold"))
+    invisible(TRUE)
+  })
+  vapply(seq_along(xgb_parameters), FUN.VALUE = logical(1), function(i) {
+    out <- xgb_parameters[[i]]$nrounds
+    if (is.null(out))
+      stop(paste0("argument to xgb_parameters[[", i,
+                  "]] is missing scale_pos_weight element"))
+    if (!identical(length(out), n_folds[[i]]))
+      stop(paste0("argument to xgb_parameters[[", i, "]]$scale_pos_weight",
+                  "does not have a value for each training fold"))
+    invisible(TRUE)
+  })
+  vapply(xgb_parameters, FUN.VALUE = logical(1), function(x) {
+    out <- x[names(x) != "nrounds"]
+    xgb_param_names <- c("max_depth", "eta", "lambda",
+                         "subsample", "colsample_bytree", "objective")
+    extra_names <- names(out)[!names(out) %in% xgb_param_names]
+    assertthat::assert_that(
+      length(extra_names) == 0,
+      msg = paste0("argument to xgb_parameters has unrecognized parameters: ,",
+                   paste(extra_names, collapse = ",")))
+    invisible(TRUE)
+  })
+  invisible(TRUE)
+}

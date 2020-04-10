@@ -27,7 +27,7 @@ NULL
 #'  parameter values for fitting models. Note this argument must
 #'  have a \code{nrounds} element (see example below).
 #'  Valid parameters include: \code{"max_depth"}, \code{"eta"},
-#'  \code{"nrounds"}, \code{"lambda"}, \code{"subsample"},
+#'  \code{"lambda"}, \code{"subsample"},
 #'  \code{"colsample_bytree"}, and \code{"objective"}.
 #'  See documentation for the \code{params} argument in
 #'  \code{\link[xgboost]{xgb.train}} for more information.
@@ -43,6 +43,10 @@ NULL
 #' @param n_random_search_iterations \code{numeric} number of random search
 #'    iterations to use when tuning model parameters. Defaults to 10000.
 #'
+#' @param nrounds \code{numeric} model rounds for model fitting.
+#'   See \code{\link[xgboost]{xgboost}} for more information.
+#'   Defaults to 10.
+#'
 #' @param early_stopping_rounds \code{numeric} model rounds for parameter
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 10.
@@ -55,6 +59,9 @@ NULL
 #'
 #' @param n_threads \code{integer} number of threads to use for fitting models.
 #'   Defaults to 1.
+
+#' @param seed \code{integer} seed for random number generation.
+#'   Defaults to 500.
 #'
 #' @param verbose \code{logical} indicating if information should be
 #'   printed during computations. Defaults to \code{FALSE}.
@@ -62,7 +69,7 @@ NULL
 #' @details A random search method is used to tune the model
 #'  parameters. For a given set of tuning parameters, models are fit
 #'  using k-fold cross-validation (via \code{\link[xgboost]{xgb.cv}}) and the
-#'  average area under the curve statistic calculated using the data held
+#'  binary classification error rate calculated using the data held
 #'  out from each fold is used to quantify the performance. In the event
 #'  that the number of folds for a given feature exceeds the number of sites
 #'  where it was recorded as present or absent, then a randomly selected
@@ -88,7 +95,6 @@ NULL
 #' # create list of possible tuning parameters for modelling
 #' all_parameters <- list(max_depth = seq(1, 10, 1),
 #'                        eta = seq(0.1, 0.5, 0.1),
-#'                        nrounds = seq(100, 1000, 100),
 #'                        lambda = 10 ^ seq(-1.0, 0.0, 0.25),
 #'                        subsample = seq(0.5, 1.0, 0.1),
 #'                        colsample_bytree = seq(0.4, 1.0, 0.1),
@@ -100,7 +106,8 @@ NULL
 #' parameters <- tune_occupancy_models(
 #'    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
 #'    n_folds = rep(5, 2), n_random_search_iterations = 10,
-#'    early_stopping_rounds = 5, parameters = all_parameters, n_threads = 1)
+#'    early_stopping_rounds = 5, nrounds = 1000, parameters = all_parameters,
+#'    n_threads = 1)
 #'
 #' # print best found parameters for each feature
 #' print(parameters)
@@ -110,7 +117,8 @@ tune_occupancy_models <- function(
   site_data, site_occupancy_columns, site_env_vars_columns, parameters,
   n_folds = rep(ifelse(nrow(site_data) > 1000, 10, 5), site_occupancy_columns),
   n_random_search_iterations = 10000, early_stopping_rounds = 10,
-  site_weight_columns = NULL, n_threads = 1, verbose = FALSE) {
+  n_rounds = 1000, site_weight_columns = NULL, n_threads = 1, seed = 500,
+  verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     inherits(site_data, "sf"), nrow(site_data) > 0, ncol(site_data) > 0,
@@ -127,10 +135,16 @@ tune_occupancy_models <- function(
     assertthat::noNA(n_random_search_iterations),
     assertthat::is.number(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
+    assertthat::is.number(n_rounds), assertthat::noNA(n_rounds),
+    assertthat::is.number(seed), assertthat::noNA(seed),
     assertthat::is.number(n_threads), assertthat::noNA(n_threads),
-    is.list(parameters),
-    all(names(parameters) %in% c("max_depth", "eta", "nrounds", "lambda",
-                                 "subsample", "colsample_bytree", "objective")))
+    is.list(parameters))
+  param_names <- c("max_depth", "eta", "lambda", "subsample",
+                   "colsample_bytree", "objective")
+  assertthat::assert_that(
+    all(names(parameters) %in% param_names),
+    msg = paste0("unrecognised parameters(s) in argument to parameters:",
+      paste(setdiff(names(parameters), param_names), collapse = ", ")))
   if (!is.null(site_weight_columns)) {
     assertthat::assert_that(
       is.character(site_weight_columns),
@@ -185,19 +199,17 @@ tune_occupancy_models <- function(
                                nrow = nrow(site_data))
   }
 
-  # store seed so that each feature is run with the same seed
-  seed <- .Random.seed
-
   # fit models separately for each species
   m <- lapply(seq_along(site_occupancy_columns), function(f) {
-    set.seed(seed)
-    tune_model(y = site_data[[site_occupancy_columns[f]]],
-               x = site_env_data, w = site_weight_data[, f],
-               n_folds = n_folds[f],
-               n_random_search_iterations = n_random_search_iterations,
-               early_stopping_rounds = early_stopping_rounds,
-               parameters = parameters, n_threads = n_threads,
-               verbose = verbose)
+    withr::with_seed(seed, {
+      tune_model(y = site_data[[site_occupancy_columns[f]]],
+                 x = site_env_data, w = site_weight_data[, f],
+                 n_folds = n_folds[f],
+                 n_random_search_iterations = n_random_search_iterations,
+                 early_stopping_rounds = early_stopping_rounds,
+                 n_rounds = n_rounds, parameters = parameters,
+                 n_threads = n_threads, seed = seed, verbose = verbose)
+    })
   })
   # return results
   m
@@ -205,8 +217,8 @@ tune_occupancy_models <- function(
 
 #' @noRd
 tune_model <- function(y, x, w, n_folds = 10, n_random_search_iterations = 5000,
-                      early_stopping_rounds = 5, parameters, n_threads = 1,
-                      verbose = FALSE) {
+                      early_stopping_rounds = 5, n_rounds = 1000,
+                      parameters, n_threads = 1, seed = 500, verbose = FALSE) {
   # assert arguments are valid
   assertthat::assert_that(
     is.numeric(y),
@@ -246,45 +258,91 @@ tune_model <- function(y, x, w, n_folds = 10, n_random_search_iterations = 5000,
   x <- x[train_idx, , drop = FALSE]
   w <- w[train_idx]
   # create folds
-  xgb_folds <- create_folds(y, n = n_folds)
-  # create data for model fitting and tuning
-  xgb_data <- xgboost::xgb.DMatrix(x, label = y, weight = w)
+  withr::with_seed(parameters$seed, {
+    xgb_folds <- create_folds(y, n = n_folds, seed = seed)
+  })
   # find best tuning parameters using k-fold cross validation
   ## fit models using all parameters combinations
-  cv <- plyr::ldply(seq_len(nrow(full_parameters)), function(i)  {
-    ## extract tuning parameters
-    p <- full_parameters[i, , drop = FALSE]
-    ## calculate scale pos weight
-    spw <- sum(xgboost::getinfo(xgb_data, "label") < 0.5) /
-           sum(xgboost::getinfo(xgb_data, "label") > 0.5)
-    ## run cross-validation
-    cv <- xgboost::xgb.cv(
-      params = list(objective = p$objective, verbose = 0,
-                    max_depth = p$max_depth, eta = p$eta, nthread = n_threads,
-                    lambda = p$lambda, subsample = p$subsample,
-                    colsample_bytree = p$colsample_bytree),
-      data = xgb_data, folds = xgb_folds$test,
-      train_folds = xgb_folds$train, nrounds = p$nrounds,
-      early_stopping_rounds = early_stopping_rounds,
-      eval_metric = "auc", metrics = "auc", maximize = TRUE,
-      scale_pos_weight = spw, prediction = FALSE, showsd = TRUE,
+  is_parallel <- n_threads > 1
+  if (is_parallel) {
+    cl <- parallel::makeCluster(n_threads, "FORK")
+    doParallel::registerDoParallel(cl)
+  }
+  cv <- plyr::ldply(seq_len(nrow(full_parameters)), .parallel = is_parallel,
+                    function(i)  {
+    xgb_data <- xgboost::xgb.DMatrix(x, label = y, weight = w)
+    xgboost_cv(
+      data = xgb_data, parameters = full_parameters[i, , drop = FALSE],
+      folds = xgb_folds, n_rounds = n_rounds,
+      early_stopping_rounds = early_stopping_rounds, seed = seed,
       verbose = verbose)
-    ## store the model performance
-    tibble::tibble(
-      parameter_set = i,
-      train_auc_mean = dplyr::last(cv$evaluation_log$train_auc_mean),
-      train_auc_std = dplyr::last(cv$evaluation_log$train_auc_std),
-      test_auc_mean = dplyr::last(cv$evaluation_log$test_auc_mean),
-      test_auc_std = dplyr::last(cv$evaluation_log$test_auc_std))
   })
+  if (is_parallel) {
+    cl <- parallel::stopCluster(cl)
+    doParallel::stopImplicitCluster()
+  }
   ## determine best parameters for i'th species
-  k <- which.max(cv$test_auc_mean)
+  cv <- tibble::as_tibble(cv)
+  k <- which.max(cv$test_eval_mean)
+  o1 <<- cv[k, ]
   # return best parameters
-  list(max_depth = full_parameters$max_depth[k],
-       eta = full_parameters$eta[k],
-       nrounds = full_parameters$nrounds[k],
-       lambda = full_parameters$lambda[k],
-       subsample = full_parameters$subsample[k],
-       colsample_bytree = full_parameters$colsample_bytree[k],
-       objective = as.character(full_parameters$objective[k]))
+  list(objective = as.character(full_parameters$objective[[k]]),
+       seed = seed,
+       max_depth = full_parameters$max_depth[[k]],
+       eta = full_parameters$eta[[k]],
+       lambda = full_parameters$lambda[[k]],
+       subsample = full_parameters$subsample[[k]],
+       colsample_bytree = full_parameters$colsample_bytree[[k]],
+       nrounds = cv$nrounds[[k]],
+       scale_pos_weight = cv$scale_pos_weight[[k]])
+}
+
+xgboost_cv <- function(data, parameters, folds, n_rounds,
+                       early_stopping_rounds, seed, verbose) {
+  cv <- plyr::ldply(seq_along(folds[[1]]), function(i) {
+    ## extract data
+    train_data <- xgboost::slice(data, folds$train[[i]])
+    test_data <- xgboost::slice(data, folds$test[[i]])
+    ## calculate scale pos weight
+    spw <- sum(xgboost::getinfo(train_data, "label") < 0.5) /
+           sum(xgboost::getinfo(train_data, "label") > 0.5)
+    ## fit model
+    withr::with_seed(seed, {
+      m <- xgboost::xgb.train(
+        params = list(
+          objective = as.character(parameters$objective),
+          max_depth = parameters$max_depth, eta = parameters$eta, nthread = 1,
+          lambda = parameters$lambda, subsample = parameters$subsample,
+          colsample_bytree = parameters$colsample_bytree),
+        data = train_data,
+        watchlist = list(train = train_data, eval = test_data),
+        eval_metric = "auc", metric = "auc",
+        nrounds = n_rounds, early_stopping_rounds = early_stopping_rounds,
+        scale_pos_weight = spw, prediction = FALSE, showsd = TRUE,
+        verbose = verbose)
+    })
+    ## make predictions
+    p_train <- withr::with_package("xgboost",
+      stats::predict(m, train_data, ntreelimit = m$best_ntreelimit))
+    p_test <- withr::with_package("xgboost",
+      stats::predict(m, test_data, ntreelimit = m$best_ntreelimit))
+    ## return result
+    tibble::tibble(
+      nrounds = m$best_iteration,
+      scale_pos_weight = spw,
+      eval_train = weighted_auc(
+        actual = xgboost::getinfo(train_data, "label"),
+        predicted = p_train,
+        weights = xgboost::getinfo(train_data, "weight")),
+      eval_test = weighted_auc(
+        actual = xgboost::getinfo(test_data, "label"),
+        predicted = p_test,
+        weights = xgboost::getinfo(test_data, "weight")))
+  })
+  tibble::tibble(train_eval_mean = mean(cv$eval_train),
+                 train_eval_sd = sd(cv$eval_train),
+                 test_eval_mean = mean(cv$eval_test),
+                 test_eval_sd = sd(cv$eval_test),
+                 nrounds = list(cv$nrounds),
+                 scale_pos_weight = list(cv$scale_pos_weight))
 }
