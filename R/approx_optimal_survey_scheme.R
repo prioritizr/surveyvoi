@@ -72,7 +72,8 @@ NULL
 #'
 #' # define xgboost tuning parameters
 #' xgb_parameters <-
-#'  list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+#'  list(list(objective = "binary:logistic", scale_pos_weight = 1,
+#'            nrounds = 8, eta = 0.1))[rep(1, 2)]
 #'
 #' # find optimal survey scheme using approximate method
 #' # (using 10 replicates so that this example completes relatively quickly)
@@ -282,6 +283,8 @@ approx_optimal_survey_scheme <- function(
   if (!is.null(site_weight_columns))
     validate_site_weight_data(site_data, site_occupancy_columns,
       site_weight_columns)
+  ## validate xgboost parameters
+  validate_xgboost_parameters(xgb_parameters)
 
   # prepare data for analysis
   ## drop spatial information
@@ -312,30 +315,12 @@ approx_optimal_survey_scheme <- function(
   ## identify sites that have previously been surveyed
   site_survey_status <- !is.na(site_data[[site_occupancy_columns[1]]])
   ## xgb_nrounds
-  xgb_nrounds <- vapply(seq_along(xgb_parameters), FUN.VALUE = numeric(1),
-                        function(i) {
-    out <- xgb_parameters[[i]]$nrounds
-    if (is.null(out))
-      stop(paste0("argument to xgb_parameters[[", i,
-                  "]] is missing nrounds element"))
-    out
-  })
-  ## xgb_parameters
+  xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
+                        "nrounds")
+  ## format xgb_parameters
   xgb_parameters <- lapply(xgb_parameters, function(x) {
     out <- x[names(x) != "nrounds"]
-    out <- lapply(x, as.character)
-    if (is.null(out$objective)) {
-      out$objective <- "binary:logistic"
-      warning(paste("no objective specified for model fitting,",
-                    "assuming binary:logistic"))
-    }
-    xgb_param_names <- c("max_depth", "eta", "nrounds", "lambda",
-                         "subsample", "colsample_bytree", "objective")
-    extra_names <- names(out)[!names(out) %in% xgb_param_names]
-    assertthat::assert_that(
-      length(extra_names) == 0,
-      msg = paste0("argument to xgb_parameters has unrecognized parameters: ,",
-                   paste(extra_names, collapse = ",")))
+    out <- lapply(out, as.character)
     out$nthread <- "1" # force single thread for reproducibility
     out$seed <- as.character(seed)
     out

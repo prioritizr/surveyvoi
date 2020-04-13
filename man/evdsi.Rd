@@ -148,8 +148,9 @@ containing the parameters for fitting models for each
 feature. See documentation for the \code{params} argument in
 \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
 these parameters would be determined using the
-\code{\link{tune_occupancy_models}} function. Note that arguments must
-have a \code{nrounds} element (see example below).}
+\code{\link{fit_occupancy_models}} function. Note that arguments must
+have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
+elements (see example below).}
 
 \item{site_management_locked_in_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}
@@ -188,7 +189,7 @@ equal weight when fitting models.}
  assessing model performance for each feature. Ideally, the number of folds
  should be exactly the same as the number used for tuning the
  model parameters (i.e. same parameter to the \code{n_folds}
- argument in \link{tune_occupancy_models} when generating parameters
+ argument in \link{fit_occupancy_models} when generating parameters
 for \code{xgb_parameters}).}
 
 \item{seed}{\code{integer} state of the random number generator for
@@ -234,8 +235,10 @@ site_data$survey_site <- FALSE
 site_data$survey_site[which(is.na(site_data$f1))[1:2]] <- TRUE
 
 # define xgboost tuning parameters
+# these should ideally be determined using fit_occupancy_models
 xgb_parameters <-
- list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+ list(list(objective = "binary:logistic", nrounds = 8,
+           scale_pos_weight = 1, eta = 0.1))[rep(1, 2)]
 
 # calculate expected value of management decision given the survey
 # information using exact method

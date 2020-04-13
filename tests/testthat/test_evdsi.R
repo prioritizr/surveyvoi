@@ -23,8 +23,7 @@ test_that("equal weights", {
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <-
-    list(list(objective = "binary:logistic"))[rep(1, n_f)]
+  xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
   pu_predict_idx <- which(site_data$survey | !is.na(site_data$f1))
   xgb_folds <- lapply(seq_len(n_f), function(i) {
       withr::with_seed(1, {
@@ -54,7 +53,8 @@ test_that("equal weights", {
     feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+    xgb_parameters =
+      lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
     n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
@@ -70,7 +70,8 @@ test_that("equal weights", {
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
-    xgb_parameters = lapply(xgb_parameters, append, list(seed = "1")),
+    xgb_parameters =
+      lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
     xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
@@ -110,8 +111,7 @@ test_that("variable weights", {
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <-
-    list(list(objective = "binary:logistic"))[rep(1, n_f)]
+  xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
   pu_predict_idx <- which(site_data$survey | !is.na(site_data$f1))
   xgb_folds <- lapply(seq_len(n_f), function(i) {
       withr::with_seed(1, {
@@ -142,7 +142,8 @@ test_that("variable weights", {
     feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+    xgb_parameters =
+      lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
     n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
@@ -158,7 +159,8 @@ test_that("variable weights", {
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
-    xgb_parameters = lapply(xgb_parameters, append, list(seed = "1")),
+    xgb_parameters =
+      lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
     xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),

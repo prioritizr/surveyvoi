@@ -67,3 +67,28 @@ validate_site_weight_data <- function(site_data, site_occupancy_columns,
                function(x) all(is.finite(site_data[[x]])))),
     msg = "site_data values in site_weight_columns must not be NA")
 }
+
+validate_xgboost_parameters <- function(x) {
+  param_names <- c("scale_pos_weight", "max_depth", "eta", "nrounds",
+                   "lambda", "subsample",  "colsample_bytree", "objective")
+  lapply(x, function(z) {
+    assertthat::assert_that(
+      assertthat::is.string(z$objective),
+      msg = "a feature is missing the objective parameter in xgb_parameters")
+    assertthat::assert_that(
+      assertthat::is.number(z$scale_pos_weight),
+      msg = paste("a feature is missing the scale_pos_weight parameter",
+                  "in xgb_parameters"))
+    assertthat::assert_that(
+      assertthat::is.number(z$nrounds),
+      msg = paste("a feature is missing the nrounds parameter",
+                  "in xgb_parameters"))
+    extra_names <- names(z)[!names(z) %in% param_names]
+    assertthat::assert_that(
+      length(extra_names) == 0,
+      msg = paste("argument to xgb_parameters has unrecognized parameters:",
+                  paste(extra_names, collapse = ",")))
+    invisible(TRUE)
+  })
+  invisible(TRUE)
+}

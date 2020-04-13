@@ -29,17 +29,17 @@ test_that("expected results", {
     preweight = runif(3, 100, 200),
     postweight = runif(3, 5, 20),
     target = c(1, 1, 3))
-  xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
   # generate prioritisation
   r <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2", "f3"),
-    site_probability_columns = c("p1", "p2", "p3"),,
+    site_probability_columns = c("p1", "p2", "p3"),
     site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",,
+    site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
     feature_survey_sensitivity_column = "survey_sensitivity",
     feature_survey_specificity_column = "survey_specificity",
@@ -74,11 +74,12 @@ test_that("consistent results", {
     n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
-  xgb_params <- list(list(max_depth = 5, eta = 0.3, nrounds = 91,
-                          lambda = 1, subsample = 1, colsample_bytree = 1,
-                          objective = "binary:logistic"))
-  xgb_model <- fit_occupancy_models(site_data, "f1", c("e1", "e2"),
-                                    parameters = xgb_params)
+  xgb_params <- list(
+    max_depth = 5, eta = 0.3, lambda = 1, subsample = 1, colsample_bytree = 1,
+    objective = "binary:logistic")
+  xgb_model <- fit_occupancy_models(
+    site_data, "f1", c("e1", "e2"), parameters = xgb_params,
+    n_random_search_iterations = 1)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
   r <- lapply(seq_len(5), function(i) {
@@ -100,7 +101,7 @@ test_that("consistent results", {
         feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
-        xgb_parameters = xgb_params)
+        xgb_parameters = xgb_model$parameters)
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
@@ -119,11 +120,12 @@ test_that("consistent results (multiple threads)", {
     n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
-  xgb_params <- list(list(max_depth = 5, eta = 0.3, nrounds = 91,
-                          lambda = 1, subsample = 1, colsample_bytree = 1,
-                          objective = "binary:logistic"))
-  xgb_model <- fit_occupancy_models(site_data, "f1", c("e1", "e2"),
-                                    parameters = xgb_params)
+  xgb_params <- list(
+    max_depth = 5, eta = 0.3, lambda = 1, subsample = 1, colsample_bytree = 1,
+    objective = "binary:logistic")
+  xgb_model <- fit_occupancy_models(
+    site_data, "f1", c("e1", "e2"), parameters = xgb_params,
+    n_random_search_iterations = 1)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
   r <- suppressWarnings({
@@ -146,7 +148,7 @@ test_that("consistent results (multiple threads)", {
         feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
-        xgb_parameters = xgb_params)
+        xgb_parameters = xgb_model$parameters)
     })
   })
   # verify that all repeat calculations are identical

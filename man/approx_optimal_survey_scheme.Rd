@@ -149,8 +149,9 @@ containing the parameters for fitting models for each
 feature. See documentation for the \code{params} argument in
 \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
 these parameters would be determined using the
-\code{\link{tune_occupancy_models}} function. Note that arguments must
-have a \code{nrounds} element (see example below).}
+\code{\link{fit_occupancy_models}} function. Note that arguments must
+have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
+elements (see example below).}
 
 \item{site_management_locked_in_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}
@@ -199,7 +200,7 @@ equal weight when fitting models.}
  assessing model performance for each feature. Ideally, the number of folds
  should be exactly the same as the number used for tuning the
  model parameters (i.e. same parameter to the \code{n_folds}
- argument in \link{tune_occupancy_models} when generating parameters
+ argument in \link{fit_occupancy_models} when generating parameters
 for \code{xgb_parameters}).}
 
 \item{n_approx_replicates}{\code{integer} number of replicates to use for
@@ -283,7 +284,8 @@ survey_budget <- sum(site_data$survey_cost) * 0.1
 
 # define xgboost tuning parameters
 xgb_parameters <-
- list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+ list(list(objective = "binary:logistic", scale_pos_weight = 1,
+           nrounds = 8, eta = 0.1))[rep(1, 2)]
 
 # find optimal survey scheme using approximate method
 # (using 10 replicates so that this example completes relatively quickly)

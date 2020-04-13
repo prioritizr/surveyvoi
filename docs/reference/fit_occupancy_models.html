@@ -135,7 +135,10 @@ planning units.</p>
   <span class='no'>site_occupancy_columns</span>,
   <span class='no'>site_env_vars_columns</span>,
   <span class='no'>parameters</span>,
-  <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/ifelse'>ifelse</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>site_data</span>) <span class='kw'>&gt;</span> <span class='fl'>1000</span>, <span class='fl'>10</span>, <span class='fl'>5</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
+  <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>n_rounds</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
+  <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/length'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
+  <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -169,16 +172,24 @@ No missing (<code>NA</code>) values are permitted in these columns.</p></td>
     </tr>
     <tr>
       <th>parameters</th>
-      <td><p><code>list</code> of <code>list</code> objects containing the
-parameters for fitting models for each
-feature. Ideally, these parameters would be determined using the
-<code>tune_occupancy_models</code> function. Note that arguments must
-have a <code>nrounds</code> element (see example below).
-Valid parameters include: <code>"max_depth"</code>, <code>"eta"</code>,
-<code>"nrounds"</code>, <code>"lambda"</code>, <code>"subsample"</code>,
-<code>"colsample_bytree"</code>, and <code>"objective"</code>.
-See documentation for the <code>params</code> argument in
+      <td><p><code>list</code> object containing the candidate
+parameter values for fitting models. Valid parameters include:
+<code>"max_depth"</code>, <code>"eta"</code>, <code>"lambda"</code>,
+<code>"min_child_weight"</code>, <code>"subsample"</code>, <code>"colsample_by_tree"</code>,
+<code>"objective"</code>. See documentation for the <code>params</code> argument in
 <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for more information.</p></td>
+    </tr>
+    <tr>
+      <th>early_stopping_rounds</th>
+      <td><p><code>numeric</code> model rounds for parameter
+tuning. See <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgboost</a></code> for more information.
+Defaults to 100.</p></td>
+    </tr>
+    <tr>
+      <th>n_rounds</th>
+      <td><p><code>numeric</code> model rounds for model fitting
+See <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgboost</a></code> for more information.
+Defaults to 1000.</p></td>
     </tr>
     <tr>
       <th>n_folds</th>
@@ -191,6 +202,11 @@ Note that if the maximum number of minority cases (e.g. 1 presence and
 is sampled per fold.</p></td>
     </tr>
     <tr>
+      <th>n_random_search_iterations</th>
+      <td><p><code>numeric</code> number of random search
+iterations to use when tuning model parameters. Defaults to 10000.</p></td>
+    </tr>
+    <tr>
       <th>site_weight_columns</th>
       <td><p><code>character</code> name of columns in
 <code>site_data</code> containing weights for model fitting. These columns must
@@ -200,8 +216,8 @@ equal weight when fitting models.</p></td>
     </tr>
     <tr>
       <th>n_threads</th>
-      <td><p><code>integer</code> number of threads to use for fitting models.
-Defaults to 1.</p></td>
+      <td><p><code>integer</code> number of threads to use for parameter
+tuning. Defaults to 1.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -212,71 +228,164 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>list</code> object containing the following elements:</p><dl class='dl-horizontal'>
- <dt>predictions</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> with estimated
-   probabilities of each feature occupying each site. Rows
-   correspond to sites and columns correspond to features.</p></dd>
- <dt>performance</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> with model information.
-   Each row corresponds to a different feature and column contain
-   different information. Specifically, the columns contain:
-   (<code>name</code>) <code>character</code> name of the features,
-   (<code>sensitivity</code>) <code>numeric</code> model sensitivities,
-   (<code>specificity</code>) <code>numeric</code> model specificities, and
-   (<code>auc</code>) <code>numeric</code> model area under the curve (AUC) statistics.</p></dd>
- </dl>
+    <p><code>list</code> object containing:</p><dl class='dl-horizontal'>
+<dt>parameters</dt><dd><p><code>list</code> of <code>list</code> objects containing the best
+tuning parameters for each feature.</p></dd>
+
+<dt>predictions</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> object containing
+ predictions for each feature.</p></dd>
+
+<dt>performance</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> object containing the
+ performance of the best cross-validation models for each feature.</p></dd>
+
+</dl>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The models are fitted using the specified tuning parameters and
- automatically calibrated <code>scale_pos_weight</code>
- <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgboost</a></code> parameters
- (i.e. number of absence divided by number of presences per feature)
- to account for unbalanced datasets. After the models are fitted, they
- are used to make probability of occupancy predictions (via
- <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgboost</a></code>). The average sensitivity, specificity,
- and area under the curve (AUC) statistics are calculated using the data held
- are then reported to assess model performance. Note that each feature
- is run with the same seed to ensure reproducibility.</p>
+    <p>This function (i) prepares the data for model fitting, (ii) calibrates
+ the tuning parameters for model fitting, (iii) generate predictions using
+ the best found tuning parameters, and (iv) assess the performance of the
+ best supported models. These analyses are performed separately for each
+ feature. For a given feature:</p>
+<p></p><ol>
+<li><p>The data are prepared for model fitting by partitioning the data using
+ k-fold cross-validation (set via argument to <code>n_folds</code>). The training
+ and evaluation folds are constructed
+ in such a manner as to ensure that each training and evaluation
+ fold contains at least one presence and one absence observation.</p></li>
+<li><p>A random search method is used to tune the model parameters. The
+ candidate values for each parameter (specified via <code>parameters</code>) are
+ used to generate a full set of parameter combinations, and then
+ a subset of these parameter combinations is randomly selected for
+ the tuning procedure (specified via <code>n_random_search_iterations</code>).
+ To account for unbalanced datasets, the
+ <code>scale_pos_weight</code> <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgboost</a></code> parameter
+ is calculated as the mean value across each of the training folds
+ (i.e. number of absence divided by number of presences per feature).
+ For a given parameter combination, models are fit using k-fold cross-
+ validation (via <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.cv'>xgb.cv</a></code>) -- using the previously
+ mentioned training and evaluation folds -- and the average area under the
+ curve (AUC) statistic calculated using the data held out from each fold is
+ used to quantify the performance. These models are also fitted using the
+ <code>early_stopping_rounds</code> parameter to reduce time-spent
+ tuning models. If relevant, they are also fitted using the supplied weights
+ (per by the argument to <code>site_weights_data</code>).After exploring the
+ subset of parameter combinations, the best parameter combination is
+ identified, and the associated parameter values and models are stored for
+ later use.</p></li>
+<li><p>The cross-validation models associated with the best parameter
+  combination are used to generate predict the average probability that the
+  feature occupies each site. These predictions include sites that have
+  been surveyed before, and also sites that have not been surveyed before.</p></li>
+<li><p>The performance of the cross-validation models is evaluated.
+ Specifically, the AUC, sensitivity, and specificity statistics are
+ calculated
+ (if relevant, weighted by the argument to <code>site_weights_data</code>).
+ These performance values are calculated using the models' evaluation folds.</p></li>
+</ol>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># set seed</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>100</span>)
+    <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
  <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='fl'>200</span>, <span class='fl'>2</span>, <span class='fl'>0.5</span>, <span class='kw'>n_env_vars</span> <span class='kw'>=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt; ...</div><div class='input'>
-<span class='co'># set parameters manually</span>
-<span class='no'>xgb_params</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>),
-                   <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>))
+<span class='co'># create list of possible tuning parameters for modelling</span>
+<span class='no'>all_parameters</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>max_depth</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>1</span>, <span class='fl'>10</span>, <span class='fl'>1</span>),
+                       <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.1</span>),
+                       <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>10</span> ^ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(-<span class='fl'>1.0</span>, <span class='fl'>0.0</span>, <span class='fl'>0.25</span>),
+                       <span class='kw'>subsample</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0.5</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span>),
+                       <span class='kw'>colsample_bytree</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq</a></span>(<span class='fl'>0.4</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span>),
+                       <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>)
 
 <span class='co'># fit models</span>
-<span class='no'>m</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(<span class='no'>x</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
-                          <span class='no'>xgb_params</span>)
+<span class='co'># note that we use 10 random search iterations here so that the example</span>
+<span class='co'># finishes quickly, you would probably want something like 1000+</span>
+<span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(
+   <span class='no'>x</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/paste'>paste0</a></span>(<span class='st'>"f"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_len</a></span>(<span class='fl'>2</span>)), <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/paste'>paste0</a></span>(<span class='st'>"e"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_len</a></span>(<span class='fl'>3</span>)),
+   <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10</span>,
+   <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>parameters</span> <span class='kw'>=</span> <span class='no'>all_parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
-<span class='co'># preview models predictions</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>m</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 200 x 2</span><span>
-#&gt;        f1    f2
-#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 0.820  0.616
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 0.259  0.824
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 0.053</span><span style='text-decoration: underline;'>3</span><span> 0.640
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 0.662  0.874
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 0.480  0.127
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 0.168  0.681
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 0.100  0.445
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 0.435  0.700
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 0.850  0.127
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 0.944  0.874
+<span class='co'># print best found model parameters</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>parameters</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; [[1]]$max_depth
+#&gt; [1] 2
+#&gt; 
+#&gt; [[1]]$eta
+#&gt; [1] 0.4
+#&gt; 
+#&gt; [[1]]$nrounds
+#&gt; [1] 16
+#&gt; 
+#&gt; [[1]]$scale_pos_weight
+#&gt; [1] 1.089492
+#&gt; 
+#&gt; [[1]]$lambda
+#&gt; [1] 0.3162278
+#&gt; 
+#&gt; [[1]]$subsample
+#&gt; [1] 0.6
+#&gt; 
+#&gt; [[1]]$colsample_bytree
+#&gt; [1] 0.8
+#&gt; 
+#&gt; [[1]]$objective
+#&gt; [1] "binary:logistic"
+#&gt; 
+#&gt; 
+#&gt; [[2]]
+#&gt; [[2]]$max_depth
+#&gt; [1] 2
+#&gt; 
+#&gt; [[2]]$eta
+#&gt; [1] 0.4
+#&gt; 
+#&gt; [[2]]$nrounds
+#&gt; [1] 5
+#&gt; 
+#&gt; [[2]]$scale_pos_weight
+#&gt; [1] 0.9653068
+#&gt; 
+#&gt; [[2]]$lambda
+#&gt; [1] 0.3162278
+#&gt; 
+#&gt; [[2]]$subsample
+#&gt; [1] 0.6
+#&gt; 
+#&gt; [[2]]$colsample_bytree
+#&gt; [1] 0.8
+#&gt; 
+#&gt; [[2]]$objective
+#&gt; [1] "binary:logistic"
+#&gt; 
+#&gt; </div><div class='input'>
+<span class='co'># print model predictions</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 200 x 2</span><span>
+#&gt;        f1     f2
+#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 0.964  0.584 
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 0.068</span><span style='text-decoration: underline;'>0</span><span> 0.690 
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 0.273  0.837 
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 0.019</span><span style='text-decoration: underline;'>0</span><span> 0.093</span><span style='text-decoration: underline;'>5</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 0.025</span><span style='text-decoration: underline;'>4</span><span> 0.137 
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 0.666  0.787 
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 0.111  0.475 
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 0.157  0.189 
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 0.378  0.221 
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 0.674  0.297 
 #&gt; </span><span style='color: #949494;'># ... with 190 more rows</span><span></div><div class='input'>
-<span class='co'># preview models performance</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>m</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 13</span><span>
-#&gt;   train_auc_mean train_auc_std train_sensitivi~ train_sensitivi~
-#&gt;            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>          0.990       0.001</span><span style='text-decoration: underline;'>15</span><span>            0.964          0.015</span><span style='text-decoration: underline;'>2</span><span> 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>          0.993       0.004</span><span style='text-decoration: underline;'>35</span><span>            0.967          0.001</span><span style='text-decoration: underline;'>57</span><span>
-#&gt; </span><span style='color: #949494;'># ... with 9 more variables: train_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
+<span class='co'># print model performance</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 13</span><span>
+#&gt;   feature train_auc_mean train_auc_std train_sensitivi~ train_sensitivi~
+#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1               0.970        0.013</span><span style='text-decoration: underline;'>3</span><span>            0.901           0.027</span><span style='text-decoration: underline;'>8</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2               0.956        0.018</span><span style='text-decoration: underline;'>4</span><span>            0.888           0.055</span><span style='text-decoration: underline;'>5</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
 #&gt; #   train_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
 #&gt; #   test_sensitivity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_sensitivity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   test_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, name </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span></div><div class='input'>
+#&gt; #   test_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

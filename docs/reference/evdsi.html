@@ -316,8 +316,9 @@ containing the parameters for fitting models for each
 feature. See documentation for the <code>params</code> argument in
 <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for available parameters. Ideally,
 these parameters would be determined using the
-<code>tune_occupancy_models</code> function. Note that arguments must
-have a <code>nrounds</code> element (see example below).</p></td>
+<code>fit_occupancy_models</code> function. Note that arguments must
+have <code>"nrounds"</code>, <code>"objective"</code>, <code>"scale_pos_weight"</code>
+elements (see example below).</p></td>
     </tr>
     <tr>
       <th>site_management_locked_in_column</th>
@@ -368,7 +369,7 @@ equal weight when fitting models.</p></td>
  assessing model performance for each feature. Ideally, the number of folds
  should be exactly the same as the number used for tuning the
  model parameters (i.e. same parameter to the <code>n_folds</code>
- argument in tune_occupancy_models when generating parameters
+ argument in fit_occupancy_models when generating parameters
 for <code>xgb_parameters</code>).</p></td>
     </tr>
     <tr>
@@ -406,8 +407,7 @@ different survey schemes. Defaults to 500.</p></td>
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9568333 ymax: 0.9942698
-#&gt; epsg (SRID):    NA
-#&gt; proj4string:    NA
+#&gt; CRS:            NA
 #&gt; <span style='color: #949494;'># A tibble: 15 x 10</span><span>
 #&gt;    survey_cost management_cost       e1     e2      e3    f1    f2     p1
 #&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -443,8 +443,10 @@ different survey schemes. Defaults to 500.</p></td>
 <span class='no'>site_data</span>$<span class='no'>survey_site</span>[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>site_data</span>$<span class='no'>f1</span>))[<span class='fl'>1</span>:<span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
 
 <span class='co'># define xgboost tuning parameters</span>
+<span class='co'># these should ideally be determined using fit_occupancy_models</span>
 <span class='no'>xgb_parameters</span> <span class='kw'>&lt;-</span>
- <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
+ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>,
+           <span class='kw'>scale_pos_weight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
 
 <span class='co'># calculate expected value of management decision given the survey</span>
 <span class='co'># information using exact method</span>
@@ -457,7 +459,7 @@ different survey schemes. Defaults to 500.</p></td>
   <span class='no'>total_budget</span>, <span class='no'>xgb_parameters</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_survey</span>)</div><div class='output co'>#&gt; [1] 90.42481</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>ev_survey</span>)</div><div class='output co'>#&gt; [1] 88.10451</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

@@ -43,7 +43,8 @@ test_that("equal weights", {
   wij[] <- 1
   ## set xgboost modelling information
   xgb_parameters <-
-    list(list(seed = "0", objective = "binary:logistic"))[rep(1, n_total_f)]
+    list(list(seed = "0", scale_pos_weight = "2",
+              objective = "binary:logistic"))[rep(1, n_total_f)]
   xgb_nrounds <- rep(10, n_total_f)
   xgb_folds <- lapply(survey_features_idx, function(i) {
     na_idx <- which(rij[i, ] < -0.5)
@@ -109,7 +110,8 @@ test_that("variable weights", {
   wij[] <- round(runif(length(wij)), 6)
   ## set xgboost modelling information
   xgb_parameters <-
-    list(list(seed = "0", objective = "binary:logistic"))[rep(1, n_total_f)]
+    list(list(seed = "0", scale_pos_weight = "2",
+              objective = "binary:logistic"))[rep(1, n_total_f)]
   xgb_nrounds <- rep(10, n_total_f)
   xgb_folds <- lapply(survey_features_idx, function(i) {
     na_idx <- which(rij[i, ] < -0.5)

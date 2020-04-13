@@ -34,7 +34,8 @@ test_that("equal weights", {
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
   xgb_nrounds <- rep(10, n_f)
   tuning_parameters <-
-    list(list(objective = "binary:logistic", seed = "123"))[rep(1, n_f)]
+    list(list(objective = "binary:logistic", scale_pos_weight = "2",
+              seed = "123"))[rep(1, n_f)]
   # run calculations
   r1 <- rcpp_fit_xgboost_models_and_assess_performance(
     rij, wij, pu_env_data, survey_features, tuning_parameters, xgb_nrounds,
@@ -81,7 +82,8 @@ test_that("variable weights", {
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
   xgb_nrounds <- rep(10, n_f)
   tuning_parameters <-
-    list(list(objective = "binary:logistic", seed = "123"))[rep(1, n_f)]
+    list(list(objective = "binary:logistic", scale_pos_weight = "2",
+              seed = "123"))[rep(1, n_f)]
   # run calculations
   r1 <- rcpp_fit_xgboost_models_and_assess_performance(
     rij, wij, pu_env_data, survey_features, tuning_parameters, xgb_nrounds,

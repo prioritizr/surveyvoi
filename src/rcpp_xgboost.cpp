@@ -38,12 +38,6 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::VectorXd fold_sensitivity;
   Eigen::VectorXd fold_specificity;
 
-  std::string spw_name = "scale_pos_weight";
-  std::string spw_value;
-
-  double curr_n_pres = 0.0;
-  double curr_n_abs = 0.0;
-
   // main processing
   std::size_t curr_n_xgb_parameters;
   for (std::size_t i = 0; i < n_f; ++i) {
@@ -102,14 +96,6 @@ void fit_xgboost_models_and_assess_performance(
                           xgb_parameter_names[features[i]][p].c_str(),
                           xgb_parameter_values[features[i]][p].c_str());
       }
-      // set scale_pos_weight factor to account for unbalanced data
-      curr_n_pres = 0.0;
-      for (std::size_t j = 0; j < curr_n_k_train; ++j)
-        curr_n_pres += static_cast<double>(train_y[j] > 0.5);
-      curr_n_abs = static_cast<double>(curr_n_k_train) - curr_n_pres;
-      spw_value = std::to_string(curr_n_abs / curr_n_pres);
-      XGBoosterSetParam(model_beta(i, o)[k],
-                        spw_name.c_str(), spw_value.c_str());
       // train the model
       for (std::size_t iter = 0; iter < n_xgb_nrounds[features[i]]; iter++)
         XGBoosterUpdateOneIter(model_beta(i, o)[k], iter, train_x_handle[0]);
@@ -300,17 +286,6 @@ Eigen::VectorXf rcpp_xgboost(
   for (std::size_t i = 0; i < n_xgb_parameters; ++i)
     XGBoosterSetParam(booster_handle, xgb_parameter_names[i].c_str(),
                       xgb_parameter_values[i].c_str());
-
-  // calculate and set scale_pos_weight parameter
-  std::string spw_name = "scale_pos_weight";
-  std::string spw_value;
-  double curr_n_pres = 0.0;
-  double curr_n_abs = 0.0;
-  for (std::size_t j = 0; j < nobs_train; ++j)
-    curr_n_pres += static_cast<double>(y[j] > 0.5);
-  curr_n_abs = static_cast<double>(nobs_train) - curr_n_pres;
-  spw_value = std::to_string(curr_n_abs / curr_n_pres);
-  XGBoosterSetParam(booster_handle, spw_name.c_str(), spw_value.c_str());
 
   // train model
   for (std::size_t iter = 0; iter < n_xgb_nrounds; iter++)

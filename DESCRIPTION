@@ -29,7 +29,8 @@ Imports:
     RandomFields (>= 3.3.7),
     vegan (>= 2.5-6),
     RcppAlgos (>= 2.3.6),
-    ggplot2 (>= 3.2.1)
+    ggplot2 (>= 3.2.1),
+    WeightedROC (>= 2020.1.31)
 Suggests:
     testthat (>= 2.0.0),
     knitr (>= 1.20),
@@ -71,7 +72,6 @@ Collate:
     'evdci.R'
     'evdpi.R'
     'feasible_survey_schemes.R'
-    'tune_occupancy_models.R'
     'fit_occupancy_models.R'
     'geo_cov_survey_scheme.R'
     'n_states.R'

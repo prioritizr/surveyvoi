@@ -9,7 +9,10 @@ fit_occupancy_models(
   site_occupancy_columns,
   site_env_vars_columns,
   parameters,
-  n_folds = rep(ifelse(nrow(site_data) > 1000, 10, 5), length(site_occupancy_columns)),
+  early_stopping_rounds = 100,
+  n_rounds = 1000,
+  n_folds = rep(5, length(site_occupancy_columns)),
+  n_random_search_iterations = 10000,
   site_weight_columns = NULL,
   n_threads = 1,
   verbose = FALSE
@@ -33,16 +36,20 @@ Each column should correspond to a different environmental variable,
 and contain \code{numeric}, \code{factor}, or \code{character} data.
 No missing (\code{NA}) values are permitted in these columns.}
 
-\item{parameters}{\code{list} of \code{list} objects containing the
-parameters for fitting models for each
-feature. Ideally, these parameters would be determined using the
-\code{\link{tune_occupancy_models}} function. Note that arguments must
-have a \code{nrounds} element (see example below).
-Valid parameters include: \code{"max_depth"}, \code{"eta"},
-\code{"nrounds"}, \code{"lambda"}, \code{"subsample"},
-\code{"colsample_bytree"}, and \code{"objective"}.
-See documentation for the \code{params} argument in
+\item{parameters}{\code{list} object containing the candidate
+parameter values for fitting models. Valid parameters include:
+\code{"max_depth"}, \code{"eta"}, \code{"lambda"},
+\code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
+\code{"objective"}. See documentation for the \code{params} argument in
 \code{\link[xgboost]{xgb.train}} for more information.}
+
+\item{early_stopping_rounds}{\code{numeric} model rounds for parameter
+tuning. See \code{\link[xgboost]{xgboost}} for more information.
+Defaults to 100.}
+
+\item{n_rounds}{\code{numeric} model rounds for model fitting
+See \code{\link[xgboost]{xgboost}} for more information.
+Defaults to 1000.}
 
 \item{n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
@@ -52,68 +59,120 @@ Note that if the maximum number of minority cases (e.g. 1 presence and
 1000 absences) is fewer than the number of folds then one minority case
 is sampled per fold.}
 
+\item{n_random_search_iterations}{\code{numeric} number of random search
+iterations to use when tuning model parameters. Defaults to 10000.}
+
 \item{site_weight_columns}{\code{character} name of columns in
 \code{site_data} containing weights for model fitting. These columns must
 contain \code{numeric} values. No missing (\code{NA}) values are
 permitted. Defaults to \code{NULL} such that all data are given
 equal weight when fitting models.}
 
-\item{n_threads}{\code{integer} number of threads to use for fitting models.
-Defaults to 1.}
+\item{n_threads}{\code{integer} number of threads to use for parameter
+tuning. Defaults to 1.}
 
 \item{verbose}{\code{logical} indicating if information should be
 printed during computations. Defaults to \code{FALSE}.}
 }
 \value{
-\code{list} object containing the following elements:
- \describe{
- \item{predictions}{\code{\link[tibble]{tibble}} with estimated
-   probabilities of each feature occupying each site. Rows
-   correspond to sites and columns correspond to features.}
- \item{performance}{\code{\link[tibble]{tibble}} with model information.
-   Each row corresponds to a different feature and column contain
-   different information. Specifically, the columns contain:
-   (\code{name}) \code{character} name of the features,
-   (\code{sensitivity}) \code{numeric} model sensitivities,
-   (\code{specificity}) \code{numeric} model specificities, and
-   (\code{auc}) \code{numeric} model area under the curve (AUC) statistics.}
- }
+\code{list} object containing:
+\describe{
+\item{parameters}{\code{list} of \code{list} objects containing the best
+tuning parameters for each feature.}
+
+\item{predictions}{\code{\link[tibble]{tibble}} object containing
+ predictions for each feature.}
+
+\item{performance}{\code{\link[tibble]{tibble}} object containing the
+ performance of the best cross-validation models for each feature.}
+
+}
 }
 \description{
 Estimate probability of occupancy for a set of features in a set of
 planning units.
 }
 \details{
-The models are fitted using the specified tuning parameters and
- automatically calibrated \code{scale_pos_weight}
- \code{\link[xgboost]{xgboost}} parameters
- (i.e. number of absence divided by number of presences per feature)
- to account for unbalanced datasets. After the models are fitted, they
- are used to make probability of occupancy predictions (via
- \code{\link[xgboost]{xgboost}}). The average sensitivity, specificity,
- and area under the curve (AUC) statistics are calculated using the data held
- are then reported to assess model performance. Note that each feature
- is run with the same seed to ensure reproducibility.
+This function (i) prepares the data for model fitting, (ii) calibrates
+ the tuning parameters for model fitting, (iii) generate predictions using
+ the best found tuning parameters, and (iv) assess the performance of the
+ best supported models. These analyses are performed separately for each
+ feature. For a given feature:
+
+ \enumerate{
+
+ \item The data are prepared for model fitting by partitioning the data using
+ k-fold cross-validation (set via argument to \code{n_folds}). The training
+ and evaluation folds are constructed
+ in such a manner as to ensure that each training and evaluation
+ fold contains at least one presence and one absence observation.
+
+ \item A random search method is used to tune the model parameters. The
+ candidate values for each parameter (specified via \code{parameters}) are
+ used to generate a full set of parameter combinations, and then
+ a subset of these parameter combinations is randomly selected for
+ the tuning procedure (specified via \code{n_random_search_iterations}).
+ To account for unbalanced datasets, the
+ \code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
+ is calculated as the mean value across each of the training folds
+ (i.e. number of absence divided by number of presences per feature).
+ For a given parameter combination, models are fit using k-fold cross-
+ validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
+ mentioned training and evaluation folds -- and the average area under the
+ curve (AUC) statistic calculated using the data held out from each fold is
+ used to quantify the performance. These models are also fitted using the
+ \code{early_stopping_rounds} parameter to reduce time-spent
+ tuning models. If relevant, they are also fitted using the supplied weights
+ (per by the argument to \code{site_weights_data}).After exploring the
+ subset of parameter combinations, the best parameter combination is
+ identified, and the associated parameter values and models are stored for
+ later use.
+
+ \item The cross-validation models associated with the best parameter
+  combination are used to generate predict the average probability that the
+  feature occupies each site. These predictions include sites that have
+  been surveyed before, and also sites that have not been surveyed before.
+
+ \item The performance of the cross-validation models is evaluated.
+ Specifically, the AUC, sensitivity, and specificity statistics are
+ calculated
+ (if relevant, weighted by the argument to \code{site_weights_data}).
+ These performance values are calculated using the models' evaluation folds.
+
+}
 }
 \examples{
-# set seed
-set.seed(100)
+# set seeds for reproducibility
+library(RandomFields)
+set.seed(123)
+RFoptions(seed = 123)
 
 # simulate data for 200 sites, 2 features, and 3 environmental variables
  x <- simulate_site_data(200, 2, 0.5, n_env_vars = 3)
 
-# set parameters manually
-xgb_params <- list(list(nrounds = 10, objective = "binary:logistic"),
-                   list(nrounds = 5, objective = "binary:logistic"))
+# create list of possible tuning parameters for modelling
+all_parameters <- list(max_depth = seq(1, 10, 1),
+                       eta = seq(0.1, 0.5, 0.1),
+                       lambda = 10 ^ seq(-1.0, 0.0, 0.25),
+                       subsample = seq(0.5, 1.0, 0.1),
+                       colsample_bytree = seq(0.4, 1.0, 0.1),
+                       objective = "binary:logistic")
 
 # fit models
-m <- fit_occupancy_models(x, c("f1", "f2"), c("e1", "e2", "e3"),
-                          xgb_params)
+# note that we use 10 random search iterations here so that the example
+# finishes quickly, you would probably want something like 1000+
+results <- fit_occupancy_models(
+   x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
+   n_folds = rep(5, 2), n_random_search_iterations = 10,
+   early_stopping_rounds = 100, parameters = all_parameters, n_threads = 1)
 
-# preview models predictions
-print(m$predictions)
+# print best found model parameters
+print(results$parameters)
 
-# preview models performance
-print(m$performance)
+# print model predictions
+print(results$predictions)
+
+# print model performance
+print(results$performance)
 
 }

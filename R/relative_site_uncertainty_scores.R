@@ -1,4 +1,4 @@
-#' @include tune_occupancy_models.R
+#' @include internal.R
 NULL
 
 #' Relative site uncertainty scores

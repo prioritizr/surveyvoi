@@ -319,8 +319,9 @@ containing the parameters for fitting models for each
 feature. See documentation for the <code>params</code> argument in
 <code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for available parameters. Ideally,
 these parameters would be determined using the
-<code>tune_occupancy_models</code> function. Note that arguments must
-have a <code>nrounds</code> element (see example below).</p></td>
+<code>fit_occupancy_models</code> function. Note that arguments must
+have <code>"nrounds"</code>, <code>"objective"</code>, <code>"scale_pos_weight"</code>
+elements (see example below).</p></td>
     </tr>
     <tr>
       <th>site_management_locked_in_column</th>
@@ -371,7 +372,7 @@ equal weight when fitting models.</p></td>
  assessing model performance for each feature. Ideally, the number of folds
  should be exactly the same as the number used for tuning the
  model parameters (i.e. same parameter to the <code>n_folds</code>
- argument in tune_occupancy_models when generating parameters
+ argument in fit_occupancy_models when generating parameters
 for <code>xgb_parameters</code>).</p></td>
     </tr>
     <tr>
@@ -441,8 +442,7 @@ functions using the approximation methods. Defaults to 500.</p></td>
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9568333 ymax: 0.9942698
-#&gt; epsg (SRID):    NA
-#&gt; proj4string:    NA
+#&gt; CRS:            NA
 #&gt; <span style='color: #949494;'># A tibble: 15 x 10</span><span>
 #&gt;    survey_cost management_cost       e1     e2      e3    f1    f2     p1
 #&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
@@ -478,8 +478,10 @@ functions using the approximation methods. Defaults to 500.</p></td>
 <span class='no'>site_data</span>$<span class='no'>survey_site</span>[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/which'>which</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/NA'>is.na</a></span>(<span class='no'>site_data</span>$<span class='no'>f1</span>))[<span class='fl'>1</span>:<span class='fl'>2</span>]] <span class='kw'>&lt;-</span> <span class='fl'>TRUE</span>
 
 <span class='co'># define xgboost tuning parameters</span>
+<span class='co'># these should ideally be determined using fit_occupancy_models</span>
 <span class='no'>xgb_parameters</span> <span class='kw'>&lt;-</span>
- <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
+ <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>,
+           <span class='kw'>scale_pos_weight</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
 
 <span class='co'># calculate expected value of management decision given the survey</span>
 <span class='co'># information using exact method</span>
@@ -492,19 +494,19 @@ functions using the approximation methods. Defaults to 500.</p></td>
   <span class='no'>total_budget</span>, <span class='no'>xgb_parameters</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>approx_ev_survey</span>)</div><div class='output co'>#&gt;   [1] 95.11776 94.39444 95.15203 94.55769 94.72919 94.73081 94.60596 93.95198
-#&gt;   [9] 94.81218 94.82681 91.26836 94.58919 94.40425 93.31873 93.83220 93.96132
-#&gt;  [17] 92.64881 93.73699 94.73060 93.02221 93.40294 93.63098 92.45128 95.23186
-#&gt;  [25] 93.48435 91.78260 95.54017 94.13310 94.69489 92.75166 95.96753 95.24176
-#&gt;  [33] 95.69532 94.06535 93.98620 93.82707 94.16058 95.17282 95.75571 93.70530
-#&gt;  [41] 95.46399 94.51576 94.80206 94.38817 95.51641 95.47108 95.98684 94.47933
-#&gt;  [49] 92.38388 95.49128 93.61958 93.41372 93.39139 94.38523 91.88078 92.56848
-#&gt;  [57] 94.97876 94.62009 94.36265 92.89106 95.80528 93.70894 95.37670 94.19389
-#&gt;  [65] 95.60537 95.19624 94.12002 93.78265 94.99181 93.82944 95.14325 94.09016
-#&gt;  [73] 95.42301 93.84779 92.53829 95.33816 94.31331 95.38431 95.69602 92.29136
-#&gt;  [81] 93.36316 93.76830 94.26825 93.78389 94.36051 93.33928 93.52203 94.99372
-#&gt;  [89] 93.40434 92.95204 95.12308 94.47136 94.52085 95.75064 95.58245 94.92098
-#&gt;  [97] 95.67311 95.10887 95.01254 95.23518</div><div class='input'>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>approx_ev_survey</span>)</div><div class='output co'>#&gt;   [1] 92.87357 93.09485 93.15514 93.65871 93.31148 94.28926 93.35015 94.36486
+#&gt;   [9] 93.72449 93.09289 92.42897 93.14384 93.38498 93.16135 92.77755 92.17163
+#&gt;  [17] 93.72948 93.64916 94.12442 92.64176 92.71008 94.28817 93.13402 92.81583
+#&gt;  [25] 92.67120 92.32982 92.89619 93.51816 93.95784 92.50700 93.27700 93.06729
+#&gt;  [33] 93.72103 93.27113 93.35536 93.21273 93.07208 94.31808 94.50985 93.15614
+#&gt;  [41] 93.44869 93.17538 93.18190 93.33843 93.37552 93.06600 94.00318 93.72077
+#&gt;  [49] 93.57354 93.72137 93.71659 91.98809 93.13867 93.47346 93.43021 92.56898
+#&gt;  [57] 92.77732 94.10990 92.90130 93.09836 92.91310 93.76777 93.97263 93.62517
+#&gt;  [65] 92.95704 94.11176 93.24095 92.91095 92.92921 92.38462 93.87993 94.02824
+#&gt;  [73] 93.47338 93.26194 93.03404 93.31996 91.88683 92.43534 93.17314 92.69666
+#&gt;  [81] 92.76703 92.61634 93.68933 93.48585 93.88290 92.85635 93.49207 92.67842
+#&gt;  [89] 93.33044 93.56078 93.39146 93.88118 92.98957 94.01977 93.39720 93.09727
+#&gt;  [97] 93.04666 93.24531 93.45119 93.05844</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

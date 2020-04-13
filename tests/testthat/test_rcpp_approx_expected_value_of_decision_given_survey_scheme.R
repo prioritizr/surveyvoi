@@ -28,7 +28,8 @@ test_that("correct result", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic"))[rep(1, n_f)]
+    list(list(seed = "0", scale_pos_weight = "2",
+              objective = "binary:logistic"))[rep(1, n_f)]
   pu_predict_idx <- which(site_data$survey | !is.na(site_data$f1))
   xgb_folds <- lapply(seq_len(n_f), function(i) {
       withr::with_seed(1, {

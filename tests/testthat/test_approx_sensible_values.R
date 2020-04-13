@@ -24,7 +24,8 @@ test_that("lower voi when most of budget spent on surveys", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
   n_states_per_rep <- ceiling(n_states(8, n_f) * 0.9)
@@ -113,7 +114,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
   n_states_per_rep <- ceiling(n_states(8, n_f) * 0.9)
@@ -200,7 +202,8 @@ test_that("different voi when xgboost models trained with different weights", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
   n_states_per_rep <- min(ceiling(n_states(12, n_f) * 0.9), 1e+4)
@@ -288,7 +291,8 @@ test_that("identical outputs given identical inputs", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
   n_states_per_rep <- min(ceiling(n_states(12, n_f) * 0.9), 1e+4)
@@ -312,7 +316,7 @@ test_that("identical outputs given identical inputs", {
       feature_postweight_column = "postweight",
       feature_target_column = "target",
       total_budget = total_budget,
-      xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+      xgb_parameters = xgb_parameters,
       n_approx_obj_fun_points = 1000,
       xgb_n_folds = rep(5, n_f),
       optimality_gap = 0,
@@ -355,7 +359,7 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     preweight = 100,
     postweight = 5,
     target = 2)
-  xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   # set approximation values
   n_reps <- 10
@@ -458,7 +462,7 @@ test_that("current < optimal info < perfect info, some pu selected", {
     preweight = 100,
     postweight = 5,
     target = 2)
-  xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   budget <- 25
   gap <- 1e-4
@@ -655,7 +659,8 @@ test_that("approx = exact, when all states used (evdsi)", {
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 3))[rep(1, n_f)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 3))[rep(1, n_f)]
   n_states_per_rep <- n_states(nrow(site_data), nrow(feature_data))
   # prepare data
   site_occ_columns <- paste0("f", seq_len(n_f))

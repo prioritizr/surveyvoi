@@ -135,8 +135,7 @@ site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rd
 ## geometry type:  POINT
 ## dimension:      XY
 ## bbox:           xmin: 0.01366063 ymin: 0.01929364 xmax: 0.9272025 ymax: 0.9946761
-## epsg (SRID):    NA
-## proj4string:    NA
+## CRS:            NA
 ## # A tibble: 30 x 6
 ##    survey_cost management_cost          e1        e2    f1
 ##          &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
@@ -208,21 +207,21 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 <div id="modelling-probability-of-occupancy" class="section level2">
 <h2 class="hasAnchor">
 <a href="#modelling-probability-of-occupancy" class="anchor"></a>Modelling probability of occupancy</h2>
-<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches. Since gradient boosted regression trees have many parameters that influence their performance, we will first run a calibration procedure to identify suitable parameters.</p>
-<p>Our calibration procedure will use a random search method to identify suitable parameters. Given candidate values for different parameters, this method explores a predetermined number of randomly selected combinations of parameters (set using the <code>n_random_search_iterations</code> parameter). Ideally, we would examine all possible combinations of tuning parameters but this is not computationally feasible and the random search method is often “good enough”. For a given combination of tuning parameters, the parameters are used to fit a model along with <em>k</em>-fold cross-validation, and the area under the curve (AUC) statistic derived from the held out data is used to assess model performance. After evaluating the predetermined number of parameter combinations, this function returns the best parameter combination (i.e. the parameters producing a model with the greatest AUC statistic).</p>
+<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches. Since gradient boosted regression trees have many tuning parameters that influence their performance, we will also supply parameters to perform a preliminary calibration procedure using <em>k</em>-fold cross-validation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create list of candidate parameter value for calibration procedure</span>
-candidate_xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
-  <span class="dt">max_depth =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">1</span>), <span class="dt">eta =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span>),
-  <span class="dt">nrounds =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">10</span>), <span class="dt">lambda =</span> <span class="dv">10</span> <span class="op">^</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.25</span>),
-  <span class="dt">subsample =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>), <span class="dt">colsample_bytree =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
+candidate_xgb_parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
+  <span class="dt">max_depth =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">1</span>),
+  <span class="dt">eta =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span>),
+  <span class="dt">lambda =</span> <span class="dv">10</span> <span class="op">^</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.25</span>),
+  <span class="dt">subsample =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
+  <span class="dt">colsample_bytree =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
   <span class="dt">objective =</span> <span class="st">"binary:logistic"</span>)
 
 <span class="co"># preview candidate parameters</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(candidate_xgb_params)</code></pre></div>
-<pre><code>## List of 7
+<span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(candidate_xgb_parameters)</code></pre></div>
+<pre><code>## List of 6
 ##  $ max_depth       : num [1:10] 1 2 3 4 5 6 7 8 9 10
 ##  $ eta             : num [1:5] 0.1 0.2 0.3 0.4 0.5
-##  $ nrounds         : num [1:10] 1 11 21 31 41 51 61 71 81 91
 ##  $ lambda          : num [1:5] 0.1 0.178 0.316 0.562 1
 ##  $ subsample       : num [1:6] 0.5 0.6 0.7 0.8 0.9 1
 ##  $ colsample_bytree: num [1:7] 0.4 0.5 0.6 0.7 0.8 0.9 1
@@ -230,27 +229,28 @@ candidate_xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="htt
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># identify suitable parameters for model fitting</span>
 <span class="co"># ideally, we would set n_random_search_iterations much higher (e.g. 10000),</span>
 <span class="co"># but we will keep it low to reduce processing time for this example</span>
-xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/tune_occupancy_models">tune_occupancy_models</a></span>(site_data, <span class="st">"f1"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
-                                    <span class="dt">n_folds =</span> <span class="dv">2</span>,
-                                    <span class="dt">n_random_search_iterations =</span> <span class="dv">1000</span>,
-                                    <span class="dt">early_stopping_rounds =</span> <span class="dv">10</span>,
-                                    <span class="dt">parameters =</span> candidate_xgb_params,
-                                    <span class="dt">n_threads =</span> <span class="dv">1</span>)
-
-<span class="co"># print best parameters</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(xgb_params)</code></pre></div>
+xgb_results &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/fit_occupancy_models">fit_occupancy_models</a></span>(
+  site_data, <span class="st">"f1"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>), <span class="dt">n_folds =</span> <span class="dv">2</span>,
+  <span class="dt">n_random_search_iterations =</span> <span class="dv">100</span>, <span class="dt">parameters =</span> candidate_xgb_parameters)</code></pre></div>
+<p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print best parameters</span>
+xgb_parameters &lt;-<span class="st"> </span>xgb_results<span class="op">$</span>parameters
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(xgb_parameters)</code></pre></div>
 <pre><code>## [[1]]
 ## [[1]]$max_depth
-## [1] 10
+## [1] 1
 ## 
 ## [[1]]$eta
-## [1] 0.2
+## [1] 0.1
 ## 
 ## [[1]]$nrounds
-## [1] 41
+## [1] 5
+## 
+## [[1]]$scale_pos_weight
+## [1] 0.8333333
 ## 
 ## [[1]]$lambda
-## [1] 0.5623413
+## [1] 0.1
 ## 
 ## [[1]]$subsample
 ## [1] 1
@@ -260,23 +260,42 @@ xgb_params &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
 ## 
 ## [[1]]$objective
 ## [1] "binary:logistic"</code></pre>
-<p>Now that we have identified suitable parameters for fitting the occupancy model, we will use these parameters to predict the probability that the feature occurs in each site.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit model</span>
-xgb_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/fit_occupancy_models">fit_occupancy_models</a></span>(site_data, <span class="st">"f1"</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
-                                  <span class="dt">n_folds =</span> <span class="dv">2</span>,
-                                  <span class="dt">parameters =</span> xgb_params)
-
-<span class="co"># print model performance (AUC value)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print model performance (AUC value)</span>
 <span class="co"># since this value is greater than 0.8, our model is "good enough"</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(xgb_model<span class="op">$</span>performance<span class="op">$</span>test_auc_mean <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>)
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(xgb_model<span class="op">$</span>performance<span class="op">$</span>test_auc_mean)</code></pre></div>
-<pre><code>## [1] 0.8895833</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># store predicted probabilities values in the site_data object</span>
-site_data<span class="op">$</span>p1 &lt;-<span class="st"> </span>xgb_model<span class="op">$</span>predictions<span class="op">$</span>f1
+xgb_performance &lt;-<span class="st"> </span>xgb_results<span class="op">$</span>performance
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(xgb_performance))</code></pre></div>
+<pre><code>##   feature train_auc_mean train_auc_std train_sensitivity_mean
+## 1      f1      0.8870833     0.0465512              0.8166667
+##   train_sensitivity_std train_specificity_mean train_specificity_std
+## 1            0.02357023                  0.775            0.03535534
+##   test_auc_mean test_auc_std test_sensitivity_mean test_sensitivity_std
+## 1     0.9695833   0.01355288             0.9166667            0.1178511
+##   test_specificity_mean test_specificity_std
+## 1                   0.9            0.1414214</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(xgb_performance<span class="op">$</span>test_auc_mean <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>)
 
 <span class="co"># store the model sensitivities and specificities in the feature_data object</span>
-feature_data<span class="op">$</span>model_sensitivity &lt;-<span class="st"> </span>xgb_model<span class="op">$</span>performance<span class="op">$</span>test_sensitivity_mean
-feature_data<span class="op">$</span>model_specificity &lt;-<span class="st"> </span>xgb_model<span class="op">$</span>performance<span class="op">$</span>test_specificity_mean
+feature_data<span class="op">$</span>model_sensitivity &lt;-<span class="st"> </span>xgb_performance<span class="op">$</span>test_sensitivity_mean
+feature_data<span class="op">$</span>model_specificity &lt;-<span class="st"> </span>xgb_performance<span class="op">$</span>test_specificity_mean
+
+<span class="co"># store predicted probabilities values in the site_data object</span>
+xgb_predictions &lt;-<span class="st"> </span>xgb_results<span class="op">$</span>predictions
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(xgb_predictions)</code></pre></div>
+<pre><code>## # A tibble: 30 x 1
+##          f1
+##       &lt;dbl&gt;
+##  1 0.530074
+##  2 0.484937
+##  3 0.530074
+##  4 0.555923
+##  5 0.530074
+##  6 0.398704
+##  7 0.530074
+##  8 0.615830
+##  9 0.615830
+## 10 0.615830
+## # … with 20 more rows</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">site_data<span class="op">$</span>p1 &lt;-<span class="st"> </span>xgb_predictions<span class="op">$</span>f1
 
 <span class="co"># plot site estimated occupancy probabilities</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(site_data) <span class="op">+</span>
@@ -337,11 +356,11 @@ approx_evd_current &lt;-<span class="st"> </span><span class="kw"><a href="https
   <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
   <span class="dt">total_budget =</span> total_budget,
   <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
+  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">1000</span>)
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_current)</code></pre></div>
-<pre><code>## [1] 176.5152</code></pre>
+<pre><code>## [1] 174.6665</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="expected-value-given-perfect-information" class="section level2">
@@ -364,16 +383,16 @@ approx_evd_perfect &lt;-<span class="st"> </span><span class="kw"><a href="https
   <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
   <span class="dt">total_budget =</span> total_budget,
   <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
+  <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">1000</span>)
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_perfect)</code></pre></div>
-<pre><code>## [1] 177.4604</code></pre>
+<pre><code>## [1] 175.0634</code></pre>
 <p>We can also estimate how much perfect information would improve the management decision compared with using current information.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate how much perfect information would improve the decision</span>
 approx_roi_perfect &lt;-<span class="st"> </span>approx_evd_perfect <span class="op">-</span><span class="st"> </span>approx_evd_current
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_roi_perfect)</code></pre></div>
-<pre><code>## [1] 0.9452251</code></pre>
+<pre><code>## [1] 0.3968404</code></pre>
 <p>Although the <em>approximate expected value of the decision given perfect information</em> tells us the likely performance of the management decision given omniscient knowledge, it doesn’t actually tell us which sites we should survey to improve the <em>expected value of the management decision</em>.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -493,10 +512,10 @@ approx_evd_survey_schemes<span class="op">$</span>value &lt;-<span class="st"> <
     <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
     <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
-    <span class="dt">xgb_parameters =</span> xgb_params,
+    <span class="dt">xgb_parameters =</span> xgb_parameters,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">1000</span>)
 })
 
 <span class="co"># print values</span>
@@ -504,11 +523,11 @@ approx_evd_survey_schemes<span class="op">$</span>value &lt;-<span class="st"> <
 <pre><code>## # A tibble: 5 x 2
 ##   name           value
 ##   &lt;chr&gt;          &lt;dbl&gt;
-## 1 geo_scheme   176.482
-## 2 env_scheme   176.528
-## 3 unc_scheme   176.482
-## 4 cheap_scheme 176.482
-## 5 rich_scheme  176.316</code></pre>
+## 1 geo_scheme   174.437
+## 2 env_scheme   174.630
+## 3 unc_scheme   174.437
+## 4 cheap_scheme 174.437
+## 5 rich_scheme  173.741</code></pre>
 <p>Similar to before with perfect information, we can also estimate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate the return on investment for each survey scheme</span>
 approx_evd_survey_schemes<span class="op">$</span>roi &lt;-
@@ -519,11 +538,11 @@ approx_evd_survey_schemes<span class="op">$</span>roi &lt;-
 <pre><code>## # A tibble: 5 x 3
 ##   name           value        roi
 ##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   176.482 -0.0334011
-## 2 env_scheme   176.528  0.0126147
-## 3 unc_scheme   176.482 -0.0334011
-## 4 cheap_scheme 176.482 -0.0334011
-## 5 rich_scheme  176.316 -0.199533</code></pre>
+## 1 geo_scheme   174.437 -0.229098 
+## 2 env_scheme   174.630 -0.0369440
+## 3 unc_scheme   174.437 -0.229098 
+## 4 cheap_scheme 174.437 -0.229098 
+## 5 rich_scheme  173.741 -0.926005</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>
@@ -566,10 +585,10 @@ opt_scheme &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
     <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
     <span class="dt">survey_budget =</span> survey_budget,
-    <span class="dt">xgb_parameters =</span> xgb_params,
+    <span class="dt">xgb_parameters =</span> xgb_parameters,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)</code></pre></div>
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">1000</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print number of optimal survey schemes</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(opt_scheme))</code></pre></div>
 <pre><code>## [1] 1</code></pre>
@@ -607,14 +626,14 @@ approx_evd_opt &lt;-<span class="st"> </span><span class="kw"><a href="https://w
     <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
     <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
     <span class="dt">total_budget =</span> total_budget,
-    <span class="dt">xgb_parameters =</span> xgb_params,
+    <span class="dt">xgb_parameters =</span> xgb_parameters,
     <span class="dt">xgb_n_folds =</span> <span class="dv">2</span>,
     <span class="dt">n_approx_replicates =</span> <span class="dv">1</span>,
-    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">10000</span>)
+    <span class="dt">n_approx_states_per_replicate =</span> <span class="dv">1000</span>)
 
 <span class="co"># calculate value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_opt)</code></pre></div>
-<pre><code>## [1] 177.2146</code></pre>
+<pre><code>## [1] 175.6505</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># append optimal results to results table</span>
 approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(
   approx_evd_survey_schemes,
@@ -626,12 +645,12 @@ approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href
 <pre><code>## # A tibble: 6 x 3
 ##   name           value        roi
 ##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   176.482 -0.0334011
-## 2 env_scheme   176.528  0.0126147
-## 3 unc_scheme   176.482 -0.0334011
-## 4 cheap_scheme 176.482 -0.0334011
-## 5 rich_scheme  176.316 -0.199533 
-## 6 opt_scheme   177.215  0.699418</code></pre>
+## 1 geo_scheme   174.437 -0.229098 
+## 2 env_scheme   174.630 -0.0369440
+## 3 unc_scheme   174.437 -0.229098 
+## 4 cheap_scheme 174.437 -0.229098 
+## 5 rich_scheme  173.741 -0.926005 
+## 6 opt_scheme   175.650  0.983940</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>

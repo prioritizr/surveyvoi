@@ -23,8 +23,8 @@ test_that("lower voi when most of budget spent on surveys", {
   site_env_columns <- c("e1", "e2", "e3")
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+  xgb_parameters <- list(list(objective = "binary:logistic", nrounds = 8,
+                              scale_pos_weight = 1.5, eta = 0.1))[rep(1, 2)]
   # calculations
   r1 <- evdsi(
     site_data = site_data,
@@ -44,7 +44,7 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+    xgb_parameters = xgb_parameters,
     n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
@@ -67,7 +67,7 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+    xgb_parameters = xgb_parameters,
     n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
@@ -104,7 +104,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # calculations
   r1 <- evdsi(
     site_data = site_data,
@@ -182,7 +183,8 @@ test_that("different voi when xgboost models trained with different weights", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # calculations
   r1 <- evdsi(
     site_data = site_data,
@@ -261,7 +263,8 @@ test_that("identical outputs given identical inputs", {
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
-    list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
+              nrounds = 8, eta = 0.1))[rep(1, 2)]
   # calculations
   r <- vapply(seq_len(20), FUN.VALUE = numeric(1), function(i) {
     evdsi(
@@ -282,7 +285,7 @@ test_that("identical outputs given identical inputs", {
       feature_postweight_column = "postweight",
       feature_target_column = "target",
       total_budget = total_budget,
-      xgb_parameters = lapply(xgb_parameters, append, list(nrounds = 8)),
+      xgb_parameters = xgb_parameters,
       n_approx_obj_fun_points = 1000,
       xgb_n_folds = rep(5, n_f),
       optimality_gap = 0,
@@ -320,7 +323,7 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     preweight = runif(2, 100, 200),
     postweight = runif(2, 5, 20),
     target = c(1, 1))
-  xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   # calculate expected values
   evd_current <- evdci(
@@ -412,7 +415,7 @@ test_that("current < optimal info < perfect info, some pu selected", {
     preweight = runif(2, 100, 200),
     postweight = runif(2, 5, 20),
     target = c(1, 1))
-  xgb_parameters <- list(list(nrounds = 3, eta = 0.3,
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   budget <- 25
   gap <- 1e-4

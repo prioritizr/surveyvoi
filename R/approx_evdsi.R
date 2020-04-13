@@ -167,15 +167,16 @@
 #'   feature. See documentation for the \code{params} argument in
 #'   \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
 #'   these parameters would be determined using the
-#'   \code{\link{tune_occupancy_models}} function. Note that arguments must
-#'   have a \code{nrounds} element (see example below).
+#'   \code{\link{fit_occupancy_models}} function. Note that arguments must
+#'   have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
+#'   elements (see example below).
 #'
 #' @param xgb_n_folds \code{integer} vector containing the number of
 #'   k-fold cross-validation folds to use for fitting models and
 #'   assessing model performance for each feature. Ideally, the number of folds
 #'   should be exactly the same as the number used for tuning the
 #'   model parameters (i.e. same parameter to the \code{n_folds}
-#'   argument in \link{tune_occupancy_models} when generating parameters
+#'   argument in \link{fit_occupancy_models} when generating parameters
 #'  for \code{xgb_parameters}).
 #'
 #' @param optimality_gap \code{numeric} relative optimality gap for generating
@@ -225,8 +226,10 @@
 #' site_data$survey_site[which(is.na(site_data$f1))[1:2]] <- TRUE
 #'
 #' # define xgboost tuning parameters
+#' # these should ideally be determined using fit_occupancy_models
 #' xgb_parameters <-
-#'  list(list(objective = "binary:logistic", nrounds = 8, eta = 0.1))[rep(1, 2)]
+#'  list(list(objective = "binary:logistic", nrounds = 8,
+#'            scale_pos_weight = 1, eta = 0.1))[rep(1, 2)]
 #'
 #' # calculate expected value of management decision given the survey
 #' # information using exact method
@@ -422,6 +425,8 @@ approx_evdsi <- function(
   if (!is.null(site_weight_columns))
     validate_site_weight_data(site_data, site_occupancy_columns,
       site_weight_columns)
+  ## validate xgboost parameters
+  validate_xgboost_parameters(xgb_parameters)
 
   # prepare data for analysis
   ## drop spatial information
@@ -446,30 +451,12 @@ approx_evdsi <- function(
   ## identify sites that have previously been surveyed
   site_survey_status <- !is.na(site_data[[site_occupancy_columns[1]]])
   ## xgb_nrounds
-  xgb_nrounds <- vapply(seq_along(xgb_parameters), FUN.VALUE = numeric(1),
-                        function(i) {
-    out <- xgb_parameters[[i]]$nrounds
-    if (is.null(out))
-      stop(paste0("argument to xgb_parameters[[", i,
-                  "]] is missing nrounds element"))
-    out
-  })
-  ## xgb_parameters
+  xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
+                        "nrounds")
+  ## format xgb_parameters
   xgb_parameters <- lapply(xgb_parameters, function(x) {
     out <- x[names(x) != "nrounds"]
-    out <- lapply(x, as.character)
-    if (is.null(out$objective)) {
-      out$objective <- "binary:logistic"
-      warning(paste("no objective specified for model fitting,",
-                    "assuming binary:logistic"))
-    }
-    xgb_param_names <- c("max_depth", "eta", "nrounds", "lambda",
-                         "subsample", "colsample_bytree", "objective")
-    extra_names <- names(out)[!names(out) %in% xgb_param_names]
-    assertthat::assert_that(
-      length(extra_names) == 0,
-      msg = paste0("argument to xgb_parameters has unrecognized parameters: ,",
-                   paste(extra_names, collapse = ",")))
+    out <- lapply(out, as.character)
     out$nthread <- "1" # force single thread for reproducibility
     out$seed <- as.character(seed)
     out

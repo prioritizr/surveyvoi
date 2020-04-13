@@ -13,14 +13,13 @@ weighted_specificity <- function(y, yhat, weights) {
 }
 
 r_xgboost <- function(y, x_train, x_weight, predict_x, xgb_parameters,
-                              xgb_nrounds) {
-  spw <- round(sum(y < 0.5) / sum(y > 0.5), 6) # C++ code uses 1e-6 precision
+                      xgb_nrounds) {
   withr::with_seed(as.numeric(xgb_parameters$seed), {
   model <- xgboost::xgboost(
     data = x_train, label = y, weight = round(x_weight, 6),
     nrounds = xgb_nrounds,
     objective = xgb_parameters$objective,
-    scale_pos_weight = spw,
+    scale_pos_weight = as.numeric(xgb_parameters$scale_pos_weight),
     verbose = FALSE)
   })
   predict(model, predict_x)
