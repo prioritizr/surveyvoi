@@ -485,6 +485,8 @@ approx_evdsi <- function(
   ## prepare rij matrix for Rcpp
   rij[is.na(rij)] <- -1
 
+  o1 <<- environment()
+
   # main calculation
   withr::with_seed(seed, {
     out <- rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(

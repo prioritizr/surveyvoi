@@ -47,5 +47,6 @@ using namespace dmlc;
 
 /* typedefs */
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXfRM;
+typedef Eigen::Matrix<bool, Eigen::Dynamic, Eigen::Dynamic> MatrixXb;
 
 #endif

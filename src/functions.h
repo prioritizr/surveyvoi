@@ -13,6 +13,8 @@ double log_sum(double, double);
 
 double log_sum(Eigen::VectorXd&);
 
+double log_sum(Eigen::MatrixXd&);
+
 double mean_value(Eigen::VectorXd&);
 
 double standard_error_value(Eigen::VectorXd&);

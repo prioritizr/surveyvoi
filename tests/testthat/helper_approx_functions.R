@@ -1,11 +1,11 @@
-r_approx_expected_value_of_action <- function(
+r_approx_expected_value_of_action_values <- function(
   solution, prior_data, preweight, postweight, target, states) {
   # initialization
   total <- ncol(prior_data)
   prior_data_log <- log(prior_data)
   prior_data_log1m <- log(1 - prior_data)
   # calculate value and prob given each state
-  out <- sapply(states, function(i) {
+  vapply(states, FUN.VALUE = numeric(2), function(i) {
     s <- rcpp_nth_state(i, prior_data)
     rij <- sweep(s, 2, solution, "*")
     v <- r_conservation_benefit_state(rij, preweight, postweight, target, total)
@@ -13,12 +13,19 @@ r_approx_expected_value_of_action <- function(
          sum((1 - s[]) * prior_data_log1m[])
     c(v, p)
   })
-  # calculate total expected value
+}
+
+r_approx_expected_value_of_action <- function(
+  solution, prior_data, preweight, postweight, target, states) {
+  # calculate values
+  out <- r_approx_expected_value_of_action_values(
+    solution, prior_data, preweight, postweight, target, states)
+  # apply correction and calculate total expected value
   idx <- out[1, ] > 1e-10
-  v <- log(out[1, idx])
+  v <- out[1, idx]
   p <- out[2, idx]
   p <- p - rcpp_log_sum(out[2, ])
-  exp(rcpp_log_sum(p + v))
+  exp(rcpp_log_sum(p + log(v)))
 }
 
 r_approx_expected_value_of_decision_given_current_info_fixed_states <- function(
@@ -187,11 +194,16 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   }
   ## create dummy matrix
   dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
+  ## create matrix with all values and probabilities
+  value_matrix <- matrix(NA_real_, nrow = length(states),
+                         ncol = total_outcomes + 1)
+  prob_matrix <- value_matrix
+
   # main processing
-  out <- Inf
   for (i in seq(0, total_outcomes)) {
     ## generate state
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
+
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
       curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
@@ -221,22 +233,28 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       n_approx_obj_fun_points, remaining_budget, optim_gap, "")$x
 
     ## calculate approximate expected value of the prioritisation
-    curr_value <- log(r_approx_expected_value_of_action(
+    curr_results <- r_approx_expected_value_of_action_values(
       curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
-      obj_fun_target, states))
+      obj_fun_target, states)
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(
       curr_oij2, total_probability_of_survey_positive_log,
       total_probability_of_survey_negative_log, rij_outcome_idx + 1);
 
-    ## calculate expected value of the action
-    if (!is.finite(out)) {
-      out <- curr_value + curr_prob
-    } else {
-      out <- log_sum(out, curr_value + curr_prob)
-    }
+    ## store values
+    value_matrix[, i + 1] <- curr_results[1, ]
+    prob_matrix[, i + 1] <- curr_prob + curr_results[2, ]
   }
-  # exports
-  exp(out)
+
+  surv_p <<- prob_matrix
+
+  # apply correction for approximation calculations and return result
+  state_probs <- apply(prob_matrix, 1, rcpp_log_sum) # total prob of each state
+  total_prob <- rcpp_log_sum(state_probs) # total prob of all states
+  state_corr <- state_probs - total_prob
+  prob_matrix2 <- sweep(prob_matrix, 1, state_probs, "-")
+  prob_matrix3 <- sweep(prob_matrix2, 1, state_corr, "+")
+  idx <- which(value_matrix > 1e-10)
+  exp(rcpp_log_sum(log(value_matrix[idx]) + (prob_matrix3[idx])))
 }

@@ -1,6 +1,8 @@
 r_expected_value_of_action <- function(
   solution, prior_data, preweight, postweight, target) {
   # initialization
+  print("here")
+  print(solution)
   total <- ncol(prior_data)
   sub_prior_data <- prior_data[, solution, drop = FALSE]
   sub_prior_data_log <- log(sub_prior_data)

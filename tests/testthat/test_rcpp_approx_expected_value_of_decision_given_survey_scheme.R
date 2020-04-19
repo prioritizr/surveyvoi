@@ -1,6 +1,6 @@
-context("rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states")
-
-test_that("correct result", {
+# context("rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states")
+#
+# test_that("correct result", {
   # data
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
@@ -41,6 +41,9 @@ test_that("correct result", {
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
   # calculations
+
+  print("R")
+
   set.seed(1)
   r1 <- r_approx_expected_value_of_decision_given_survey_scheme_n_states(
     rij = rij, pij = pij, wij = wij,
@@ -65,6 +68,10 @@ test_that("correct result", {
     optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_states_per_replicate = n_states_per_rep)
+
+  cat("\n\n\n")
+  print("Rcpp")
+
   set.seed(1)
   r2 <- rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
     rij = rij, pij = pij, wij = wij,
@@ -92,4 +99,4 @@ test_that("correct result", {
     method_approx_states = "weighted_without_replacement")
   # tests
   expect_equal(r1, r2)
-})
+# })

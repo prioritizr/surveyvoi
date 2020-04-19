@@ -72,15 +72,22 @@ Rcpp::NumericVector
   MatrixXfRM pu_env_data2 = pu_env_data;
 
   // initial calculations
+  /// set mpz maximum unsighned integer
+  mpz_class max_size_t = std::numeric_limits<std::size_t>::max();
   /// integer over-flow checks, highest std::size_t value is 1e+18
   if (n_pu_surveyed_in_scheme > 20)
     Rcpp::stop("number of planning units in selected in survey scheme is too large (i.e. >20)");
   /// calculate number of outcomes for a given feature
   const std::size_t n_f_outcomes = n_states(n_pu_surveyed_in_scheme) + 1;
-  /// calculate toal number of outcomes across all features
+  /// calculate total number of outcomes across all features and planning units
   mpz_class n_outcomes;
   n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
   n_outcomes = n_outcomes + 1; // increment to include final outcome
+  /// calculate total number of state values across all outcomes
+  mpz_class n_total_state_values =
+    (n_outcomes + 1) * n_approx_states_per_replicate;
+  if (cmp(n_total_state_values, max_size_t) >= 0)
+    Rcpp::stop("too many replicates given number of states, try reducing the number of replicates");
 
   // data integrity checks
   /// calculate remaining budget
@@ -245,13 +252,27 @@ Rcpp::NumericVector
   assert_valid_probability_data(model_specificity,
                                 "issue calculating model specificities");
 
-  // main processing
-  mpz_class o = 0;
-  std::vector<double> out(n_approx_replicates,
-    std::numeric_limits<double>::infinity());
-  while (cmp(o, n_outcomes) < 0) {
+  // initialize loop variables
+  mpz_class o;
+  std::size_t n_total_state_values_ui = n_total_state_values.get_ui();
+  std::vector<std::vector<double>>
+    value_given_state_occurring(n_approx_replicates);
+  std::vector<std::vector<double>>
+    prob_of_state_occurring(n_approx_replicates);
+  std::vector<std::vector<double>>
+    extra_prob_of_state_occurring(n_approx_replicates);
+  for (std::size_t r = 0; r < n_approx_replicates; ++r)
+    value_given_state_occurring[r].reserve(n_total_state_values_ui);
+  for (std::size_t r = 0; r < n_approx_replicates; ++r)
+    prob_of_state_occurring[r].reserve(n_total_state_values_ui);
+  for (std::size_t r = 0; r < n_approx_replicates; ++r)
+    extra_prob_of_state_occurring[r].reserve(n_total_state_values_ui);
+
+  // calculate values and probabilities
+  for (std::size_t oo = 0; oo < n_outcomes; ++oo) {
     /// generate the o'th outcome from surveying the planning units across
     /// all species
+    o = oo;
     nth_state_sparse(o, rij_outcome_idx, curr_oij);
 
     // find out which model coefficients should be used for making
@@ -312,25 +333,21 @@ Rcpp::NumericVector
       curr_pij_log_1m = curr_pij;
       log_matrix(curr_pij_log);
       log_1m_matrix(curr_pij_log_1m);
-      curr_expected_value_of_action_given_outcome =
-        std::log(approx_expected_value_of_action(
-          curr_solution, curr_pij_log, curr_pij_log_1m, obj_fun_preweight,
-          obj_fun_postweight, obj_fun_target, states[r]));
 
       /// calculate likelihood of outcome
       curr_probability_of_outcome = log_probability_of_outcome(
         curr_oij, total_probability_of_survey_positive_log,
         total_probability_of_survey_negative_log, rij_outcome_idx);
 
-      /// calculate expected value of action
-      if (std::isinf(out[r])) {
-        out[r] = curr_expected_value_of_action_given_outcome +
-                 curr_probability_of_outcome;
-      } else {
-        out[r] = log_sum(out[r],
-                         curr_expected_value_of_action_given_outcome +
-                         curr_probability_of_outcome);
-      }
+      // calculate values given states and probabilities of states
+      approx_expected_value_of_action_values(
+        curr_solution, curr_pij_log, curr_pij_log_1m, obj_fun_preweight,
+        obj_fun_postweight, obj_fun_target, states[r],
+        value_given_state_occurring[r],
+        prob_of_state_occurring[r],
+        extra_prob_of_state_occurring[r],
+        curr_probability_of_outcome);
+
     }
 
     /// reset oij matrix so that -1s are present for planning units/features
@@ -340,14 +357,50 @@ Rcpp::NumericVector
         for (std::size_t i = 0; i < n_f; ++i)
           if (survey_features[i])
             curr_oij(i, j) = -1.0;
-
-    /// increment o loop variable
-    o = o + 1;
   }
 
-  // exponentiate values
-  for (std::size_t r = 0; r < n_approx_replicates; ++r)
-    out[r] = std::exp(out[r]);
+
+  // initialize loop variables
+  double total_prob;
+  std::size_t n_nonzero_values;
+  std::size_t n_zero_values;
+  Eigen::VectorXd value_given_state_occurring2;
+  Eigen::VectorXd prob_of_state_occurring2;
+  Eigen::VectorXd extra_prob_of_state_occurring2;
+  Eigen::VectorXd out(n_approx_replicates);
+
+  // calculate corrected values
+  for (std::size_t r = 0; r < n_approx_replicates; ++r) {
+    // check that at least one state had a non-zero value
+    n_nonzero_values = value_given_state_occurring[r].size();
+    n_zero_values = extra_prob_of_state_occurring[r].size();
+    assert_gt_value(n_nonzero_values, (std::size_t) 0,
+      "all states have zero value, try increasing argument to n_approx_states_per_replicate");
+
+    // create Eigen maps of data
+    value_given_state_occurring2 =
+      Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        value_given_state_occurring[r].data(), n_nonzero_values);
+    prob_of_state_occurring2 =
+      Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        prob_of_state_occurring[r].data(), n_nonzero_values);
+    extra_prob_of_state_occurring2 =
+      Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        extra_prob_of_state_occurring[r].data(), n_zero_values);
+
+    // calculate total probability
+    total_prob = log_sum(prob_of_state_occurring2);
+    if (n_zero_values > 0)
+      total_prob = log_sum(total_prob, log_sum(extra_prob_of_state_occurring2));
+
+    // caclulate corrected values
+    prob_of_state_occurring2.array() -= total_prob;
+    prob_of_state_occurring2.array() +=
+      value_given_state_occurring2.array().log();
+
+    // store expected value
+    out[r] = std::exp(log_sum(prob_of_state_occurring2));
+  }
 
   // clean-up
   for (std::size_t i = 0; i < (n_f_outcomes * n_f_survey); ++i)

@@ -1,13 +1,19 @@
 #include "rcpp_approx_expected_value_of_action.h"
 
-double approx_expected_value_of_action(
+void approx_expected_value_of_action_values(
   std::vector<bool> &solution,
   Eigen::MatrixXd &pij_log,
   Eigen::MatrixXd &pij_log1m,
   Eigen::VectorXd &preweight,
   Eigen::VectorXd &postweight,
   Eigen::VectorXd &target,
-  std::vector<mpz_class> &states) {
+  std::vector<mpz_class> &states,
+  std::vector<double> &value_given_state_occurring,
+  std::vector<double> &prob_of_state_occurring,
+  std::vector<double> &extra_prob_of_state_occurring,
+  double extra_prob = 0) // used if state probabilities are conditional on
+                        // another event (e.g. survey outcomes)
+  {
   // initialization
   const std::size_t n_pu = pij_log.cols();
   const double total = static_cast<double>(n_pu);
@@ -16,14 +22,7 @@ double approx_expected_value_of_action(
   // main processing
   /// initialize loop variables
   double v, p;
-  std::size_t k = 0;
   Eigen::MatrixXd curr_state(pij_log.rows(), pij_log.cols());
-  std::vector<double> value_given_state_occurring;
-  std::vector<double> prob_of_state_occurring;
-  std::vector<double> all_prob_of_state_occurring;
-  value_given_state_occurring.reserve(n_approx_states);
-  prob_of_state_occurring.reserve(n_approx_states);
-  all_prob_of_state_occurring.reserve(n_approx_states);
 
   /// iterate over each state
   for (std::size_t i = 0; i < n_approx_states; ++i) {
@@ -36,36 +35,68 @@ double approx_expected_value_of_action(
       curr_state.col(j) *= solution[j];
     //// calculate the value of the prioritization given the state
     v = conservation_benefit_state(
-    curr_state, preweight, postweight, target, total);
-    /// store probability of state occurring
-    all_prob_of_state_occurring.push_back(p);
-    /// store values if non-zero benefit
+      curr_state, preweight, postweight, target, total);
+    // store data
     if (v > 1.0e-10) {
       value_given_state_occurring.push_back(v);
-      prob_of_state_occurring.push_back(p);
-      ++k;
+      prob_of_state_occurring.push_back(p + extra_prob);
+    } else {
+      extra_prob_of_state_occurring.push_back(p + extra_prob);
     }
   }
 
+  // return void
+  return;
+}
+
+double approx_expected_value_of_action(
+  std::vector<bool> &solution,
+  Eigen::MatrixXd &pij_log,
+  Eigen::MatrixXd &pij_log1m,
+  Eigen::VectorXd &preweight,
+  Eigen::VectorXd &postweight,
+  Eigen::VectorXd &target,
+  std::vector<mpz_class> &states) {
+
+  // initialization
+  const std::size_t n_approx_states = states.size();
+  std::vector<double> value_given_state_occurring;
+  std::vector<double> prob_of_state_occurring;
+  std::vector<double> extra_prob_of_state_occurring;
+  value_given_state_occurring.reserve(n_approx_states);
+  prob_of_state_occurring.reserve(n_approx_states);
+  extra_prob_of_state_occurring.reserve(n_approx_states);
+
+  // main processing
+  approx_expected_value_of_action_values(
+    solution, pij_log, pij_log1m, preweight, postweight, target, states,
+    value_given_state_occurring, prob_of_state_occurring,
+    extra_prob_of_state_occurring);
+
   // check that at least one state had a non-zero value
+  const std::size_t k = value_given_state_occurring.size();
+  const std::size_t k2 = extra_prob_of_state_occurring.size();
   assert_gt_value(k, (std::size_t) 0,
     "all states have zero value, try increasing argument to n_approx_states_per_replicate");
 
-  // create Eigen maps of data
+ // create Eigen maps of data
   Eigen::VectorXd value_given_state_occurring2 =
     Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
       value_given_state_occurring.data(), k);
   Eigen::VectorXd prob_of_state_occurring2 =
     Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
       prob_of_state_occurring.data(), k);
-  Eigen::VectorXd all_prob_of_state_occurring2 =
+  Eigen::VectorXd extra_prob_of_state_occurring2 =
     Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      all_prob_of_state_occurring.data(), n_approx_states);
+      extra_prob_of_state_occurring.data(), k2);
 
-  // rescale probabilities
-  prob_of_state_occurring2.array() -= log_sum(all_prob_of_state_occurring2);
+  // calculate total probaiblity
+  double total_prob = log_sum(prob_of_state_occurring2);
+  if (k2 > 0)
+    total_prob = log_sum(total_prob, log_sum(extra_prob_of_state_occurring2));
 
-  // calculate values weighted by probabilities
+  // caclulate corrected values
+  prob_of_state_occurring2.array() -= total_prob;
   prob_of_state_occurring2.array() +=
     value_given_state_occurring2.array().log();
 

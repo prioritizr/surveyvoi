@@ -41,6 +41,11 @@ double log_sum(Eigen::VectorXd &x) {
   return m + std::log((x.array() - m).exp().sum());
 }
 
+double log_sum(Eigen::MatrixXd &x) {
+  double m = x.maxCoeff();
+  return m + std::log((x.array() - m).exp().sum());
+}
+
 double mean_value(Eigen::VectorXd &x) {
   return x.mean();
 }
