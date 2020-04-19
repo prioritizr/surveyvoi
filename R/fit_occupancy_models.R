@@ -33,7 +33,7 @@ NULL
 #' @param early_stopping_rounds \code{numeric} model rounds for parameter
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 100.
-
+#'
 #' @param n_rounds \code{numeric} model rounds for model fitting
 #'   See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 1000.
@@ -58,9 +58,12 @@ NULL
 #' @param n_threads \code{integer} number of threads to use for parameter
 #'   tuning. Defaults to 1.
 #'
+#' @param seed \code{integer} initial random number generator state for model
+#'   fitting. Defaults to 500.
+#'
 #' @param verbose \code{logical} indicating if information should be
 #'   printed during computations. Defaults to \code{FALSE}.
-
+#'
 #' @details
 #'  This function (i) prepares the data for model fitting, (ii) calibrates
 #'  the tuning parameters for model fitting, (iii) generate predictions using
@@ -163,7 +166,7 @@ fit_occupancy_models <- function(
   early_stopping_rounds = 100, n_rounds = 1000,
   n_folds = rep(5, length(site_occupancy_columns)),
   n_random_search_iterations = 10000,
-  site_weight_columns = NULL, n_threads = 1, verbose = FALSE) {
+  site_weight_columns = NULL, n_threads = 1, seed = 500, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     inherits(site_data, "sf"), nrow(site_data) > 0, ncol(site_data) > 0,
@@ -182,6 +185,8 @@ fit_occupancy_models <- function(
     assertthat::noNA(n_rounds),
     assertthat::is.count(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
+    assertthat::is.count(seed),
+    assertthat::noNA(seed),
     assertthat::is.count(n_threads), assertthat::noNA(n_threads),
     is.list(parameters),
     isTRUE(n_random_search_iterations <= prod(lengths(parameters))))

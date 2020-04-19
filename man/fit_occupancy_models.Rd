@@ -15,6 +15,7 @@ fit_occupancy_models(
   n_random_search_iterations = 10000,
   site_weight_columns = NULL,
   n_threads = 1,
+  seed = 500,
   verbose = FALSE
 )
 }
@@ -70,6 +71,9 @@ equal weight when fitting models.}
 
 \item{n_threads}{\code{integer} number of threads to use for parameter
 tuning. Defaults to 1.}
+
+\item{seed}{\code{integer} initial random number generator state for model
+fitting. Defaults to 500.}
 
 \item{verbose}{\code{logical} indicating if information should be
 printed during computations. Defaults to \code{FALSE}.}
