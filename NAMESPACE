@@ -3,6 +3,7 @@
 export(approx_evdci)
 export(approx_evdpi)
 export(approx_evdsi)
+export(approx_near_optimal_survey_scheme)
 export(approx_optimal_survey_scheme)
 export(env_div_survey_scheme)
 export(evdci)

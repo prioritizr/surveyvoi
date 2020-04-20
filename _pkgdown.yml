@@ -19,9 +19,14 @@ reference:
     desc: Functions for value of information analyses
     contents:
       - evdci
-      - approx_evdci
       - evdpi
+      - evdsi
+      - approx_evdci
       - approx_evdpi
+      - approx_evdsi
+      - optimal_survey_scheme
+      - approx_optimal_survey_scheme
+      - approx_near_optimal_survey_scheme
       - prior_probability_matrix
   - title: Survey schemes
     desc: Functions for generating survey schemes
@@ -35,11 +40,6 @@ reference:
     contents:
       - relative_site_richness_scores
       - relative_site_uncertainty_scores
-  - title: Occupancy models
-    desc: Functions for modelling occupancy
-    contents:
-      - tune_occupancy_models
-      - fit_occupancy_models
   - title: Simulate data
     desc: Functions for simulating datasets
     contents:
@@ -49,3 +49,5 @@ reference:
     desc: Assorted functions with varying uses
     contents:
       - n_states
+      - fit_occupancy_models
+      - plot_conservation_benefit

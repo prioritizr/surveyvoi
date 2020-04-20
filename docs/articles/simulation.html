@@ -238,25 +238,25 @@ xgb_parameters &lt;-<span class="st"> </span>xgb_results<span class="op">$</span
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(xgb_parameters)</code></pre></div>
 <pre><code>## [[1]]
 ## [[1]]$max_depth
-## [1] 1
+## [1] 2
 ## 
 ## [[1]]$eta
 ## [1] 0.1
 ## 
 ## [[1]]$nrounds
-## [1] 5
+## [1] 80
 ## 
 ## [[1]]$scale_pos_weight
 ## [1] 0.8333333
 ## 
 ## [[1]]$lambda
-## [1] 0.1
+## [1] 0.3162278
 ## 
 ## [[1]]$subsample
-## [1] 1
+## [1] 0.7
 ## 
 ## [[1]]$colsample_bytree
-## [1] 0.9
+## [1] 0.5
 ## 
 ## [[1]]$objective
 ## [1] "binary:logistic"</code></pre>
@@ -265,11 +265,11 @@ xgb_parameters &lt;-<span class="st"> </span>xgb_results<span class="op">$</span
 xgb_performance &lt;-<span class="st"> </span>xgb_results<span class="op">$</span>performance
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(xgb_performance))</code></pre></div>
 <pre><code>##   feature train_auc_mean train_auc_std train_sensitivity_mean
-## 1      f1      0.8870833     0.0465512              0.8166667
+## 1      f1      0.8870833     0.0465512              0.7166667
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
-## 1            0.02357023                  0.775            0.03535534
+## 1             0.1649916                  0.875             0.1767767
 ##   test_auc_mean test_auc_std test_sensitivity_mean test_sensitivity_std
-## 1     0.9695833   0.01355288             0.9166667            0.1178511
+## 1     0.9695833   0.01355288             0.8333333            0.2357023
 ##   test_specificity_mean test_specificity_std
 ## 1                   0.9            0.1414214</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/stopifnot">stopifnot</a></span>(xgb_performance<span class="op">$</span>test_auc_mean <span class="op">&gt;=</span><span class="st"> </span><span class="fl">0.8</span>)
@@ -284,16 +284,16 @@ xgb_predictions &lt;-<span class="st"> </span>xgb_results<span class="op">$</spa
 <pre><code>## # A tibble: 30 x 1
 ##          f1
 ##       &lt;dbl&gt;
-##  1 0.530074
-##  2 0.484937
-##  3 0.530074
-##  4 0.555923
-##  5 0.530074
-##  6 0.398704
-##  7 0.530074
-##  8 0.615830
-##  9 0.615830
-## 10 0.615830
+##  1 0.518793
+##  2 0.500435
+##  3 0.518793
+##  4 0.563083
+##  5 0.518793
+##  6 0.425734
+##  7 0.518793
+##  8 0.594216
+##  9 0.594216
+## 10 0.594216
 ## # … with 20 more rows</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">site_data<span class="op">$</span>p1 &lt;-<span class="st"> </span>xgb_predictions<span class="op">$</span>f1
 
@@ -360,7 +360,7 @@ approx_evd_current &lt;-<span class="st"> </span><span class="kw"><a href="https
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_current)</code></pre></div>
-<pre><code>## [1] 174.6665</code></pre>
+<pre><code>## [1] 177.0362</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="expected-value-given-perfect-information" class="section level2">
@@ -387,12 +387,12 @@ approx_evd_perfect &lt;-<span class="st"> </span><span class="kw"><a href="https
 
 <span class="co"># print value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_perfect)</code></pre></div>
-<pre><code>## [1] 175.0634</code></pre>
+<pre><code>## [1] 177.5678</code></pre>
 <p>We can also estimate how much perfect information would improve the management decision compared with using current information.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate how much perfect information would improve the decision</span>
 approx_roi_perfect &lt;-<span class="st"> </span>approx_evd_perfect <span class="op">-</span><span class="st"> </span>approx_evd_current
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_roi_perfect)</code></pre></div>
-<pre><code>## [1] 0.3968404</code></pre>
+<pre><code>## [1] 0.5315382</code></pre>
 <p>Although the <em>approximate expected value of the decision given perfect information</em> tells us the likely performance of the management decision given omniscient knowledge, it doesn’t actually tell us which sites we should survey to improve the <em>expected value of the management decision</em>.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -523,11 +523,11 @@ approx_evd_survey_schemes<span class="op">$</span>value &lt;-<span class="st"> <
 <pre><code>## # A tibble: 5 x 2
 ##   name           value
 ##   &lt;chr&gt;          &lt;dbl&gt;
-## 1 geo_scheme   174.437
-## 2 env_scheme   174.630
-## 3 unc_scheme   174.437
-## 4 cheap_scheme 174.437
-## 5 rich_scheme  173.741</code></pre>
+## 1 geo_scheme   176.705
+## 2 env_scheme   176.717
+## 3 unc_scheme   176.705
+## 4 cheap_scheme 176.705
+## 5 rich_scheme  176.658</code></pre>
 <p>Similar to before with perfect information, we can also estimate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># estimate the return on investment for each survey scheme</span>
 approx_evd_survey_schemes<span class="op">$</span>roi &lt;-
@@ -536,13 +536,13 @@ approx_evd_survey_schemes<span class="op">$</span>roi &lt;-
 <span class="co"># print values</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_survey_schemes)</code></pre></div>
 <pre><code>## # A tibble: 5 x 3
-##   name           value        roi
-##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   174.437 -0.229098 
-## 2 env_scheme   174.630 -0.0369440
-## 3 unc_scheme   174.437 -0.229098 
-## 4 cheap_scheme 174.437 -0.229098 
-## 5 rich_scheme  173.741 -0.926005</code></pre>
+##   name           value       roi
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+## 1 geo_scheme   176.705 -0.331592
+## 2 env_scheme   176.717 -0.319048
+## 3 unc_scheme   176.705 -0.331592
+## 4 cheap_scheme 176.705 -0.331592
+## 5 rich_scheme  176.658 -0.378348</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>
@@ -633,7 +633,7 @@ approx_evd_opt &lt;-<span class="st"> </span><span class="kw"><a href="https://w
 
 <span class="co"># calculate value</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_opt)</code></pre></div>
-<pre><code>## [1] 175.6505</code></pre>
+<pre><code>## [1] 177.1987</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># append optimal results to results table</span>
 approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">rbind</a></span>(
   approx_evd_survey_schemes,
@@ -643,14 +643,14 @@ approx_evd_survey_schemes &lt;-<span class="st"> </span><span class="kw"><a href
 <span class="co"># print updated results table</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(approx_evd_survey_schemes)</code></pre></div>
 <pre><code>## # A tibble: 6 x 3
-##   name           value        roi
-##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   174.437 -0.229098 
-## 2 env_scheme   174.630 -0.0369440
-## 3 unc_scheme   174.437 -0.229098 
-## 4 cheap_scheme 174.437 -0.229098 
-## 5 rich_scheme  173.741 -0.926005 
-## 6 opt_scheme   175.650  0.983940</code></pre>
+##   name           value       roi
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+## 1 geo_scheme   176.705 -0.331592
+## 2 env_scheme   176.717 -0.319048
+## 3 unc_scheme   176.705 -0.331592
+## 4 cheap_scheme 176.705 -0.331592
+## 5 rich_scheme  176.658 -0.378348
+## 6 opt_scheme   177.199  0.162527</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="co"># red dashed line shows improvement given perfect information</span>

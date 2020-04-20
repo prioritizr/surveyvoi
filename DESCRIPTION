@@ -67,6 +67,7 @@ Collate:
     'approx_evdsi.R'
     'evdsi.R'
     'internal.R'
+    'approx_near_optimal_survey_scheme.R'
     'approx_optimal_survey_scheme.R'
     'env_div_survey_scheme.R'
     'evdci.R'

@@ -141,6 +141,7 @@ planning units.</p>
   <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
@@ -218,6 +219,11 @@ equal weight when fitting models.</p></td>
       <th>n_threads</th>
       <td><p><code>integer</code> number of threads to use for parameter
 tuning. Defaults to 1.</p></td>
+    </tr>
+    <tr>
+      <th>seed</th>
+      <td><p><code>integer</code> initial random number generator state for model
+fitting. Defaults to 500.</p></td>
     </tr>
     <tr>
       <th>verbose</th>
@@ -314,10 +320,10 @@ tuning parameters for each feature.</p></dd>
 #&gt; [1] 2
 #&gt; 
 #&gt; [[1]]$eta
-#&gt; [1] 0.4
+#&gt; [1] 0.2
 #&gt; 
 #&gt; [[1]]$nrounds
-#&gt; [1] 16
+#&gt; [1] 25
 #&gt; 
 #&gt; [[1]]$scale_pos_weight
 #&gt; [1] 1.089492
@@ -329,7 +335,7 @@ tuning parameters for each feature.</p></dd>
 #&gt; [1] 0.6
 #&gt; 
 #&gt; [[1]]$colsample_bytree
-#&gt; [1] 0.8
+#&gt; [1] 1
 #&gt; 
 #&gt; [[1]]$objective
 #&gt; [1] "binary:logistic"
@@ -340,10 +346,10 @@ tuning parameters for each feature.</p></dd>
 #&gt; [1] 2
 #&gt; 
 #&gt; [[2]]$eta
-#&gt; [1] 0.4
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[2]]$nrounds
-#&gt; [1] 5
+#&gt; [1] 19
 #&gt; 
 #&gt; [[2]]$scale_pos_weight
 #&gt; [1] 0.9653068
@@ -352,10 +358,10 @@ tuning parameters for each feature.</p></dd>
 #&gt; [1] 0.3162278
 #&gt; 
 #&gt; [[2]]$subsample
-#&gt; [1] 0.6
+#&gt; [1] 0.7
 #&gt; 
 #&gt; [[2]]$colsample_bytree
-#&gt; [1] 0.8
+#&gt; [1] 0.5
 #&gt; 
 #&gt; [[2]]$objective
 #&gt; [1] "binary:logistic"
@@ -363,29 +369,29 @@ tuning parameters for each feature.</p></dd>
 #&gt; </div><div class='input'>
 <span class='co'># print model predictions</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 200 x 2</span><span>
-#&gt;        f1     f2
-#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 0.964  0.584 
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 0.068</span><span style='text-decoration: underline;'>0</span><span> 0.690 
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 0.273  0.837 
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 0.019</span><span style='text-decoration: underline;'>0</span><span> 0.093</span><span style='text-decoration: underline;'>5</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 0.025</span><span style='text-decoration: underline;'>4</span><span> 0.137 
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 0.666  0.787 
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 0.111  0.475 
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 0.157  0.189 
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 0.378  0.221 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 0.674  0.297 
+#&gt;        f1    f2
+#&gt;     </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> 0.946  0.577
+#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> 0.141  0.636
+#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> 0.421  0.697
+#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> 0.018</span><span style='text-decoration: underline;'>3</span><span> 0.215
+#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> 0.035</span><span style='text-decoration: underline;'>5</span><span> 0.215
+#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> 0.679  0.828
+#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> 0.081</span><span style='text-decoration: underline;'>3</span><span> 0.481
+#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> 0.132  0.232
+#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> 0.541  0.304
+#&gt; </span><span style='color: #BCBCBC;'>10</span><span> 0.732  0.362
 #&gt; </span><span style='color: #949494;'># ... with 190 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 13</span><span>
 #&gt;   feature train_auc_mean train_auc_std train_sensitivi~ train_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1               0.970        0.013</span><span style='text-decoration: underline;'>3</span><span>            0.901           0.027</span><span style='text-decoration: underline;'>8</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2               0.956        0.018</span><span style='text-decoration: underline;'>4</span><span>            0.888           0.055</span><span style='text-decoration: underline;'>5</span><span>
-#&gt; </span><span style='color: #949494;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   train_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   test_sensitivity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_sensitivity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   test_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1               0.977       0.004</span><span style='text-decoration: underline;'>75</span><span>            0.932           0.023</span><span style='text-decoration: underline;'>2</span><span>
+#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2               0.961       0.013</span><span style='text-decoration: underline;'>0</span><span>             0.862           0.030</span><span style='text-decoration: underline;'>7</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   train_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_auc_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   test_sensitivity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_sensitivity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   test_specificity_mean </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, test_specificity_std </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

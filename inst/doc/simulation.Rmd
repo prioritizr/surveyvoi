@@ -262,7 +262,7 @@ approx_evd_current <- approx_evdci(
   feature_target_column = "target",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 1000)
+  n_approx_states_per_replicate = 10000)
 
 # print value
 print(approx_evd_current)
@@ -291,7 +291,7 @@ approx_evd_perfect <- approx_evdpi(
   feature_target_column = "target",
   total_budget = total_budget,
   n_approx_replicates = 1,
-  n_approx_states_per_replicate = 1000)
+  n_approx_states_per_replicate = 10000)
 
 # print value
 print(approx_evd_perfect)
@@ -445,7 +445,7 @@ approx_evd_survey_schemes$value <- sapply(
     xgb_parameters = xgb_parameters,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 })
 
 # print values
@@ -509,7 +509,7 @@ opt_scheme <- approx_optimal_survey_scheme(
     xgb_parameters = xgb_parameters,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.5}
@@ -556,7 +556,7 @@ approx_evd_opt <- approx_evdsi(
     xgb_parameters = xgb_parameters,
     xgb_n_folds = 2,
     n_approx_replicates = 1,
-    n_approx_states_per_replicate = 1000)
+    n_approx_states_per_replicate = 10000)
 
 # calculate value
 print(approx_evd_opt)
