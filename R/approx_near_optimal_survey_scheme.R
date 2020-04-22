@@ -57,7 +57,10 @@ NULL
 #'
 #' \item Calculate the approximate expected value of each
 #' new candidate survey scheme. If the cost of a given candidate survey scheme
-#' exceeds the total budget, then store a missing \code{NA} value instead.
+#' exceeds the survey budget, then store a missing \code{NA value} instead.
+#' Also if the the cost of a given candidate survey scheme plus the
+#' management costs of locked in planning units exceeds the total budget,
+#' then a store a missing value \code{NA} value too.
 #'
 #' \item If all of the new candidate survey schemes are associated with
 #' missing \code{NA} values -- because they all exceed the survey budget -- then
@@ -429,12 +432,16 @@ approx_near_optimal_survey_scheme <- function(
       ## generate solution
       curr_candidate_solution <- prev_solution
       curr_candidate_solution[j] <- TRUE
+      ## cost of surveys exceeds survey budget then return NA
+      curr_surv_cost <-
+        sum(site_data[[site_survey_cost_column]] * curr_candidate_solution)
+      if (curr_surv_cost > survey_budget) return(NA_real_)
       ## calculate cost of solution, if it exceeds the budget then return NA
-      curr_cost <-
-        sum(site_data[[site_survey_cost_column]] * curr_candidate_solution) +
+      curr_total_cost <-
+        curr_surv_cost +
         sum(site_data[[site_management_cost_column]] *
             site_management_locked_in)
-      if (curr_cost > total_budget) return(NA_real_)
+      if (curr_total_cost > total_budget) return(NA_real_)
       ## setup folds for training and testing models
       pu_predict_idx <-
         which(curr_candidate_solution | site_survey_status)
@@ -487,9 +494,6 @@ approx_near_optimal_survey_scheme <- function(
     # check to see if main loop should be exited
     ## if all candidate solutions exceed the budget then exit loop
     if (all(is.na(curr_sites_approx_evsdi))) break()
-    ## if all candidate solutions have worse performance than previous iteration
-    ## then exit loop
-    if (all(curr_sites_approx_evsdi < survey_solution_values[s - 1])) break()
 
     # penalise each objective value by the cost of the extra planning unit
     curr_eval_metrics <-

@@ -458,7 +458,10 @@ a survey, generate a new candidate survey scheme with each candidate site
 added to the current survey solution.</p></li>
 <li><p>Calculate the approximate expected value of each
 new candidate survey scheme. If the cost of a given candidate survey scheme
-exceeds the total budget, then store a missing <code>NA</code> value instead.</p></li>
+exceeds the survey budget, then store a missing <code>NA value</code> instead.
+Also if the the cost of a given candidate survey scheme plus the
+management costs of locked in planning units exceeds the total budget,
+then a store a missing value <code>NA</code> value too.</p></li>
 <li><p>If all of the new candidate survey schemes are associated with
 missing <code>NA</code> values -- because they all exceed the survey budget -- then
 go to step 13.</p></li>

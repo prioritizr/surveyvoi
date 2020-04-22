@@ -276,7 +276,10 @@ added to the current survey solution.
 
 \item Calculate the approximate expected value of each
 new candidate survey scheme. If the cost of a given candidate survey scheme
-exceeds the total budget, then store a missing \code{NA} value instead.
+exceeds the survey budget, then store a missing \code{NA value} instead.
+Also if the the cost of a given candidate survey scheme plus the
+management costs of locked in planning units exceeds the total budget,
+then a store a missing value \code{NA} value too.
 
 \item If all of the new candidate survey schemes are associated with
 missing \code{NA} values -- because they all exceed the survey budget -- then
