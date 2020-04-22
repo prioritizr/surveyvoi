@@ -11,7 +11,7 @@ plot_conservation_benefit(
   feature_preweight_column,
   feature_postweight_column,
   feature_target_column,
-  plot_data = TRUE
+  plot = TRUE
 )
 }
 \arguments{
@@ -51,7 +51,7 @@ This column should have \code{numeric} values that
 are equal to or greater than zero. No missing (\code{NA}) values are
 permitted in this column.}
 
-\item{plot_data}{\code{logical} should the plot be returned? If \code{FALSE}
+\item{plot}{\code{logical} should the plot be returned? If \code{FALSE}
 the underlying data (i.e. a \code{tibble}{tibble} object) is returned
 instead of the plot. Defaults to \code{TRUE}.}
 }

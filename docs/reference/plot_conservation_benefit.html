@@ -137,7 +137,7 @@ conservation features.</p>
   <span class='no'>feature_preweight_column</span>,
   <span class='no'>feature_postweight_column</span>,
   <span class='no'>feature_target_column</span>,
-  <span class='kw'>plot_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='kw'>plot</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -192,7 +192,7 @@ are equal to or greater than zero. No missing (<code>NA</code>) values are
 permitted in this column.</p></td>
     </tr>
     <tr>
-      <th>plot_data</th>
+      <th>plot</th>
       <td><p><code>logical</code> should the plot be returned? If <code>FALSE</code>
 the underlying data (i.e. a <code>tibble</code>tibble object) is returned
 instead of the plot. Defaults to <code>TRUE</code>.</p></td>
@@ -221,8 +221,10 @@ instead of the plot. Defaults to <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    RFoptions</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
@@ -242,16 +244,16 @@ instead of the plot. Defaults to <code>TRUE</code>.</p></td>
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     0     1     1     1
-#&gt; </span><span style='color: #949494;'># ... with 5 more variables: p1 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p3 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p4 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 4 x 9</span><span>
-#&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
+#&gt; </span><span style='color: #949494;'># … with 5 more variables: p1 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p3 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p4 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 4 x 9</span><span>
+#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    FALSE             0.952            0.863            0.778
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.956            0.887            0.734
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span> f3    FALSE             0.963            0.802            0.725
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span> f4    TRUE              0.987            0.849            0.727
-#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #949494;'># … with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># plot conservation benefit for each feature</span>
 <span class='fu'>plot_conservation_benefit</span>(
  <span class='kw'>site_data</span> <span class='kw'>=</span> <span class='no'>site_data</span>,

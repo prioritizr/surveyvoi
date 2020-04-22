@@ -1,6 +1,6 @@
 context("plot_conservation_benefit")
 
-test_that("plot_data = TRUE", {
+test_that("plot = TRUE", {
   # initialize rng
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
@@ -20,7 +20,7 @@ test_that("plot_data = TRUE", {
   expect_is(p, "gg")
 })
 
-test_that("plot_data = FALSE", {
+test_that("plot = FALSE", {
   # initialize rng
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
@@ -36,7 +36,7 @@ test_that("plot_data = FALSE", {
   feature_preweight_column = "preweight",
   feature_postweight_column  = "postweight",
   feature_target_column = "target",
-  plot_data = FALSE)
+  plot = FALSE)
   # tests
   expect_is(p, "tbl_df")
 })

@@ -8,7 +8,7 @@ NULL
 #'
 #' @inheritParams approx_evdsi
 #'
-#' @param plot_data \code{logical} should the plot be returned? If \code{FALSE}
+#' @param plot \code{logical} should the plot be returned? If \code{FALSE}
 #'   the underlying data (i.e. a \code{tibble}{tibble} object) is returned
 #'   instead of the plot. Defaults to \code{TRUE}.
 #'
@@ -60,7 +60,7 @@ plot_conservation_benefit <- function(
   feature_preweight_column,
   feature_postweight_column,
   feature_target_column,
-  plot_data = TRUE) {
+  plot = TRUE) {
   # assert arguments are valid
   assertthat::assert_that(
   ## site_data
@@ -92,8 +92,8 @@ plot_conservation_benefit <- function(
   is.numeric(feature_data[[feature_target_column]]),
   assertthat::noNA(feature_data[[feature_target_column]]),
   all(feature_data[[feature_target_column]] >= 0),
-  ## plot_data
-  assertthat::is.flag(plot_data), assertthat::noNA(plot_data))
+  ## plot
+  assertthat::is.flag(plot), assertthat::noNA(plot))
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
 
@@ -131,8 +131,8 @@ plot_conservation_benefit <- function(
                           rep("potential", length(unsurveyed_benefit))))
   }) %>% tibble::as_tibble()
 
-  # if plot_data then do so
-  if (!isTRUE(plot_data)) return(d)
+  # if not plot then return result
+  if (!isTRUE(plot)) return(d)
 
   # create plot
   p <-
