@@ -1,13 +1,13 @@
-#include "rcpp_conservation_benefit.h"
+#include "rcpp_conservation_value.h"
 
-double conservation_benefit_amount(
+double conservation_value_amount(
   double x, double preweight, double postweight, double target, double total) {
   bool met = x >= target;
   return (!met * (preweight * (x / target))) +
          (met * (preweight + (postweight * ((x - target) / (total - target)))));
 }
 
-double conservation_benefit_state(
+double conservation_value_state(
   Eigen::MatrixXd &x, Eigen::VectorXd &preweight, Eigen::VectorXd &postweight,
   Eigen::VectorXd &target, double total) {
   Eigen::VectorXd v = x.rowwise().sum();
@@ -28,14 +28,14 @@ double conservation_benefit_state(
 }
 
 // [[Rcpp::export]]
-double rcpp_conservation_benefit_state(
+double rcpp_conservation_value_state(
   Eigen::MatrixXd x, Eigen::VectorXd preweight, Eigen::VectorXd postweight,
   Eigen::VectorXd target, double total) {
-  return conservation_benefit_state(x, preweight, postweight, target, total);
+  return conservation_value_state(x, preweight, postweight, target, total);
 }
 
 // [[Rcpp::export]]
-double rcpp_conservation_benefit_amount(
+double rcpp_conservation_value_amount(
   double x, double preweight, double postweight, double target, double total) {
-  return conservation_benefit_amount(x, preweight, postweight, target, total);
+  return conservation_value_amount(x, preweight, postweight, target, total);
 }

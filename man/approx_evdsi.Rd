@@ -2,7 +2,7 @@
 % Please edit documentation in R/approx_evdsi.R
 \name{approx_evdsi}
 \alias{approx_evdsi}
-\title{Expected value of the decision given survey information}
+\title{Approximate expected value of the decision given survey information}
 \usage{
 approx_evdsi(
   site_data,
@@ -30,8 +30,8 @@ approx_evdsi(
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
-  n_approx_states_per_replicate = 1000,
-  method_approx_states = "weighted_without_replacement",
+  n_approx_outcomes_per_replicate = 10000,
+  method_approx_outcomes = "weighted_without_replacement",
   seed = 500
 )
 }
@@ -198,32 +198,27 @@ for \code{xgb_parameters}).}
 \item{n_approx_replicates}{\code{integer} number of replicates to use for
 approximating the expected value calculations. Defaults to 100.}
 
-\item{n_approx_states_per_replicate}{\code{integer} number of states to use
-per replicate for approximating the expected value of a given management
-action. This number must be smaller than or equal to the total number of
-presence absence states in the system
-(i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
-Defaults to 1000.}
+\item{n_approx_outcomes_per_replicate}{\code{integer} number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.}
 
-\item{method_approx_states}{\code{character} name of method that is
-used to sample states for approximating the expected value
+\item{method_approx_outcomes}{\code{character} name of method that is
+used to sample outcomes for approximating the expected value
 calculations. Available options are:
 \code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
 \code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
 Uniform sampling methods have an equal chance of returning each
 state, and weighted sampling methods are more likely to return
-states with a higher prior probability of occurring.
+outcomes with a higher prior probability of occurring.
 Defaults to \code{"weighted_without_replacement"}.}
 
 \item{seed}{\code{integer} state of the random number generator for
 partitioning data into folds cross-validation and fitting \pkg{xgboost}
-models. It is also used for generating states.
+models. It is also used for generating outcomes.
 This parameter must remain the same to compare results from different
 functions using the approximation methods. Defaults to 500.}
 }
 \value{
-\code{numeric} \code{vector} containing the estimate for each
-  replicate.
+\code{numeric} vector containing the expected values for each
+replicate.
 }
 \description{
 Calculate the \emph{expected value of the conservation management decision
@@ -237,7 +232,7 @@ This function uses approximation methods to estimate the
   the same seed is used when comparing results to other functions that
   use approximation methods. Additionally, the accuracy of these
   calculations depend on the arguments to
-  \code{n_approx_replicates} and \code{n_approx_states_per_replicate}, and
+  \code{n_approx_replicates} and \code{n_approx_outcomes_per_replicate}, and
   so you may need to increase these parameters for large problems.
 }
 \examples{

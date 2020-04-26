@@ -176,6 +176,5 @@ print(ev_current)
 
 }
 \seealso{
-\code{\link{prior_probability_matrix}},
-\code{\link{approx_evdci}}.
+\code{\link{prior_probability_matrix}}.
 }

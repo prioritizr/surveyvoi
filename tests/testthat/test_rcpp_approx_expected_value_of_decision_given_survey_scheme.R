@@ -1,4 +1,5 @@
 context("rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states")
+skip("TODO")
 
 test_that("correct result", {
   # data

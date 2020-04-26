@@ -2,7 +2,7 @@
 #define PRIORITIZATION_H
 
 #include "package.h"
-#include "rcpp_conservation_benefit.h"
+#include "rcpp_conservation_value.h"
 #include "gurobi_c.h"
 
 class Prioritization
@@ -131,11 +131,11 @@ public:
     // add piece-wise linear objective function components
     /// initialize dummmy variables if a feature only contains zeros
     Eigen::VectorXd dummy_held(3);
-    Eigen::VectorXd dummy_benefit(3);
+    Eigen::VectorXd dummy_value(3);
     dummy_held[0] = 0.0;
-    dummy_benefit[0] = 0.0;
+    dummy_value[0] = 0.0;
     dummy_held[2] = 100.0;
-    dummy_benefit[2] = 100.0;
+    dummy_value[2] = 100.0;
     /// initialize variables
     double curr_value;
     Eigen::VectorXd min_feature_held = rij.rowwise().minCoeff();
@@ -146,9 +146,9 @@ public:
       (sum_feature_held.array() - min_feature_held.array()) /
       static_cast<double>(_n_approx_obj_fun_points - 2);
     Eigen::VectorXd obj_feature_held(_n_approx_obj_fun_points);
-    Eigen::VectorXd obj_feature_benefit(_n_approx_obj_fun_points);
+    Eigen::VectorXd obj_feature_value(_n_approx_obj_fun_points);
     obj_feature_held[0] = 0.0;
-    obj_feature_benefit[0] = 0.0;
+    obj_feature_value[0] = 0.0;
     /// add piece-wise components
     for (std::size_t j = 0; j < _n_f; ++j) {
       /// calculate held values
@@ -157,34 +157,34 @@ public:
         obj_feature_held[k] = curr_value;
         curr_value += incr_feature_held[j];
       }
-      /// calculate benefit values
+      /// calculate value values
       for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
-        obj_feature_benefit[k] =  conservation_benefit_amount(
+        obj_feature_value[k] =  conservation_value_amount(
           obj_feature_held[k], *(_preweight + j),
           *(_postweight + j), *(_target + j), static_cast<double>(_n_pu));
       }
-      obj_feature_benefit[0] = 0.0;
+      obj_feature_value[0] = 0.0;
       /// add component
-      if ((obj_feature_benefit.maxCoeff() - obj_feature_benefit[0]) > 1.0e-5) {
+      if ((obj_feature_value.maxCoeff() - obj_feature_value[0]) > 1.0e-5) {
         // use actual peice-wise linear objectives if the feature doesn't
         // have zeros in all planning units
         GRBsetpwlobj(_model, _n_pu + j, _n_approx_obj_fun_points,
                      obj_feature_held.data(),
-                     obj_feature_benefit.data());
+                     obj_feature_value.data());
       } else {
         // use dummy peice-wise linear objectives if there is zero variation
-        // in the benefit function
-        if (obj_feature_benefit[1] > 1.0e-5) {
-          // if the benefit function has constant values that are greater
+        // in the value function
+        if (obj_feature_value[1] > 1.0e-5) {
+          // if the value function has constant values that are greater
           // than zero, then set this value as the maximum value
           dummy_held[1] = obj_feature_held[1];
-          dummy_benefit[1] = obj_feature_benefit[1];
+          dummy_value[1] = obj_feature_value[1];
         } else {
           dummy_held[1] = 1.0;
-          dummy_benefit[1] = 1.0;
+          dummy_value[1] = 1.0;
         }
         GRBsetpwlobj(_model, _n_pu + j, 3, dummy_held.data(),
-                     dummy_benefit.data());
+                     dummy_value.data());
       }
     }
     // return void

@@ -118,8 +118,8 @@ approx_optimal_survey_scheme <- function(
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
-  n_approx_states_per_replicate = 1000,
-  method_approx_states = "weighted_without_replacement",
+  n_approx_outcomes_per_replicate = 10000,
+  method_approx_outcomes = "weighted_without_replacement",
   seed = 500,
   n_threads = 1) {
   # assert arguments are valid
@@ -237,13 +237,13 @@ approx_optimal_survey_scheme <- function(
     ## n_approx_replicates
     assertthat::is.count(n_approx_replicates),
     assertthat::noNA(n_approx_replicates),
-    ## n_approx_states_per_replicate
-    assertthat::is.count(n_approx_states_per_replicate),
-    assertthat::noNA(n_approx_states_per_replicate),
-    ## method_approx_states
-    assertthat::is.string(method_approx_states),
-    assertthat::noNA(method_approx_states),
-    isTRUE(method_approx_states %in%
+    ## n_approx_outcomes_per_replicate
+    assertthat::is.count(n_approx_outcomes_per_replicate),
+    assertthat::noNA(n_approx_outcomes_per_replicate),
+    ## method_approx_outcomes
+    assertthat::is.string(method_approx_outcomes),
+    assertthat::noNA(method_approx_outcomes),
+    isTRUE(method_approx_outcomes %in%
       c("uniform_with_replacement", "uniform_without_replacement",
         "weighted_with_replacement", "weighted_without_replacement")),
     ## seed
@@ -270,10 +270,10 @@ approx_optimal_survey_scheme <- function(
       assertthat::noNA(site_data[[site_survey_locked_out_column]]),
       !all(site_data[[site_survey_locked_out_column]]))
   }
-  ## n_approx_states_per_replicate
+  ## n_approx_outcomes_per_replicate
   if ((nrow(site_data) * nrow(feature_data)) < 50)
     assertthat::assert_that(
-    isTRUE(n_approx_states_per_replicate <=
+    isTRUE(n_approx_outcomes_per_replicate <=
            n_states(nrow(site_data), nrow(feature_data))))
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
@@ -350,7 +350,7 @@ approx_optimal_survey_scheme <- function(
 
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
-    rcpp_approx_expected_value_of_decision_given_current_info_n_states(
+    rcpp_expected_value_of_decision_given_current_info(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
@@ -359,10 +359,7 @@ approx_optimal_survey_scheme <- function(
       target = feature_data[[feature_target_column]],
       n_approx_obj_fun_points = n_approx_obj_fun_points,
       budget = total_budget,
-      gap = optimality_gap,
-      n_approx_replicates = n_approx_replicates,
-      n_approx_states_per_replicate = n_approx_states_per_replicate,
-      method_approx_states = method_approx_states)
+      gap = optimality_gap)
   })
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -411,8 +408,8 @@ approx_optimal_survey_scheme <- function(
         total_budget = total_budget,
         optim_gap = optimality_gap,
         n_approx_replicates = n_approx_replicates,
-        n_approx_states_per_replicate = n_approx_states_per_replicate,
-        method_approx_states = method_approx_states)
+        n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
+        method_approx_outcomes = method_approx_outcomes)
     })
   })
   ## kill cluster

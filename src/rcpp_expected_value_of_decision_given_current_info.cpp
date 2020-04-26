@@ -4,7 +4,6 @@
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
 #include "rcpp_expected_value_of_action.h"
-#include "rcpp_conservation_benefit.h"
 
 // [[Rcpp::export]]
 double rcpp_expected_value_of_decision_given_current_info(
@@ -27,12 +26,6 @@ double rcpp_expected_value_of_decision_given_current_info(
   p.solve();
   p.get_solution(solution);
 
-  // calculate log prior probabilities
-  Eigen::MatrixXd pij_log1m = pij;
-  log_1m_matrix(pij_log1m);
-  log_matrix(pij);
-
   // calculate expected value of management action
-  return expected_value_of_action(
-    solution, pij, pij_log1m, preweight, postweight, target);
+  return expected_value_of_action(solution, pij, preweight, postweight, target);
 }

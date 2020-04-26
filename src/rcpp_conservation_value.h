@@ -4,10 +4,10 @@
 #include "package.h"
 #include "functions.h"
 
-double conservation_benefit_amount(
+double conservation_value_amount(
   double, double, double, double, double);
 
-double conservation_benefit_state(
+double conservation_value_state(
   Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&, Eigen::VectorXd&,
   double);
 

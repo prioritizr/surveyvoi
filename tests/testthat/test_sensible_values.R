@@ -297,7 +297,7 @@ test_that("identical outputs given identical inputs", {
   expect_lte(abs(diff(range(r))), 1e-10)
 })
 
-test_that("current = optimal info = perfect info, when all pu selected", {
+test_that("current = optimal info, when all pu selected", {
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -365,31 +365,11 @@ test_that("current = optimal info = perfect info, when all pu selected", {
     site_management_locked_in_column = "locked_in",
     n_approx_obj_fun_points = 1000,
     optimality_gap = 0)
-  evd_perfect <- evdpi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_occupancy_columns = c("f1", "f2"),
-    site_probability_columns = c("p1", "p2"),
-    site_management_cost_column = "management_cost",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
-    feature_target_column = "target",
-    total_budget = 100,
-    site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 1000,
-    optimality_gap = 0)
-
   # tests
-  expect_equal(evd_current, evd_perfect)
   expect_equal(max(attr(evd_ss, "ev")), evd_current)
-  expect_equal(max(attr(evd_ss, "ev")), evd_perfect)
 })
 
-test_that("current < optimal info < perfect info, some pu selected", {
+test_that("current < optimal info, some pu selected", {
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -459,25 +439,6 @@ test_that("current < optimal info < perfect info, some pu selected", {
     site_management_locked_in_column = "locked_in",
     n_approx_obj_fun_points = 100,
     optimality_gap = gap)
-  evd_perfect <- evdpi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_occupancy_columns = c("f1", "f2"),
-    site_probability_columns = c("p1", "p2"),
-    site_management_cost_column = "management_cost",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
-    feature_target_column = "target",
-    total_budget = budget,
-    site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 100,
-    optimality_gap = gap)
   # tests
-  expect_lt(evd_current, evd_perfect)
   expect_gt(max(attr(evd_ss, "ev")), evd_current)
-  expect_lt(max(attr(evd_ss, "ev")), evd_perfect)
 })

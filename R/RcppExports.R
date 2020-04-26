@@ -9,36 +9,16 @@ rcpp_log_sum <- function(x) {
     .Call(`_surveyvoi_rcpp_log_sum`, x)
 }
 
-rcpp_approx_expected_value_of_action <- function(solution, pij, preweight, postweight, target, states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_action`, solution, pij, preweight, postweight, target, states)
+rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_preweight, obj_fun_postweight, obj_fun_target, n_approx_obj_fun_points, total_budget, optim_gap, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_preweight, obj_fun_postweight, obj_fun_target, n_approx_obj_fun_points, total_budget, optim_gap, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes)
 }
 
-rcpp_approx_expected_value_of_decision_given_current_info_n_states <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_n_states`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states)
+rcpp_conservation_value_state <- function(x, preweight, postweight, target, total) {
+    .Call(`_surveyvoi_rcpp_conservation_value_state`, x, preweight, postweight, target, total)
 }
 
-rcpp_approx_expected_value_of_decision_given_current_info_fixed_states <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info_fixed_states`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, states)
-}
-
-rcpp_approx_expected_value_of_decision_given_perfect_info_n_states <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_n_states`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states)
-}
-
-rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_perfect_info_fixed_states`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap, states)
-}
-
-rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_preweight, obj_fun_postweight, obj_fun_target, n_approx_obj_fun_points, total_budget, optim_gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_preweight, obj_fun_postweight, obj_fun_target, n_approx_obj_fun_points, total_budget, optim_gap, n_approx_replicates, n_approx_states_per_replicate, method_approx_states)
-}
-
-rcpp_conservation_benefit_state <- function(x, preweight, postweight, target, total) {
-    .Call(`_surveyvoi_rcpp_conservation_benefit_state`, x, preweight, postweight, target, total)
-}
-
-rcpp_conservation_benefit_amount <- function(x, preweight, postweight, target, total) {
-    .Call(`_surveyvoi_rcpp_conservation_benefit_amount`, x, preweight, postweight, target, total)
+rcpp_conservation_value_amount <- function(x, preweight, postweight, target, total) {
+    .Call(`_surveyvoi_rcpp_conservation_value_amount`, x, preweight, postweight, target, total)
 }
 
 rcpp_expected_value_of_action <- function(solution, pij, preweight, postweight, target) {
@@ -47,10 +27,6 @@ rcpp_expected_value_of_action <- function(solution, pij, preweight, postweight, 
 
 rcpp_expected_value_of_decision_given_current_info <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap) {
     .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_current_info`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap)
-}
-
-rcpp_expected_value_of_decision_given_perfect_info <- function(pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_perfect_info`, pij, pu_costs, pu_locked_in, preweight, postweight, target, n_approx_obj_fun_points, budget, gap)
 }
 
 rcpp_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_status, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_preweight, obj_fun_postweight, obj_fun_target, n_approx_obj_fun_points, total_budget, optim_gap) {

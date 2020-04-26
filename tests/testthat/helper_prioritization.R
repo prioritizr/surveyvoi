@@ -24,10 +24,10 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
     r2 <- sum(x) * 1.01
     seq(r1, r2, length.out = n_approx_points)
   })
-  obj_feature_benefit <- obj_feature_held
-  {for (i in seq_len(ncol(obj_feature_benefit))) {
-    obj_feature_benefit[, i] <-
-      r_conservation_benefit_amount(obj_feature_held[, i],
+  obj_feature_value <- obj_feature_held
+  {for (i in seq_len(ncol(obj_feature_value))) {
+    obj_feature_value[, i] <-
+      r_conservation_value_amount(obj_feature_held[, i],
         preweight[i], postweight[i], target[i], n_pu)
   }}
   # build problem
@@ -41,14 +41,14 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   p$sense <- c(rep("=", n_f), "<=")
   p$A <- rbind(cbind(rij, diag(n_f) * -1), c(pu_costs, rep(0, n_f)))
   p$pwlobj <- lapply(seq_len(n_f), function(i) {
-    if (abs(diff(range(obj_feature_benefit[, i]))) > 1e-5) {
+    if (abs(diff(range(obj_feature_value[, i]))) > 1e-5) {
       o <- list(var = n_pu + i,
                 x = c(0, obj_feature_held[, i]),
-                y = c(0, obj_feature_benefit[, i]))
-    } else if (obj_feature_benefit[1, i] > 1e-5) {
+                y = c(0, obj_feature_value[, i]))
+    } else if (obj_feature_value[1, i] > 1e-5) {
       o <- list(var = n_pu + i,
                 x = c(0, obj_feature_held[1, i]),
-                y = c(0, obj_feature_benefit[1, i]))
+                y = c(0, obj_feature_value[1, i]))
     } else {
       o <- list(var = n_pu + i, x = c(0, 0.5, 1), y = c(0, 0.5, 1))
     }
@@ -93,7 +93,7 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
     if (sum(x * pu_costs) > budget)
       return(-Inf)
     # if feasible solution then return objective function
-    r_conservation_benefit_state(
+    r_conservation_value_state(
       x[rep(1, n_f), ] * rij, preweight, postweight, target, total)
   })
   # find best solution

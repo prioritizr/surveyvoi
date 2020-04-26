@@ -23,7 +23,7 @@ test_that("expected result", {
     rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
   # tests
   objval <-
-    r_conservation_benefit_state(
+    r_conservation_value_state(
       matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
       rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)
@@ -89,7 +89,7 @@ test_that("expected result (one feature has all zeros)", {
     rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
   # tests
   objval <-
-    r_conservation_benefit_state(
+    r_conservation_value_state(
       matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
       rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)

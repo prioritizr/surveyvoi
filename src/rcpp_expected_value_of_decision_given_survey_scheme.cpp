@@ -282,8 +282,8 @@ double expected_value_of_decision_given_survey_scheme(
       curr_total_probability_of_model_negative,
       curr_pij);
 
-    assert_valid_probability_data(curr_pij,
-                                  "issue calculating posterior probabilities");
+    assert_valid_probability_data(
+      curr_pij, "issue calculating posterior probabilities");
 
     /// generate prioritisation
     prioritize.add_rij_data(curr_pij);

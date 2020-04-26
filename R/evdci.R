@@ -5,16 +5,9 @@
 #' decision that is expected when the decision maker is limited to
 #' existing biodiversity data (i.e. survey data and environmental niche models).
 #'
-#' @inheritParams approx_evdci
+#' @inheritParams evdsi
 #'
-#' @details This function calculates the expected value and does not
-#'  use approximation methods. As such, this function can only be applied
-#'  to very small problems.
-#'
-#' @return \code{numeric} value.
-#'
-#' @seealso \code{\link{prior_probability_matrix}},
-#' \code{\link{approx_evdci}}.
+#' @inherit evdsi details return seealso
 #'
 #' @examples
 #' # set seeds for reproducibility
