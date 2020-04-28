@@ -348,6 +348,10 @@ approx_optimal_survey_scheme <- function(
   new_info_idx <- which(rowSums(all_feasible_schemes) > 0.5)
   current_idx <- which(rowSums(all_feasible_schemes) < 0.5)
 
+  print("all_feasible_schemes")
+  print(all_feasible_schemes)
+
+
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
     rcpp_expected_value_of_decision_given_current_info(

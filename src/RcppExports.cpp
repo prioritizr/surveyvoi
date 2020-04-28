@@ -293,30 +293,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_total_probability_of_positive_model_result
-Eigen::MatrixXd rcpp_total_probability_of_positive_model_result(Eigen::MatrixXd prior, Eigen::MatrixXd sensitivity, Eigen::MatrixXd specificity, std::vector<std::size_t> feature_outcome_idx);
-RcppExport SEXP _surveyvoi_rcpp_total_probability_of_positive_model_result(SEXP priorSEXP, SEXP sensitivitySEXP, SEXP specificitySEXP, SEXP feature_outcome_idxSEXP) {
+Eigen::MatrixXd rcpp_total_probability_of_positive_model_result(Eigen::MatrixXd prior, Eigen::VectorXd sensitivity, Eigen::VectorXd specificity);
+RcppExport SEXP _surveyvoi_rcpp_total_probability_of_positive_model_result(SEXP priorSEXP, SEXP sensitivitySEXP, SEXP specificitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type prior(priorSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type sensitivity(sensitivitySEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type specificity(specificitySEXP);
-    Rcpp::traits::input_parameter< std::vector<std::size_t> >::type feature_outcome_idx(feature_outcome_idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_total_probability_of_positive_model_result(prior, sensitivity, specificity, feature_outcome_idx));
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type sensitivity(sensitivitySEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type specificity(specificitySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_total_probability_of_positive_model_result(prior, sensitivity, specificity));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_total_probability_of_negative_model_result
-Eigen::MatrixXd rcpp_total_probability_of_negative_model_result(Eigen::MatrixXd prior, Eigen::MatrixXd sensitivity, Eigen::MatrixXd specificity, std::vector<std::size_t> feature_outcome_idx);
-RcppExport SEXP _surveyvoi_rcpp_total_probability_of_negative_model_result(SEXP priorSEXP, SEXP sensitivitySEXP, SEXP specificitySEXP, SEXP feature_outcome_idxSEXP) {
+Eigen::MatrixXd rcpp_total_probability_of_negative_model_result(Eigen::MatrixXd prior, Eigen::VectorXd sensitivity, Eigen::VectorXd specificity);
+RcppExport SEXP _surveyvoi_rcpp_total_probability_of_negative_model_result(SEXP priorSEXP, SEXP sensitivitySEXP, SEXP specificitySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type prior(priorSEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type sensitivity(sensitivitySEXP);
-    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type specificity(specificitySEXP);
-    Rcpp::traits::input_parameter< std::vector<std::size_t> >::type feature_outcome_idx(feature_outcome_idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_total_probability_of_negative_model_result(prior, sensitivity, specificity, feature_outcome_idx));
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type sensitivity(sensitivitySEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type specificity(specificitySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_total_probability_of_negative_model_result(prior, sensitivity, specificity));
     return rcpp_result_gen;
 END_RCPP
 }

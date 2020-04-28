@@ -1,5 +1,4 @@
 context("approx_evdsi")
-skip("TODO")
 
 test_that("equal weights", {
   # data

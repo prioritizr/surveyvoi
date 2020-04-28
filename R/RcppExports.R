@@ -69,12 +69,12 @@ rcpp_probability_of_state <- function(sij, pij) {
     .Call(`_surveyvoi_rcpp_probability_of_state`, sij, pij)
 }
 
-rcpp_total_probability_of_positive_model_result <- function(prior, sensitivity, specificity, feature_outcome_idx) {
-    .Call(`_surveyvoi_rcpp_total_probability_of_positive_model_result`, prior, sensitivity, specificity, feature_outcome_idx)
+rcpp_total_probability_of_positive_model_result <- function(prior, sensitivity, specificity) {
+    .Call(`_surveyvoi_rcpp_total_probability_of_positive_model_result`, prior, sensitivity, specificity)
 }
 
-rcpp_total_probability_of_negative_model_result <- function(prior, sensitivity, specificity, feature_outcome_idx) {
-    .Call(`_surveyvoi_rcpp_total_probability_of_negative_model_result`, prior, sensitivity, specificity, feature_outcome_idx)
+rcpp_total_probability_of_negative_model_result <- function(prior, sensitivity, specificity) {
+    .Call(`_surveyvoi_rcpp_total_probability_of_negative_model_result`, prior, sensitivity, specificity)
 }
 
 rcpp_sample_n_weighted_states_with_replacement <- function(k, pij) {

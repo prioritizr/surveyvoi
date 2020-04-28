@@ -126,12 +126,12 @@ double expected_value_of_decision_given_survey_scheme(
   }
 
   /// declare temporary variables used in the main loop
+  std::size_t curr_n_folds;
   double curr_value;
   double curr_expected_value_of_action_given_outcome;
   double curr_probability_of_outcome;
   double curr_expected_value_of_decision =
     std::numeric_limits<double>::infinity();
-  Eigen::MatrixXd curr_state(n_pu_surveyed_in_scheme * n_f_survey, 1);
   Eigen::MatrixXd curr_oij = rij;
   Eigen::MatrixXd curr_mij = rij;
   Eigen::MatrixXd curr_pij(n_f, n_pu);
@@ -139,7 +139,12 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd curr_total_probability_of_model_positive(n_f_survey, n_pu);
   Eigen::MatrixXd curr_total_probability_of_model_negative(n_f_survey, n_pu);
   std::vector<bool> curr_solution(n_pu);
-  std::vector<std::size_t> feature_outcome_idx(n_f_survey);
+  std::vector<mpz_class> feature_outcome_idx(n_f_survey);
+  model_beta_map model_beta;
+  model_performance_map model_performance;
+  std::vector<std::vector<BoosterHandle> *> curr_models(n_f_survey);
+  Eigen::VectorXd curr_model_sensitivity(n_f_survey);
+  Eigen::VectorXd curr_model_specificity(n_f_survey);
 
   // preliminary processing
   /// create subset of prior matrix for just the species that need surveys
@@ -196,44 +201,6 @@ double expected_value_of_decision_given_survey_scheme(
     }
   }
 
-  /// fit distribution models for feature under different outcomes
-  /// for each feature separately
-  Eigen::Array<std::vector<BoosterHandle>, Eigen::Dynamic, Eigen::Dynamic>
-    model_beta(n_f_survey, n_f_outcomes);
-  Eigen::MatrixXd model_sensitivity(n_f_survey, n_f_outcomes);
-  Eigen::MatrixXd model_specificity(n_f_survey, n_f_outcomes);
-  Eigen::MatrixXd model_fit_oij = curr_oij;
-  Eigen::MatrixXd curr_outcome(1, n_pu_surveyed_in_scheme);
-  std::vector<std::size_t> curr_outcome_idx(n_pu_surveyed_in_scheme);
-  std::iota(curr_outcome_idx.begin(), curr_outcome_idx.end(), 0);
-  mpz_class tmp;
-  for (std::size_t o = 0; o < n_f_outcomes; ++o) {
-    /// generate the i'th outcome from surveying the planning units
-    tmp = o;
-    nth_state_sparse(tmp, curr_outcome_idx, curr_outcome);
-
-    /// create a copy of the oij matrix with prior-filled data
-    /// with all the planning units for features that need surveying
-    /// updated
-    for (std::size_t j = 0; j < n_pu_surveyed_in_scheme; ++j)
-      for (std::size_t i = 0; i < n_f_survey; ++i)
-        model_fit_oij(survey_features_idx[i], pu_survey_solution_idx[j]) =
-          curr_outcome(j);
-
-    /// fit model and store results
-    fit_xgboost_models_and_assess_performance(
-      model_fit_oij, wij, pu_env_data, survey_features_idx,
-      o, xgb_parameter_names, xgb_parameter_values,
-      n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
-      model_beta, model_sensitivity, model_specificity);
-  }
-
-  // validate calculations
-  assert_valid_probability_data(model_sensitivity,
-                                "issue calculating model sensitivites");
-  assert_valid_probability_data(model_specificity,
-                                "issue calculating model specificities");
-
   // main processing
   mpz_class o = 0;
   while (cmp(o, n_outcomes) < 0) {
@@ -241,30 +208,35 @@ double expected_value_of_decision_given_survey_scheme(
     /// all species
     nth_state_sparse(o, rij_outcome_idx, curr_oij);
 
-    // find out which model coefficients should be used for making predictions,
-    // in other words, find out what outcome has been generated for the feature.
-    // this involves finding the cell numbers of rij that correspond to
-    // the planning units that have been selected for surveying
+    // find out the outcome for each feature seperately
     which_feature_state(curr_oij, survey_features_idx, pu_survey_solution_idx,
                         feature_outcome_idx);
 
+    // fit models for the feature's outcomes if needed
+    fit_xgboost_models_and_assess_performance(
+      curr_oij, wij, pu_env_data,
+      survey_features_idx, feature_outcome_idx,
+      xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
+      xgb_train_folds, xgb_test_folds,
+      model_beta, model_performance,
+      curr_models, curr_model_sensitivity, curr_model_specificity);
+
     /// generate modelled predictions for species we are interested in surveying
     predict_missing_rij_data(curr_oij, pu_env_data, survey_features_idx,
-                             feature_outcome_idx, pu_model_prediction_idx,
-                             model_beta);
+                             pu_model_prediction_idx, curr_models);
     assert_valid_probability_data(curr_oij, "issue predicting missing data");
 
     /// calculate total probability of models' positive results
     total_probability_of_positive_model_result(
-      pij_survey_species_subset, model_sensitivity, model_specificity,
-      feature_outcome_idx, curr_total_probability_of_model_positive);
+      pij_survey_species_subset, curr_model_sensitivity, curr_model_specificity,
+      curr_total_probability_of_model_positive);
     assert_valid_probability_data(curr_total_probability_of_model_positive,
                                   "issue calculating total model positives");
 
     /// calculate total probability of models' negative results
     total_probability_of_negative_model_result(
-      pij_survey_species_subset, model_sensitivity, model_specificity,
-      feature_outcome_idx, curr_total_probability_of_model_negative);
+      pij_survey_species_subset, curr_model_sensitivity, curr_model_specificity,
+      curr_total_probability_of_model_negative);
     assert_valid_probability_data(curr_total_probability_of_model_negative,
                                   "issue calculating total model negatives");
 
@@ -272,16 +244,14 @@ double expected_value_of_decision_given_survey_scheme(
     posterior_probability_matrix(
       rij, pij, curr_oij,
       pu_survey_solution,
-      survey_features,
-      feature_outcome_idx, survey_features_rev_idx,
+      survey_features, survey_features_rev_idx,
       survey_sensitivity, survey_specificity,
       total_probability_of_survey_positive,
       total_probability_of_survey_negative,
-      model_sensitivity, model_specificity,
+      curr_model_sensitivity, curr_model_specificity,
       curr_total_probability_of_model_positive,
       curr_total_probability_of_model_negative,
       curr_pij);
-
     assert_valid_probability_data(
       curr_pij, "issue calculating posterior probabilities");
 
@@ -325,9 +295,12 @@ double expected_value_of_decision_given_survey_scheme(
   }
 
   // clean-up
-  for (std::size_t i = 0; i < (n_f_outcomes * n_f_survey); ++i)
-    for (std::size_t k = 0; k < model_beta(i).size(); ++k)
-      XGBoosterFree(model_beta(i)[k]);
+  for (auto itr = model_beta.begin(); itr != model_beta.end(); ++itr) {
+    curr_n_folds = itr->second->size();
+    for (std::size_t k = 0; k < curr_n_folds; ++k)
+      XGBoosterFree(itr->second->at(k));
+    delete itr->second;
+  }
 
   // exports
   return std::exp(curr_expected_value_of_decision);

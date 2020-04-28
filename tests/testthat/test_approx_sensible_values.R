@@ -1,5 +1,4 @@
 context("approx sensible values")
-skip("TODO")
 
 test_that("lower voi when most of budget spent on surveys", {
   # initialize rng
@@ -366,7 +365,7 @@ test_that("current = optimal info, when all pu selected", {
   n_reps <- 10
   n_states_per_rep <- 20
   # calculate expected values
-  evd_current <- approx_evdci(
+  evd_current <- evdci(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2"),
@@ -382,10 +381,7 @@ test_that("current = optimal info, when all pu selected", {
     total_budget = 100,
     site_management_locked_in_column = "locked_in",
     n_approx_obj_fun_points = 1000,
-    optimality_gap = 0,
-    n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    optimality_gap = 0)
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -412,7 +408,7 @@ test_that("current = optimal info, when all pu selected", {
     n_approx_outcomes_per_replicate = n_states_per_rep,
     method_approx_outcomes = "uniform_without_replacement")
   # tests
-  expect_equal(attr(evd_ss, "ev")[1, ], evd_current)
+  expect_equal(attr(evd_ss, "ev")[1, ], rep(evd_current, n_reps))
 })
 
 test_that("current < optimal info, some pu selected", {
@@ -449,7 +445,7 @@ test_that("current < optimal info, some pu selected", {
   n_reps <- 3
   n_states_per_rep <- 1000
   # calculate expected values
-  evd_current <- approx_evdci(
+  evd_current <- evdci(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2"),
@@ -465,10 +461,7 @@ test_that("current < optimal info, some pu selected", {
     total_budget = budget,
     site_management_locked_in_column = "locked_in",
     n_approx_obj_fun_points = 100,
-    optimality_gap = gap,
-    n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    optimality_gap = gap)
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
