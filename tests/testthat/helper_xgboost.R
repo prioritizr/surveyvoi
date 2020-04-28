@@ -46,7 +46,6 @@ r_fit_xgboost_models_and_assess_performance <- function(
                            wij[i, xgb_test_folds[[i]][[j]]])
     }))
   })
-  sens <- matrix(sens, ncol = 1)
 
   ## calculate specificity
   spec <- sapply(seq_len(nrow(rij)), function(i) {
@@ -56,7 +55,6 @@ r_fit_xgboost_models_and_assess_performance <- function(
                            wij[i, xgb_test_folds[[i]][[j]]])
     }))
   })
-  spec <- matrix(spec, ncol = 1)
 
   ## clamp values to (1e-10) and (1 - 1e-10) to arise from probabilities
   ## that are exactly zero and one
