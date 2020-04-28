@@ -6,14 +6,13 @@ void posterior_probability_matrix(
   Eigen::MatrixXd &oij, // outcome & modelled prediction data
   std::vector<bool> &pu_survey_solution, // is the planning unit being surveyed?
   std::vector<bool> &survey_features, // is the feature being surveyed?
-  std::vector<std::size_t> &feature_outcome_idx, // outcomes ids for features
   std::vector<std::size_t> &survey_features_rev_idx,
   Eigen::VectorXd &survey_sensitivity,
   Eigen::VectorXd &survey_specificity,
   Eigen::MatrixXd &total_probability_of_survey_positive,
   Eigen::MatrixXd &total_probability_of_survey_negative,
-  Eigen::MatrixXd &model_sensitivity,
-  Eigen::MatrixXd &model_specificity,
+  Eigen::VectorXd &curr_model_sensitivity,
+  Eigen::VectorXd &curr_model_specificity,
   Eigen::MatrixXd &total_probability_of_model_positive,
   Eigen::MatrixXd &total_probability_of_model_negative,
   Eigen::MatrixXd &out) {
@@ -77,8 +76,7 @@ void posterior_probability_matrix(
           /// and the overall probability of the model predicting a presence
           /// accounting for false-presences
           out(i, j) =
-            (model_sensitivity(sub_i, feature_outcome_idx[sub_i]) *
-             pij(i, j)) /
+            (curr_model_sensitivity[sub_i] * pij(i, j)) /
             total_probability_of_model_positive(sub_i, j);
         } else {
           /// if the model predicts an absence,
@@ -87,8 +85,7 @@ void posterior_probability_matrix(
           /// and the overall probability of the model predicting an absence
           /// accounting for false-absences
           out(i, j) =
-            ((1.0 - model_sensitivity(sub_i, feature_outcome_idx[sub_i])) *
-             pij(i, j)) /
+            ((1.0 - curr_model_sensitivity[sub_i]) * pij(i, j)) /
             total_probability_of_model_negative(sub_i, j);
         }
         /// if posterior probability is NaN because the total
@@ -119,6 +116,7 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   Eigen::VectorXd survey_specificity,
   Eigen::VectorXd model_sensitivity,
   Eigen::VectorXd model_specificity) {
+
   // initialize variables
   std::size_t n_f = rij.rows();
   std::size_t n_pu = rij.cols();
@@ -138,14 +136,14 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   }
 
   // subset model performance to only include surveyed features
-  Eigen::MatrixXd model_sensitivity2(n_f_survey, 1);
-  Eigen::MatrixXd model_specificity2(n_f_survey, 1);
+  Eigen::VectorXd model_sensitivity2(n_f_survey);
+  Eigen::VectorXd model_specificity2(n_f_survey);
   {
     std::size_t k = 0;
     for (std::size_t i = 0; i < n_f; ++i) {
       if (survey_features[i]) {
-        model_sensitivity2(k, 0) = model_sensitivity[i];
-        model_specificity2(k, 0) = model_specificity[i];
+        model_sensitivity2[k] = model_sensitivity[i];
+        model_specificity2[k] = model_specificity[i];
         ++k;
       }
     }
@@ -162,7 +160,6 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
     total_probability_of_survey_negative);
 
   // prepare feature ids
-  std::vector<std::size_t> feature_outcome_idx(n_f_survey, 0);
   std::vector<std::size_t> survey_features_rev_idx(n_f, 0);
   {
     std::size_t k = 0;
@@ -179,17 +176,17 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   Eigen::MatrixXd total_probability_of_model_negative(n_f_survey, n_pu);
   total_probability_of_positive_model_result(
     pij_survey_species_subset, model_sensitivity2, model_specificity2,
-    feature_outcome_idx, total_probability_of_model_positive);
+    total_probability_of_model_positive);
   total_probability_of_negative_model_result(
     pij_survey_species_subset, model_sensitivity2, model_specificity2,
-    feature_outcome_idx, total_probability_of_model_negative);
+    total_probability_of_model_negative);
 
   // calculate posterior matrix
   Eigen::MatrixXd out(n_f, n_pu);
   posterior_probability_matrix(
     rij, pij, oij,
     pu_survey_solution,
-    survey_features, feature_outcome_idx, survey_features_rev_idx,
+    survey_features, survey_features_rev_idx,
     survey_sensitivity, survey_specificity,
     total_probability_of_survey_positive,
     total_probability_of_survey_negative,
