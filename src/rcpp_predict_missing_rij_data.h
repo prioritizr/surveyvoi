@@ -10,7 +10,6 @@ void predict_missing_rij_data(
   MatrixXfRM&,
   std::vector<std::size_t>&,
   std::vector<std::size_t>&,
-  std::vector<std::size_t>&,
-  Eigen::Array<std::vector<BoosterHandle>, Eigen::Dynamic, Eigen::Dynamic>&);
+  std::vector<std::vector<BoosterHandle> *> &);
 
 #endif

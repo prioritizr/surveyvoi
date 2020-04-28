@@ -26,17 +26,16 @@ void total_probability_of_negative_result(
 
 void total_probability_of_positive_model_result(
   Eigen::MatrixXd &prior, // only contains rows for spp that need surveys
-  Eigen::MatrixXd &sensitivity, // only elements for spp needing surveys
-  Eigen::MatrixXd &specificity, // only elements for spp needing surveys
-  std::vector<std::size_t> &feature_outcome_idx, // outcomes ids for features
+  Eigen::VectorXd &sensitivity, // only elements for spp needing surveys
+  Eigen::VectorXd &specificity, // only elements for spp needing surveys
   Eigen::MatrixXd &out) {
   const std::size_t n_pu = prior.cols();
-  const std::size_t n_f = feature_outcome_idx.size();
+  const std::size_t n_f = sensitivity.size();
   for (std::size_t j = 0; j < n_pu; ++j) {
     for (std::size_t i = 0; i < n_f; ++i) {
       out(i, j) =
-        (sensitivity(i, feature_outcome_idx[i]) * prior(i, j)) +
-        ((1.0 - specificity(i, feature_outcome_idx[i])) * (1.0 - prior(i, j)));
+        (sensitivity[i] * prior(i, j)) +
+        ((1.0 - specificity[i]) * (1.0 - prior(i, j)));
     }
   }
   out = out.cwiseMax(1.0e-10);
@@ -46,17 +45,16 @@ void total_probability_of_positive_model_result(
 
 void total_probability_of_negative_model_result(
   Eigen::MatrixXd &prior, // only contains rows for spp that need surveys
-  Eigen::MatrixXd &sensitivity, // only elements for spp needing surveys
-  Eigen::MatrixXd &specificity, // only elements for spp needing surveys
-  std::vector<std::size_t> &feature_outcome_idx, // outcomes ids for features
+  Eigen::VectorXd &sensitivity, // only elements for spp needing surveys
+  Eigen::VectorXd &specificity, // only elements for spp needing surveys
   Eigen::MatrixXd &out) {
   const std::size_t n_pu = prior.cols();
-  const std::size_t n_f = feature_outcome_idx.size();
+  const std::size_t n_f = sensitivity.size();
   for (std::size_t j = 0; j < n_pu; ++j) {
     for (std::size_t i = 0; i < n_f; ++i) {
       out(i, j) =
-        ((1.0 - sensitivity(i, feature_outcome_idx[i])) * prior(i, j)) +
-        (specificity(i, feature_outcome_idx[i]) * (1.0 - prior(i, j)));
+        ((1.0 - sensitivity[i]) * prior(i, j)) +
+        (specificity[i] * (1.0 - prior(i, j)));
     }
   }
   out = out.cwiseMax(1.0e-10);
@@ -138,23 +136,21 @@ double rcpp_probability_of_state(
 // [[Rcpp::export]]
 Eigen::MatrixXd rcpp_total_probability_of_positive_model_result(
   Eigen::MatrixXd prior,
-  Eigen::MatrixXd sensitivity,
-  Eigen::MatrixXd specificity,
-  std::vector<std::size_t> feature_outcome_idx) {
+  Eigen::VectorXd sensitivity,
+  Eigen::VectorXd specificity) {
   Eigen::MatrixXd out(prior.cols(), prior.rows());
   total_probability_of_positive_model_result(
-    prior, sensitivity, specificity, feature_outcome_idx, out);
+    prior, sensitivity, specificity, out);
   return out;
 }
 
 // [[Rcpp::export]]
 Eigen::MatrixXd rcpp_total_probability_of_negative_model_result(
   Eigen::MatrixXd prior,
-  Eigen::MatrixXd sensitivity,
-  Eigen::MatrixXd specificity,
-  std::vector<std::size_t> feature_outcome_idx) {
+  Eigen::VectorXd sensitivity,
+  Eigen::VectorXd specificity) {
   Eigen::MatrixXd out(prior.cols(), prior.rows());
   total_probability_of_negative_model_result(
-    prior, sensitivity, specificity, feature_outcome_idx, out);
+    prior, sensitivity, specificity, out);
   return out;
 }
