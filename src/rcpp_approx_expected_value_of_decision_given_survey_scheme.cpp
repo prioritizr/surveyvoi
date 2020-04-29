@@ -149,6 +149,7 @@ Rcpp::NumericVector
   }
 
   /// declare temporary variables used in the main loop
+  double curr_expected_value_of_decision;
   Eigen::VectorXd out(n_approx_replicates);
   std::size_t curr_n_folds;
   double curr_expected_value_of_action_given_outcome;
@@ -230,7 +231,7 @@ Rcpp::NumericVector
   // main processing
   for (std::size_t r = 0; r < n_approx_replicates; ++r) {
     /// initialize current value
-    out[r] = std::numeric_limits<double>::infinity();
+    curr_expected_value_of_decision = std::numeric_limits<double>::infinity();
     /// generate outcomes
     sample_n_states(
       n_approx_outcomes_per_replicate, survey_pij, method_approx_outcomes,
@@ -310,13 +311,15 @@ Rcpp::NumericVector
         total_probability_of_survey_negative_log, rij_outcome_idx);
 
       /// calculate expected value of action
-      if (std::isinf(out[r])) {
-        out[r] = curr_expected_value_of_action_given_outcome +
-                 curr_probability_of_outcome;
+      if (std::isinf(curr_expected_value_of_decision)) {
+        curr_expected_value_of_decision =
+          curr_expected_value_of_action_given_outcome +
+          curr_probability_of_outcome;
       } else {
-        out[r] = log_sum(out[r],
-                         curr_expected_value_of_action_given_outcome +
-                         curr_probability_of_outcome);
+        curr_expected_value_of_decision =
+          log_sum(curr_expected_value_of_decision,
+                  curr_expected_value_of_action_given_outcome +
+                  curr_probability_of_outcome);
       }
 
       /// reset oij matrix so that -1s are present for planning units/features
@@ -327,6 +330,9 @@ Rcpp::NumericVector
             if (survey_features[i])
               curr_oij(i, j) = -1.0;
     }
+
+    // store result
+    out[r] = curr_expected_value_of_decision;
   }
 
   // clean-up
