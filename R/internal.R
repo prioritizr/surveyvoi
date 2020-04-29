@@ -90,7 +90,10 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
     m$rhs[1] <- budget[b]
     ## solve problem
     s <- gurobi::gurobi(m, p)$x[seq_len(n)]
-    assertthat::assert_that(sum(s * costs) <= budget[b])
+    assertthat::assert_that(
+      isTRUE(sum(s * costs) <= budget[b]) ||
+      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-10),
+      msg = "solver returned infeasible solution")
     ## store solution
     out[b, ] <- as.logical(s)
   }
@@ -177,7 +180,10 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
     m$rhs[1] <- budget[b]
     ## solve problem
     s <- gurobi::gurobi(m, p)$x
-    assertthat::assert_that(sum(s * costs) <= budget[b])
+    assertthat::assert_that(
+      isTRUE(sum(s * costs) <= budget[b]) ||
+      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-10),
+      msg = "solver returned infeasible solution")
     ## store solution
     out[b, ] <- as.logical(s)
   }
