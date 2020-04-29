@@ -26,7 +26,7 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 devtools::load_all()
 ```
 
-Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of states to _approximate_ the full set of states, and so we will investigate several different methods for generating states. We will also examine how the number of approximation states affects the quality of the estimate.
+Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of outcomes to _approximate_ the full set of outcomes, and so we will investigate several different methods for generating outcomes. We will also examine how the number of approximation outcomes affects the quality of the estimate.
 
 ## Setup
 
@@ -53,12 +53,12 @@ options(pillar.sigfig = 6)
 
 ## Simulate data
 
-Let's simulate some data. To keep things simple, we will simulate data for 10 sites and 1 conservation feature (e.g. species). Of the 10 sites in total, we will simulate survey data for 5 sites---meaning that 10 sites will not have survey data.
+Let's simulate some data. To keep things simple, we will simulate data for 10 sites and 1 conservation feature (e.g. species). Of the 15 sites in total, we will simulate survey data for 10 sites---meaning that 5 sites will not have survey data.
 
 ```{r}
 # simulate site data
 site_data <- simulate_site_data(
-  n_sites = 10, n_features = 1, proportion_of_sites_missing_data = 5 / 10)
+  n_sites = 15, n_features = 1, proportion_of_sites_missing_data = 5 / 15)
 
 # print site data
 print(site_data)
@@ -69,7 +69,7 @@ ggplot(site_data) +
   ggtitle("sites")
 ```
 
-The `site_data` object is a spatially explicit dataset (i.e. `sf`) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `p1` column contains modelled probability of occupancy predictions from environmental niche models. The `management_cost` column contains the cost for managing each site for conservation. Although the `site_data` object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let's create some visualizations.
+The `site_data` object is a spatially explicit dataset (i.e. `sf`) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `p1` column contains modelled probability of occupancy predictions from environmental niche models. The `e1`, `e2`, and `e3` columns contain environmental variables for each site. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. Although the `site_data` object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let's create some visualizations.
 
 ```{r, fig.height = h, fig.width = w * 2.0}
 # map of site occupancy data from previous surveys
@@ -105,13 +105,25 @@ p3 <-
 grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
-Next we will simulate a total budget for protecting sites. Specifically, we will set this budget (i.e. `total_budget`) as 60% of the overall site management costs.
+Next, we will simulate a survey scheme. This survey scheme will contain four of the five sites that have not previously been surveyed.
 
 ```{r}
-# calculate total budget for protecting sites
-total_budget <- sum(site_data$management_cost) * 0.6
+# generate survey scheme
+site_data$survey_scheme <-
+  replace(rep(FALSE, nrow(site_data)), sample(which(is.na(site_data$f1)), 4),
+          TRUE)
 
-# print budget
+# print survey scheme
+print(site_data$survey_scheme)
+```
+
+We will also set a total budget for surveying sites and managing sites for conservation. This budget will be 80% of the total costs of all planning units.
+
+```{r}
+# set total budget
+total_budget <- sum(site_data$management_cost) * 0.8
+
+# print total budget
 print(total_budget)
 ```
 
@@ -128,29 +140,42 @@ print(feature_data)
 
 The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `preweight`, `postweight`, and `target` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
 
-## Benchmark analysis
-
-After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of `r n_states(1, 10)` states. Since we are interested in understanding how the number states in the approximation method affects its accuracy, we will create a set of containing different numbers of states (i.e. `n_approx_states`).
+Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the `fit_occupancy_models` function, but here we will define them manually to keep things simple.
 
 ```{r}
-# create set of number of approximation states
-n_approx_states <- ceiling(seq(10, n_states(1, 10), length.out = 10))
-
-# print states
-print(n_approx_states)
+# define parameters
+xgb_parameters <- list(list(
+  eta = 0.3, nrounds = 10, objective = "binary:logistic",
+  scale_pos_weight = 1))
 ```
 
-This benchmark analysis will examine various approaches for approximating the _expected value of the decision given current information_. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.
+## Benchmark analysis
+
+After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of `r n_states(1, 5)` outcomes. Since we are interested in understanding how the number outcomes in the approximation method affects its accuracy, we will create a set of containing different numbers of outcomes (i.e. `n_approx_outcomes`).
 
 ```{r}
-# calculate the correct value of the decision given current information using
+# create set of number of approximation outcomes
+n_approx_outcomes <- ceiling(seq(10, n_states(1, 5), length.out = 10))
+
+# print outcomes
+print(n_approx_outcomes)
+```
+
+This benchmark analysis will examine various approaches for approximating the _expected value of the decision given survey information_. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.
+
+```{r}
+# calculate the correct value of the decision given survey information using
 # exact methods
-ev_current <- evdci(
+ev_survey <- evdsi(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = "f1",
   site_probability_columns = "p1",
+  site_env_vars_columns = c("e1", "e2", "e3"),
+  site_survey_scheme_column = "survey_scheme",
+  site_survey_cost_column = "survey_cost",
   site_management_cost_column = "management_cost",
+  feature_survey_column = "survey",
   feature_survey_sensitivity_column = "survey_sensitivity",
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
@@ -158,35 +183,40 @@ ev_current <- evdci(
   feature_preweight_column = "preweight",
   feature_postweight_column = "postweight",
   feature_target_column = "target",
-  total_budget = total_budget)
+  total_budget = total_budget,
+  xgb_parameters = xgb_parameters)
 
 # print value
-print(ev_current)
+print(ev_survey)
 ```
 
-Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating states: _uniform with replacement_, _uniform without replacement_, _weighted with replacement_, and _weighted without replacement_. The uniform methods randomly sample states and do not consider the prior probability of each state occurring. The weighted methods, on the other hand, are select states that have a greater chance of occurring. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the state of the random number generator -- we will report means and standard errors for 25 replicates per number of approximation states. Furthermore since the _weighted without replacement_ method is computationally inefficient for generating subsets that contain a high proportion of the total states, we will not explore the full range of subsets for this method.
+Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating outcomes: _uniform with replacement_, _uniform without replacement_, _weighted with replacement_, and _weighted without replacement_. The uniform methods randomly sample outcomes and do not consider the prior probability of each outcome occurring. The weighted methods, on the other hand, are select outcomes that have a greater chance of occurring. To account for stochasticity in the approximation methods -- i.e. each run will give a different answer depending on the outcome of the random number generator -- we will report means and standard errors for 25 replicates per number of approximation outcomes. Furthermore since the _weighted without replacement_ method is computationally inefficient for generating subsets that contain a high proportion of the total outcomes, we will not explore the full range of subsets for this method.
 
 ```{r}
 # define function for calculating standard error
 se <- function(x) sqrt(var(x) / length(x))
 
-# estimate the correct value of the decision given current information using
+# estimate the correct value of the decision given survey information using
 # approximation methods
-ev_prime_current <-
+ev_prime_survey <-
   expand.grid(method =
     c("uniform_with_replacement", "uniform_without_replacement",
       "weighted_with_replacement", "weighted_without_replacement"),
-  n = n_approx_states) %>%
+  n = n_approx_outcomes) %>%
   filter(!((method == "weighted_without_replacement") &
-           (n >= (max(n_approx_states) * 0.5)))) %>%
+           (n >= (max(n_approx_outcomes) * 0.5)))) %>%
   plyr::ddply(c("method", "n"), function(x) {
     result <-
-      approx_evdci(
+      approx_evdsi(
         site_data = site_data,
         feature_data = feature_data,
         site_occupancy_columns = "f1",
         site_probability_columns = "p1",
+        site_env_vars_columns = c("e1", "e2", "e3"),
+        site_survey_scheme_column = "survey_scheme",
+        site_survey_cost_column = "survey_cost",
         site_management_cost_column = "management_cost",
+        feature_survey_column = "survey",
         feature_survey_sensitivity_column = "survey_sensitivity",
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
@@ -196,9 +226,9 @@ ev_prime_current <-
         feature_target_column = "target",
         total_budget = total_budget,
         n_approx_replicates = 25,
-        n_approx_states_per_replicate = x$n,
-        method_approx_states = as.character(x$method),
-        seed = 100)
+        n_approx_outcomes_per_replicate = x$n,
+        method_approx_outcomes = as.character(x$method),
+        xgb_parameters = xgb_parameters)
     data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
   as_tibble() %>%
@@ -211,14 +241,14 @@ Now, let's visualize the results.
 ```{r, fig.height = h * 2, fig.width = w * 1.5}
 # create plot
 ggplot() +
-geom_hline(yintercept = ev_current, colour = "#3366FF") +
-geom_point(aes(x = n, y = mean), ev_prime_current) +
-geom_errorbar(aes(x = n, ymin = lower, ymax = upper), ev_prime_current) +
+geom_hline(yintercept = ev_survey, colour = "#3366FF") +
+geom_point(aes(x = n, y = mean), ev_prime_survey) +
+geom_errorbar(aes(x = n, ymin = lower, ymax = upper), ev_prime_survey) +
 facet_wrap(~ method, ncol = 1) +
-xlab("Number of states used in approximation calculations") +
-ylab("Expected value of the decision given current information") +
+xlab("Number of outcomes used in approximation calculations") +
+ylab("Expected value of the decision given survey information") +
 theme(strip.background = element_rect(color = "black", fill = "black"),
       strip.text = element_text(color = "white", size = 12))
 ```
 
-Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods -- except for the _weighted with replacement_ method which performs really poorly -- and shows that most the approximation method is more accurate when we use a greater number of states for the calculations. In particular, we can see that the _weighted without replacement_ method is the most useful because it converges to the correct value (blue line) with the fewest approximation states.
+Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more outcomes are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more outcomes are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods -- except for the _weighted with replacement_ method which performs really poorly -- and shows that most the approximation method is more accurate when we use a greater number of outcomes for the calculations. In particular, we can see that the _weighted without replacement_ method is the most useful because it converges to the correct value (blue line) with the fewest approximation outcomes.
