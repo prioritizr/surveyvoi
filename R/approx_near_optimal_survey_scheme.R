@@ -482,6 +482,7 @@ approx_near_optimal_survey_scheme <- function(
       ## return average expected value
       mean(out)
     })
+
     ## kill cluster
     if (n_threads > 1) {
       doParallel::stopImplicitCluster()
