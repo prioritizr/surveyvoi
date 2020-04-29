@@ -127,7 +127,6 @@ double expected_value_of_decision_given_survey_scheme(
 
   /// declare temporary variables used in the main loop
   std::size_t curr_n_folds;
-  double curr_value;
   double curr_expected_value_of_action_given_outcome;
   double curr_probability_of_outcome;
   double curr_expected_value_of_decision =
