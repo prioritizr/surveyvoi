@@ -163,7 +163,9 @@ Rcpp::NumericVector
   std::vector<mpz_class> feature_outcome_idx(n_f_survey);
   std::vector<mpz_class> outcomes(n_approx_outcomes_per_replicate);
   model_beta_map model_beta;
+  model_beta.reserve(n_f_survey * 1000);
   model_performance_map model_performance;
+  model_performance.reserve(n_f_survey * 1000);
   std::vector<std::vector<BoosterHandle> *> curr_models(n_f_survey);
   Eigen::VectorXd curr_model_sensitivity(n_f_survey);
   Eigen::VectorXd curr_model_specificity(n_f_survey);
