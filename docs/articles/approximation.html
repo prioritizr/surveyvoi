@@ -93,7 +93,7 @@
 
     
     
-<p>Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of states to <em>approximate</em> the full set of states, and so we will investigate several different methods for generating states. We will also examine how the number of approximation states affects the quality of the estimate.</p>
+<p>Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of outcomes to <em>approximate</em> the full set of outcomes, and so we will investigate several different methods for generating outcomes. We will also examine how the number of approximation outcomes affects the quality of the estimate.</p>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h2>
@@ -118,38 +118,43 @@
 <div id="simulate-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simulate-data" class="anchor"></a>Simulate data</h2>
-<p>Let’s simulate some data. To keep things simple, we will simulate data for 10 sites and 1 conservation feature (e.g. species). Of the 10 sites in total, we will simulate survey data for 5 sites—meaning that 10 sites will not have survey data.</p>
+<p>Let’s simulate some data. To keep things simple, we will simulate data for 10 sites and 1 conservation feature (e.g. species). Of the 15 sites in total, we will simulate survey data for 10 sites—meaning that 5 sites will not have survey data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate site data</span>
 site_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/simulate_site_data">simulate_site_data</a></span>(
-  <span class="dt">n_sites =</span> <span class="dv">10</span>, <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_sites_missing_data =</span> <span class="dv">5</span> <span class="op">/</span><span class="st"> </span><span class="dv">10</span>)</code></pre></div>
+  <span class="dt">n_sites =</span> <span class="dv">15</span>, <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_sites_missing_data =</span> <span class="dv">5</span> <span class="op">/</span><span class="st"> </span><span class="dv">15</span>)</code></pre></div>
 <pre><code>## ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># print site data</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(site_data)</code></pre></div>
-<pre><code>## Simple feature collection with 10 features and 7 fields
+<pre><code>## Simple feature collection with 15 features and 7 fields
 ## geometry type:  POINT
 ## dimension:      XY
-## bbox:           xmin: 0.02070792 ymin: 0.1813143 xmax: 0.7855831 ymax: 0.8754956
+## bbox:           xmin: 0.02070792 ymin: 0.01366063 xmax: 0.7855831 ymax: 0.9272025
 ## CRS:            NA
-## # A tibble: 10 x 8
-##    survey_cost management_cost        e1         e2         e3    f1
-##          &lt;dbl&gt;           &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;
-##  1     7.94602         72.1741 -0.416735 -0.832440   0.0844003     1
-##  2     4.53083         71.4528 -1.15906   0.628728   1.46784      NA
-##  3     7.16376         72.1627 -1.10065  -0.908241   0.885747      1
-##  4     7.20006         69.8814 -0.807846 -1.01260    0.556981     NA
-##  5     5.36988         69.3756  0.588708 -0.761210  -0.660947      0
-##  6     5.03169         62.6822 -0.349896  2.28301    1.01294      NA
-##  7     6.27642         66.6239  1.11393   0.0835220 -1.23753       0
-##  8     4.65999         58.0444  1.54020   0.362299  -1.10079      NA
-##  9     4.68288         68.2921 -0.529539 -0.165824   0.212885      1
-## 10     6.28144         61.8291  1.12090   0.322752  -1.22152      NA
+## # A tibble: 15 x 8
+##    survey_cost management_cost         e1         e2        e3    f1
+##          &lt;dbl&gt;           &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+##  1     8.78717         69.5624  0.352685  -0.615935  -0.728549     0
+##  2     5.36696         64.8589 -0.612633   1.15596    0.718512    NA
+##  3     6.25925         57.5309 -1.53741   -0.281868   1.29149     NA
+##  4     8.81519         66.1143  1.14228   -1.24025   -0.839952     1
+##  5     5.45039         62.7456 -1.01539   -0.409767   0.518910     1
+##  6     4.37280         60.5701  1.43650    2.52796   -0.253192     0
+##  7     8.76247         67.2501  0.0259090 -0.402047  -0.519918    NA
+##  8     8.80315         65.1071  0.838224  -0.894822  -0.878425     0
+##  9     9.57884         66.6267  0.347615  -0.0776230 -0.635106    NA
+## 10     6.37048         65.9617  1.08574   -0.560094  -0.813593     0
+## 11     8.75928         67.5310  0.496681   0.0117405 -0.682279     1
+## 12     9.58011         64.8944  0.722107  -0.580667  -0.846134    NA
+## 13     5.49527         58.2507 -1.44014   -0.152584   1.18873      1
+## 14     7.11370         64.8953 -0.608469  -0.0494300  0.128359     1
+## 15     5.19364         70.5367 -1.23370    1.56944    2.35114      0
 ## # … with 2 more variables: p1 &lt;dbl&gt;, geometry &lt;POINT&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the spatial location of the sites</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(site_data) <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"sites"</span>)</code></pre></div>
 <p><img src="approximation_files/figure-html/unnamed-chunk-4-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code>) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>p1</code> column contains modelled probability of occupancy predictions from environmental niche models. The <code>management_cost</code> column contains the cost for managing each site for conservation. Although the <code>site_data</code> object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let’s create some visualizations.</p>
+<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code>) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>p1</code> column contains modelled probability of occupancy predictions from environmental niche models. The <code>e1</code>, <code>e2</code>, and <code>e3</code> columns contain environmental variables for each site. The <code>survey_cost</code> column contains the cost for surveying each site, and the <code>management_cost</code> column contains the cost for managing each site for conservation. Although the <code>site_data</code> object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let’s create some visualizations.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># map of site occupancy data from previous surveys</span>
 p1 &lt;-
 <span class="st">  </span>site_data <span class="op">%&gt;%</span>
@@ -182,13 +187,23 @@ p3 &lt;-
 <span class="co"># display plots</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/gridExtra/topics/arrangeGrob">grid.arrange</a></span>(p1, p2, p3, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
 <p><img src="approximation_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>Next we will simulate a total budget for protecting sites. Specifically, we will set this budget (i.e. <code>total_budget</code>) as 60% of the overall site management costs.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate total budget for protecting sites</span>
-total_budget &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(site_data<span class="op">$</span>management_cost) <span class="op">*</span><span class="st"> </span><span class="fl">0.6</span>
+<p>Next, we will simulate a survey scheme. This survey scheme will contain four of the five sites that have not previously been surveyed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># generate survey scheme</span>
+site_data<span class="op">$</span>survey_scheme &lt;-
+<span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/replace">replace</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/rep">rep</a></span>(<span class="ot">FALSE</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/nrow">nrow</a></span>(site_data)), <span class="kw"><a href="https://dplyr.tidyverse.org/reference/sample.html">sample</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/which">which</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/NA">is.na</a></span>(site_data<span class="op">$</span>f1)), <span class="dv">4</span>),
+          <span class="ot">TRUE</span>)
 
-<span class="co"># print budget</span>
+<span class="co"># print survey scheme</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(site_data<span class="op">$</span>survey_scheme)</code></pre></div>
+<pre><code>##  [1] FALSE  TRUE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE
+## [12]  TRUE FALSE FALSE FALSE</code></pre>
+<p>We will also set a total budget for surveying sites and managing sites for conservation. This budget will be 80% of the total costs of all planning units.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set total budget</span>
+total_budget &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/sum">sum</a></span>(site_data<span class="op">$</span>management_cost) <span class="op">*</span><span class="st"> </span><span class="fl">0.8</span>
+
+<span class="co"># print total budget</span>
 <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(total_budget)</code></pre></div>
-<pre><code>## [1] 403.5109</code></pre>
+<pre><code>## [1] 777.9488</code></pre>
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate feature data</span>
 feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/simulate_feature_data">simulate_feature_data</a></span>(
@@ -199,30 +214,39 @@ feature_data &lt;-<span class="st"> </span><span class="kw"><a href="https://www
 <pre><code>## # A tibble: 1 x 9
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1 f1    TRUE           0.982836         0.861585         0.713643
+## 1 f1    TRUE           0.959335         0.895506         0.778723
 ## # … with 4 more variables: model_specificity &lt;dbl&gt;, preweight &lt;dbl&gt;,
 ## #   postweight &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
 <p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>preweight</code>, <code>postweight</code>, and <code>target</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
+<p>Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the <code>fit_occupancy_models</code> function, but here we will define them manually to keep things simple.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define parameters</span>
+xgb_parameters &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/list">list</a></span>(
+  <span class="dt">eta =</span> <span class="fl">0.3</span>, <span class="dt">nrounds =</span> <span class="dv">10</span>, <span class="dt">objective =</span> <span class="st">"binary:logistic"</span>,
+  <span class="dt">scale_pos_weight =</span> <span class="dv">1</span>))</code></pre></div>
 </div>
 <div id="benchmark-analysis" class="section level2">
 <h2 class="hasAnchor">
 <a href="#benchmark-analysis" class="anchor"></a>Benchmark analysis</h2>
-<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of 1024 states. Since we are interested in understanding how the number states in the approximation method affects its accuracy, we will create a set of containing different numbers of states (i.e. <code>n_approx_states</code>).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create set of number of approximation states</span>
-n_approx_states &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">ceiling</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">10</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/n_states">n_states</a></span>(<span class="dv">1</span>, <span class="dv">10</span>), <span class="dt">length.out =</span> <span class="dv">10</span>))
+<p>After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of 32 outcomes. Since we are interested in understanding how the number outcomes in the approximation method affects its accuracy, we will create a set of containing different numbers of outcomes (i.e. <code>n_approx_outcomes</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create set of number of approximation outcomes</span>
+n_approx_outcomes &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">ceiling</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/seq">seq</a></span>(<span class="dv">10</span>, <span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/n_states">n_states</a></span>(<span class="dv">1</span>, <span class="dv">5</span>), <span class="dt">length.out =</span> <span class="dv">10</span>))
 
-<span class="co"># print states</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(n_approx_states)</code></pre></div>
-<pre><code>##  [1]   10  123  236  348  461  574  686  799  912 1024</code></pre>
-<p>This benchmark analysis will examine various approaches for approximating the <em>expected value of the decision given current information</em>. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given current information using</span>
+<span class="co"># print outcomes</span>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(n_approx_outcomes)</code></pre></div>
+<pre><code>##  [1] 10 13 15 18 20 23 25 28 30 32</code></pre>
+<p>This benchmark analysis will examine various approaches for approximating the <em>expected value of the decision given survey information</em>. To evaluate the accuracy of the approximation calculations, we will calculate exactly what this number should be given the simulated data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the correct value of the decision given survey information using</span>
 <span class="co"># exact methods</span>
-ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdci">evdci</a></span>(
+ev_survey &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/evdsi">evdsi</a></span>(
   <span class="dt">site_data =</span> site_data,
   <span class="dt">feature_data =</span> feature_data,
   <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
   <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+  <span class="dt">site_env_vars_columns =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span>),
+  <span class="dt">site_survey_scheme_column =</span> <span class="st">"survey_scheme"</span>,
+  <span class="dt">site_survey_cost_column =</span> <span class="st">"survey_cost"</span>,
   <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+  <span class="dt">feature_survey_column =</span> <span class="st">"survey"</span>,
   <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
   <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
   <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
@@ -230,32 +254,37 @@ ev_current &lt;-<span class="st"> </span><span class="kw"><a href="https://www.r
   <span class="dt">feature_preweight_column =</span> <span class="st">"preweight"</span>,
   <span class="dt">feature_postweight_column =</span> <span class="st">"postweight"</span>,
   <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
-  <span class="dt">total_budget =</span> total_budget)
+  <span class="dt">total_budget =</span> total_budget,
+  <span class="dt">xgb_parameters =</span> xgb_parameters)
 
 <span class="co"># print value</span>
-<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_current)</code></pre></div>
-<pre><code>## [1] 31.28657</code></pre>
-<p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating states: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample states and do not consider the prior probability of each state occurring. The weighted methods, on the other hand, are select states that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the state of the random number generator – we will report means and standard errors for 25 replicates per number of approximation states. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total states, we will not explore the full range of subsets for this method.</p>
+<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/print">print</a></span>(ev_survey)</code></pre></div>
+<pre><code>## [1] 128.498</code></pre>
+<p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating outcomes: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample outcomes and do not consider the prior probability of each outcome occurring. The weighted methods, on the other hand, are select outcomes that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the outcome of the random number generator – we will report means and standard errors for 25 replicates per number of approximation outcomes. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total outcomes, we will not explore the full range of subsets for this method.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define function for calculating standard error</span>
 se &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">sqrt</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/cor">var</a></span>(x) <span class="op">/</span><span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/length">length</a></span>(x))
 
-<span class="co"># estimate the correct value of the decision given current information using</span>
+<span class="co"># estimate the correct value of the decision given survey information using</span>
 <span class="co"># approximation methods</span>
-ev_prime_current &lt;-
+ev_prime_survey &lt;-
 <span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/expand.grid">expand.grid</a></span>(<span class="dt">method =</span>
     <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"uniform_with_replacement"</span>, <span class="st">"uniform_without_replacement"</span>,
       <span class="st">"weighted_with_replacement"</span>, <span class="st">"weighted_without_replacement"</span>),
-  <span class="dt">n =</span> n_approx_states) <span class="op">%&gt;%</span>
+  <span class="dt">n =</span> n_approx_outcomes) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="op">!</span>((method <span class="op">==</span><span class="st"> "weighted_without_replacement"</span>) <span class="op">&amp;</span>
-<span class="st">           </span>(n <span class="op">&gt;=</span><span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">max</a></span>(n_approx_states) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span>)))) <span class="op">%&gt;%</span>
+<span class="st">           </span>(n <span class="op">&gt;=</span><span class="st"> </span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">max</a></span>(n_approx_outcomes) <span class="op">*</span><span class="st"> </span><span class="fl">0.5</span>)))) <span class="op">%&gt;%</span>
 <span class="st">  </span>plyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/plyr/topics/ddply">ddply</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"method"</span>, <span class="st">"n"</span>), <span class="cf">function</span>(x) {
     result &lt;-
-<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdci">approx_evdci</a></span>(
+<span class="st">      </span><span class="kw"><a href="https://www.rdocumentation.org/packages/surveyvoi/topics/approx_evdsi">approx_evdsi</a></span>(
         <span class="dt">site_data =</span> site_data,
         <span class="dt">feature_data =</span> feature_data,
         <span class="dt">site_occupancy_columns =</span> <span class="st">"f1"</span>,
         <span class="dt">site_probability_columns =</span> <span class="st">"p1"</span>,
+        <span class="dt">site_env_vars_columns =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/RandomFields/topics/QMath">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span>),
+        <span class="dt">site_survey_scheme_column =</span> <span class="st">"survey_scheme"</span>,
+        <span class="dt">site_survey_cost_column =</span> <span class="st">"survey_cost"</span>,
         <span class="dt">site_management_cost_column =</span> <span class="st">"management_cost"</span>,
+        <span class="dt">feature_survey_column =</span> <span class="st">"survey"</span>,
         <span class="dt">feature_survey_sensitivity_column =</span> <span class="st">"survey_sensitivity"</span>,
         <span class="dt">feature_survey_specificity_column =</span> <span class="st">"survey_specificity"</span>,
         <span class="dt">feature_model_sensitivity_column =</span> <span class="st">"model_sensitivity"</span>,
@@ -265,9 +294,9 @@ ev_prime_current &lt;-
         <span class="dt">feature_target_column =</span> <span class="st">"target"</span>,
         <span class="dt">total_budget =</span> total_budget,
         <span class="dt">n_approx_replicates =</span> <span class="dv">25</span>,
-        <span class="dt">n_approx_states_per_replicate =</span> x<span class="op">$</span>n,
-        <span class="dt">method_approx_states =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(x<span class="op">$</span>method),
-        <span class="dt">seed =</span> <span class="dv">100</span>)
+        <span class="dt">n_approx_outcomes_per_replicate =</span> x<span class="op">$</span>n,
+        <span class="dt">method_approx_outcomes =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/character">as.character</a></span>(x<span class="op">$</span>method),
+        <span class="dt">xgb_parameters =</span> xgb_parameters)
     <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/data.frame">data.frame</a></span>(<span class="dt">n =</span> x, <span class="dt">mean =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/mean">mean</a></span>(result), <span class="dt">se =</span> <span class="kw">se</span>(result))
   }) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>() <span class="op">%&gt;%</span>
@@ -276,16 +305,16 @@ ev_prime_current &lt;-
 <p>Now, let’s visualize the results.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create plot</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="dt">yintercept =</span> ev_current, <span class="dt">colour =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">y =</span> mean), ev_prime_current) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), ev_prime_current) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html">geom_hline</a></span>(<span class="dt">yintercept =</span> ev_survey, <span class="dt">colour =</span> <span class="st">"#3366FF"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">y =</span> mean), ev_prime_survey) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span>(<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x =</span> n, <span class="dt">ymin =</span> lower, <span class="dt">ymax =</span> upper), ev_prime_survey) <span class="op">+</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(<span class="op">~</span><span class="st"> </span>method, <span class="dt">ncol =</span> <span class="dv">1</span>) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Number of states used in approximation calculations"</span>) <span class="op">+</span>
-<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected value of the decision given current information"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span>(<span class="st">"Number of outcomes used in approximation calculations"</span>) <span class="op">+</span>
+<span class="kw"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span>(<span class="st">"Expected value of the decision given survey information"</span>) <span class="op">+</span>
 <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="dt">strip.background =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_rect</a></span>(<span class="dt">color =</span> <span class="st">"black"</span>, <span class="dt">fill =</span> <span class="st">"black"</span>),
       <span class="dt">strip.text =</span> <span class="kw"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="dt">color =</span> <span class="st">"white"</span>, <span class="dt">size =</span> <span class="dv">12</span>))</code></pre></div>
-<p><img src="approximation_files/figure-html/unnamed-chunk-11-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more states are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more states are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods – except for the <em>weighted with replacement</em> method which performs really poorly – and shows that most the approximation method is more accurate when we use a greater number of states for the calculations. In particular, we can see that the <em>weighted without replacement</em> method is the most useful because it converges to the correct value (blue line) with the fewest approximation states.</p>
+<p><img src="approximation_files/figure-html/unnamed-chunk-13-1.png" width="504" style="display: block; margin: auto;"></p>
+<p>Broadly speaking, we can see that the estimates (points) get closer to the correct value (blue line) when more outcomes are used in the approximation calculations (greater values on the x-axis). Furthermore, we can see that the estimates become more precise (smaller error bars) when more outcomes are used in the approximation calculations (greater values on the x-axis). This pattern is true for most of the sampling methods – except for the <em>weighted with replacement</em> method which performs really poorly – and shows that most the approximation method is more accurate when we use a greater number of outcomes for the calculations. In particular, we can see that the <em>weighted without replacement</em> method is the most useful because it converges to the correct value (blue line) with the fewest approximation outcomes.</p>
 </div>
   </div>
 

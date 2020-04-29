@@ -161,8 +161,8 @@ and a greedy heuristic algorithm to maximize this metric.</p>
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
   <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>method_approx_states</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
+  <span class='kw'>n_approx_outcomes_per_replicate</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
+  <span class='kw'>method_approx_outcomes</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>
 )</pre>
@@ -391,31 +391,26 @@ for <code>xgb_parameters</code>).</p></td>
 approximating the expected value calculations. Defaults to 100.</p></td>
     </tr>
     <tr>
-      <th>n_approx_states_per_replicate</th>
-      <td><p><code>integer</code> number of states to use
-per replicate for approximating the expected value of a given management
-action. This number must be smaller than or equal to the total number of
-presence absence states in the system
-(i.e. <code>n_states(nrow(site_data), nrow(feature_data))</code>)
-Defaults to 1000.</p></td>
+      <th>n_approx_outcomes_per_replicate</th>
+      <td><p><code>integer</code> number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.</p></td>
     </tr>
     <tr>
-      <th>method_approx_states</th>
+      <th>method_approx_outcomes</th>
       <td><p><code>character</code> name of method that is
-used to sample states for approximating the expected value
+used to sample outcomes for approximating the expected value
 calculations. Available options are:
 <code>"uniform_with_replacement"</code>, <code>"uniform_without_replacement"</code>,
 <code>"weighted_with_replacement"</code>, <code>"weighted_without_replacement"</code>.
 Uniform sampling methods have an equal chance of returning each
 state, and weighted sampling methods are more likely to return
-states with a higher prior probability of occurring.
+outcomes with a higher prior probability of occurring.
 Defaults to <code>"weighted_without_replacement"</code>.</p></td>
     </tr>
     <tr>
       <th>seed</th>
       <td><p><code>integer</code> state of the random number generator for
 partitioning data into folds cross-validation and fitting <span class="pkg">xgboost</span>
-models. It is also used for generating states.
+models. It is also used for generating outcomes.
 This parameter must remain the same to compare results from different
 functions using the approximation methods. Defaults to 500.</p></td>
     </tr>
@@ -487,10 +482,8 @@ has the highest expected value in the
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    RFoptions</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>201</span>)
 
 <span class='co'># simulate data</span>
@@ -516,12 +509,12 @@ has the highest expected value in the
 #&gt; </span><span style='color: #BCBCBC;'> 9</span><span>        8.14            71.4  0.014</span><span style='text-decoration: underline;'>0</span><span>  1.73    0.764       1     1 0.984 
 #&gt; </span><span style='color: #BCBCBC;'>10</span><span>        9.09            72.9  0.310   1.20    1.25       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.961 
 #&gt; </span><span style='color: #BCBCBC;'>11</span><span>       10.8             66.4  0.141   0.191  -</span><span style='color: #BB0000;'>0.052</span><span style='color: #BB0000;text-decoration: underline;'>1</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.524 
-#&gt; </span><span style='color: #949494;'># … with 2 more variables: p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
-#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
+#&gt; </span><span style='color: #949494;'># ... with 2 more variables: p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
+#&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.956            0.892            0.787
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.963            0.863            0.702
-#&gt; </span><span style='color: #949494;'># … with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
 #&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='co'># (i.e. 50% of the cost of managing all sites)</span>

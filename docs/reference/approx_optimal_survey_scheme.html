@@ -159,8 +159,8 @@ for calculating the expected value of the decision given a survey scheme.</p>
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
   <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>n_approx_states_per_replicate</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>method_approx_states</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
+  <span class='kw'>n_approx_outcomes_per_replicate</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
+  <span class='kw'>method_approx_outcomes</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>
 )</pre>
@@ -389,31 +389,26 @@ for <code>xgb_parameters</code>).</p></td>
 approximating the expected value calculations. Defaults to 100.</p></td>
     </tr>
     <tr>
-      <th>n_approx_states_per_replicate</th>
-      <td><p><code>integer</code> number of states to use
-per replicate for approximating the expected value of a given management
-action. This number must be smaller than or equal to the total number of
-presence absence states in the system
-(i.e. <code>n_states(nrow(site_data), nrow(feature_data))</code>)
-Defaults to 1000.</p></td>
+      <th>n_approx_outcomes_per_replicate</th>
+      <td><p><code>integer</code> number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.</p></td>
     </tr>
     <tr>
-      <th>method_approx_states</th>
+      <th>method_approx_outcomes</th>
       <td><p><code>character</code> name of method that is
-used to sample states for approximating the expected value
+used to sample outcomes for approximating the expected value
 calculations. Available options are:
 <code>"uniform_with_replacement"</code>, <code>"uniform_without_replacement"</code>,
 <code>"weighted_with_replacement"</code>, <code>"weighted_without_replacement"</code>.
 Uniform sampling methods have an equal chance of returning each
 state, and weighted sampling methods are more likely to return
-states with a higher prior probability of occurring.
+outcomes with a higher prior probability of occurring.
 Defaults to <code>"weighted_without_replacement"</code>.</p></td>
     </tr>
     <tr>
       <th>seed</th>
       <td><p><code>integer</code> state of the random number generator for
 partitioning data into folds cross-validation and fitting <span class="pkg">xgboost</span>
-models. It is also used for generating states.
+models. It is also used for generating outcomes.
 This parameter must remain the same to compare results from different
 functions using the approximation methods. Defaults to 500.</p></td>
     </tr>
@@ -481,8 +476,8 @@ this algorithm, it can take a very long time to complete.</p>
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.956            0.892            0.787
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.963            0.863            0.702
-#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,
-#&gt; #   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
@@ -506,15 +501,25 @@ this algorithm, it can take a very long time to complete.</p>
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
   <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
   <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>,
-  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%</div><div class='input'>
+  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] "all_feasible_schemes"
+#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11]
+#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [2,] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [3,] FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [4,] FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [5,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE
+#&gt; [6,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
+#&gt; [7,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+#&gt; [8,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE
+#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%</div><div class='input'>
 <span class='co'># print result</span>
 <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>approx_opt_survey</span>)</div><div class='output co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE
 #&gt; attr(,"ev")
 #&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
-#&gt; [1,] 116.6865 117.1937 116.8464 116.8188 116.4501 117.0196 117.0001 117.2626
+#&gt; [1,] 108.2077 108.2401 108.8055 108.8055 108.0009 108.2077 108.2077 108.2401
 #&gt;          [,9]    [,10]
-#&gt; [1,] 116.8236 116.9675</div><div class='input'>
+#&gt; [1,] 108.8055 108.8055</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
