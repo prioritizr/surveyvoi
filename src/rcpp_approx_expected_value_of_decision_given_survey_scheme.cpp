@@ -74,10 +74,13 @@ Rcpp::NumericVector
   /// clamp number of approximation outcomes to total number of outcomes across
   /// all features
   mpz_class n_outcomes;
-  n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
-  n_outcomes = n_outcomes + 1; // increment to include final outcome
-  n_approx_outcomes_per_replicate = std::min(
-    n_approx_outcomes_per_replicate, n_outcomes.get_ui());
+  mpz_class n_approx_outcomes_per_replicate2 = n_approx_outcomes_per_replicate;
+  if ((n_pu_surveyed_in_scheme * n_f_survey) < 30) {
+    n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
+    n_outcomes = n_outcomes + 1; // increment to include final outcome
+    if (cmp(n_approx_outcomes_per_replicate2, n_outcomes) > 0)
+      n_approx_outcomes_per_replicate = n_outcomes.get_ui();
+  }
 
   // data integrity checks
   /// calculate remaining budget
@@ -234,6 +237,7 @@ Rcpp::NumericVector
   for (std::size_t r = 0; r < n_approx_replicates; ++r) {
     /// initialize current value
     curr_expected_value_of_decision = std::numeric_limits<double>::infinity();
+
     /// generate outcomes
     sample_n_states(
       n_approx_outcomes_per_replicate, survey_pij, method_approx_outcomes,
