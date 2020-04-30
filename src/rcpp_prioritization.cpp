@@ -8,7 +8,6 @@ Rcpp::List rcpp_prioritization(
   Eigen::VectorXd preweight,
   Eigen::VectorXd postweight,
   Eigen::VectorXd target,
-  std::size_t n_approx_obj_fun_points,
   double budget,
   double gap,
   std::string file_path) {
@@ -16,7 +15,7 @@ Rcpp::List rcpp_prioritization(
   std::vector<bool> solution(rij.cols());
   // main processing
   Prioritization p(rij.cols(), rij.rows(), pu_costs, pu_locked_in,
-                   preweight, postweight, target, n_approx_obj_fun_points,
+                   preweight, postweight, target,
                    budget, gap);
   p.add_rij_data(rij);
   p.solve();

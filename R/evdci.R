@@ -55,7 +55,6 @@ evdci <- function(
   total_budget,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000,
   optimality_gap = 0) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -132,10 +131,6 @@ evdci <- function(
     isTRUE(total_budget > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## n_approx_obj_fun_points
-    assertthat::is.number(n_approx_obj_fun_points),
-    assertthat::noNA(n_approx_obj_fun_points),
-    isTRUE(n_approx_obj_fun_points > 0),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -188,7 +183,6 @@ evdci <- function(
     preweight = feature_data[[feature_preweight_column]],
     postweight = feature_data[[feature_postweight_column]],
     target = feature_data[[feature_target_column]],
-    n_approx_obj_fun_points = n_approx_obj_fun_points,
     budget = total_budget,
     gap = optimality_gap)
 

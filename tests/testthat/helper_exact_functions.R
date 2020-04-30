@@ -7,11 +7,11 @@ r_expected_value_of_action <- function(
 
 r_expected_value_of_decision_given_current_info <- function(
   prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
-  n_approx_obj_fun_points, budget, gap) {
+  budget, gap) {
   # find optimal solution
   solution <- rcpp_prioritization(
     prior_data, pu_costs, pu_locked_in, preweight, postweight, target,
-    n_approx_obj_fun_points, budget, gap, "")$x
+    budget, gap, "")$x
   # calculate expected value
   r_expected_value_of_action(
     solution, prior_data, preweight, postweight, target)
@@ -23,7 +23,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
   xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
   obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-  n_approx_obj_fun_points, total_budget, optim_gap) {
+  total_budget, optim_gap) {
   # init
   ## constants
   n_pu <- ncol(rij)
@@ -112,7 +112,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     curr_solution <- r_prioritization(
       curr_postij, pu_purchase_costs, as.numeric(pu_purchase_locked_in),
       obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      n_approx_obj_fun_points, remaining_budget, optim_gap, "")$x
+      remaining_budget, optim_gap, "")$x
 
     ## calculate expected value of the prioritisation
     curr_value <- log(r_expected_value_of_action(

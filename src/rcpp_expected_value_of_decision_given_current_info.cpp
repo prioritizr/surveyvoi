@@ -13,15 +13,15 @@ double rcpp_expected_value_of_decision_given_current_info(
   Eigen::VectorXd &preweight,
   Eigen::VectorXd &postweight,
   Eigen::VectorXd &target,
-  std::size_t n_approx_obj_fun_points,
   double budget,
   double gap) {
-
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   preweight, postweight, target, n_approx_obj_fun_points,
-                   budget, gap);
+                   preweight, postweight, target, budget, gap);
+
+
+  // save problem to disk for debugging
   p.add_rij_data(pij);
   p.solve();
   p.get_solution(solution);

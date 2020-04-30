@@ -52,7 +52,6 @@ test_that("expected results", {
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 1000,
     optimality_gap = 0)
   # tests
   expect_is(r, "matrix")

@@ -50,7 +50,6 @@ test_that("equal weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
@@ -71,7 +70,6 @@ test_that("equal weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
   # tests
@@ -128,7 +126,6 @@ test_that("variables weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
@@ -149,7 +146,6 @@ test_that("variables weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0)
   # tests

@@ -45,7 +45,6 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
@@ -68,7 +67,6 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
@@ -126,7 +124,6 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 100,
     seed = 1)
@@ -149,7 +146,6 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
@@ -205,7 +201,6 @@ test_that("different voi when xgboost models trained with different weights", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
@@ -229,7 +224,6 @@ test_that("different voi when xgboost models trained with different weights", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
@@ -286,7 +280,6 @@ test_that("identical outputs given identical inputs", {
       feature_target_column = "target",
       total_budget = total_budget,
       xgb_parameters = xgb_parameters,
-      n_approx_obj_fun_points = 1000,
       xgb_n_folds = rep(5, n_f),
       optimality_gap = 0,
       seed = 1)
@@ -341,7 +334,6 @@ test_that("current = optimal info, when all pu selected", {
     feature_target_column = "target",
     total_budget = 100,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 1000,
     optimality_gap = 0)
   evd_ss <- optimal_survey_scheme(
     site_data = site_data,
@@ -363,7 +355,6 @@ test_that("current = optimal info, when all pu selected", {
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 1000,
     optimality_gap = 0)
   # tests
   expect_equal(max(attr(evd_ss, "ev")), evd_current)
@@ -415,7 +406,6 @@ test_that("current < optimal info, some pu selected", {
     feature_target_column = "target",
     total_budget = budget,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 100,
     optimality_gap = gap)
   evd_ss <- optimal_survey_scheme(
     site_data = site_data,
@@ -437,7 +427,6 @@ test_that("current < optimal info, some pu selected", {
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 100,
     optimality_gap = gap)
   # tests
   expect_gt(max(attr(evd_ss, "ev")), evd_current)

@@ -58,7 +58,6 @@ test_that("equal weights", {
     total_budget = total_budget,
     xgb_parameters =
       lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1,
@@ -85,7 +84,6 @@ test_that("equal weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
@@ -156,7 +154,6 @@ test_that("variable weights", {
     total_budget = total_budget,
     xgb_parameters =
       lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
-    n_approx_obj_fun_points = 1000,
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1,
@@ -183,7 +180,6 @@ test_that("variable weights", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 1000,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,

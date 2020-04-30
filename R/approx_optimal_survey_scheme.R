@@ -113,7 +113,6 @@ approx_optimal_survey_scheme <- function(
   site_management_locked_in_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
@@ -223,10 +222,6 @@ approx_optimal_survey_scheme <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## n_approx_obj_fun_points
-    assertthat::is.number(n_approx_obj_fun_points),
-    assertthat::noNA(n_approx_obj_fun_points),
-    isTRUE(n_approx_obj_fun_points > 0),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -347,11 +342,6 @@ approx_optimal_survey_scheme <- function(
   # subset for debugging
   new_info_idx <- which(rowSums(all_feasible_schemes) > 0.5)
   current_idx <- which(rowSums(all_feasible_schemes) < 0.5)
-
-  print("all_feasible_schemes")
-  print(all_feasible_schemes)
-
-
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
     rcpp_expected_value_of_decision_given_current_info(
@@ -361,7 +351,6 @@ approx_optimal_survey_scheme <- function(
       preweight = feature_data[[feature_preweight_column]],
       postweight = feature_data[[feature_postweight_column]],
       target = feature_data[[feature_target_column]],
-      n_approx_obj_fun_points = n_approx_obj_fun_points,
       budget = total_budget,
       gap = optimality_gap)
   })
@@ -408,7 +397,6 @@ approx_optimal_survey_scheme <- function(
         obj_fun_preweight = feature_data[[feature_preweight_column]],
         obj_fun_postweight = feature_data[[feature_postweight_column]],
         obj_fun_target = feature_data[[feature_target_column]],
-        n_approx_obj_fun_points = n_approx_obj_fun_points,
         total_budget = total_budget,
         optim_gap = optimality_gap,
         n_approx_replicates = n_approx_replicates,

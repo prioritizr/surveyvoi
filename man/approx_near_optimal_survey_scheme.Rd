@@ -26,7 +26,6 @@ approx_near_optimal_survey_scheme(
   site_management_locked_in_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
@@ -177,11 +176,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{n_approx_obj_fun_points}{\code{integer} number of points to use
-for approximating the piecewise-linear components of the objective
-function. Greater values result in more precise calculations, but
-also incur more computational costs. Defaults to 1000.}
 
 \item{optimality_gap}{\code{numeric} relative optimality gap for generating
 conservation prioritizations. A value of zero indicates that

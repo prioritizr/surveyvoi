@@ -154,7 +154,6 @@ calculating the expected value of the decision given a survey scheme.</p>
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>site_survey_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>n_approx_obj_fun_points</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
@@ -346,13 +345,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to <code>NULL</code> such that prior data is calculated automatically
 using <code>prior_probability_matrix</code>.</p></td>
-    </tr>
-    <tr>
-      <th>n_approx_obj_fun_points</th>
-      <td><p><code>integer</code> number of points to use
-for approximating the piecewise-linear components of the objective
-function. Greater values result in more precise calculations, but
-also incur more computational costs. Defaults to 1000.</p></td>
     </tr>
     <tr>
       <th>optimality_gap</th>

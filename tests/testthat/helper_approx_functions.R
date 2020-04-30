@@ -4,7 +4,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
     xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    n_approx_obj_fun_points, total_budget, optim_gap,
+    total_budget, optim_gap,
     n_approx_replicates, n_approx_outcomes_per_replicate) {
   # generate outcomes
   outcomes <- lapply(seq_len(n_approx_replicates), function(i) {
@@ -20,7 +20,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
       pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
       xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
       obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      n_approx_obj_fun_points, total_budget, optim_gap, outcomes[[i]])
+      total_budget, optim_gap, outcomes[[i]])
   })
   value
 }
@@ -32,7 +32,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
     xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    n_approx_obj_fun_points, total_budget, optim_gap, outcomes) {
+    total_budget, optim_gap, outcomes) {
   # init
   ## constants
   n_pu <- ncol(rij)
@@ -118,7 +118,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     curr_solution <- r_prioritization(
       curr_postij, pu_purchase_costs, as.numeric(pu_purchase_locked_in),
       obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      n_approx_obj_fun_points, remaining_budget, optim_gap, "")$x
+      remaining_budget, optim_gap, "")$x
 
     ## calculate approximate expected value of the prioritisation
     curr_value <- log(r_expected_value_of_action(

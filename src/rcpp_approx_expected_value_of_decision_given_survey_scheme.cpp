@@ -30,7 +30,6 @@ Rcpp::NumericVector
   Eigen::VectorXd obj_fun_preweight,
   Eigen::VectorXd obj_fun_postweight,
   Eigen::VectorXd obj_fun_target,
-  std::size_t n_approx_obj_fun_points,
   double total_budget,
   double optim_gap,
   std::size_t n_approx_replicates,
@@ -202,7 +201,7 @@ Rcpp::NumericVector
   Prioritization prioritize(
     rij.cols(), rij.rows(), pu_purchase_costs, pu_purchase_locked_in,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    n_approx_obj_fun_points, remaining_budget, optim_gap);
+    remaining_budget, optim_gap);
 
   /// overwrite missing data for feature we are not interested in surveying
   /// using the prior data

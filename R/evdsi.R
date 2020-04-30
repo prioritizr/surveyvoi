@@ -137,11 +137,6 @@
 #'  Defaults to \code{NULL} such that prior data is calculated automatically
 #'  using \code{\link{prior_probability_matrix}}.
 #'
-#' @param n_approx_obj_fun_points \code{integer} number of points to use
-#'  for approximating the piecewise-linear components of the objective
-#'  function. Greater values result in more precise calculations, but
-#'  also incur more computational costs. Defaults to 1000.
-#'
 #' @param xgb_parameters \code{list} of \code{list} objects
 #'   containing the parameters for fitting models for each
 #'   feature. See documentation for the \code{params} argument in
@@ -241,7 +236,6 @@ evdsi <- function(
   xgb_parameters,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
@@ -349,10 +343,6 @@ evdsi <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## n_approx_obj_fun_points
-    assertthat::is.number(n_approx_obj_fun_points),
-    assertthat::noNA(n_approx_obj_fun_points),
-    isTRUE(n_approx_obj_fun_points > 0),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -460,7 +450,6 @@ evdsi <- function(
       obj_fun_preweight = feature_data[[feature_preweight_column]],
       obj_fun_postweight = feature_data[[feature_postweight_column]],
       obj_fun_target = feature_data[[feature_target_column]],
-      n_approx_obj_fun_points = n_approx_obj_fun_points,
       total_budget = total_budget,
       optim_gap = optimality_gap)
   })
