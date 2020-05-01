@@ -52,7 +52,7 @@ Citation
     To cite package 'surveyvoi' in publications use:
 
       Jeffrey O Hanson and Joseph Bennett (NA). surveyvoi: Survey
-      Value of Information. R package version 0.0.1.
+      Value of Information. R package version 0.0.2.
       https://github.com/jeffreyhanson/surveyvoi
 
     A BibTeX entry for LaTeX users is
@@ -60,6 +60,6 @@ Citation
       @Manual{,
         title = {surveyvoi: Survey Value of Information},
         author = {Jeffrey O Hanson and Joseph Bennett},
-        note = {R package version 0.0.1},
+        note = {R package version 0.0.2},
         url = {https://github.com/jeffreyhanson/surveyvoi},
       }
