@@ -32,12 +32,12 @@ test_that("expected result", {
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$preweight, feature_data$postweight, feature_data$target,
-    1000, 301, 0)
+    301, 0)
   r2 <- evdci(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
     "model_specificity", "preweight", "postweight", "target",
-    301, "locked_in", NULL, 1000, 0)
+    301, "locked_in", NULL, 0)
   # tests
   expect_equal(r1, r2)
 })

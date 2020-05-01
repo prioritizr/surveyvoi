@@ -1,192 +1,30 @@
-#' Expected value of the decision given survey information
+#' Approximate expected value of the decision given survey information
 #'
 #' Calculate the \emph{expected value of the conservation management decision
 #' given survey information}. This metric describes the value of the management
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
-#' @param site_data \code{\link[sf]{sf}} object with site data.
-#'
-#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
-#'
-#' @param site_occupancy_columns \code{character} names of \code{numeric}
-#'   columns in the
-#'   argument to \code{site_data} that contain presence/absence data.
-#'   Each column should correspond to a different feature, and contain
-#'   binary presence/absence data (zeros or ones) indicating if the
-#'   feature was detected in a previous survey or not. If a site has not
-#'   been surveyed before, then missing (\code{NA}) values should be used.
-#'
-#' @param site_probability_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain modelled
-#'   probabilities of occupancy for each feature in each site.
-#'   Each column should correspond to a different feature, and contain
-#'   probability data (values between zero and one). No missing (\code{NA})
-#'   values are permitted in these columns.
-#'
-#' @param site_survey_scheme_column \code{character} name of \code{logical}
-#'  (\code{TRUE} / \code{FALSE}) column in the argument to \code{site_data}
-#'  that indicates which sites are selected in the scheme or not.
-#'  No missing \code{NA} values are permitted. Additionally, only sites
-#'  that are missing data can be selected or surveying (as per the
-#'  argument to \code{site_occupancy_columns}).
-#'
-#' @param feature_survey_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains \code{logical} (\code{TRUE} /
-#'   \code{FALSE}) values indicating if the feature will be surveyed in
-#'   the planned surveys or not. Note that considering additional features will
-#'   rapidly increase computational burden, and so it is only recommended to
-#'   consider features that are of specific conservation interest.
-#'   No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param site_survey_cost_column \code{character} name of column in the
-#'   argument to  \code{site_data} that contains costs for surveying each
-#'   site. This column should have \code{numeric} values that are equal to
-#'   or greater than zero. No missing (\code{NA}) values are permitted in this
-#'   column.
-#'
-#' @param site_env_vars_columns \code{character} names of columns in the
-#'   argument to  \code{site_data} that contain environmental information
-#'   for fitting updated occupancy models based on possible survey outcomes.
-#'   Each column should correspond to a different environmental variable,
-#'   and contain \code{numeric}, \code{factor}, or \code{character} data.
-#'   No missing (\code{NA}) values are permitted in these columns.
-#'
-#' @param site_weight_columns \code{character} name of columns in
-#'  \code{site_data} containing weights for model fitting for each
-#'  feature. These columns must contain \code{numeric} values greater
-#'  than or equal to zero. No missing (\code{NA}) values are
-#'  permitted. Defaults to \code{NULL} such that all data are given
-#'  equal weight when fitting models.
-#'
-#' @param site_management_cost_column \code{character} name of column in the
-#'   argument to \code{site_data} that contains costs for managing each
-#'   site for conservation. This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_survey_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting a presence of each
-#'   feature in a given site (i.e. the sensitivity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param feature_survey_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting an absence of each
-#'   feature in a given site (i.e. the specificity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param feature_model_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of the initial models correctly predicting a presence of each
-#'   feature in a given site (i.e. the sensitivity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
-#'
-#' @param feature_model_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of the initial models correctly predicting an absence of each
-#'   feature in a given site (i.e. the specificity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
-#'
-#' @param feature_preweight_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{preweight}
-#'   values used to parametrize  the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_postweight_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{postweight}
-#'   values used to parametrize  the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_target_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{target}
-#'   values used to parametrize the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param total_budget \code{numeric} maximum expenditure permitted
-#'   for conducting surveys and managing sites for conservation.
-#'
-#' @param site_management_locked_in_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked in for (\code{TRUE}) being managed for conservation or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
-#'   column. This is useful if some sites have already been earmarked for
-#'   conservation, or if some sites are already being managed for conservation.
-#'   Defaults to \code{NULL} such that no sites are locked in.
-#'
-#' @param prior_matrix \code{numeric} \code{matrix} containing
-#'  the prior probability of each feature occupying each site.
-#'  Rows correspond to features, and columns correspond to sites.
-#'  Defaults to \code{NULL} such that prior data is calculated automatically
-#'  using \code{\link{prior_probability_matrix}}.
-#'
-#' @param n_approx_obj_fun_points \code{integer} number of points to use
-#'  for approximating the piecewise-linear components of the objective
-#'  function. Greater values result in more precise calculations, but
-#'  also incur more computational costs. Defaults to 1000.
+#' @inheritParams evdsi
 #'
 #' @param n_approx_replicates \code{integer} number of replicates to use for
 #'   approximating the expected value calculations. Defaults to 100.
 #'
-#' @param n_approx_states_per_replicate \code{integer} number of states to use
-#'   per replicate for approximating the expected value of a given management
-#'   action. This number must be smaller than or equal to the total number of
-#'   presence absence states in the system
-#'   (i.e. \code{n_states(nrow(site_data), nrow(feature_data))})
-#'   Defaults to 1000.
+#' @param n_approx_outcomes_per_replicate \code{integer} number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.
 #'
-#' @param method_approx_states \code{character} name of method that is
-#'   used to sample states for approximating the expected value
+#' @param method_approx_outcomes \code{character} name of method that is
+#'   used to sample outcomes for approximating the expected value
 #'   calculations. Available options are:
 #'   \code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
 #'   \code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
 #'   Uniform sampling methods have an equal chance of returning each
 #'   state, and weighted sampling methods are more likely to return
-#'   states with a higher prior probability of occurring.
+#'   outcomes with a higher prior probability of occurring.
 #'   Defaults to \code{"weighted_without_replacement"}.
-#'
-#' @param xgb_parameters \code{list} of \code{list} objects
-#'   containing the parameters for fitting models for each
-#'   feature. See documentation for the \code{params} argument in
-#'   \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
-#'   these parameters would be determined using the
-#'   \code{\link{fit_occupancy_models}} function. Note that arguments must
-#'   have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
-#'   elements (see example below).
-#'
-#' @param xgb_n_folds \code{integer} vector containing the number of
-#'   k-fold cross-validation folds to use for fitting models and
-#'   assessing model performance for each feature. Ideally, the number of folds
-#'   should be exactly the same as the number used for tuning the
-#'   model parameters (i.e. same parameter to the \code{n_folds}
-#'   argument in \link{fit_occupancy_models} when generating parameters
-#'  for \code{xgb_parameters}).
-#'
-#' @param optimality_gap \code{numeric} relative optimality gap for generating
-#'   conservation prioritizations. A value of zero indicates that
-#'   prioritizations must be solved to optimality. A value of 0.1 indicates
-#'   prioritizations must be within 10\% of optimality. Defaults to 0.
 #'
 #' @param seed \code{integer} state of the random number generator for
 #'  partitioning data into folds cross-validation and fitting \pkg{xgboost}
-#'  models. It is also used for generating states.
+#'  models. It is also used for generating outcomes.
 #'  This parameter must remain the same to compare results from different
 #'  functions using the approximation methods. Defaults to 500.
 #;
@@ -195,12 +33,13 @@
 #'   the same seed is used when comparing results to other functions that
 #'   use approximation methods. Additionally, the accuracy of these
 #'   calculations depend on the arguments to
-#'   \code{n_approx_replicates} and \code{n_approx_states_per_replicate}, and
+#'   \code{n_approx_replicates} and \code{n_approx_outcomes_per_replicate}, and
 #'   so you may need to increase these parameters for large problems.
 #'
-#' @inherit approx_evdci details return
+#' @return \code{numeric} vector containing the expected values for each
+#' replicate.
 #'
-#' @seealso \code{\link{prior_probability_matrix}}.
+#' @inherit evdci seealso
 #'
 #' @examples
 #' # set seeds for reproducibility
@@ -266,13 +105,12 @@ approx_evdsi <- function(
   xgb_parameters,
   site_management_locked_in_column = NULL,
   prior_matrix = NULL,
-  n_approx_obj_fun_points = 1000,
   optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
-  n_approx_states_per_replicate = 1000,
-  method_approx_states = "weighted_without_replacement",
+  n_approx_outcomes_per_replicate = 10000,
+  method_approx_outcomes = "weighted_without_replacement",
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -377,10 +215,6 @@ approx_evdsi <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## n_approx_obj_fun_points
-    assertthat::is.number(n_approx_obj_fun_points),
-    assertthat::noNA(n_approx_obj_fun_points),
-    isTRUE(n_approx_obj_fun_points > 0),
     ## optimality_gap
     assertthat::is.number(optimality_gap),
     assertthat::noNA(optimality_gap),
@@ -388,13 +222,13 @@ approx_evdsi <- function(
     ## n_approx_replicates
     assertthat::is.count(n_approx_replicates),
     assertthat::noNA(n_approx_replicates),
-    ## n_approx_states_per_replicate
-    assertthat::is.count(n_approx_states_per_replicate),
-    assertthat::noNA(n_approx_states_per_replicate),
-    ## method_approx_states
-    assertthat::is.string(method_approx_states),
-    assertthat::noNA(method_approx_states),
-    isTRUE(method_approx_states %in%
+    ## n_approx_outcomes_per_replicate
+    assertthat::is.count(n_approx_outcomes_per_replicate),
+    assertthat::noNA(n_approx_outcomes_per_replicate),
+    ## method_approx_outcomes
+    assertthat::is.string(method_approx_outcomes),
+    assertthat::noNA(method_approx_outcomes),
+    isTRUE(method_approx_outcomes %in%
       c("uniform_with_replacement", "uniform_without_replacement",
         "weighted_with_replacement", "weighted_without_replacement")),
     ## seed
@@ -412,10 +246,10 @@ approx_evdsi <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
-  ## n_approx_states_per_replicate
+  ## n_approx_outcomes_per_replicate
   if ((nrow(site_data) * nrow(feature_data)) < 50)
     assertthat::assert_that(
-    isTRUE(n_approx_states_per_replicate <=
+    isTRUE(n_approx_outcomes_per_replicate <=
            n_states(nrow(site_data), nrow(feature_data))))
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
@@ -505,12 +339,11 @@ approx_evdsi <- function(
       obj_fun_preweight = feature_data[[feature_preweight_column]],
       obj_fun_postweight = feature_data[[feature_postweight_column]],
       obj_fun_target = feature_data[[feature_target_column]],
-      n_approx_obj_fun_points = n_approx_obj_fun_points,
       total_budget = total_budget,
       optim_gap = optimality_gap,
       n_approx_replicates = n_approx_replicates,
-      n_approx_states_per_replicate = n_approx_states_per_replicate,
-      method_approx_states = method_approx_states)
+      n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
+      method_approx_outcomes = method_approx_outcomes)
   })
   # return result
   out

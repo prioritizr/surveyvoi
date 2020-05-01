@@ -29,17 +29,15 @@ total_probability_of_negative_result <- function(
 }
 
 total_probability_of_positive_model_result <- function(
-  pij_subset, model_sensitivity, model_specificity, feature_outcome_idx) {
-  n_f <- length(feature_outcome_idx)
+  pij_subset, model_sensitivity, model_specificity) {
+  n_f <- nrow(pij_subset)
   n_pu <- ncol(pij_subset)
   out <- matrix(NA, nrow = n_f, ncol = n_pu)
   for (j in seq_len(n_pu)) {
-    for (i in seq_along(feature_outcome_idx)) {
+    for (i in seq_len(n_f)) {
     out[i, j] <-
-     (model_sensitivity[i, feature_outcome_idx[i]] *
-      pij_subset[i, j]) +
-     ((1.0 - model_specificity[i, feature_outcome_idx[i]]) *
-      (1.0 - pij_subset[i, j]))
+     (model_sensitivity[i] * pij_subset[i, j]) +
+     ((1.0 - model_specificity[i]) * (1.0 - pij_subset[i, j]))
   }}
   out[] <- pmin(out[], 1.0 - 1e-10)
   out[] <- pmax(out[], 1e-10)
@@ -47,17 +45,15 @@ total_probability_of_positive_model_result <- function(
 }
 
 total_probability_of_negative_model_result <- function(
-  pij_subset, model_sensitivity, model_specificity, feature_outcome_idx) {
-  n_f <- length(feature_outcome_idx)
+  pij_subset, model_sensitivity, model_specificity) {
+  n_f <- nrow(pij_subset)
   n_pu <- ncol(pij_subset)
   out <- matrix(NA, nrow = n_f, ncol = n_pu)
   for (j in seq_len(n_pu)) {
-    for (i in seq_along(feature_outcome_idx)) {
+    for (i in seq_len(n_f)) {
     out[i, j] <-
-     ((1 - model_sensitivity[i, feature_outcome_idx[i]]) *
-      pij_subset[i, j]) +
-     ((model_specificity[i, feature_outcome_idx[i]]) *
-      (1.0 - pij_subset[i, j]))
+     ((1 - model_sensitivity[i]) * pij_subset[i, j]) +
+     ((model_specificity[i]) * (1.0 - pij_subset[i, j]))
   }}
   out[] <- pmin(out[], 1.0 - 1e-10)
   out[] <- pmax(out[], 1e-10)

@@ -8,16 +8,18 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::MatrixXd&,
   Eigen::MatrixXd&,
   MatrixXfRM&,
+  MatrixXfRM&,
   std::vector<std::size_t>&,
-  std::size_t,
+  std::vector<mpz_class>&,
   std::vector<std::vector<std::string>>&,
   std::vector<std::vector<std::string>>&,
   std::vector<std::size_t>&,
-  std::vector<std::vector<std::vector<std::size_t>>> &xgb_train_folds,
-  std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
-  Eigen::Array<std::vector<BoosterHandle>, Eigen::Dynamic, Eigen::Dynamic>&,
-  Eigen::MatrixXd&,
-  Eigen::MatrixXd&);
+  std::vector<std::vector<std::vector<std::size_t>>>&,
+  std::vector<std::vector<std::vector<std::size_t>>>&,
+  model_yhat_map&,
+  model_performance_map&,
+  Eigen::VectorXd&,
+  Eigen::VectorXd&);
 
 void predict_xgboost_model(
   BoosterHandle&,

@@ -1,9 +1,9 @@
 #' @include internal.R
 NULL
 
-#' Plot conservation benefit
+#' Plot conservation value
 #'
-#' Create a plot showing the relative conservation benefit for different
+#' Create a plot showing the relative conservation value for different
 #' conservation features.
 #'
 #' @inheritParams approx_evdsi
@@ -12,18 +12,18 @@ NULL
 #'   the underlying data (i.e. a \code{tibble}{tibble} object) is returned
 #'   instead of the plot. Defaults to \code{TRUE}.
 #'
-#' @details This function creates a plot to visualize the conservation benefit
+#' @details This function creates a plot to visualize the conservation value
 #'   for each feature. The x-axis shows the number of protected sites that
 #'   are occupied by a given feature, and the y-axis represents the amount of
-#'   conservation benefit with that number of protected sites. Lines correspond
+#'   conservation value with that number of protected sites. Lines correspond
 #'   to features. Each feature will have a line that is comprised of a
 #'   solid component and a dashed component. The solid component of the line
-#'   corresponds to the range of conservation benefit values based on recorded
+#'   corresponds to the range of values based on recorded
 #'   presences and absences in the site data. The dashed component of the
-#'   line corresponds to the additional conservation benefit values that could
+#'   line corresponds to the additional values that could
 #'   be obtained if additional surveys were conducted and the feature was
 #'   detected in all sites that are currently unsurveyed. Features that are
-#'   associated with greater conservation benefit values (greater y-axis
+#'   associated with greater values (greater y-axis
 #'   values) at lower numbers of protected sites (smaller x-axis values) will,
 #'   broadly speaking, be considered more important for protection.
 #'
@@ -43,8 +43,8 @@ NULL
 #' print(site_data)
 #' print(feature_data)
 #'
-#' # plot conservation benefit for each feature
-#' plot_conservation_benefit(
+#' # plot conservation value for each feature
+#' plot_conservation_value(
 #'  site_data = site_data,
 #'  feature_data = feature_data,
 #'  site_occupancy_columns = paste0("f", seq_len(4)),
@@ -53,7 +53,7 @@ NULL
 #'  feature_target_column = "target")
 #'
 #' @export
-plot_conservation_benefit <- function(
+plot_conservation_value <- function(
   site_data,
   feature_data,
   site_occupancy_columns,
@@ -111,24 +111,24 @@ plot_conservation_benefit <- function(
   # create data to plot
   d <- plyr::ldply(seq_len(nrow(feature_data)), function(i) {
     survey_held <- seq(0, n_survey_held[i])
-    survey_benefit <- vapply(
-      survey_held, rcpp_conservation_benefit_amount, numeric(1),
+    survey_value <- vapply(
+      survey_held, rcpp_conservation_value_amount, numeric(1),
       preweight = feature_data[[feature_preweight_column]][[i]],
       postweight = feature_data[[feature_postweight_column]][[i]],
       target = feature_data[[feature_target_column]][[i]],
       total = nrow(site_data))
     unsurveyed_held <- seq(n_survey_held[i], n_unsurveyed_held[i])
-    unsurveyed_benefit <- vapply(
-      unsurveyed_held, rcpp_conservation_benefit_amount, numeric(1),
+    unsurveyed_value <- vapply(
+      unsurveyed_held, rcpp_conservation_value_amount, numeric(1),
       preweight = feature_data[[feature_preweight_column]][[i]],
       postweight = feature_data[[feature_postweight_column]][[i]],
       target = feature_data[[feature_target_column]][[i]],
       total = nrow(site_data))
   tibble::tibble(feature = as.character(i),
                  held = c(survey_held, unsurveyed_held),
-                 benefit = c(survey_benefit, unsurveyed_benefit),
-                 type = c(rep("observed", length(survey_benefit)),
-                          rep("potential", length(unsurveyed_benefit))))
+                 value = c(survey_value, unsurveyed_value),
+                 type = c(rep("observed", length(survey_value)),
+                          rep("potential", length(unsurveyed_value))))
   }) %>% tibble::as_tibble()
 
   # if not plot then return result
@@ -138,7 +138,7 @@ plot_conservation_benefit <- function(
   p <-
     ggplot2::ggplot(
       data = d,
-      mapping = ggplot2::aes(x = held, y = benefit, color = feature,
+      mapping = ggplot2::aes(x = held, y = value, color = feature,
                         linetype = type)) +
     ggplot2::geom_line() +
     ggplot2::scale_linetype_manual(
@@ -147,7 +147,7 @@ plot_conservation_benefit <- function(
       color = "Feature",
       linetype = "Data type",
       x = "Number of occupied sites held in prioritization",
-      y = "Conservation benefit")
+      y = "Conservation value")
 
   # return plot
   p

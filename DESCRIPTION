@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 0.0.1
+Version: 0.0.2
 Title: Survey Value of Information
 Description: Develop candidate survey schemes for sampling biodiversity, and
     and evaluate their return on investment using value of
@@ -62,8 +62,6 @@ VignetteBuilder: knitr
 RoxygenNote: 7.1.0
 Collate:
     'RcppExports.R'
-    'approx_evdci.R'
-    'approx_evdpi.R'
     'approx_evdsi.R'
     'evdsi.R'
     'internal.R'
@@ -71,14 +69,13 @@ Collate:
     'approx_optimal_survey_scheme.R'
     'env_div_survey_scheme.R'
     'evdci.R'
-    'evdpi.R'
     'feasible_survey_schemes.R'
     'fit_occupancy_models.R'
     'geo_cov_survey_scheme.R'
     'n_states.R'
     'optimal_survey_scheme.R'
     'package.R'
-    'plot_conservation_benefit.R'
+    'plot_conservation_value.R'
     'prior_probability_matrix.R'
     'relative_site_richness_scores.R'
     'relative_site_uncertainty_scores.R'

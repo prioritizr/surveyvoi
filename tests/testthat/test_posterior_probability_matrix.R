@@ -41,7 +41,6 @@ test_that("correct result", {
     feature_data$survey,
     feature_data$sensitivity, feature_data$specificity,
     feature_data$model_sensitivity, feature_data$model_specificity)
-  traceback()
   r2 <- r_posterior_probability_matrix(
     rij, pij, oij,
     site_data$solution,

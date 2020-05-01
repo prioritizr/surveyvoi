@@ -170,7 +170,7 @@ void which_feature_state(
   Eigen::MatrixXd &oij,
   std::vector<std::size_t> &features,
   std::vector<std::size_t> &pu_survey_solution_idx,
-  std::vector<std::size_t> &out) {
+  std::vector<mpz_class> &out) {
   // init
   const std::size_t n_f_total = oij.rows();
   const std::size_t n_f = features.size();
@@ -184,8 +184,8 @@ void which_feature_state(
     for (std::size_t j = 0; j < n_pu_survey; ++j) {
       curr_feature_pu_survey_solution_idx[j] =
         (n_f_total * pu_survey_solution_idx[j]) + features[i];
-      out[i] =
-        which_state_sparse(oij, curr_feature_pu_survey_solution_idx);
+      out[i] = 0;
+      which_state_sparse(oij, curr_feature_pu_survey_solution_idx, out[i]);
     }
   }
   // return void

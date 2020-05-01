@@ -28,7 +28,7 @@ test_that("expected results", {
     model_specificity = rep(0.85, 3),
     preweight = runif(3, 100, 200),
     postweight = runif(3, 5, 20),
-    target = rep(1, 3))
+    target = c(1, 1, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
   # generate prioritisation
@@ -36,10 +36,10 @@ test_that("expected results", {
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2", "f3"),
-    site_probability_columns = c("p1", "p2", "p3"),,
+    site_probability_columns = c("p1", "p2", "p3"),
     site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",,
+    site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
     feature_survey_sensitivity_column = "survey_sensitivity",
     feature_survey_specificity_column = "survey_specificity",
@@ -48,15 +48,14 @@ test_that("expected results", {
     feature_preweight_column = "preweight",
     feature_postweight_column = "postweight",
     feature_target_column = "target",
-    total_budget = 59,
+    total_budget = 49,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    n_approx_obj_fun_points = 1000,
     optimality_gap = 0,
     n_approx_replicates = 10,
-    n_approx_states_per_replicate = 30000,
-    method_approx_state = "uniform_without_replacement")
+    n_approx_outcomes_per_replicate = 10000,
+    method_approx_outcomes = "uniform_without_replacement")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -106,7 +105,7 @@ test_that("consistent results", {
         total_budget = total_budget,
         xgb_parameters = xgb_model$parameters,
         n_approx_replicates = 10,
-        n_approx_states_per_replicate = 100)
+        n_approx_outcomes_per_replicate = 100)
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
@@ -154,7 +153,7 @@ test_that("consistent results (multiple threads)", {
         total_budget = total_budget,
         xgb_parameters = xgb_model$parameters,
         n_approx_replicates = 10,
-        n_approx_states_per_replicate = 100,
+        n_approx_outcomes_per_replicate = 100,
         n_threads = 2))
   })
   # verify that all repeat calculations are identical

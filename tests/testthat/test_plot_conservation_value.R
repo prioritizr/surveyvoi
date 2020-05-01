@@ -1,4 +1,4 @@
-context("plot_conservation_benefit")
+context("plot_conservation_value")
 
 test_that("plot = TRUE", {
   # initialize rng
@@ -9,7 +9,7 @@ test_that("plot = TRUE", {
   site_data <- simulate_site_data(n_sites = 100, n_features = n_f, 0.3)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   # make plot
-  p <- plot_conservation_benefit(
+  p <- plot_conservation_value(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = paste0("f", seq_len(n_f)),
@@ -29,7 +29,7 @@ test_that("plot = FALSE", {
   site_data <- simulate_site_data(n_sites = 30, n_features = n_f, 0.8)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   # make plot
-  p <- plot_conservation_benefit(
+  p <- plot_conservation_value(
   site_data = site_data,
   feature_data = feature_data,
   site_occupancy_columns = paste0("f", seq_len(n_f)),

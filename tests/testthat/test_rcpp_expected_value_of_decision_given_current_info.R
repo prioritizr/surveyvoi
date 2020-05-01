@@ -33,11 +33,11 @@ test_that("correct result", {
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$preweight, feature_data$postweight, feature_data$target,
-    1000, 301, 0)
+    301, 0)
   r2 <- r_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     feature_data$preweight, feature_data$postweight, feature_data$target,
-    1000, 301, 0)
+    301, 0)
   # tests
   expect_equal(r1, r2)
 })

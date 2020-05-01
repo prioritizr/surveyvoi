@@ -2,7 +2,7 @@
 #define PRIORITIZATION_H
 
 #include "package.h"
-#include "rcpp_conservation_benefit.h"
+#include "rcpp_conservation_value.h"
 #include "gurobi_c.h"
 
 class Prioritization
@@ -13,13 +13,13 @@ public:
   std::size_t _n_pu;    // number of planning units
   std::size_t _n_vars;  // number of variables in problem
   std::size_t _n_lcs;   // number of linear constraints in problem
-  std::size_t _n_approx_obj_fun_points; // number of approximation points
-  double *_preweight; // objective function scaling parameter
-  double *_postweight; // objective function scaling parameter
-  double *_target; // objective function scaling parameter
+  double *_preweight; // objective function data
+  double *_postweight; // objective function data
+  double *_target; // objective function data
   std::vector<int> _update_constraints_idx; // update indices for rij
   std::vector<int> _update_vars_idx;        // update indices for rij
-
+  std::vector<double> _preweight_slope;  // objective function scaling parameter
+  std::vector<double> _postweight_slope; // objective function scaling parameter
   GRBenv *_env;           // gurobi problem environment
   GRBmodel *_model;       // gurobi problem object
 
@@ -30,18 +30,39 @@ public:
                  Eigen::VectorXd &preweight,
                  Eigen::VectorXd &postweight,
                  Eigen::VectorXd &target,
-                 std::size_t n_approx_obj_fun_points,
                  double budget, double gap) :
                  _env(NULL), _model(NULL) {
     // initialization
     _n_pu = n_pu;
     _n_f = n_f;
-    _n_vars = n_pu + n_f;
-    _n_lcs = n_f + 1;
-    _n_approx_obj_fun_points = n_approx_obj_fun_points;
+    _n_vars = n_pu + n_f + n_f;
+    _n_lcs = n_f + n_f + 1;
     _preweight = preweight.data();
     _postweight = postweight.data();
     _target = target.data();
+
+    // calculate preweight slopes for obj fun
+    _preweight_slope.resize(_n_f);
+    for (std::size_t i = 0; i < _n_f; ++i)
+      _preweight_slope[i] = preweight[i] / *(_target + i);
+    // calculate postweight slopes for obj fun
+    _postweight_slope.resize(_n_f);
+    double n_pu_dbl = static_cast<double>(_n_pu);
+    double max_value;
+    for (std::size_t i = 0; i < _n_f; ++i) {
+      // if target == number of planning units, then postweight slope = 0
+      if (std::abs(*(_target + i) - n_pu_dbl) < 1.0e-10) {
+        _postweight_slope[i] = 0;
+      } else {
+        // otherwise, caclulate based on conservation value euqation
+        max_value = conservation_value_amount(
+          n_pu_dbl, *(_preweight + i), *(_postweight + i),  *(_target + i),
+          n_pu_dbl);
+        _postweight_slope[i] =
+          (max_value - *(_preweight + i)) /
+          (n_pu_dbl - *(_target + i));
+      }
+    }
 
     // create update indices for rij data
     /// add constraint matrix row numbers
@@ -65,11 +86,21 @@ public:
     /// upper bounds
     std::vector<double> ub(_n_vars);
     for (std::size_t i = 0; i < _n_pu; ++i)
-      ub[i] = 1.0;
-    for (std::size_t i = _n_pu; i < _n_vars; ++i)
-      ub[i] = GRB_INFINITY;
+    ub[i] = 1.0;
+    for (std::size_t i = 0; i < _n_f; ++i)
+      ub[_n_pu + i] = *(_target + i);
+    for (std::size_t i = 0; i < _n_f; ++i)
+      ub[_n_pu + _n_f + i] = GRB_INFINITY;
+
     /// linear component of objective function
-    std::vector<double> obj(_n_vars, 0.0);
+    std::vector<double> obj(_n_vars);
+    for (std::size_t i = 0; i < _n_pu; ++i)
+      obj[i] = 0;
+    for (std::size_t i = 0; i < _n_f; ++i)
+      obj[_n_pu + i] = _preweight_slope[i];
+    for (std::size_t i = 0; i < _n_f; ++i)
+      obj[_n_pu + _n_f + i] = _postweight_slope[i];
+
     /// variable types
     std::vector<char> vtype(_n_vars);
     for (std::size_t i = 0; i < _n_pu; ++i)
@@ -97,14 +128,16 @@ public:
     // add constraints to problem
     /// feature held calculation constraints
     //// initialize vectors
-    std::vector<int> feature_held_col_idx(_n_pu + 1);
+    std::vector<int> feature_held_col_idx(_n_pu + 2);
     std::iota(feature_held_col_idx.begin(), feature_held_col_idx.end(), 0);
-    std::vector<double> feature_held_col_val(_n_pu + 1, 1.0);
+    std::vector<double> feature_held_col_val(_n_pu + 2, 1.0);
     feature_held_col_val[_n_pu] = -1.0;
+    feature_held_col_val[_n_pu + 1] = -1.0;
     //// add constraints
     for (std::size_t j = 0; j < _n_f; ++j) {
       feature_held_col_idx[_n_pu] = _n_pu + j;
-      GRBaddconstr(_model, _n_pu + 1, &feature_held_col_idx[0],
+      feature_held_col_idx[_n_pu + 1] = _n_pu + _n_f + j;
+      GRBaddconstr(_model, _n_pu + 2, &feature_held_col_idx[0],
                     &feature_held_col_val[0], '=', 0.0, NULL);
     }
     /// budget constraints
@@ -112,7 +145,7 @@ public:
     std::vector<int> budget_col_idx(_n_pu);
     std::iota(budget_col_idx.begin(), budget_col_idx.end(), 0);
     //// add constraint
-    GRBaddconstr(_model, _n_pu, &feature_held_col_idx[0],
+    GRBaddconstr(_model, _n_pu, &budget_col_idx[0],
                  pu_costs.data(), '<', budget, NULL);
   };
 
@@ -128,65 +161,6 @@ public:
     // update coefficients in the linear constraint matrix
     GRBchgcoeffs(_model, _n_f * _n_pu, &_update_constraints_idx[0],
                  &_update_vars_idx[0], rij.data());
-    // add piece-wise linear objective function components
-    /// initialize dummmy variables if a feature only contains zeros
-    Eigen::VectorXd dummy_held(3);
-    Eigen::VectorXd dummy_benefit(3);
-    dummy_held[0] = 0.0;
-    dummy_benefit[0] = 0.0;
-    dummy_held[2] = 100.0;
-    dummy_benefit[2] = 100.0;
-    /// initialize variables
-    double curr_value;
-    Eigen::VectorXd min_feature_held = rij.rowwise().minCoeff();
-    min_feature_held *= 0.99;
-    Eigen::VectorXd sum_feature_held = rij.rowwise().sum();
-    sum_feature_held *= 1.01;
-    Eigen::VectorXd incr_feature_held =
-      (sum_feature_held.array() - min_feature_held.array()) /
-      static_cast<double>(_n_approx_obj_fun_points - 2);
-    Eigen::VectorXd obj_feature_held(_n_approx_obj_fun_points);
-    Eigen::VectorXd obj_feature_benefit(_n_approx_obj_fun_points);
-    obj_feature_held[0] = 0.0;
-    obj_feature_benefit[0] = 0.0;
-    /// add piece-wise components
-    for (std::size_t j = 0; j < _n_f; ++j) {
-      /// calculate held values
-      curr_value = min_feature_held(j);
-      for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
-        obj_feature_held[k] = curr_value;
-        curr_value += incr_feature_held[j];
-      }
-      /// calculate benefit values
-      for (std::size_t k = 1; k < _n_approx_obj_fun_points; ++k) {
-        obj_feature_benefit[k] =  conservation_benefit_amount(
-          obj_feature_held[k], *(_preweight + j),
-          *(_postweight + j), *(_target + j), static_cast<double>(_n_pu));
-      }
-      obj_feature_benefit[0] = 0.0;
-      /// add component
-      if ((obj_feature_benefit.maxCoeff() - obj_feature_benefit[0]) > 1.0e-5) {
-        // use actual peice-wise linear objectives if the feature doesn't
-        // have zeros in all planning units
-        GRBsetpwlobj(_model, _n_pu + j, _n_approx_obj_fun_points,
-                     obj_feature_held.data(),
-                     obj_feature_benefit.data());
-      } else {
-        // use dummy peice-wise linear objectives if there is zero variation
-        // in the benefit function
-        if (obj_feature_benefit[1] > 1.0e-5) {
-          // if the benefit function has constant values that are greater
-          // than zero, then set this value as the maximum value
-          dummy_held[1] = obj_feature_held[1];
-          dummy_benefit[1] = obj_feature_benefit[1];
-        } else {
-          dummy_held[1] = 1.0;
-          dummy_benefit[1] = 1.0;
-        }
-        GRBsetpwlobj(_model, _n_pu + j, 3, dummy_held.data(),
-                     dummy_benefit.data());
-      }
-    }
     // return void
     return;
   }
@@ -196,8 +170,13 @@ public:
     // generate solution
     int error = GRBoptimize(_model);
     // check for error
-    if (static_cast<bool>(error))
-      Rcpp::stop("issue solving prioritization problem");
+    if (static_cast<bool>(error)) {
+      // throw error
+      std::string err_message =
+        "issue solving prioritization problem (code " +
+        std::to_string(error) + ")";
+      Rcpp::stop(err_message);
+    }
     // return void
     return;
   }

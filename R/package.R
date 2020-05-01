@@ -13,9 +13,9 @@ NULL
 #' -- wherein some sites have previously been surveyed and other sites have not
 #' -- this package aims to identify which sites should be surveyed because
 #' doing so could lead to vastly superior conservation management plans.
-#' Methods are provided to calculate the value of perfect information,
-#' and the value of sample information for a given survey scheme.
-#' Furthermore, by maximizing the value of sample information, optimal
+#' Methods are provided to calculate the expected value of current information,
+#' and the expected value of sample information given a given survey scheme.
+#' Furthermore, by directly maximizing the value of sample information, optimal
 #' survey schemes can also be identified.
 #' This package requires the 'Gurobi' software suite (https://www.gurobi.com).
 #'

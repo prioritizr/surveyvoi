@@ -17,8 +17,8 @@ cd /tmp
 wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
 sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
 sudo sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list'
-sudo apt-get update
-sudo apt-get install install intel-mkl-64bit-2020.0-088
+sudo apt-get -o Acquire::http::proxy=false update
+sudo apt-get -o Acquire::http::proxy=false install intel-mkl-64bit-2020.0-088
 ```
 
 You will then need to add the following commands to your `~./bashrc` file:
@@ -52,7 +52,7 @@ Citation
     To cite package 'surveyvoi' in publications use:
 
       Jeffrey O Hanson and Joseph Bennett (NA). surveyvoi: Survey
-      Value of Information. R package version 0.0.1.
+      Value of Information. R package version 0.0.2.
       https://github.com/jeffreyhanson/surveyvoi
 
     A BibTeX entry for LaTeX users is
@@ -60,6 +60,6 @@ Citation
       @Manual{,
         title = {surveyvoi: Survey Value of Information},
         author = {Jeffrey O Hanson and Joseph Bennett},
-        note = {R package version 0.0.1},
+        note = {R package version 0.0.2},
         url = {https://github.com/jeffreyhanson/surveyvoi},
       }

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot conservation benefit — plot_conservation_benefit • surveyvoi</title>
+<title>Plot conservation value — plot_conservation_value • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -33,8 +33,8 @@
 
 
 
-<meta property="og:title" content="Plot conservation benefit — plot_conservation_benefit" />
-<meta property="og:description" content="Create a plot showing the relative conservation benefit for different
+<meta property="og:title" content="Plot conservation value — plot_conservation_value" />
+<meta property="og:description" content="Create a plot showing the relative conservation value for different
 conservation features." />
 <meta name="twitter:card" content="summary" />
 
@@ -67,7 +67,7 @@ conservation features." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -120,17 +120,17 @@ conservation features." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot conservation benefit</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/plot_conservation_benefit.R'><code>R/plot_conservation_benefit.R</code></a></small>
-    <div class="hidden name"><code>plot_conservation_benefit.Rd</code></div>
+    <h1>Plot conservation value</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/plot_conservation_value.R'><code>R/plot_conservation_value.R</code></a></small>
+    <div class="hidden name"><code>plot_conservation_value.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Create a plot showing the relative conservation benefit for different
+    <p>Create a plot showing the relative conservation value for different
 conservation features.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plot_conservation_benefit</span>(
+    <pre class="usage"><span class='fu'>plot_conservation_value</span>(
   <span class='no'>site_data</span>,
   <span class='no'>feature_data</span>,
   <span class='no'>site_occupancy_columns</span>,
@@ -204,27 +204,25 @@ instead of the plot. Defaults to <code>TRUE</code>.</p></td>
     <p><code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></code> plot object.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function creates a plot to visualize the conservation benefit
+    <p>This function creates a plot to visualize the conservation value
   for each feature. The x-axis shows the number of protected sites that
   are occupied by a given feature, and the y-axis represents the amount of
-  conservation benefit with that number of protected sites. Lines correspond
+  conservation value with that number of protected sites. Lines correspond
   to features. Each feature will have a line that is comprised of a
   solid component and a dashed component. The solid component of the line
-  corresponds to the range of conservation benefit values based on recorded
+  corresponds to the range of values based on recorded
   presences and absences in the site data. The dashed component of the
-  line corresponds to the additional conservation benefit values that could
+  line corresponds to the additional values that could
   be obtained if additional surveys were conducted and the feature was
   detected in all sites that are currently unsurveyed. Features that are
-  associated with greater conservation benefit values (greater y-axis
+  associated with greater values (greater y-axis
   values) at lower numbers of protected sites (smaller x-axis values) will,
   broadly speaking, be considered more important for protection.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    RFoptions</span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
 <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
@@ -244,24 +242,24 @@ instead of the plot. Defaults to <code>TRUE</code>.</p></td>
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     0     1     1     1
-#&gt; </span><span style='color: #949494;'># … with 5 more variables: p1 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p3 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p4 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 5 more variables: p1 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p3 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, p4 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
 #&gt; </span><span style='color: #949494;'>#   geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 4 x 9</span><span>
-#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
+#&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    FALSE             0.952            0.863            0.778
 #&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.956            0.887            0.734
 #&gt; </span><span style='color: #BCBCBC;'>3</span><span> f3    FALSE             0.963            0.802            0.725
 #&gt; </span><span style='color: #BCBCBC;'>4</span><span> f4    TRUE              0.987            0.849            0.727
-#&gt; </span><span style='color: #949494;'># … with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
+#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
 #&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
-<span class='co'># plot conservation benefit for each feature</span>
-<span class='fu'>plot_conservation_benefit</span>(
+<span class='co'># plot conservation value for each feature</span>
+<span class='fu'>plot_conservation_value</span>(
  <span class='kw'>site_data</span> <span class='kw'>=</span> <span class='no'>site_data</span>,
  <span class='kw'>feature_data</span> <span class='kw'>=</span> <span class='no'>feature_data</span>,
  <span class='kw'>site_occupancy_columns</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/paste'>paste0</a></span>(<span class='st'>"f"</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/seq'>seq_len</a></span>(<span class='fl'>4</span>)),
  <span class='kw'>feature_preweight_column</span> <span class='kw'>=</span> <span class='st'>"preweight"</span>,
  <span class='kw'>feature_postweight_column</span>  <span class='kw'>=</span> <span class='st'>"postweight"</span>,
- <span class='kw'>feature_target_column</span> <span class='kw'>=</span> <span class='st'>"target"</span>)</div><div class='img'><img src='plot_conservation_benefit-1.png' alt='' width='700' height='433' /></div><div class='input'>
+ <span class='kw'>feature_target_column</span> <span class='kw'>=</span> <span class='st'>"target"</span>)</div><div class='img'><img src='plot_conservation_value-1.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

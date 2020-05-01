@@ -4,12 +4,6 @@
     <loc>https://jeffrey-hanson.com/surveyvoi/index.html</loc>
   </url>
   <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/reference/approx_evdci.html</loc>
-  </url>
-  <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/reference/approx_evdpi.html</loc>
-  </url>
-  <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/approx_evdsi.html</loc>
   </url>
   <url>
@@ -23,9 +17,6 @@
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/evdci.html</loc>
-  </url>
-  <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/reference/evdpi.html</loc>
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/evdsi.html</loc>
@@ -46,7 +37,7 @@
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/optimal_survey_scheme.html</loc>
   </url>
   <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/reference/plot_conservation_benefit.html</loc>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/plot_conservation_value.html</loc>
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/prior_probability_matrix.html</loc>

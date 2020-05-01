@@ -4,7 +4,6 @@
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
 #include "rcpp_expected_value_of_action.h"
-#include "rcpp_conservation_benefit.h"
 
 // [[Rcpp::export]]
 double rcpp_expected_value_of_decision_given_current_info(
@@ -14,25 +13,19 @@ double rcpp_expected_value_of_decision_given_current_info(
   Eigen::VectorXd &preweight,
   Eigen::VectorXd &postweight,
   Eigen::VectorXd &target,
-  std::size_t n_approx_obj_fun_points,
   double budget,
   double gap) {
-
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
   Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
-                   preweight, postweight, target, n_approx_obj_fun_points,
-                   budget, gap);
+                   preweight, postweight, target, budget, gap);
+
+
+  // save problem to disk for debugging
   p.add_rij_data(pij);
   p.solve();
   p.get_solution(solution);
 
-  // calculate log prior probabilities
-  Eigen::MatrixXd pij_log1m = pij;
-  log_1m_matrix(pij_log1m);
-  log_matrix(pij);
-
   // calculate expected value of management action
-  return expected_value_of_action(
-    solution, pij, pij_log1m, preweight, postweight, target);
+  return expected_value_of_action(solution, pij, preweight, postweight, target);
 }

@@ -34,6 +34,6 @@ void sample_k_uniform_no_replacement_nth_states(
 
 void which_feature_state(
   Eigen::MatrixXd&, std::vector<std::size_t>&, std::vector<std::size_t>&,
-  std::vector<std::size_t>&);
+  std::vector<mpz_class>&);
 
 #endif

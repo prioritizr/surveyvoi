@@ -1,6 +1,5 @@
 context("fit_xgboost_models_and_assess_performance")
 
-
 test_that("equal weights", {
   # data
   ## set seeds

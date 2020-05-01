@@ -3,12 +3,11 @@ context("prioritization")
 test_that("expected result", {
   # data
   set.seed(123)
-  n_pu <- 100
-  n_f <- 20
+  n_pu <- 500
+  n_f <- 40
   prew <- 200
-  postw <- 30
-  target <- 10
-  n_approx_points <- 1000
+  postw <- 0.3
+  target <- 5
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
@@ -17,21 +16,27 @@ test_that("expected result", {
   # results
   r1 <- r_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "r1.lp")
+    rep(target, n_f), budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
+    rep(target, n_f), budget, gap, "r2.lp")
+  r3 <- r_pwl_prioritization(
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), 1000, budget, gap, "r3.lp")
   # tests
   objval <-
-    r_conservation_benefit_state(
-      matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
+    r_conservation_value_state(
+      matrix(r3$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
       rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
+  expect_lte(abs(r3$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)
+  expect_equal(r1$x, r3$x)
   # clean up
   unlink("r1.lp")
   unlink("r2.lp")
+  unlink("r3.lp")
 })
 
 test_that("correct result", {
@@ -51,10 +56,10 @@ test_that("correct result", {
   # results
   r1 <- r_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "")
+    rep(target, n_f), budget, gap, "")
   r2 <- rcpp_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "")
+    rep(target, n_f), budget, gap, "")
   r3 <- brute_force_prioritization(
     rij, rep(prew, n_f), rep(postw, n_f), rep(target, n_f), pu_costs,
     pu_locked_in, budget)
@@ -83,23 +88,30 @@ test_that("expected result (one feature has all zeros)", {
   # results
   r1 <- r_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "r1.lp")
+    rep(target, n_f), budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
     rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
-    rep(target, n_f), n_approx_points, budget, gap, "r2.lp")
+    rep(target, n_f), budget, gap, "r2.lp")
+  r3 <- r_pwl_prioritization(
+    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rep(target, n_f), 1000, budget, gap, "r3.lp")
   # tests
   objval <-
-    r_conservation_benefit_state(
-      matrix(r1$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
+    r_conservation_value_state(
+      matrix(r3$x, ncol = n_pu, nrow = n_f, byrow = TRUE) * rij,
       rep(prew, n_f), rep(postw, n_f), rep(target, n_f), ncol(rij))
   expect_lte(abs(r1$objval - objval), 1e-4)
   expect_lte(abs(r2$objval - objval), 1e-4)
+  expect_lte(abs(r3$objval - objval), 1e-4)
   expect_equal(r1$x, r2$x)
+  expect_equal(r1$x, r3$x)
   expect_true(all(r1$x))
   expect_true(all(r2$x))
+  expect_true(all(r3$x))
   # clean up
  unlink("r1.lp")
  unlink("r2.lp")
+ unlink("r3.lp")
 })
 
 test_that("complex example", {
@@ -121,10 +133,10 @@ test_that("complex example", {
   pu_locked_in <- rep(0, ncol(rij))
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, preweight, postweight, target, 1000, budget,
+    rij, pu_costs, pu_locked_in, preweight, postweight, target, budget,
     gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, preweight, postweight, target, 1000, budget,
+    rij, pu_costs, pu_locked_in, preweight, postweight, target, budget,
     gap, "r2.lp")
   r3 <- brute_force_prioritization(
     rij, preweight, postweight, target, pu_costs, pu_locked_in, budget)

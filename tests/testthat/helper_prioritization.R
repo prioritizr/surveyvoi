@@ -1,4 +1,4 @@
-r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
+r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   postweight, target, n_approx_points, budget, gap, file_path) {
   # assert that arguments are valid
   assertthat::assert_that(
@@ -24,10 +24,10 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
     r2 <- sum(x) * 1.01
     seq(r1, r2, length.out = n_approx_points)
   })
-  obj_feature_benefit <- obj_feature_held
-  {for (i in seq_len(ncol(obj_feature_benefit))) {
-    obj_feature_benefit[, i] <-
-      r_conservation_benefit_amount(obj_feature_held[, i],
+  obj_feature_value <- obj_feature_held
+  {for (i in seq_len(ncol(obj_feature_value))) {
+    obj_feature_value[, i] <-
+      r_conservation_value_amount(obj_feature_held[, i],
         preweight[i], postweight[i], target[i], n_pu)
   }}
   # build problem
@@ -41,19 +41,69 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   p$sense <- c(rep("=", n_f), "<=")
   p$A <- rbind(cbind(rij, diag(n_f) * -1), c(pu_costs, rep(0, n_f)))
   p$pwlobj <- lapply(seq_len(n_f), function(i) {
-    if (abs(diff(range(obj_feature_benefit[, i]))) > 1e-5) {
+    if (abs(diff(range(obj_feature_value[, i]))) > 1e-5) {
       o <- list(var = n_pu + i,
                 x = c(0, obj_feature_held[, i]),
-                y = c(0, obj_feature_benefit[, i]))
-    } else if (obj_feature_benefit[1, i] > 1e-5) {
+                y = c(0, obj_feature_value[, i]))
+    } else if (obj_feature_value[1, i] > 1e-5) {
       o <- list(var = n_pu + i,
                 x = c(0, obj_feature_held[1, i]),
-                y = c(0, obj_feature_benefit[1, i]))
+                y = c(0, obj_feature_value[1, i]))
     } else {
       o <- list(var = n_pu + i, x = c(0, 0.5, 1), y = c(0, 0.5, 1))
     }
     o
   })
+  # solve problem
+  g <- gurobi::gurobi(p, list(MIPGap = gap, Presolve = -1, OutputFlag = 0))
+  assertthat::assert_that(identical(g$status, "OPTIMAL"))
+  # write problem to disk if needed
+  if (nchar(file_path) > 0)
+    gurobi::gurobi_write(p, file_path)
+  # return result
+  list(x = as.logical(g$x[seq_len(n_pu)]), objval = g$objval, full_x = g$x)
+}
+
+r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
+  postweight, target, budget, gap, file_path) {
+  # assert that arguments are valid
+  assertthat::assert_that(
+    is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
+    is.numeric(preweight), is.numeric(postweight), is.numeric(target),
+    length(preweight) == nrow(rij), length(postweight) == nrow(rij),
+    length(target) == nrow(rij),
+    is.numeric(pu_costs), length(pu_costs) == ncol(rij),
+    assertthat::noNA(pu_costs),
+    is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
+    assertthat::noNA(pu_locked_in),
+    all(pu_locked_in %in% c(0, 1)),
+    assertthat::is.number(budget), assertthat::noNA(budget),
+    assertthat::is.number(gap), assertthat::noNA(gap))
+  # init
+  n_pu <- ncol(rij)
+  n_f <- nrow(rij)
+  # calculate slopes for lines for each species
+  pre_target_slope <- preweight / target
+  post_target_slope <- sapply(seq_along(postweight), function(i) {
+    if (target[i] == ncol(rij))
+      return(0)
+    xcoord = c(target[i], ncol(rij))
+    ycoord = c(preweight[i], r_conservation_value_amount(
+      ncol(rij), preweight[i], postweight[i], target[i], ncol(rij)))
+    (max(ycoord) - min(ycoord)) / (max(xcoord) - min(xcoord))
+  })
+  # build problem
+  p <- list()
+  p$modelsense <- "max"
+  p$ub <- c(rep(1, n_pu), target, rep(Inf, n_f))
+  p$lb <- c(pu_locked_in, rep(0, n_f), rep(0, n_f))
+  p$obj <- c(rep(0, n_pu), pre_target_slope, post_target_slope)
+  p$vtype <- c(rep("B", n_pu), rep("C", n_f), rep("C", n_f))
+  p$rhs <- c(rep(0, n_f), budget)
+  p$sense <- c(rep("=", n_f), "<=")
+  p$A <- rbind(
+    cbind(rij, diag(n_f) * -1, diag(n_f) * -1),
+    c(pu_costs, rep(0, n_f * 2)))
   # solve problem
   g <- gurobi::gurobi(p, list(MIPGap = gap, Presolve = -1, OutputFlag = 0))
   assertthat::assert_that(identical(g$status, "OPTIMAL"))
@@ -93,7 +143,7 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
     if (sum(x * pu_costs) > budget)
       return(-Inf)
     # if feasible solution then return objective function
-    r_conservation_benefit_state(
+    r_conservation_value_state(
       x[rep(1, n_f), ] * rij, preweight, postweight, target, total)
   })
   # find best solution

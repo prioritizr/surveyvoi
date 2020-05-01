@@ -13,7 +13,7 @@ test_that("correct result", {
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   n_reps <- 1
-  n_states_per_rep <- 4
+  n_outcomes_per_rep <- 4
   # prepare data
   site_occ_columns <- paste0("f", seq_len(n_f))
   site_prb_columns <- paste0("p", seq_len(n_f))
@@ -60,11 +60,10 @@ test_that("correct result", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 100,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
   set.seed(1)
   r2 <- rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
     rij = rij, pij = pij, wij = wij,
@@ -84,12 +83,11 @@ test_that("correct result", {
     obj_fun_preweight = feature_data$preweight,
     obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    n_approx_obj_fun_points = 100,
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_states_per_replicate = n_states_per_rep,
-    method_approx_states = "weighted_without_replacement")
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    method_approx_outcomes = "weighted_without_replacement")
   # tests
   expect_equal(r1, r2)
 })
