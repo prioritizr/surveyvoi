@@ -19,10 +19,7 @@ reference:
     desc: Functions for value of information analyses
     contents:
       - evdci
-      - evdpi
       - evdsi
-      - approx_evdci
-      - approx_evdpi
       - approx_evdsi
       - optimal_survey_scheme
       - approx_optimal_survey_scheme
@@ -50,4 +47,4 @@ reference:
     contents:
       - n_states
       - fit_occupancy_models
-      - plot_conservation_benefit
+      - plot_conservation_value
