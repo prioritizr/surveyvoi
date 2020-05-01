@@ -38,6 +38,7 @@ double expected_value_of_decision_given_survey_scheme(
   /// constant variables
   const std::size_t n_pu = rij.cols();
   const std::size_t n_f = rij.rows();
+  const std::size_t n_vars = pu_env_data.cols();
   const std::size_t n_f_survey =
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
   const std::size_t n_pu_surveyed_in_scheme =
@@ -138,7 +139,7 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd curr_total_probability_of_model_negative(n_f_survey, n_pu);
   std::vector<bool> curr_solution(n_pu);
   std::vector<mpz_class> feature_outcome_idx(n_f_survey);
-  model_beta_map model_beta;
+  model_yhat_map model_yhat;
   model_performance_map model_performance;
   std::vector<std::vector<BoosterHandle> *> curr_models(n_f_survey);
   Eigen::VectorXd curr_model_sensitivity(n_f_survey);
@@ -149,6 +150,12 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd pij_survey_species_subset(n_f_survey, n_pu);
   for (std::size_t i = 0; i < n_f_survey; ++i)
     pij_survey_species_subset.row(i) = pij.row(survey_features_idx[i]);
+
+  // subset environmental data for planning unit predictions
+  MatrixXfRM pu_predict_env_data(n_pu_model_prediction, n_vars);
+  for (std::size_t i = 0; i < n_pu_model_prediction; ++i)
+    pu_predict_env_data.row(i).array() =
+      pu_env_data.row(pu_model_prediction_idx[i]).array();
 
   /// calculate the total probabilities of positive and negative outcomes
   /// from the surveys
@@ -212,16 +219,17 @@ double expected_value_of_decision_given_survey_scheme(
 
     // fit models for the feature's outcomes if needed
     fit_xgboost_models_and_assess_performance(
-      curr_oij, wij, pu_env_data,
+      curr_oij, wij,
+      pu_env_data, pu_predict_env_data,
       survey_features_idx, feature_outcome_idx,
       xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
       xgb_train_folds, xgb_test_folds,
-      model_beta, model_performance,
-      curr_models, curr_model_sensitivity, curr_model_specificity);
+      model_yhat, model_performance,
+      curr_model_sensitivity, curr_model_specificity);
 
     /// generate modelled predictions for species we are interested in surveying
-    predict_missing_rij_data(curr_oij, pu_env_data, survey_features_idx,
-                             pu_model_prediction_idx, curr_models);
+    predict_missing_rij_data(curr_oij, survey_features_idx, feature_outcome_idx,
+                             pu_model_prediction_idx, model_yhat);
     assert_valid_probability_data(curr_oij, "issue predicting missing data");
 
     /// calculate total probability of models' positive results
@@ -290,14 +298,6 @@ double expected_value_of_decision_given_survey_scheme(
             curr_oij(i, j) = -1.0;
     /// increment o loop variable
     o = o + 1;
-  }
-
-  // clean-up
-  for (auto itr = model_beta.begin(); itr != model_beta.end(); ++itr) {
-    curr_n_folds = itr->second->size();
-    for (std::size_t k = 0; k < curr_n_folds; ++k)
-      XGBoosterFree(itr->second->at(k));
-    delete itr->second;
   }
 
   // exports

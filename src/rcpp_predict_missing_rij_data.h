@@ -7,9 +7,9 @@
 
 void predict_missing_rij_data(
   Eigen::MatrixXd&,
-  MatrixXfRM&,
   std::vector<std::size_t>&,
+  std::vector<mpz_class>&,
   std::vector<std::size_t>&,
-  std::vector<std::vector<BoosterHandle> *> &);
+  model_yhat_map&);
 
 #endif

@@ -4,6 +4,7 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::MatrixXd &rij,
   Eigen::MatrixXd &wij,
   MatrixXfRM &x,
+  MatrixXfRM &predict_x,
   std::vector<std::size_t> &survey_features_idx,
   std::vector<mpz_class> &feature_outcome_idx,
   std::vector<std::vector<std::string>> &xgb_parameter_names,
@@ -11,9 +12,8 @@ void fit_xgboost_models_and_assess_performance(
   std::vector<std::size_t> &n_xgb_nrounds,
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_train_folds,
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
-  model_beta_map &model_beta,
+  model_yhat_map &model_yhat,
   model_performance_map &model_performance,
-  std::vector<std::vector<BoosterHandle> *> &output_models,
   Eigen::VectorXd &output_model_sensitivity,
   Eigen::VectorXd &output_model_specificity) {
 
@@ -21,22 +21,27 @@ void fit_xgboost_models_and_assess_performance(
   const std::size_t n_pu = rij.cols();
   const std::size_t n_f = survey_features_idx.size();
   const std::size_t n_vars = x.cols();
+  const std::size_t n_pu_predict = predict_x.rows();
 
   // prepare looping variables
+  /// class prototypes
   model_key curr_key;
   std::pair<double, double> curr_performance;
+  Eigen::VectorXd curr_predictions(n_pu_predict);
+  Eigen::VectorXf curr_fold_predictions(n_pu_predict);
+  /// counters
   std::size_t curr_n_folds;
   std::size_t curr_n_k_train;
   std::size_t curr_n_k_test;
-
+  /// training dta
   Eigen::VectorXf train_y;
   Eigen::VectorXf train_w;
   MatrixXfRM train_x;
-
+  /// test data
   Eigen::VectorXf test_y;
   Eigen::VectorXf test_w;
   MatrixXfRM test_x;
-
+  /// performance maetrics
   Eigen::VectorXd fold_sensitivity;
   Eigen::VectorXd fold_specificity;
 
@@ -46,18 +51,18 @@ void fit_xgboost_models_and_assess_performance(
     // initialize unordered map key
     curr_key = std::make_pair(survey_features_idx[i], feature_outcome_idx[i]);
     // check if model has already been fit, and if so then skip model fitting
-    if (model_beta.find(curr_key) != model_beta.end())
+    if (model_yhat.find(curr_key) != model_yhat.end())
       continue;
     // determine number of folds for the i'th species
     curr_n_folds = xgb_train_folds[i].size();
-    // initialize new model in map
-    std::vector<BoosterHandle>* curr_model =
-      new std::vector<BoosterHandle>(curr_n_folds);
-    model_beta[curr_key] = curr_model;
     // allocate memory for storing performance of each fold
     fold_sensitivity.resize(curr_n_folds);
     fold_specificity.resize(curr_n_folds);
+    // reset predictions vector
+    curr_predictions.setZero();
     for (std::size_t k = 0; k < curr_n_folds; ++k) {
+      // initialize new model
+      BoosterHandle curr_model;
       // determine number of training and testing observations
       // for i'th species, k'th fold
       curr_n_k_train = xgb_train_folds[i][k].size();
@@ -99,30 +104,41 @@ void fit_xgboost_models_and_assess_performance(
       XGDMatrixSetFloatInfo(train_x_handle[0], "weight", train_w.data(),
                             curr_n_k_train);
       // create the booster and set parameters
-      XGBoosterCreate(train_x_handle, 1, &curr_model->at(k));
+      XGBoosterCreate(train_x_handle, 1, &curr_model);
       curr_n_xgb_parameters =
         xgb_parameter_names[survey_features_idx[i]].size();
       for (std::size_t p = 0; p < curr_n_xgb_parameters; ++p) {
         XGBoosterSetParam(
-          curr_model->at(k),
+          curr_model,
           xgb_parameter_names[survey_features_idx[i]][p].c_str(),
           xgb_parameter_values[survey_features_idx[i]][p].c_str());
       }
       // train the model
       for (std::size_t iter = 0; iter < n_xgb_nrounds[survey_features_idx[i]];
            iter++)
-        XGBoosterUpdateOneIter(curr_model->at(k), iter, train_x_handle[0]);
+        XGBoosterUpdateOneIter(curr_model, iter, train_x_handle[0]);
       // prepare xgboost data handles for model testing
       DMatrixHandle test_x_handle[1];
       XGDMatrixCreateFromMat((float *) test_x.data(), curr_n_k_test,
                              n_vars, -1.0f, &test_x_handle[0]);
       // store model performance values
       xgboost_model_sensitivity_and_specificity(
-        test_y, test_w, test_x_handle[0], curr_model->at(k),
+        test_y, test_w, test_x_handle[0], curr_model,
         fold_sensitivity[k], fold_specificity[k]);
+      // prepare predictions matrix
+      DMatrixHandle predict_x_handle[1];
+      XGDMatrixCreateFromMat((float *) predict_x.data(), n_pu_predict,
+                             n_vars, -1.0f, &predict_x_handle[0]);
+      // generate predictions
+      predict_xgboost_model(curr_model, predict_x_handle[0],
+                            curr_fold_predictions);
+      curr_predictions.array() +=
+        curr_fold_predictions.cast<double>().array();
       // clean up
       XGDMatrixFree(train_x_handle[0]);
       XGDMatrixFree(test_x_handle[0]);
+      XGDMatrixFree(predict_x_handle[0]);
+      XGBoosterFree(curr_model);
     }
     // calculate average model performance across the different folds
     curr_performance = std::make_pair(
@@ -130,14 +146,15 @@ void fit_xgboost_models_and_assess_performance(
       fold_specificity.sum() / static_cast<double>(curr_n_folds));
     // store model performance
     model_performance[curr_key] = curr_performance;
+    // sotre model predictions
+    curr_predictions.array() /= static_cast<double>(curr_n_folds);
+    model_yhat[curr_key] = curr_predictions;
   }
 
-  // extract model fits and performance statistics
+  // extract performance statistics for output
   for (std::size_t i = 0; i < n_f; ++i) {
     // create key
     curr_key = std::make_pair(survey_features_idx[i], feature_outcome_idx[i]);
-    // extract models
-    output_models[i] = model_beta.find(curr_key)->second;
     // extract performance values
     curr_performance = model_performance.find(curr_key)->second;
     output_model_sensitivity[i] = curr_performance.first;
@@ -225,6 +242,7 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
 
   // init
   MatrixXfRM pu_env_data = pu_env_data_raw;
+  MatrixXfRM pu_predict_env_data = pu_env_data;
   const std::size_t n_pu = rij.cols();
   const std::size_t n_f = rij.rows();
   std::vector<std::size_t> survey_features_idx;
@@ -238,9 +256,8 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
   std::vector<mpz_class> feature_outcome_idx(n_f_survey, 0);
 
   // prepare objects for modelling
-  model_beta_map model_beta;
+  model_yhat_map model_yhat;
   model_performance_map model_performance;
-  std::vector<std::vector<BoosterHandle> *> curr_models(n_f_survey);
   Eigen::VectorXd curr_sensitivity(n_f_survey);
   Eigen::VectorXd curr_specificity(n_f_survey);
 
@@ -260,21 +277,12 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
 
   // fit models
   fit_xgboost_models_and_assess_performance(
-    rij, wij, pu_env_data,
+    rij, wij, pu_env_data, pu_predict_env_data,
     survey_features_idx, feature_outcome_idx,
     xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
-    model_beta, model_performance,
-    curr_models, curr_sensitivity, curr_specificity);
-
-  // clean-up
-  std::size_t curr_n_folds;
-  for (auto itr = model_beta.begin(); itr != model_beta.end(); ++itr) {
-    curr_n_folds = itr->second->size();
-    for (std::size_t k = 0; k < curr_n_folds; ++k)
-      XGBoosterFree(itr->second->at(k));
-    delete itr->second;
-  }
+    model_yhat, model_performance,
+    curr_sensitivity, curr_specificity);
 
   // exports
    return Rcpp::List::create(

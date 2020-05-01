@@ -72,5 +72,8 @@ typedef std::unordered_map<std::pair<std::size_t, mpz_class>, std::vector<Booste
 
 typedef std::unordered_map<std::pair<std::size_t, mpz_class>, std::pair<double, double>, model_key_hash, model_key_equal> model_performance_map;
 
+typedef std::unordered_map<std::pair<std::size_t, mpz_class>, Eigen::VectorXd, model_key_hash, model_key_equal> model_yhat_map;
+
+typedef std::unordered_map<std::pair<std::size_t, mpz_class>, Eigen::VectorXd, model_key_hash, model_key_equal>::iterator model_yhat_iterator;
 
 #endif
