@@ -88,9 +88,11 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   ## create dummy matrix
   dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
   # main processing
-  out <- Inf
-  for (i in outcomes) {
+  outcome_probs <- numeric(length(outcomes))
+  outcome_values <- numeric(length(outcomes))
+  for (ii in seq_along(outcomes)) {
     ## generate state
+    i <- outcomes[ii]
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
@@ -121,22 +123,21 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       remaining_budget, optim_gap, "")$x
 
     ## calculate approximate expected value of the prioritisation
-    curr_value <- log(r_expected_value_of_action(
+    curr_value <- r_expected_value_of_action(
       curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
-      obj_fun_target))
+      obj_fun_target)
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(
       curr_oij2, total_probability_of_survey_positive_log,
       total_probability_of_survey_negative_log, rij_outcome_idx + 1);
 
-    ## calculate expected value of the action
-    if (!is.finite(out)) {
-      out <- curr_value + curr_prob
-    } else {
-      out <- log_sum(out, curr_value + curr_prob)
-    }
+    ## store values
+    outcome_probs[ii] <- curr_prob
+    outcome_values[ii] <- curr_value
   }
   # exports
-  exp(out)
+  outcome_probs <- outcome_probs - rcpp_log_sum(outcome_probs)
+  outcome_probs <- outcome_probs + log(outcome_values)
+  exp(rcpp_log_sum(outcome_probs))
 }

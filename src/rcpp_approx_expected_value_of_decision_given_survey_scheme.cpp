@@ -154,6 +154,8 @@ Rcpp::NumericVector
   /// declare temporary variables used in the main loop
   double curr_expected_value_of_decision;
   Eigen::VectorXd out(n_approx_replicates);
+  Eigen::VectorXd outcome_probabiliies(n_approx_outcomes_per_replicate);
+  Eigen::VectorXd outcome_values(n_approx_outcomes_per_replicate);
   std::size_t curr_n_folds;
   double curr_expected_value_of_action_given_outcome;
   double curr_probability_of_outcome;
@@ -314,26 +316,18 @@ Rcpp::NumericVector
 
       /// calculate expected value of the prioritisation
       curr_expected_value_of_action_given_outcome =
-        std::log(expected_value_of_action(
+        expected_value_of_action(
           curr_solution, curr_pij, obj_fun_preweight, obj_fun_postweight,
-          obj_fun_target));
+          obj_fun_target);
 
       /// calculate likelihood of outcome
       curr_probability_of_outcome = log_probability_of_outcome(
         curr_oij, total_probability_of_survey_positive_log,
         total_probability_of_survey_negative_log, rij_outcome_idx);
 
-      /// calculate expected value of action
-      if (std::isinf(curr_expected_value_of_decision)) {
-        curr_expected_value_of_decision =
-          curr_expected_value_of_action_given_outcome +
-          curr_probability_of_outcome;
-      } else {
-        curr_expected_value_of_decision =
-          log_sum(curr_expected_value_of_decision,
-                  curr_expected_value_of_action_given_outcome +
-                  curr_probability_of_outcome);
-      }
+      /// calculate values of action
+      outcome_values[o] = curr_expected_value_of_action_given_outcome;
+      outcome_probabiliies[o] = curr_probability_of_outcome;
 
       /// reset oij matrix so that -1s are present for planning units/features
       /// that need surveying
@@ -344,8 +338,12 @@ Rcpp::NumericVector
               curr_oij(i, j) = -1.0;
     }
 
+    // apply correction to approximate the true value
+    outcome_probabiliies.array() -= log_sum(outcome_probabiliies);
+    outcome_probabiliies.array() += outcome_values.array().log();
+
     // store result
-    out[r] = curr_expected_value_of_decision;
+    out[r] = log_sum(outcome_probabiliies);
   }
 
   // exports
