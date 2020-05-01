@@ -92,7 +92,7 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
     s <- gurobi::gurobi(m, p)$x[seq_len(n)]
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
-      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-10),
+      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),
       msg = "solver returned infeasible solution")
     ## store solution
     out[b, ] <- as.logical(s)
@@ -182,7 +182,7 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
     s <- gurobi::gurobi(m, p)$x
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
-      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-10),
+      isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),
       msg = "solver returned infeasible solution")
     ## store solution
     out[b, ] <- as.logical(s)
@@ -202,7 +202,7 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
 #' @param index \code{integer} indices associated with the presence/absence
 #'   values. Defaults to a sequence ranging from 1 to the cardinality of the
 #'   argument to \code{x} (i.e. \code{seq_along(x)}).
-
+#'
 #' @param seed \code{numeric} random number generated seed for generating
 #'   folds. Defaults to 500.
 #'
