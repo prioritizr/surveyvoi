@@ -64,13 +64,6 @@ Rcpp::NumericVector
   /// convert environmental data to row major format
   MatrixXfRM pu_env_data2 = pu_env_data;
 
-  /// integer over-flow checks, highest std::size_t value is 1e+18
-  if (n_pu_surveyed_in_scheme > 20)
-    Rcpp::stop("number of planning units in selected in survey scheme is too large (i.e. >20)");
-
-  /// calculate number of outcomes for a given feature
-  const std::size_t n_f_outcomes = n_states(n_pu_surveyed_in_scheme) + 1;
-
   /// clamp number of approximation outcomes to total number of outcomes across
   /// all features
   mpz_class n_outcomes;
