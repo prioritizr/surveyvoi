@@ -71,9 +71,10 @@ NULL
 #' then go to step 13.
 #'
 #' \item Calculate the cost effectiveness of each new candidate survey
-#' scheme, by dividing the approximate expected value of each
-#' new candidate survey scheme by the cost of the newly selected
-#' candidate site.
+#' scheme. This calculated as the difference between the approximate expected
+#' value of a given new candidate survey scheme and that of the
+#' \emph{current survey solution}, and dividing this difference by the the cost
+#' of the newly selected candidate site.
 #'
 #' \item Find the new candidate survey scheme that is associated with the
 #' highest cost-effectiveness value, ignoring any missing \code{NA} values.
@@ -488,14 +489,15 @@ approx_near_optimal_survey_scheme <- function(
 
     # penalise each objective value by the cost of the extra planning unit
     curr_eval_metrics <-
-      curr_sites_approx_evsdi /
+      (curr_sites_approx_evsdi - survey_solution_values[s]) /
       site_data[[site_survey_cost_column]][curr_remaining_sites]
 
     # find the best site
-    curr_best_site <- curr_remaining_sites[which.max(curr_eval_metrics)]
+    curr_best_idx <- which.max(curr_eval_metrics)
+    curr_best_site <- curr_remaining_sites[curr_best_idx]
 
     # store the objective value
-    survey_solution_values[s] <- max(curr_sites_approx_evsdi, na.rm = TRUE)
+    survey_solution_values[s] <- curr_sites_approx_evsdi[curr_best_idx]
 
     # add the best site to the solution matrix
     survey_solution_matrix[s, ] <- prev_solution

@@ -279,9 +279,10 @@ lower approximate expected values than the \emph{current survey solution}
 then go to step 13.
 
 \item Calculate the cost effectiveness of each new candidate survey
-scheme, by dividing the approximate expected value of each
-new candidate survey scheme by the cost of the newly selected
-candidate site.
+scheme. This calculated as the difference between the approximate expected
+value of a given new candidate survey scheme and that of the
+\emph{current survey solution}, and dividing this difference by the the cost
+of the newly selected candidate site.
 
 \item Find the new candidate survey scheme that is associated with the
 highest cost-effectiveness value, ignoring any missing \code{NA} values.
