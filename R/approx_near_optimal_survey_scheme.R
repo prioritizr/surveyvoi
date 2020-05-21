@@ -6,7 +6,7 @@ NULL
 #' Find a near optimal survey scheme that maximizes return on investment using
 #' value of information analyses. This function uses the approximation method
 #' for calculating the expected value of the decision given a survey scheme,
-#' and a greedy heuristic algorithm to maximize this metric.
+#' and a backwards heuristic algorithm to maximize this metric.
 #'
 #' @inheritParams approx_evdsi
 #'
@@ -30,67 +30,11 @@ NULL
 #' survey scheme. Unfortunately, it is not feasible to apply the brute-force
 #' to large problems because it can take an incredibly long time to complete.
 #' In such cases, it may be desirable to obtain a "relatively good" survey
-#' scheme and the greedy heuristic algorithm is provided for such cases.
-#' The greedy heuristic algorithm -- unlike the brute force algorithm --
+#' scheme and the backwards heuristic algorithm is provided for such cases.
+#' The backwards heuristic algorithm -- unlike the brute force algorithm --
 #' is not guaranteed to identify an optimal solution -- or even a "relatively
-#' good solution" for that matter -- though greedy heuristic algorithms tend to
-#' deliver solutions that are 15\% from optimality. Specifically, this
-#' greedy algorithms is implemented as:
-#'
-#' \enumerate{
-#'
-#' \item Initialize an empty \emph{list of survey scheme solutions}, and an
-#' empty \emph{list of approximate expected values}.
-#'
-#' \item Calculate the expected value of current information.
-#'
-#' \item Add a survey scheme with no sites selected for surveying to the
-#' \emph{list of survey scheme solutions}, and add the expected value of current
-#' information to the \emph{list of approximate expected values}.
-#'
-#' \item Set the \emph{current survey solution} as the survey scheme with no
-#' sites selected for surveying.
-#'
-#' \item For each remaining candidate site that has not been selected for
-#' a survey, generate a new candidate survey scheme with each candidate site
-#' added to the current survey solution.
-#'
-#' \item Calculate the approximate expected value of each
-#' new candidate survey scheme. If the cost of a given candidate survey scheme
-#' exceeds the survey budget, then store a missing \code{NA value} instead.
-#' Also if the the cost of a given candidate survey scheme plus the
-#' management costs of locked in planning units exceeds the total budget,
-#' then a store a missing value \code{NA} value too.
-#'
-#' \item If all of the new candidate survey schemes are associated with
-#' missing \code{NA} values -- because they all exceed the survey budget -- then
-#' go to step 13.
-#'
-#' \item If all of the new candidate survey schemes are associated with
-#' lower approximate expected values than the \emph{current survey solution}
-#' then go to step 13.
-#'
-#' \item Calculate the cost effectiveness of each new candidate survey
-#' scheme, by dividing the approximate expected value of each
-#' new candidate survey scheme by the cost of the newly selected
-#' candidate site.
-#'
-#' \item Find the new candidate survey scheme that is associated with the
-#' highest cost-effectiveness value, ignoring any missing \code{NA} values.
-#' This new candidate survey scheme is now set as the
-#' \emph{current survey scheme}.
-#'
-#' \item Store the \emph{current survey scheme} in the
-#' \emph{list of survey scheme solutions} and store its approximate expected
-#' value in the \emph{list of approximate expected values}.
-#'
-#' \item Go to step 13.
-#'
-#' \item Find the solution in the \emph{list of survey scheme solutions} that
-#' has the highest expected value in the
-#' \emph{list of approximate expected values} and return this solution.
-#'
-#' }
+#' good solution" for that matter -- though backwards heuristic algorithms tend
+#' to deliver solutions that within 30\% from optimality.
 #'
 #' @return
 #' \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
@@ -384,33 +328,30 @@ approx_near_optimal_survey_scheme <- function(
   ## prepare rij matrix for Rcpp
   rij[is.na(rij)] <- -1
 
-  # calculate expected value of decision given scheme that does not survey sites
-  evd_current <- withr::with_seed(seed, {
-    rcpp_expected_value_of_decision_given_current_info(
-      pij = pij,
-      pu_costs = site_data[[site_management_cost_column]],
-      pu_locked_in = site_management_locked_in,
-      preweight = feature_data[[feature_preweight_column]],
-      postweight = feature_data[[feature_postweight_column]],
-      target = feature_data[[feature_target_column]],
-      budget = total_budget,
-      gap = optimality_gap)
-  })
-
   # initialize looping variables
   candidate_sites <- !(site_survey_status | site_survey_locked_out)
   n_candidate_sites <- sum(candidate_sites)
   survey_solution_matrix <- matrix(FALSE, ncol = nrow(site_data),
-                                   nrow = n_candidate_sites + 1)
-  survey_solution_values <- numeric(n_candidate_sites + 1)
-  survey_solution_values[1] <- mean(evd_current)
+                                   nrow = n_candidate_sites + 2)
+  survey_solution_matrix[, candidate_sites] <- TRUE
+  survey_solution_values <- numeric(n_candidate_sites + 2)
+
+  # manually change the working environment for the heuristic worker
+  # function, so that it has access to all the variables defined here
+  environment(heuristic_worker) <- new.env()
+
+  # calculate expected value of decision given scheme that contains
+  # all of the survey sites
+  evd_all_sites <- heuristic_worker(candidate_sites)
+  survey_solution_values[1] <- evd_all_sites
+
   # iterate over the the total number of available sites
-  for (s in (1 + seq_len(n_candidate_sites))) {
+  for (s in seq(2, length(n_candidate_sites))) {
     # extract previous solution
     prev_solution <- survey_solution_matrix[s - 1, ]
     # find candidate remaining sites that have not been selected yet
-    curr_remaining_sites <- which(!prev_solution & candidate_sites)
-    # calculate approx expected value of survey information when adding
+    curr_remaining_sites <- which(prev_solution)
+    # calculate approx expected value of survey information when removing
     # each candidate remaining site to the previous solution
     ## initialize cluster
     if (n_threads > 1) {
@@ -422,85 +363,59 @@ approx_near_optimal_survey_scheme <- function(
       curr_remaining_sites, .parallel = n_threads > 1, function(j) {
       ## generate solution
       curr_candidate_solution <- prev_solution
-      curr_candidate_solution[j] <- TRUE
-      ## cost of surveys exceeds survey budget then return NA
-      curr_surv_cost <-
-        sum(site_data[[site_survey_cost_column]] * curr_candidate_solution)
-      if (curr_surv_cost > survey_budget) return(NA_real_)
-      ## calculate cost of solution, if it exceeds the budget then return NA
-      curr_total_cost <-
-        curr_surv_cost +
-        sum(site_data[[site_management_cost_column]] *
-            site_management_locked_in)
-      if (curr_total_cost > total_budget) return(NA_real_)
-      ## setup folds for training and testing models
-      pu_predict_idx <-
-        which(curr_candidate_solution | site_survey_status)
-      xgb_folds <- lapply(seq_len(nrow(feature_data)),
-        function(i) {
-          withr::with_seed(seed, {
-            create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                         index = pu_predict_idx,
-                         na.fail = FALSE, seed = seed)
-          })
-      })
-      ## calculate expected value of decision given survey scheme
-      out <- withr::with_seed(seed, {
-        rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
-          rij = rij, pij = pij, wij = wij,
-          survey_features = feature_data[[feature_survey_column]],
-          survey_sensitivity =
-            feature_data[[feature_survey_sensitivity_column]],
-          survey_specificity =
-            feature_data[[feature_survey_specificity_column]],
-          pu_survey_solution = curr_candidate_solution,
-          pu_survey_status = site_survey_status,
-          pu_survey_costs = site_data[[site_survey_cost_column]],
-          pu_purchase_costs = site_data[[site_management_cost_column]],
-          pu_purchase_locked_in = site_management_locked_in,
-          pu_env_data = ejx,
-          xgb_parameters = xgb_parameters,
-          xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
-          xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-          n_xgb_nrounds = xgb_nrounds,
-          obj_fun_preweight = feature_data[[feature_preweight_column]],
-          obj_fun_postweight = feature_data[[feature_postweight_column]],
-          obj_fun_target = feature_data[[feature_target_column]],
-          total_budget = total_budget,
-          optim_gap = optimality_gap,
-          n_approx_replicates = n_approx_replicates,
-          n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-          method_approx_outcomes = method_approx_outcomes)
-      })
-      ## return average expected value
-      mean(out)
+      curr_candidate_solution[j] <- FALSE
+      ## evaluate solution
+      heuristic_worker(candidate_sites)
     })
-
     ## kill cluster
     if (n_threads > 1) {
       doParallel::stopImplicitCluster()
       cl <- parallel::stopCluster(cl)
     }
 
-    # check to see if main loop should be exited
-    ## if all candidate solutions exceed the budget then exit loop
-    if (all(is.na(curr_sites_approx_evsdi))) break()
+    # if not all sites have missing values, then find the least worst to remove
+    if (!all(is.na(curr_sites_approx_evsdi)))  {
+      # penalise each objective value by the cost of the extra planning unit
+      curr_eval_metrics <-
+        (survey_solution_values[s - 1] - curr_sites_approx_evsdi) /
+        site_data[[site_survey_cost_column]][curr_remaining_sites]
 
-    # penalise each objective value by the cost of the extra planning unit
-    curr_eval_metrics <-
-      curr_sites_approx_evsdi /
-      site_data[[site_survey_cost_column]][curr_remaining_sites]
+      # find the least worse site
+      curr_best_site <- curr_remaining_sites[which.min(curr_eval_metrics)]
 
-    # find the best site
-    curr_best_site <- curr_remaining_sites[which.max(curr_eval_metrics)]
+      # store the objective value
+      survey_solution_values[s] <-
+        curr_sites_approx_evsdi[which.min(curr_eval_metrics)]
+    } else {
+      # store missing value for solution value
+      survey_solution_values[s] <- NA_real_
 
-    # store the objective value
-    survey_solution_values[s] <- max(curr_sites_approx_evsdi, na.rm = TRUE)
+      # randomly pick a best site
+      curr_best_site <-
+        curr_remaining_sites[sample.int(length(curr_sites_approx_evsdi), 1)]
+    }
 
     # add the best site to the solution matrix
-    survey_solution_matrix[s, ] <- prev_solution
-    survey_solution_matrix[s, curr_best_site] <- TRUE
+    survey_solution_matrix[s, curr_best_site] <- FALSE
   }
+
+  # add results for current information
+  evd_current <- withr::with_seed(seed, {
+    rcpp_expected_value_of_decision_given_current_info(
+      pij = pij,
+      pu_costs = site_data[[site_management_cost_column]],
+      pu_locked_in = site_management_locked_in,
+      preweight = feature_data[[feature_preweight_column]],
+      postweight = feature_data[[feature_postweight_column]],
+      target = feature_data[[feature_target_column]],
+      budget = total_budget,
+      gap = optimality_gap)
+  })
+  survey_solution_matrix[nrow(survey_solution_matrix), ] <- FALSE
+  survey_solution_values[length(survey_solution_values)] <- mean(evd_current)
+
+  o1 <<- survey_solution_matrix
+  o2 <<- survey_solution_values
 
   # find optimal solution(s)
   best_idx <- abs(max(survey_solution_values) - survey_solution_values) < 1e-10
@@ -508,4 +423,59 @@ approx_near_optimal_survey_scheme <- function(
 
   # return result
   out
+}
+
+# define main worker for heuristic function
+heuristic_worker <- function(curr_candidate_solution) {
+  ## cost of surveys exceeds survey budget then return NA
+  curr_surv_cost <-
+    sum(site_data[[site_survey_cost_column]] * curr_candidate_solution)
+  if (curr_surv_cost > survey_budget) return(NA_real_)
+  ## calculate cost of solution, if it exceeds the budget then return NA
+  curr_total_cost <-
+    curr_surv_cost +
+    sum(site_data[[site_management_cost_column]] *
+        site_management_locked_in)
+  if (curr_total_cost > total_budget) return(NA_real_)
+  ## setup folds for training and testing models
+  pu_predict_idx <-
+    which(curr_candidate_solution | site_survey_status)
+  xgb_folds <- lapply(seq_len(nrow(feature_data)),
+    function(i) {
+      withr::with_seed(seed, {
+        create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
+                     index = pu_predict_idx,
+                     na.fail = FALSE, seed = seed)
+      })
+  })
+  ## calculate expected value of decision given survey scheme
+  out <- withr::with_seed(seed, {
+    rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
+      rij = rij, pij = pij, wij = wij,
+      survey_features = feature_data[[feature_survey_column]],
+      survey_sensitivity =
+        feature_data[[feature_survey_sensitivity_column]],
+      survey_specificity =
+        feature_data[[feature_survey_specificity_column]],
+      pu_survey_solution = curr_candidate_solution,
+      pu_survey_status = site_survey_status,
+      pu_survey_costs = site_data[[site_survey_cost_column]],
+      pu_purchase_costs = site_data[[site_management_cost_column]],
+      pu_purchase_locked_in = site_management_locked_in,
+      pu_env_data = ejx,
+      xgb_parameters = xgb_parameters,
+      xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
+      xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
+      n_xgb_nrounds = xgb_nrounds,
+      obj_fun_preweight = feature_data[[feature_preweight_column]],
+      obj_fun_postweight = feature_data[[feature_postweight_column]],
+      obj_fun_target = feature_data[[feature_target_column]],
+      total_budget = total_budget,
+      optim_gap = optimality_gap,
+      n_approx_replicates = n_approx_replicates,
+      n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
+      method_approx_outcomes = method_approx_outcomes)
+  })
+  ## return average expected value
+  mean(out)
 }

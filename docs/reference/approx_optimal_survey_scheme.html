@@ -10,21 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +43,6 @@
 <meta property="og:description" content="Find the optimal survey scheme that maximizes return on investment using
 value of information analyses. This function uses the approximation method
 for calculating the expected value of the decision given a survey scheme." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -52,9 +57,10 @@ for calculating the expected value of the decision given a survey scheme." />
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -68,7 +74,7 @@ for calculating the expected value of the decision given a survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
       </span>
     </div>
 
@@ -76,7 +82,7 @@ for calculating the expected value of the decision given a survey scheme." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -104,8 +110,8 @@ for calculating the expected value of the decision given a survey scheme." />
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jeffreyhanson/surveyvoi">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/jeffreyhanson/surveyvoi/">
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -116,6 +122,7 @@ for calculating the expected value of the decision given a survey scheme." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -156,7 +163,7 @@ for calculating the expected value of the decision given a survey scheme.</p>
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>feature_data</span>)),
+  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>feature_data</span>)),
   <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>n_approx_outcomes_per_replicate</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
   <span class='kw'>method_approx_outcomes</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
@@ -169,11 +176,11 @@ for calculating the expected value of the decision given a survey scheme.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://www.rdocumentation.org/packages/sf/topics/sf'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_occupancy_columns</th>
@@ -255,7 +262,7 @@ probability of the initial models correctly predicting a presence of each
 feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
+This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -265,7 +272,7 @@ probability of the initial models correctly predicting an absence of each
 feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
+This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_preweight_column</th>
@@ -312,9 +319,9 @@ for conducting surveys.</p></td>
       <td><p><code>list</code> of <code>list</code> objects
 containing the parameters for fitting models for each
 feature. See documentation for the <code>params</code> argument in
-<code><a href='https://www.rdocumentation.org/packages/xgboost/topics/xgb.train'>xgb.train</a></code> for available parameters. Ideally,
+<code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgb.train</a></code> for available parameters. Ideally,
 these parameters would be determined using the
-<code>fit_occupancy_models</code> function. Note that arguments must
+<code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code> function. Note that arguments must
 have <code>"nrounds"</code>, <code>"objective"</code>, <code>"scale_pos_weight"</code>
 elements (see example below).</p></td>
     </tr>
@@ -347,7 +354,7 @@ Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
 the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to <code>NULL</code> such that prior data is calculated automatically
-using <code>prior_probability_matrix</code>.</p></td>
+using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></td>
     </tr>
     <tr>
       <th>optimality_gap</th>
@@ -372,7 +379,7 @@ equal weight when fitting models.</p></td>
  assessing model performance for each feature. Ideally, the number of folds
  should be exactly the same as the number used for tuning the
  model parameters (i.e. same parameter to the <code>n_folds</code>
- argument in fit_occupancy_models when generating parameters
+ argument in <a href='fit_occupancy_models.html'>fit_occupancy_models</a> when generating parameters
 for <code>xgb_parameters</code>).</p></td>
     </tr>
     <tr>
@@ -427,94 +434,84 @@ and each column corresponds to a different replicate.</p>
 algorithm.
 Initially, all feasible (valid) survey schemes are identified given the
 survey costs and the survey budget (using
-<code>feasible_survey_schemes</code>. Next, the expected value of each and
+<code><a href='feasible_survey_schemes.html'>feasible_survey_schemes</a></code>. Next, the expected value of each and
 every feasible survey scheme is approximated
-(using <code>approx_evdsi</code>).
+(using <code><a href='approx_evdsi.html'>approx_evdsi</a></code>).
 Finally, the greatest expected value is identified, and all survey schemes
 that share this greatest expected value are returned. Due to the nature of
 this algorithm, it can take a very long time to complete.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>201</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>201</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>11</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.8</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>11</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.8</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 11 features and 9 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 11 features and 9 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9568333 ymax: 0.9545036
 #&gt; CRS:            NA
-#&gt; <span style='color: #949494;'># A tibble: 11 x 10</span><span>
+#&gt; <span style='color: #555555;'># A tibble: 11 x 10</span><span>
 #&gt;    survey_cost management_cost      e1      e2       e3    f1    f2     p1
-#&gt;          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span>       12.2             64.6  1.01   -</span><span style='color: #BB0000;'>0.958</span><span>   0.898       0     0 0.091</span><span style='text-decoration: underline;'>4</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span>       11.8             66.6  0.320   0.074</span><span style='text-decoration: underline;'>7</span><span>  0.262      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.491 
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span>       11.1             64.4  0.924  -</span><span style='color: #BB0000;'>0.544</span><span>   1.10       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.239 
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span>       10.4             78.1 -</span><span style='color: #BB0000;'>2.10</span><span>   -</span><span style='color: #BB0000;'>0.296</span><span>  -</span><span style='color: #BB0000;'>1.60</span><span>       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.676 
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span>        7.27            65.4  0.177   1.24   -</span><span style='color: #BB0000;'>0.326</span><span>      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.848 
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span>       11.4             72.5  1.20   -</span><span style='color: #BB0000;'>1.35</span><span>    0.003</span><span style='text-decoration: underline;'>43</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.013</span><span style='text-decoration: underline;'>2</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span>       10.5             73.8 -</span><span style='color: #BB0000;'>0.924</span><span>  -</span><span style='color: #BB0000;'>0.643</span><span>  -</span><span style='color: #BB0000;'>1.63</span><span>       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span>        8.93            75.0 -</span><span style='color: #BB0000;'>1.08</span><span>   -</span><span style='color: #BB0000;'>0.654</span><span>  -</span><span style='color: #BB0000;'>0.659</span><span>      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.407 
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span>        8.14            71.4  0.014</span><span style='text-decoration: underline;'>0</span><span>  1.73    0.764       1     1 0.984 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span>        9.09            72.9  0.310   1.20    1.25       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.961 
-#&gt; </span><span style='color: #BCBCBC;'>11</span><span>       10.8             66.4  0.141   0.191  -</span><span style='color: #BB0000;'>0.052</span><span style='color: #BB0000;text-decoration: underline;'>1</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.524 
-#&gt; </span><span style='color: #949494;'># ... with 2 more variables: p2 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
+#&gt;          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span>       12.2             64.6  1.01   -</span><span style='color: #BB0000;'>0.958</span><span>   0.898       0     0 0.091</span><span style='text-decoration: underline;'>4</span><span>
+#&gt; </span><span style='color: #555555;'> 2</span><span>       11.8             66.6  0.320   0.074</span><span style='text-decoration: underline;'>7</span><span>  0.262      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.491 
+#&gt; </span><span style='color: #555555;'> 3</span><span>       11.1             64.4  0.924  -</span><span style='color: #BB0000;'>0.544</span><span>   1.10       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.239 
+#&gt; </span><span style='color: #555555;'> 4</span><span>       10.4             78.1 -</span><span style='color: #BB0000;'>2.10</span><span>   -</span><span style='color: #BB0000;'>0.296</span><span>  -</span><span style='color: #BB0000;'>1.60</span><span>       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.676 
+#&gt; </span><span style='color: #555555;'> 5</span><span>        7.27            65.4  0.177   1.24   -</span><span style='color: #BB0000;'>0.326</span><span>      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.848 
+#&gt; </span><span style='color: #555555;'> 6</span><span>       11.4             72.5  1.20   -</span><span style='color: #BB0000;'>1.35</span><span>    0.003</span><span style='text-decoration: underline;'>43</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.013</span><span style='text-decoration: underline;'>2</span><span>
+#&gt; </span><span style='color: #555555;'> 7</span><span>       10.5             73.8 -</span><span style='color: #BB0000;'>0.924</span><span>  -</span><span style='color: #BB0000;'>0.643</span><span>  -</span><span style='color: #BB0000;'>1.63</span><span>       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 
+#&gt; </span><span style='color: #555555;'> 8</span><span>        8.93            75.0 -</span><span style='color: #BB0000;'>1.08</span><span>   -</span><span style='color: #BB0000;'>0.654</span><span>  -</span><span style='color: #BB0000;'>0.659</span><span>      </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.407 
+#&gt; </span><span style='color: #555555;'> 9</span><span>        8.14            71.4  0.014</span><span style='text-decoration: underline;'>0</span><span>  1.73    0.764       1     1 0.984 
+#&gt; </span><span style='color: #555555;'>10</span><span>        9.09            72.9  0.310   1.20    1.25       </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.961 
+#&gt; </span><span style='color: #555555;'>11</span><span>       10.8             66.4  0.141   0.191  -</span><span style='color: #BB0000;'>0.052</span><span style='color: #BB0000;text-decoration: underline;'>1</span><span>     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.524 
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 9</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.956            0.892            0.787
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.963            0.863            0.702
-#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
-#&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.956            0.892            0.787
+#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.963            0.863            0.702
+#&gt; </span><span style='color: #555555;'># ... with 4 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, preweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
+#&gt; </span><span style='color: #555555;'>#   postweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
-<span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
+<span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
 
 <span class='co'># set total budget for surveying sites for conservation</span>
 <span class='co'># (i.e. 10% of the cost of managing all sites)</span>
-<span class='no'>survey_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/sum'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>survey_cost</span>) * <span class='fl'>0.1</span>
+<span class='no'>survey_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>survey_cost</span>) * <span class='fl'>0.1</span>
 
 <span class='co'># define xgboost tuning parameters</span>
 <span class='no'>xgb_parameters</span> <span class='kw'>&lt;-</span>
- <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/list'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>scale_pos_weight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-           <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/rep'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
+ <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>, <span class='kw'>scale_pos_weight</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+           <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>))[<span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>)]
 
 <span class='co'># find optimal survey scheme using approximate method</span>
 <span class='co'># (using 10 replicates so that this example completes relatively quickly)</span>
 <span class='no'>approx_opt_survey</span> <span class='kw'>&lt;-</span> <span class='fu'>approx_optimal_survey_scheme</span>(
   <span class='no'>site_data</span>, <span class='no'>feature_data</span>,
-  <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
+  <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_cost"</span>,
   <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
   <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
   <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>,
-  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%</div><div class='input'>
+  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as(rcpp_feasible_actions_ilp_matrix(costs), "dgCMatrix"): no method or default for coercing "matrix" to "dgCMatrix"</span></div><div class='input'>
 <span class='co'># print result</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>approx_opt_survey</span>)</div><div class='output co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE
-#&gt; attr(,"ev")
-#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
-#&gt; [1,] 108.2077 108.2401 108.8055 108.8055 108.0009 108.2077 108.2077 108.2401
-#&gt;          [,9]    [,10]
-#&gt; [1,] 108.8055 108.8055</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>approx_opt_survey</span>)</div><div class='output co'>#&gt; <span class='error'>Error in print(approx_opt_survey): object 'approx_opt_survey' not found</span></div><div class='input'>
 </div></span></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -522,13 +519,16 @@ this algorithm, it can take a very long time to complete.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

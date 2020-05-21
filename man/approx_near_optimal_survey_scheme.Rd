@@ -231,68 +231,63 @@ will only contain a single row.
 Find a near optimal survey scheme that maximizes return on investment using
 value of information analyses. This function uses the approximation method
 for calculating the expected value of the decision given a survey scheme,
-and a greedy heuristic algorithm to maximize this metric.
+and a backwards heuristic algorithm to maximize this metric.
 }
 \details{
 Ideally, the brute-force algorithm would be used to identify the optimal
 survey scheme. Unfortunately, it is not feasible to apply the brute-force
 to large problems because it can take an incredibly long time to complete.
 In such cases, it may be desirable to obtain a "relatively good" survey
-scheme and the greedy heuristic algorithm is provided for such cases.
-The greedy heuristic algorithm -- unlike the brute force algorithm --
+scheme and the backwards heuristic algorithm is provided for such cases.
+The backwards heuristic algorithm -- unlike the brute force algorithm --
 is not guaranteed to identify an optimal solution -- or even a "relatively
-good solution" for that matter -- though greedy heuristic algorithms tend to
-deliver solutions that are 15\% from optimality. Specifically, this
-greedy algorithms is implemented as:
+good solution" for that matter -- though backwards heuristic algorithms tend
+to deliver solutions that within 30\% from optimality. Specifically, this
+backwards algorithms is implemented as:
 
 \enumerate{
 
 \item Initialize an empty \emph{list of survey scheme solutions}, and an
 empty \emph{list of approximate expected values}.
 
-\item Calculate the expected value of current information.
+\item Create a "full" survey scheme that has all sites selected for an
+additional survey, and set is as the \emph{current survey solution}.
 
-\item Add a survey scheme with no sites selected for surveying to the
-\emph{list of survey scheme solutions}, and add the expected value of current
-information to the \emph{list of approximate expected values}.
+\item Calculate the approximate expected value of the
+management decision given the \emph{current survey solution}. Next,
+store the \emph{current survey solution} in the \emph{list of survey
+scheme solutions}, and store its approximate expected value in the
+\emph{list of approximate expected values}.
 
-\item Set the \emph{current survey solution} as the survey scheme with no
-sites selected for surveying.
+\item For each remaining candidate site that is selected in the
+\emph{current survey solution}, generate a new candidate survey scheme with
+that site removed from the \emph{current survey solution}.
 
-\item For each remaining candidate site that has not been selected for
-a survey, generate a new candidate survey scheme with each candidate site
-added to the current survey solution.
+\item Calculate the approximate expected value of the
+management decision given each of the new candidate survey schemes.
 
-\item Calculate the approximate expected value of each
-new candidate survey scheme. If the cost of a given candidate survey scheme
-exceeds the survey budget, then store a missing \code{NA value} instead.
-Also if the the cost of a given candidate survey scheme plus the
-management costs of locked in planning units exceeds the total budget,
-then a store a missing value \code{NA} value too.
+\item Calculate the relative change in effectiveness of each new
+candidate survey scheme, by dividing the change in the approximate expected
+values by the the cost of the removed candidate site.
 
-\item If all of the new candidate survey schemes are associated with
-missing \code{NA} values -- because they all exceed the survey budget -- then
-go to step 13.
+\item Find the new candidate survey scheme is associated with the
+smallest decreases in cost-effectiveness value. This new candidate survey
+scheme is now set as the \emph{current survey scheme}.
 
-\item If all of the new candidate survey schemes are associated with
-lower approximate expected values than the \emph{current survey solution}
-then go to step 13.
+\item Store the \emph{current survey solution} in the \emph{list of survey
+scheme solutions}. Also, calculate the approximate expected value of the
+management decision given the \emph{current survey solution}.
+Next, store the approximate expected value in the
+\emph{list of approximate expected values}.
 
-\item Calculate the cost effectiveness of each new candidate survey
-scheme, by dividing the approximate expected value of each
-new candidate survey scheme by the cost of the newly selected
-candidate site.
+\item If the \emph{current survey solution} contains more than one
+site selected for an additional survey, go to step TODO.
 
-\item Find the new candidate survey scheme that is associated with the
-highest cost-effectiveness value, ignoring any missing \code{NA} values.
-This new candidate survey scheme is now set as the
-\emph{current survey scheme}.
-
-\item Store the \emph{current survey scheme} in the
-\emph{list of survey scheme solutions} and store its approximate expected
-value in the \emph{list of approximate expected values}.
-
-\item Go to step 13.
+\item Calculate the expected value of management decision given current
+information, and store this value in the
+\emph{list of approximate expected values}. Also, store an "empty"
+survey scheme -- with no sites selected for additional surveys -- in the
+\emph{list of survey scheme solutions}.
 
 \item Find the solution in the \emph{list of survey scheme solutions} that
 has the highest expected value in the
