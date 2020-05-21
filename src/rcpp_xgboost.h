@@ -8,7 +8,7 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::MatrixXd&,
   Eigen::MatrixXd&,
   MatrixXfRM&,
-  MatrixXfRM&,
+  std::vector<MatrixXfRM>&,
   std::vector<std::size_t>&,
   std::vector<mpz_class>&,
   std::vector<std::vector<std::string>>&,

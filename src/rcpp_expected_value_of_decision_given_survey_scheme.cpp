@@ -15,7 +15,8 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd &survey_sensitivity,
   Eigen::VectorXd &survey_specificity,
   std::vector<bool> &pu_survey_solution, // planning units to survey, 0/1
-  Eigen::VectorXd &pu_survey_status,  // has planning unit been surveyed? 0/1
+  std::vector<std::vector<std::size_t>> &pu_model_prediction_idx,
+  // planning units needing prediction for rij matrix
   Eigen::VectorXd &pu_survey_costs,   // cost of surveying planning units
   Eigen::VectorXd &pu_purchase_costs, // cost of purchasing planning units
   Eigen::VectorXd &pu_purchase_locked_in,  // planning units that are locked in
@@ -43,8 +44,9 @@ double expected_value_of_decision_given_survey_scheme(
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
   const std::size_t n_pu_surveyed_in_scheme =
     std::accumulate(pu_survey_solution.begin(), pu_survey_solution.end(), 0);
-  const std::size_t n_pu_surveyed_already =
-    static_cast<std::size_t>((pu_survey_status.array()).sum());
+   std::vector<std::size_t> n_pu_model_prediction(n_f);
+   for (std::size_t i = 0; i < n_f; ++i)
+    n_pu_model_prediction[i] = pu_model_prediction_idx[i].size();
 
   /// integer over-flow checks, highest std::size_t value is 1e+18
   if (n_pu_surveyed_in_scheme > 20)
@@ -83,22 +85,6 @@ double expected_value_of_decision_given_survey_scheme(
   for (std::size_t i = 0; i < n_pu; ++i)
     if (pu_survey_solution[i])
       pu_survey_solution_idx.push_back(i);
-
-  //// store indices of planning units that have already been surveyed
-  std::vector<std::size_t> pu_survey_status_idx;
-  pu_survey_status_idx.reserve(n_pu_surveyed_already);
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (pu_survey_status[i] < 0.5)
-      pu_survey_status_idx.push_back(i);
-
-  //// store indices of planning units that need feature probs. predicted
-  std::vector<std::size_t> pu_model_prediction_idx;
-  pu_model_prediction_idx.reserve(n_pu);
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if ((pu_survey_status[i] < 0.5) && (!pu_survey_solution[i]))
-      pu_model_prediction_idx.push_back(i);
-  pu_model_prediction_idx.shrink_to_fit();
-  const std::size_t n_pu_model_prediction = pu_model_prediction_idx.size();
 
   //// store indices of features that need surveying
   std::vector<std::size_t> survey_features_idx;
@@ -152,10 +138,17 @@ double expected_value_of_decision_given_survey_scheme(
     pij_survey_species_subset.row(i) = pij.row(survey_features_idx[i]);
 
   // subset environmental data for planning unit predictions
-  MatrixXfRM pu_predict_env_data(n_pu_model_prediction, n_vars);
-  for (std::size_t i = 0; i < n_pu_model_prediction; ++i)
-    pu_predict_env_data.row(i).array() =
-      pu_env_data.row(pu_model_prediction_idx[i]).array();
+  std::vector<MatrixXfRM> pu_predict_env_data(n_f_survey);
+  std::size_t curr_n;
+  for (std::size_t i = 0; i < n_f_survey; ++i) {
+    /// prepare matrix
+    curr_n = n_pu_model_prediction[survey_features_idx[i]];
+    pu_predict_env_data[i].resize(curr_n, n_vars);
+    /// store environmental values for species needing predictions
+    for (std::size_t j = 0; j < curr_n; ++j)
+      pu_predict_env_data[i].row(j).array() =
+        pu_env_data.row(pu_model_prediction_idx[i][j]).array();
+  }
 
   /// calculate the total probabilities of positive and negative outcomes
   /// from the surveys
@@ -184,11 +177,11 @@ double expected_value_of_decision_given_survey_scheme(
 
   /// overwrite missing data for feature we are not interested in surveying
   /// using the prior data
-  for (std::size_t j = 0; j < n_pu; ++j)
-    if (!pu_survey_status[j])
-      for (std::size_t i = 0; i < n_f; ++i)
-        if (!survey_features[i])
-          curr_oij(i, j) = pij(i, j);
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (!survey_features[i])
+      for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
+        curr_oij(i, pu_model_prediction_idx[i][j]) =
+          pij(i, pu_model_prediction_idx[i][j]);
 
   /// store indices for cells in the rij matrix that will be used for
   /// simulating different outcomes
@@ -291,11 +284,11 @@ double expected_value_of_decision_given_survey_scheme(
 
     /// reset oij matrix so that -1s are present for planning units/features
     /// that need surveying
-    for (std::size_t j = 0; j < n_pu; ++j)
-      if (!pu_survey_status[j])
-        for (std::size_t i = 0; i < n_f; ++i)
-          if (survey_features[i])
-            curr_oij(i, j) = -1.0;
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (survey_features[i])
+      for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
+        curr_oij(i, pu_model_prediction_idx[i][j]) = -1.0;
+
     /// increment o loop variable
     o = o + 1;
   }
@@ -313,7 +306,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd survey_sensitivity,
   Eigen::VectorXd survey_specificity,
   std::vector<bool> pu_survey_solution,
-  Eigen::VectorXd pu_survey_status,
+  Rcpp::List pu_model_prediction,
   Eigen::VectorXd pu_survey_costs,
   Eigen::VectorXd pu_purchase_costs,
   Eigen::VectorXd pu_purchase_locked_in,
@@ -347,6 +340,10 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   extract_k_fold_indices(xgb_train_folds, xgb_train_folds2);
   extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
 
+  // format pu model prediction indices
+  std::vector<std::vector<std::size_t>> pu_model_prediction_idx;
+  extract_list_of_list_of_indices(pu_model_prediction, pu_model_prediction_idx);
+
   // convert environmental data to row major format
   MatrixXfRM pu_env_data2 = pu_env_data;
 
@@ -355,7 +352,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
     rij, pij, wij,
     survey_features,
     survey_sensitivity, survey_specificity,
-    pu_survey_solution, pu_survey_status, pu_survey_costs,
+    pu_survey_solution, pu_model_prediction_idx, pu_survey_costs,
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data2,
     xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
