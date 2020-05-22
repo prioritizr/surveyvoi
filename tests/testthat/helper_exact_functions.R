@@ -19,7 +19,7 @@ r_expected_value_of_decision_given_current_info <- function(
 
 r_expected_value_of_decision_given_survey_scheme <- function(
   rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-  pu_survey_solution, pu_survey_status, pu_survey_costs,
+  pu_survey_solution, pu_model_prediction, pu_survey_costs,
   pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
   xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
   obj_fun_preweight, obj_fun_postweight, obj_fun_target,
@@ -36,9 +36,6 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   total_outcomes <- n_states(sum(pu_survey_solution), n_f_survey) - 1
   ## planning unit indices
   pu_survey_solution_idx <- which(pu_survey_solution > 0.5)
-  pu_survey_status_idx <- which(pu_survey_status > 0.5)
-  pu_model_prediction_idx <- which(!pu_survey_status & !pu_survey_solution)
-  pu_model_fitting_idx <- which(pu_survey_status | pu_survey_solution)
   ## feature indices
   survey_features_idx <- which(survey_features > 0.5)
   survey_features_rev_idx <- rep(0, n_f)
@@ -65,8 +62,10 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   ## overwrite missing data with prior data for features we are not interested
   ## in surveying
   oij <- rij
-  for (i in which(!survey_features))
-    oij[i, !pu_survey_status] <- pij[i, !pu_survey_status]
+  for (i in which(!survey_features)) {
+    oij[i, pu_survey_solution_idx] <- pij[i, pu_survey_solution_idx]
+    oij[i, pu_model_prediction[[i]]] <- pij[i, pu_model_prediction[[i]]]
+  }
   ## find indices for cells corresponding to planning units and features that
   ## that are specified to be surveyed
   rij_outcome_idx <- c()
@@ -94,7 +93,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
       curr_oij, wij, pu_env_data, survey_features_idx,
-      pu_model_prediction_idx, xgb_parameters, xgb_nrounds, xgb_train_folds,
+      pu_model_prediction, xgb_parameters, xgb_nrounds, xgb_train_folds,
       xgb_test_folds)
 
     ## generate posterior matrix

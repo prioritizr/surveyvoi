@@ -159,7 +159,7 @@ test_that("multiple species (sparse)", {
          objective = "binary:logistic")
   # randomly add a missing values to each species
   for (i in paste0("f", n_f)) {
-    non_na <- which(!is.na(y[[i]]))
+    non_na <- which(!is.na(x[[i]]))
     idx <- sample(non_na, ceiling(length(non_na) * 0.25))
     x2[[i]][idx] <- NA_real_
     expect_gt(sum(is.na(x2[[i]])), sum(is.na(x[[i]])))
@@ -179,8 +179,10 @@ test_that("multiple species (sparse)", {
   expect_is(r$predictions$f1, "numeric")
   expect_lte(max(r$predictions$f1), 1)
   expect_lte(min(r$predictions$f1), 1)
-  expect_gte(mean(round(as.matrix(r$predictions)) ==
-                  round(as.matrix(y[, paste0("p", seq_len(n_f))]))), 0.8)
+  expect_gte(
+    mean(round(as.matrix(r$predictions)) ==
+    round(as.matrix(sf::st_drop_geometry(x)[,
+      paste0("p", seq_len(n_f))]))), 0.8)
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")

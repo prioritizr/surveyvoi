@@ -17,17 +17,20 @@ test_that("equal weights", {
   pij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_prb_columns])))
   wij <- matrix(1, ncol = ncol(pij), nrow = nrow(pij))
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, env_columns]))
+  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
+    which(!site_data$survey & is.na(rij[i, ]))
+  })
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
     list(list(seed = "0", scale_pos_weight = "2",
               objective = "binary:logistic"))[rep(1, n_f)]
-  pu_predict_idx <- which(site_data$survey | !is.na(site_data$f1))
-  xgb_folds <- lapply(seq_len(n_f),
-    function(i) {
-      create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                   index = pu_predict_idx,
-                   na.fail = FALSE)
+  ## folds for training and testing models
+  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
+    pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
+    create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+                 index = pu_train_idx,
+                 na.fail = FALSE)
   })
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
@@ -38,7 +41,7 @@ test_that("equal weights", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_status = !is.na(site_data$f1),
+    pu_model_prediction = pu_model_prediction,
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
@@ -58,7 +61,7 @@ test_that("equal weights", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_status = !is.na(site_data$f1),
+    pu_model_prediction = pu_model_prediction,
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
@@ -93,17 +96,20 @@ test_that("variables weights", {
   pij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_prb_columns])))
   wij <- matrix(runif(length(rij)) + 0.1, ncol = ncol(pij), nrow = nrow(pij))
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, env_columns]))
+  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
+    which(!site_data$survey & is.na(rij[i, ]))
+  })
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <-
     list(list(seed = "0", scale_pos_weight = "2",
               objective = "binary:logistic"))[rep(1, n_f)]
-  pu_predict_idx <- which(site_data$survey | !is.na(site_data$f1))
-  xgb_folds <- lapply(seq_len(n_f),
-    function(i) {
-      create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                   index = pu_predict_idx,
-                   na.fail = FALSE)
+  ## folds for training and testing models
+  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
+    pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
+    create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+                 index = pu_train_idx,
+                 na.fail = FALSE)
   })
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
@@ -114,7 +120,7 @@ test_that("variables weights", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_status = !is.na(site_data$f1),
+    pu_model_prediction = pu_model_prediction,
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
@@ -134,7 +140,7 @@ test_that("variables weights", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_status = !is.na(site_data$f1),
+    pu_model_prediction = pu_model_prediction,
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),

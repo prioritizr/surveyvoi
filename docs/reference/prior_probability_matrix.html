@@ -10,21 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
-<!-- sticky kit -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script>
+<!-- headroom.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -35,7 +41,6 @@
 
 <meta property="og:title" content="Prior probability matrix — prior_probability_matrix" />
 <meta property="og:description" content="Create prior probability matrix for the value of information analysis." />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -50,9 +55,10 @@
 <![endif]-->
 
 
+
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -66,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
       </span>
     </div>
 
@@ -74,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -102,8 +108,8 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/jeffreyhanson/surveyvoi">
-    <span class="fa fa-github fa-lg"></span>
+  <a href="https://github.com/jeffreyhanson/surveyvoi/">
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -114,6 +120,7 @@
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -144,21 +151,23 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://www.rdocumentation.org/packages/sf/topics/sf'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://www.rdocumentation.org/packages/base/topics/data.frame'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_occupancy_columns</th>
       <td><p><code>character</code> names of <code>numeric</code>
-columns in the
-argument to <code>site_data</code> that contain presence/absence data.
+columns in the argument to <code>site_data</code> that contain detections
+and non-detections of features at each site.
 Each column should correspond to a different feature, and contain
-binary presence/absence data (zeros or ones) indicating if the
+binary detection/non-detection value (zeros or ones) indicating if the
 feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (<code>NA</code>) values should be used.</p></td>
+been surveyed before, then missing (<code>NA</code>) values should be used.
+Additionally, if a feature was not looked for when surveying a specific
+site, then missing (<code>NA</code>) value should be used.</p></td>
     </tr>
     <tr>
       <th>site_probability_columns</th>
@@ -195,7 +204,7 @@ probability of the initial models correctly predicting a presence of each
 feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
+This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -205,7 +214,7 @@ probability of the initial models correctly predicting an absence of each
 feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code>fit_occupancy_models</code>.</p></td>
+This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
     </tr>
     </table>
 
@@ -244,57 +253,53 @@ $$</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/library'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/Random'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/RFoptions'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-                                <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+                                <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
 #&gt; CRS:            NA
-#&gt; <span style='color: #949494;'># A tibble: 5 x 10</span><span>
+#&gt; <span style='color: #555555;'># A tibble: 5 x 10</span><span>
 #&gt;   survey_cost management_cost     e1     e2     e3    f1    f2    p1     p2
-#&gt;         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span>        8.13            73.9 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08      1     1 0.950 0.940 
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span>        6.07            69.7 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span>     0     0 0.229 0.362 
-#&gt; </span><span style='color: #BCBCBC;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
-#&gt; </span><span style='color: #BCBCBC;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
-#&gt; </span><span style='color: #949494;'># ... with 1 more variable: geometry </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 2 x 9</span><span>
+#&gt;         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>        8.13            73.9 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08      1     1 0.950 0.940 
+#&gt; </span><span style='color: #555555;'>2</span><span>        6.07            69.7 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span>     0     0 0.229 0.362 
+#&gt; </span><span style='color: #555555;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.789 0.022</span><span style='text-decoration: underline;'>8</span><span>
+#&gt; </span><span style='color: #555555;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.157 0.552 
+#&gt; </span><span style='color: #555555;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.201 0.798 
+#&gt; </span><span style='color: #555555;'># ... with 1 more variable: geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 9</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
-#&gt;   </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'>1</span><span> f1    TRUE              0.955            0.822            0.775
-#&gt; </span><span style='color: #BCBCBC;'>2</span><span> f2    TRUE              0.961            0.829            0.723
-#&gt; </span><span style='color: #949494;'># ... with 4 more variables: model_specificity </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, preweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>,</span><span>
-#&gt; </span><span style='color: #949494;'>#   postweight </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #949494;'>, target </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.955            0.822            0.775
+#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.961            0.829            0.723
+#&gt; </span><span style='color: #555555;'># ... with 4 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, preweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
+#&gt; </span><span style='color: #555555;'>#   postweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># calculate prior probability matrix</span>
 <span class='no'>prior_matrix</span> <span class='kw'>&lt;-</span> <span class='fu'>prior_probability_matrix</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://www.rdocumentation.org/packages/RandomFields/topics/QMath'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
   <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>, <span class='st'>"model_sensitivity"</span>,
   <span class='st'>"model_specificity"</span>)
 
 <span class='co'># preview prior probability matrix</span>
-<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/print'>print</a></span>(<span class='no'>prior_matrix</span>)</div><div class='output co'>#&gt;         [,1]      [,2]      [,3]      [,4]      [,5]
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>prior_matrix</span>)</div><div class='output co'>#&gt;         [,1]      [,2]      [,3]      [,4]      [,5]
 #&gt; f1 0.9554571 0.1784514 0.7748368 0.1044942 0.9554571
 #&gt; f2 0.9612699 0.1713662 0.1212766 0.7233379 0.9612699</div></span></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
+
 
       <footer>
       <div class="copyright">
@@ -302,13 +307,16 @@ $$</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

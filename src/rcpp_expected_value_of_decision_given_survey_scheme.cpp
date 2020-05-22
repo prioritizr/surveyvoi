@@ -175,8 +175,16 @@ double expected_value_of_decision_given_survey_scheme(
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     remaining_budget, optim_gap);
 
-  /// overwrite missing data for feature we are not interested in surveying
-  /// using the prior data
+  /// overwrite outcome data with prior data for features we are
+  /// not interested in surveying: planning units needing model predictions
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (!survey_features[i])
+      for (std::size_t j = 0; j < n_pu_surveyed_in_scheme; ++j)
+        curr_oij(i, pu_survey_solution_idx[j]) =
+          pij(i, pu_survey_solution_idx[j]);
+
+  /// overwrite outcome data with prior data for features we are
+  /// not interested in surveying: planning units in the survey scheme
   for (std::size_t i = 0; i < n_f; ++i)
     if (!survey_features[i])
       for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
@@ -281,13 +289,6 @@ double expected_value_of_decision_given_survey_scheme(
                 curr_expected_value_of_action_given_outcome +
                 curr_probability_of_outcome);
     }
-
-    /// reset oij matrix so that -1s are present for planning units/features
-    /// that need surveying
-  for (std::size_t i = 0; i < n_f; ++i)
-    if (survey_features[i])
-      for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
-        curr_oij(i, pu_model_prediction_idx[i][j]) = -1.0;
 
     /// increment o loop variable
     o = o + 1;

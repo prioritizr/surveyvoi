@@ -42,12 +42,14 @@ approx_optimal_survey_scheme(
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
 \item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the
-argument to \code{site_data} that contain presence/absence data.
+columns in the argument to \code{site_data} that contain detections
+and non-detections of features at each site.
 Each column should correspond to a different feature, and contain
-binary presence/absence data (zeros or ones) indicating if the
+binary detection/non-detection value (zeros or ones) indicating if the
 feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.}
+been surveyed before, then missing (\code{NA}) values should be used.
+Additionally, if a feature was not looked for when surveying a specific
+site, then missing (\code{NA}) value should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled
