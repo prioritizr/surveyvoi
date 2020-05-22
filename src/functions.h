@@ -40,6 +40,9 @@ inline void assert_gt_value(T x, T y, std::string msg) {
 void extract_k_fold_indices(Rcpp::List&,
   std::vector<std::vector<std::vector<std::size_t>>>&);
 
+void extract_list_of_list_of_indices(
+  Rcpp::List&, std::vector<std::vector<std::size_t>>&);
+
 void extract_xgboost_parameters(Rcpp::List&,
   std::vector<std::vector<std::string>>&,
   std::vector<std::vector<std::string>>&);

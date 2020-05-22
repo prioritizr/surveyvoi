@@ -10,12 +10,14 @@
 #' @param feature_data \code{\link[base]{data.frame}} object with feature data.
 #'
 #' @param site_occupancy_columns \code{character} names of \code{numeric}
-#'   columns in the
-#'   argument to \code{site_data} that contain presence/absence data.
+#'   columns in the argument to \code{site_data} that contain detections
+#'   and non-detections of features at each site.
 #'   Each column should correspond to a different feature, and contain
-#'   binary presence/absence data (zeros or ones) indicating if the
+#'   binary detection/non-detection value (zeros or ones) indicating if the
 #'   feature was detected in a previous survey or not. If a site has not
 #'   been surveyed before, then missing (\code{NA}) values should be used.
+#'   Additionally, if a feature was not looked for when surveying a specific
+#'   site, then missing (\code{NA}) value should be used.
 #'
 #' @param site_probability_columns \code{character} names of \code{numeric}
 #'   columns in the argument to \code{site_data} that contain modelled
@@ -393,8 +395,6 @@ evdsi <- function(
   } else {
     site_management_locked_in <- rep(FALSE, nrow(site_data))
   }
-  ## identify sites that have previously been surveyed
-  site_survey_status <- !is.na(site_data[[site_occupancy_columns[1]]])
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
                         "nrounds")
@@ -407,15 +407,19 @@ evdsi <- function(
     out
   })
   ## extract site occupancy data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns]))
+  rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
+  ## identify sites that need model predictions for each feature
+  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
+    which(!site_data[[site_survey_scheme_column]] & is.na(rij[i, ]))
+  })
   ## folds for training and testing models
-  pu_predict_idx <-
-    which(site_data[[site_survey_scheme_column]] | site_survey_status)
   xgb_folds <- lapply(seq_len(nrow(feature_data)),
     function(i) {
+      pu_train_idx <-
+        which(site_data[[site_survey_scheme_column]] | !is.na(rij[i, ]))
       withr::with_seed(seed, {
-        create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                     index = pu_predict_idx,
+        create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+                     index = pu_train_idx,
                      na.fail = FALSE, seed = seed)
       })
   })
@@ -438,7 +442,7 @@ evdsi <- function(
       survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
       survey_specificity = feature_data[[feature_survey_specificity_column]],
       pu_survey_solution = site_data[[site_survey_scheme_column]],
-      pu_survey_status = site_survey_status,
+      pu_model_prediction = pu_model_prediction,
       pu_survey_costs = site_data[[site_survey_cost_column]],
       pu_purchase_costs = site_data[[site_management_cost_column]],
       pu_purchase_locked_in = site_management_locked_in,

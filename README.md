@@ -42,17 +42,17 @@ Just don't - it's still early in development and isn't ready yet.
 Citation
 --------
 
-    Warning in citation("surveyvoi"): no date field in DESCRIPTION file of
-    package 'surveyvoi'
+    Warning in citation("surveyvoi"): no date field in DESCRIPTION file of package
+    'surveyvoi'
 
-    Warning in citation("surveyvoi"): could not determine year for 'surveyvoi'
-    from package DESCRIPTION file
+    Warning in citation("surveyvoi"): could not determine year for 'surveyvoi' from
+    package DESCRIPTION file
 
 
     To cite package 'surveyvoi' in publications use:
 
-      Jeffrey O Hanson and Joseph Bennett (NA). surveyvoi: Survey
-      Value of Information. R package version 0.0.2.
+      Jeffrey O Hanson and Joseph Bennett (NA). surveyvoi: Survey Value of
+      Information. R package version 0.0.2.2.
       https://github.com/jeffreyhanson/surveyvoi
 
     A BibTeX entry for LaTeX users is
@@ -60,6 +60,6 @@ Citation
       @Manual{,
         title = {surveyvoi: Survey Value of Information},
         author = {Jeffrey O Hanson and Joseph Bennett},
-        note = {R package version 0.0.2},
+        note = {R package version 0.0.2.2},
         url = {https://github.com/jeffreyhanson/surveyvoi},
       }

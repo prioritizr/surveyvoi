@@ -282,8 +282,6 @@ approx_evdsi <- function(
   } else {
     site_management_locked_in <- rep(FALSE, nrow(site_data))
   }
-  ## identify sites that have previously been surveyed
-  site_survey_status <- !is.na(site_data[[site_occupancy_columns[1]]])
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
                         "nrounds")
@@ -296,15 +294,19 @@ approx_evdsi <- function(
     out
   })
   ## extract site occupancy data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns]))
+  rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
+  ## identify sites that need model predictions for each feature
+  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
+    which(!site_data[[site_survey_scheme_column]] & is.na(rij[i, ]))
+  })
   ## folds for training and testing models
-  pu_predict_idx <-
-    which(site_data[[site_survey_scheme_column]] | site_survey_status)
   xgb_folds <- lapply(seq_len(nrow(feature_data)),
     function(i) {
+      pu_train_idx <-
+        which(site_data[[site_survey_scheme_column]] | !is.na(rij[i, ]))
       withr::with_seed(seed, {
-        create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                     index = pu_predict_idx,
+        create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+                     index = pu_train_idx,
                      na.fail = FALSE, seed = seed)
       })
   })
@@ -321,13 +323,13 @@ approx_evdsi <- function(
 
   # main calculation
   withr::with_seed(seed, {
-    out <- rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
+    out <- rcpp_approx_expected_value_of_decision_given_survey_scheme(
       rij = rij, pij = pij, wij = wij,
       survey_features = feature_data[[feature_survey_column]],
       survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
       survey_specificity = feature_data[[feature_survey_specificity_column]],
       pu_survey_solution = site_data[[site_survey_scheme_column]],
-      pu_survey_status = site_survey_status,
+      pu_model_prediction = pu_model_prediction,
       pu_survey_costs = site_data[[site_survey_cost_column]],
       pu_purchase_costs = site_data[[site_management_cost_column]],
       pu_purchase_locked_in = site_management_locked_in,

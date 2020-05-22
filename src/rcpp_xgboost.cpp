@@ -4,7 +4,7 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::MatrixXd &rij,
   Eigen::MatrixXd &wij,
   MatrixXfRM &x,
-  MatrixXfRM &predict_x,
+  std::vector<MatrixXfRM> &predict_x,
   std::vector<std::size_t> &survey_features_idx,
   std::vector<mpz_class> &feature_outcome_idx,
   std::vector<std::vector<std::string>> &xgb_parameter_names,
@@ -21,15 +21,15 @@ void fit_xgboost_models_and_assess_performance(
   const std::size_t n_pu = rij.cols();
   const std::size_t n_f = survey_features_idx.size();
   const std::size_t n_vars = x.cols();
-  const std::size_t n_pu_predict = predict_x.rows();
 
   // prepare looping variables
   /// class prototypes
   model_key curr_key;
   std::pair<double, double> curr_performance;
-  Eigen::VectorXd curr_predictions(n_pu_predict);
-  Eigen::VectorXf curr_fold_predictions(n_pu_predict);
+  Eigen::VectorXd curr_predictions;
+  Eigen::VectorXf curr_fold_predictions;
   /// counters
+  std::size_t curr_n_pu_predict;
   std::size_t curr_n_folds;
   std::size_t curr_n_k_train;
   std::size_t curr_n_k_test;
@@ -58,6 +58,10 @@ void fit_xgboost_models_and_assess_performance(
     // allocate memory for storing performance of each fold
     fold_sensitivity.resize(curr_n_folds);
     fold_specificity.resize(curr_n_folds);
+    // allocate memory for i'th species predictions
+    curr_n_pu_predict = predict_x[i].rows();
+    curr_predictions.resize(curr_n_pu_predict);
+    curr_fold_predictions.resize(curr_n_pu_predict);
     // reset predictions vector
     curr_predictions.setZero();
     for (std::size_t k = 0; k < curr_n_folds; ++k) {
@@ -127,7 +131,7 @@ void fit_xgboost_models_and_assess_performance(
         fold_sensitivity[k], fold_specificity[k]);
       // prepare predictions matrix
       DMatrixHandle predict_x_handle[1];
-      XGDMatrixCreateFromMat((float *) predict_x.data(), n_pu_predict,
+      XGDMatrixCreateFromMat((float *) predict_x[i].data(), curr_n_pu_predict,
                              n_vars, -1.0f, &predict_x_handle[0]);
       // generate predictions
       predict_xgboost_model(curr_model, predict_x_handle[0],
@@ -242,7 +246,6 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
 
   // init
   MatrixXfRM pu_env_data = pu_env_data_raw;
-  MatrixXfRM pu_predict_env_data = pu_env_data;
   const std::size_t n_pu = rij.cols();
   const std::size_t n_f = rij.rows();
   std::vector<std::size_t> survey_features_idx;
@@ -260,6 +263,9 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
   model_performance_map model_performance;
   Eigen::VectorXd curr_sensitivity(n_f_survey);
   Eigen::VectorXd curr_specificity(n_f_survey);
+
+  // prepare pu prediction data
+  std::vector<MatrixXfRM> pu_predict_env_data(n_f_survey, pu_env_data);
 
   // extract xgboost parameters
   std::vector<std::vector<std::string>> xgb_parameter_names;

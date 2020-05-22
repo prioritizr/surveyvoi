@@ -100,6 +100,23 @@ void extract_k_fold_indices(Rcpp::List &x,
   return;
 }
 
+void extract_list_of_list_of_indices(
+  Rcpp::List &x, std::vector<std::vector<std::size_t>> &out) {
+  const std::size_t n1 = x.size();
+  std::size_t n2;
+  Rcpp::IntegerVector idx;
+  out.resize(n1);
+  for (std::size_t i = 0; i < n1; ++i) {
+    idx = Rcpp::as<Rcpp::IntegerVector>(x[i]);
+    n2 = idx.size();
+    out[i].resize(n2);
+    for (std::size_t k = 0; k < n2; ++k) {
+        out[i][k] = idx[k] - 1;
+    }
+  }
+  return;
+}
+
 void extract_xgboost_parameters(Rcpp::List &x,
   std::vector<std::vector<std::string>> &out_names,
   std::vector<std::vector<std::string>> &out_values) {

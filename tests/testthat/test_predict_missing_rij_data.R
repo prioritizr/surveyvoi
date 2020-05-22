@@ -1,9 +1,7 @@
 context("predict_missing_rij_data")
 
 test_that("equal weights", {
-  # data
-  ## set seed
-  set.seed(401)
+  set.seed(402)
   ## set constants for simulating data
   n_total_f <- 5
   n_f <- ceiling(n_total_f * 0.5)
@@ -11,14 +9,19 @@ test_that("equal weights", {
   n_vars <- 3
   n_folds <- 5
   ## simulate planning units that need model predictions
-  pu_model_prediction_idx <- sample.int(n_pu, ceiling(n_pu * 0.5))
-  pu_model_prediction_idx <- sort(pu_model_prediction_idx)
+  pu_missing_idx <- sample.int(n_pu, ceiling(n_pu * 0.5))
+  pu_missing_idx <- sort(pu_missing_idx)
   ## simulate planning units that have been surveyed
-  pu_survey_solution_idx <- setdiff(seq_len(n_pu), pu_model_prediction_idx)
+  pu_survey_solution_idx <- setdiff(seq_len(n_pu), pu_missing_idx)
   pu_survey_solution_idx <- sample(pu_survey_solution_idx,
                                    ceiling(length(pu_survey_solution_idx) *
                                            0.4))
   pu_survey_solution_idx <- sort(pu_survey_solution_idx)
+  ## simulate planning units that need predictions
+  pu_model_prediction_idx <- lapply(seq_len(n_total_f), function(x) {
+    n <- sample.int(ceiling(length(pu_missing_idx) * 0.5), 1)
+    sample(pu_missing_idx, n)
+  })
   ## simulate features that have uncertain distributions
   features <- sort(sample.int(n_total_f, n_f))
   survey_features <- replace(rep(FALSE, n_total_f), features, TRUE)
@@ -37,7 +40,7 @@ test_that("equal weights", {
   }
   rij[] <- rbinom(prod(dim(rij)), 1, rij[])
   true_rij <- rij
-  rij[, pu_model_prediction_idx] <- -1
+  rij[, pu_missing_idx] <- -1
   ## set constant weights
   wij <- rij
   wij[] <- 1
@@ -60,17 +63,14 @@ test_that("equal weights", {
     rij, wij, x, features, pu_model_prediction_idx,
     xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds)
   r2 <- rcpp_predict_missing_rij_data(
-    rij, wij, x, survey_features,
-    pu_model_prediction_idx - 1, xgb_parameters, xgb_nrounds, xgb_train_folds,
-    xgb_test_folds)
+    rij, wij, x, survey_features, pu_model_prediction_idx, xgb_parameters,
+    xgb_nrounds, xgb_train_folds, xgb_test_folds)
   # test
-  expect_lte(max(abs(r1 - r2)), 1e-7)
+  expect_equal(r1, r2)
 })
 
 test_that("variable weights", {
-  # data
-  ## set seed
-  set.seed(401)
+  set.seed(402)
   ## set constants for simulating data
   n_total_f <- 5
   n_f <- ceiling(n_total_f * 0.5)
@@ -78,14 +78,19 @@ test_that("variable weights", {
   n_vars <- 3
   n_folds <- 5
   ## simulate planning units that need model predictions
-  pu_model_prediction_idx <- sample.int(n_pu, ceiling(n_pu * 0.5))
-  pu_model_prediction_idx <- sort(pu_model_prediction_idx)
+  pu_missing_idx <- sample.int(n_pu, ceiling(n_pu * 0.5))
+  pu_missing_idx <- sort(pu_missing_idx)
   ## simulate planning units that have been surveyed
-  pu_survey_solution_idx <- setdiff(seq_len(n_pu), pu_model_prediction_idx)
+  pu_survey_solution_idx <- setdiff(seq_len(n_pu), pu_missing_idx)
   pu_survey_solution_idx <- sample(pu_survey_solution_idx,
                                    ceiling(length(pu_survey_solution_idx) *
                                            0.4))
   pu_survey_solution_idx <- sort(pu_survey_solution_idx)
+  ## simulate planning units that need predictions
+  pu_model_prediction_idx <- lapply(seq_len(n_total_f), function(x) {
+    n <- sample.int(ceiling(length(pu_missing_idx) * 0.5), 1)
+    sample(pu_missing_idx, n)
+  })
   ## simulate features that have uncertain distributions
   features <- sort(sample.int(n_total_f, n_f))
   survey_features <- replace(rep(FALSE, n_total_f), features, TRUE)
@@ -104,8 +109,8 @@ test_that("variable weights", {
   }
   rij[] <- rbinom(prod(dim(rij)), 1, rij[])
   true_rij <- rij
-  rij[, pu_model_prediction_idx] <- -1
-  ## set constant weights
+  rij[, pu_missing_idx] <- -1
+  ## set variable weights
   wij <- rij
   wij[] <- round(runif(length(wij)), 6)
   ## set xgboost modelling information
@@ -127,9 +132,8 @@ test_that("variable weights", {
     rij, wij, x, features, pu_model_prediction_idx,
     xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds)
   r2 <- rcpp_predict_missing_rij_data(
-    rij, wij, x, survey_features,
-    pu_model_prediction_idx - 1, xgb_parameters, xgb_nrounds, xgb_train_folds,
-    xgb_test_folds)
+    rij, wij, x, survey_features, pu_model_prediction_idx, xgb_parameters,
+    xgb_nrounds, xgb_train_folds, xgb_test_folds)
   # test
-  expect_lte(max(abs(r1 - r2)), 1e-7)
+  expect_equal(r1, r2)
 })

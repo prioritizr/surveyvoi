@@ -1,8 +1,8 @@
-r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
+r_approx_expected_value_of_decision_given_survey_scheme <- function(
     rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-    pu_survey_solution, pu_survey_status, pu_survey_costs,
+    pu_survey_solution, pu_model_prediction, pu_survey_costs,
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
-    xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
+    xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     total_budget, optim_gap,
     n_approx_replicates, n_approx_outcomes_per_replicate) {
@@ -16,9 +16,9 @@ r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
   value <- sapply(seq_len(n_approx_replicates), function(i) {
     r_approx_expected_value_of_decision_given_survey_scheme_fixed_states(
       rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-      pu_survey_solution, pu_survey_status, pu_survey_costs,
+      pu_survey_solution, pu_model_prediction, pu_survey_costs,
       pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
-      xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
+      xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
       obj_fun_preweight, obj_fun_postweight, obj_fun_target,
       total_budget, optim_gap, outcomes[[i]])
   })
@@ -28,9 +28,9 @@ r_approx_expected_value_of_decision_given_survey_scheme_n_states <- function(
 r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   function(
     rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-    pu_survey_solution, pu_survey_status, pu_survey_costs,
+    pu_survey_solution, pu_model_prediction, pu_survey_costs,
     pu_purchase_costs, pu_purchase_locked_in, pu_env_data,
-    xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
+    xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     total_budget, optim_gap, outcomes) {
   # init
@@ -43,9 +43,6 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   remaining_budget <- total_budget - sum(pu_survey_costs * pu_survey_solution)
   ## planning unit indices
   pu_survey_solution_idx <- which(pu_survey_solution > 0.5)
-  pu_survey_status_idx <- which(pu_survey_status > 0.5)
-  pu_model_prediction_idx <- which(!pu_survey_status & !pu_survey_solution)
-  pu_model_fitting_idx <- which(pu_survey_status | pu_survey_solution)
   ## feature indices
   survey_features_idx <- which(survey_features > 0.5)
   survey_features_rev_idx <- rep(0, n_f)
@@ -72,8 +69,10 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   ## overwrite missing data with prior data for features we are not interested
   ## in surveying
   oij <- rij
-  for (i in which(!survey_features))
-    oij[i, !pu_survey_status] <- pij[i, !pu_survey_status]
+  for (i in which(!survey_features)) {
+    oij[i, pu_survey_solution_idx] <- pij[i, pu_survey_solution_idx]
+    oij[i, pu_model_prediction[[i]]] <- pij[i, pu_model_prediction[[i]]]
+  }
   ## find indices for cells corresponding to planning units and features that
   ## that are specified to be surveyed
   rij_outcome_idx <- c()
@@ -97,12 +96,12 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
       curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
-      xgb_nrounds, xgb_train_folds, xgb_test_folds)
+      n_xgb_nrounds, xgb_train_folds, xgb_test_folds)
 
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
       curr_oij, wij, pu_env_data, survey_features_idx,
-      pu_model_prediction_idx, xgb_parameters, xgb_nrounds, xgb_train_folds,
+      pu_model_prediction, xgb_parameters, n_xgb_nrounds, xgb_train_folds,
       xgb_test_folds)
 
     ## generate posterior matrix

@@ -359,8 +359,6 @@ approx_near_optimal_survey_scheme <- function(
   } else {
     site_survey_locked_out <- rep(FALSE, nrow(site_data))
   }
-  ## identify sites that have previously been surveyed
-  site_survey_status <- !is.na(site_data[[site_occupancy_columns[1]]])
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
                         "nrounds")
@@ -374,6 +372,8 @@ approx_near_optimal_survey_scheme <- function(
   })
   ## extract site occupancy data
   rij <- t(as.matrix(site_data[, site_occupancy_columns]))
+  ## identify planning units that have been surveyed for all species
+  site_survey_status <- colSums(is.na(rij)) == 0
   ## extract site weight data
   if (!is.null(site_weight_columns)) {
     wij <- t(as.matrix(site_data[, site_weight_columns]))
@@ -382,8 +382,6 @@ approx_near_optimal_survey_scheme <- function(
   }
   ## extract environmental data
   ejx <- as.matrix(site_data[, site_env_vars_columns])
-  ## prepare rij matrix for Rcpp
-  rij[is.na(rij)] <- -1
 
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
@@ -434,20 +432,25 @@ approx_near_optimal_survey_scheme <- function(
         sum(site_data[[site_management_cost_column]] *
             site_management_locked_in)
       if (curr_total_cost > total_budget) return(NA_real_)
-      ## setup folds for training and testing models
-      pu_predict_idx <-
-        which(curr_candidate_solution | site_survey_status)
+      ## identify sites that need model predictions for each feature
+      pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
+        which(!curr_candidate_solution & is.na(rij[i, ]))
+      })
+      ## folds for training and testing models
       xgb_folds <- lapply(seq_len(nrow(feature_data)),
         function(i) {
+          pu_train_idx <- which(curr_candidate_solution | !is.na(rij[i, ]))
           withr::with_seed(seed, {
-            create_folds(unname(rij[i, pu_predict_idx]), xgb_n_folds[i],
-                         index = pu_predict_idx,
+            create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+                         index = pu_train_idx,
                          na.fail = FALSE, seed = seed)
           })
       })
+      ## prepare rij matrix for Rcpp
+      rij[is.na(rij)] <- -1
       ## calculate expected value of decision given survey scheme
       out <- withr::with_seed(seed, {
-        rcpp_approx_expected_value_of_decision_given_survey_scheme_n_states(
+        rcpp_approx_expected_value_of_decision_given_survey_scheme(
           rij = rij, pij = pij, wij = wij,
           survey_features = feature_data[[feature_survey_column]],
           survey_sensitivity =
@@ -455,7 +458,7 @@ approx_near_optimal_survey_scheme <- function(
           survey_specificity =
             feature_data[[feature_survey_specificity_column]],
           pu_survey_solution = curr_candidate_solution,
-          pu_survey_status = site_survey_status,
+          pu_model_prediction = pu_model_prediction,
           pu_survey_costs = site_data[[site_survey_cost_column]],
           pu_purchase_costs = site_data[[site_management_cost_column]],
           pu_purchase_locked_in = site_management_locked_in,

@@ -12,8 +12,8 @@ r_predict_missing_rij_data <- function(
         x, xgb_parameters[[features[i]]], xgb_nrounds[features[i]])
     })
     # assign values
-    rij[features[i], pu_model_prediction_idx] <-
-      rowMeans(yhat)[pu_model_prediction_idx]
+    rij[features[i], pu_model_prediction_idx[[features[i]]]] <-
+      rowMeans(yhat)[pu_model_prediction_idx[[features[i]]]]
   }
   # exports
   rij
