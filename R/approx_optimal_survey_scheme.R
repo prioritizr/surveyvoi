@@ -322,14 +322,19 @@ approx_optimal_survey_scheme <- function(
   rij <- t(as.matrix(site_data[, site_occupancy_columns]))
   ## identify planning units that have been surveyed for all species
   site_survey_status <- colSums(is.na(rij)) == 0
-  ## extract site weight data
-  if (!is.null(site_weight_columns)) {
-    wij <- t(as.matrix(site_data[, site_weight_columns]))
-  } else {
-    wij <- matrix(1, ncol = ncol(rij), nrow = nrow(rij))
-  }
   ## extract environmental data
   ejx <- as.matrix(site_data[, site_env_vars_columns])
+
+  # prepare model weights
+  ## initialize weights
+  if (!is.null(site_weight_columns)) {
+    ## extract user-specified weights
+    wij <- t(as.matrix(site_data[, site_weight_columns]))
+  } else {
+    ## set weights based on if data are missing or not
+    wij <- t(as.matrix(site_data[, site_occupancy_columns]))
+    wij[] <- as.numeric(!is.na(wij))
+  }
 
   # generate survey schemes
   all_feasible_schemes <- feasible_survey_schemes(

@@ -324,6 +324,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
 
   // constant parameters
   const std::size_t n_f = rij.rows();
+  const std::size_t n_pu = rij.cols();
   const std::size_t n_f_survey =
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
 
@@ -347,6 +348,13 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
 
   // convert environmental data to row major format
   MatrixXfRM pu_env_data2 = pu_env_data;
+
+  // increment model weights for planning units selected in survey scheme
+  // and species that will be considerd in future surveys
+  for (std::size_t i = 0; i < n_f; ++i)
+    for (std::size_t j = 0; j < n_pu; ++j)
+      wij(i, j) +=
+        static_cast<double>(survey_features[i] && pu_survey_solution[j]);
 
   // calculate value of information
   return expected_value_of_decision_given_survey_scheme(

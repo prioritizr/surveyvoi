@@ -423,16 +423,21 @@ evdsi <- function(
                      na.fail = FALSE, seed = seed)
       })
   })
-  ## extract site weight data
-  if (!is.null(site_weight_columns)) {
-    wij <- t(as.matrix(site_data[, site_weight_columns]))
-  } else {
-    wij <- matrix(1, ncol = ncol(rij), nrow = nrow(rij))
-  }
   ## extract environmental data
   ejx <- as.matrix(site_data[, site_env_vars_columns])
   ## prepare rij matrix for Rcpp
   rij[is.na(rij)] <- -1
+
+  # prepare model weights
+  ## initialize weights
+  if (!is.null(site_weight_columns)) {
+    ## extract user-specified weights
+    wij <- t(as.matrix(site_data[, site_weight_columns]))
+  } else {
+    ## set weights based on if data are missing or not
+    wij <- t(as.matrix(site_data[, site_occupancy_columns]))
+    wij[] <- as.numeric(!is.na(wij))
+  }
 
   # main calculation
   withr::with_seed(seed, {

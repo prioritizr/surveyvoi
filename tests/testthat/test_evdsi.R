@@ -19,7 +19,8 @@ test_that("equal weights", {
     site_data, feature_data, site_occ_columns, site_prb_columns,
     "survey_sensitivity", "survey_specificity",
     "model_sensitivity", "model_specificity")
-  wij <- matrix(1, ncol = ncol(pij), nrow = nrow(pij))
+  wij <- t(as.matrix(sf::st_drop_geometry(site_data)[, site_occ_columns]))
+  wij[] <- as.numeric(!is.na(wij))
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
   pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
     which(!site_data$survey & is.na(rij[i, ]))

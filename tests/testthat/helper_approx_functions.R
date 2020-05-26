@@ -84,6 +84,12 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       counter <- counter + 1
     }
   }
+  ## update model weights
+  m <- as.matrix(expand.grid(
+    row = which(survey_features),
+    col = which(pu_survey_solution)))
+  wij[m] <- wij[m] + 1
+  rm(m)
   ## create dummy matrix
   dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
   # main processing
