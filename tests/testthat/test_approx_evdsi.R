@@ -21,11 +21,13 @@ test_that("equal weights", {
     site_data, feature_data, site_occ_columns, site_prb_columns,
     "survey_sensitivity", "survey_specificity",
     "model_sensitivity", "model_specificity")
-  wij <- matrix(1, ncol = ncol(pij), nrow = nrow(pij))
   ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
   pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
     which(!site_data$survey & is.na(rij[i, ]))
   })
+  # prepare weights
+  wij <- t(as.matrix(sf::st_drop_geometry(site_data)[, site_occ_columns]))
+  wij[] <- as.numeric(!is.na(wij))
   # prepare xgboost inputs
   xgb_n_folds <- rep(5, n_f)
   xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
@@ -41,7 +43,6 @@ test_that("equal weights", {
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
   # calculations
-  set.seed(1)
   r1 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
