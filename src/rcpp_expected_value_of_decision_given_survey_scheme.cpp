@@ -218,7 +218,7 @@ double expected_value_of_decision_given_survey_scheme(
     which_feature_state(curr_oij, survey_features_idx, pu_survey_solution_idx,
                         feature_outcome_idx);
 
-    // fit models for the feature's outcomes if needed
+    /// fit models for the feature's outcomes if needed
     fit_xgboost_models_and_assess_performance(
       curr_oij, wij,
       pu_env_data, pu_predict_env_data,
@@ -227,6 +227,14 @@ double expected_value_of_decision_given_survey_scheme(
       xgb_train_folds, xgb_test_folds,
       model_yhat, model_performance,
       curr_model_sensitivity, curr_model_specificity);
+
+    /// update model sensitivity and speciifcity values based on
+    /// survey sensitivity and speciifcity values, because the
+    /// model values are dependent on the survey data
+    for (std::size_t i = 0; i < n_f_survey; ++i)
+      curr_model_sensitivity[i] *= survey_sensitivity[survey_features_idx[i]];
+    for (std::size_t i = 0; i < n_f_survey; ++i)
+      curr_model_specificity[i] *= survey_specificity[survey_features_idx[i]];
 
     /// generate modelled predictions for species we are interested in surveying
     predict_missing_rij_data(curr_oij, survey_features_idx, feature_outcome_idx,

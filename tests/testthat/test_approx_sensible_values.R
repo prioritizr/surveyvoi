@@ -326,7 +326,7 @@ test_that("identical outputs given identical inputs", {
   }
 })
 
-test_that("current = optimal info, when all pu selected", {
+test_that("current <= optimal info, when all pu selected", {
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -399,7 +399,7 @@ test_that("current = optimal info, when all pu selected", {
     n_approx_outcomes_per_replicate = n_states_per_rep,
     method_approx_outcomes = "uniform_without_replacement")
   # tests
-  expect_equal(attr(evd_ss, "ev")[1, ], rep(evd_current, n_reps))
+  expect_true(all(rep(evd_current, n_reps) <= attr(evd_ss, "ev")[1, ]))
 })
 
 test_that("current < optimal info, some pu selected", {

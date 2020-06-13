@@ -251,6 +251,14 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
         model_yhat, model_performance,
         curr_model_sensitivity, curr_model_specificity);
 
+      /// update model sensitivity and speciifcity values based on
+      /// survey sensitivity and speciifcity values, because the
+      /// model values are dependent on the survey data
+      for (std::size_t i = 0; i < n_f_survey; ++i)
+        curr_model_sensitivity[i] *= survey_sensitivity[survey_features_idx[i]];
+      for (std::size_t i = 0; i < n_f_survey; ++i)
+        curr_model_specificity[i] *= survey_specificity[survey_features_idx[i]];
+
       /// generate modelled predictions for survey species
       predict_missing_rij_data(
         curr_oij, survey_features_idx, feature_outcome_idx,

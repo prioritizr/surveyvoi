@@ -105,8 +105,10 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     ## generate posterior matrix
     curr_models_sens <- rep(NA, n_f)
     curr_models_spec <- rep(NA, n_f)
-    curr_models_sens[survey_features_idx] <- curr_models$sens
-    curr_models_spec[survey_features_idx] <- curr_models$spec
+    curr_models_sens[survey_features_idx] <-
+      curr_models$sens * survey_sensitivity[survey_features_idx]
+    curr_models_spec[survey_features_idx] <-
+      curr_models$spec * survey_specificity[survey_features_idx]
     curr_postij <- r_posterior_probability_matrix(
       rij, pij, curr_oij2,
       pu_survey_solution, survey_features,

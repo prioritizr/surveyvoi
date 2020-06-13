@@ -99,6 +99,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     ## generate state
     i <- outcomes[ii]
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
+
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
       curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
@@ -113,8 +114,10 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     ## generate posterior matrix
     curr_models_sens <- rep(NA, n_f)
     curr_models_spec <- rep(NA, n_f)
-    curr_models_sens[survey_features_idx] <- curr_models$sens
-    curr_models_spec[survey_features_idx] <- curr_models$spec
+    curr_models_sens[survey_features_idx] <-
+      curr_models$sens * survey_sensitivity[survey_features_idx]
+    curr_models_spec[survey_features_idx] <-
+      curr_models$spec * survey_specificity[survey_features_idx]
     curr_postij <- r_posterior_probability_matrix(
       rij, pij, curr_oij2,
       pu_survey_solution, survey_features,

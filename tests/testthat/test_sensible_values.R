@@ -290,7 +290,7 @@ test_that("identical outputs given identical inputs", {
   expect_lte(abs(diff(range(r))), 1e-10)
 })
 
-test_that("current = optimal info, when all pu selected", {
+test_that("current <= optimal info, when all pu selected", {
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -357,7 +357,7 @@ test_that("current = optimal info, when all pu selected", {
     site_management_locked_in_column = "locked_in",
     optimality_gap = 0)
   # tests
-  expect_equal(max(attr(evd_ss, "ev")), evd_current)
+  expect_lte(evd_current, max(attr(evd_ss, "ev")))
 })
 
 test_that("current < optimal info, some pu selected", {

@@ -168,9 +168,9 @@ test_that("expected results (sparse)", {
     tibble::tibble(
       x = seq_len(5),
       y = x,
-      f1 = c(0, 1, 1, NA, NA),
-      f2 = c(NA, 1, 0, NA, NA),
-      f3 = c(0, NA, 1, NA, NA),
+      f1 = c(0, 1, 1, 0, NA),
+      f2 = c(0, 1, 0, NA, 1),
+      f3 = c(0, 0, 1, NA, NA),
       p1 = c(0.99, 0.99, 0.99, 0.99, 0.99),
       p2 = c(0.05, 0.99, 0.05, 0.05, 0.99),
       p3 = c(0.05, 0.05, 0.05, 0.05, 0.99),

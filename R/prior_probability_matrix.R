@@ -27,9 +27,19 @@
 #' P_{ij} = \\
 #' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 #' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-#' 1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
+#' {S'}_i \times S_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+#' 1 - ({N'}_i \times N_i), \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 #' }
+#'
+#' Note that the prior probability calculations account for the fact that the
+#' species distribution models were evaluated using the survey data. Since
+#' the species distribution models were evaluated using survey data, this
+#' means that sensitivity and specificity values of the models are
+#' conditional on uncertainty present in the survey methodology. To
+#' account for this, the prior probability of species \eqn{i} occurring within
+#' planning unit \eqn{j} when relying on the species distribution model
+#' predictions depends on the sensitivity and specificity of both the
+#' species distribution models and the survey methodology.
 #'
 #' @return \code{matrix} object containing the prior probabilities of each
 #'   feature occupying each site. Each row corresponds to a different
@@ -133,14 +143,16 @@ prior_probability_matrix <- function(
     ### and 1 - model specificity for predicted absence
     pos <- which(is.na(rij[f, ]))
     prior[f, pos] <-
-      ((feature_data[[feature_model_sensitivity_column]][f]) *
+      ((feature_data[[feature_model_sensitivity_column]][f] *
+        feature_data[[feature_survey_sensitivity_column]][f]) *
        (mij[f, pos] >= 0.5)) +
-      ((1 - feature_data[[feature_model_specificity_column]][f]) *
+      ((1 - (feature_data[[feature_model_specificity_column]][f] *
+             feature_data[[feature_survey_specificity_column]][f])) *
        (mij[f, pos] < 0.5))
   }
   # clamp values that are exactly zero or one
   prior[] <- pmin(prior[], 1 - 1e-10)
-  prior[] <- pmax(prior[], 1e-10) 
+  prior[] <- pmax(prior[], 1e-10)
   # return result
   rownames(prior) <- site_occupancy_columns
   prior

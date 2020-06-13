@@ -1,109 +1,67 @@
-context("prior_probability_matrix")
+context("posterior_probability_matrix")
 
 test_that("correct result", {
   # data
+  set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
-      x = seq_len(5),
+      x = seq_len(6),
       y = x,
-      f1 = c(1, 1, 1, NA, NA),
-      f2 = c(0, 1, 0, NA, NA),
-      f3 = c(0, 0, 0, NA, NA),
-      p1 = c(0.99, 0.99, 0.99, 0.99, 0.99),
-      p2 = c(0.05, 0.99, 0.99, 0.05, 0.99),
-      p3 = c(0.05, 0.05, 0.05, 0.05, 0.99)),
+      solution = c(FALSE, FALSE, FALSE, TRUE, FALSE, TRUE),
+      management_cost = c(100, 500, 200, 500, 12, 3),
+      locked_in = c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE),
+      f1 = c(1, 1, 1, -1, -1, -1),
+      f2 = c(0, 1, 0, -1, -1, -1),
+      f3 = c(0, 0, 0, -1, -1, -1),
+      p1 = c(0.99, 0.99, 0.99, 0.5, 0.1, 0.32),
+      p2 = c(0.05, 0.99, 0.99, 0.2, 0.88, 0.67),
+      p3 = c(0.21, 0.768, 0.98, 0.233, 0.56, 0.123),
+      o1 = c(1, 1, 1, 1, 0.7, 0),
+      o2 = c(0, 1, 0, -1, -1, -1),
+      o3 = c(0, 1, 0, 0, 0.2, 0)),
     coords = c("x", "y"))
   feature_data <- tibble::tibble(
     name = letters[1:3],
-    survey = rep(TRUE, 3),
-    sensitivity = c(0.5, 0.96, 0.97),
-    specificity = c(0.34, 0.92, 0.98),
-    model_sensitivity = c(0.8, 0.7, 0.6),
-    model_specificity = c(0.91, 0.94, 0.55))
-  site_occupancy_columns <- c("f1", "f2", "f3")
-  site_probability_columns <-  c("p1", "p2", "p3")
+    survey = c(TRUE, FALSE, TRUE),
+    sensitivity = c(0.7, 0.96, 0.8),
+    specificity = c(0.54, 0.92, 0.6),
+    model_sensitivity = c(0.8, 0.7, 0.657),
+    model_specificity = c(0.92, 0.9, 0.65))
+  site_occ_columns <- c("f1", "f2", "f3")
+  site_prb_columns <- c("p1", "p2", "p3")
+  site_out_columns <- c("o1", "o2", "o3") # combination of outcome/new models
+  # extract data
+  rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
+  pij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_prb_columns])))
+  oij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_out_columns])))
   # calculations
-  pij <- prior_probability_matrix(
-    site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
+  r1 <- rcpp_posterior_probability_matrix(
+    rij, pij, oij,
+    site_data$solution,
+    feature_data$survey,
+    feature_data$sensitivity, feature_data$specificity,
+    feature_data$model_sensitivity, feature_data$model_specificity)
+  r2 <- r_posterior_probability_matrix(
+    rij, pij, oij,
+    site_data$solution,
+    feature_data$survey,
+    feature_data$sensitivity, feature_data$specificity,
+    feature_data$model_sensitivity, feature_data$model_specificity)
+  dimnames(r1) <- dimnames(pij)
+  dimnames(r2) <- dimnames(pij)
   # tests
-  expect_is(pij, "matrix")
-  expect_true(all(is.finite(pij)))
-  expect_lte(max(pij), 1)
-  expect_gte(min(pij), 0)
-  correct <- matrix(0, ncol = nrow(site_data), nrow = nrow(feature_data))
-  for (f in seq_len(nrow(feature_data))) {
-    for (j in seq_len(nrow(site_data))) {
-      h <- site_data[[site_occupancy_columns[f]]][j]
-      m <- site_data[[site_probability_columns[f]]][j]
-      if (!is.na(h)) {
-        if (h >= 0.5) {
-          correct[f, j] <- feature_data$sensitivity[f]
-        } else {
-          correct[f, j] <- 1 - feature_data$specificity[f]
-        }
-      } else {
-        if (m >= 0.5) {
-          correct[f, j] <- feature_data$model_sensitivity[f]
-        } else {
-          correct[f, j] <- 1 - feature_data$model_specificity[f]
-        }
-      }
-    }
-  }
-  expect_equivalent(pij, correct)
-})
-
-test_that("correct result (sparse)", {
-  # data
-  site_data <- sf::st_as_sf(
-    tibble::tibble(
-      x = seq_len(5),
-      y = x,
-      f1 = c(1, 1, 1, NA, 1),
-      f2 = c(0, 1, 0, NA, NA),
-      f3 = c(NA, 0, 0, NA, NA),
-      p1 = c(0.99, 0.99, 0.99, 0.99, 0.99),
-      p2 = c(0.05, 0.99, 0.99, 0.05, 0.99),
-      p3 = c(0.05, 0.05, 0.05, 0.05, 0.99)),
-    coords = c("x", "y"))
-  feature_data <- tibble::tibble(
-    name = letters[1:3],
-    survey = rep(TRUE, 3),
-    sensitivity = c(0.5, 0.96, 0.97),
-    specificity = c(0.34, 0.92, 0.98),
-    model_sensitivity = c(0.8, 0.7, 0.6),
-    model_specificity = c(0.91, 0.94, 0.55))
-  site_occupancy_columns <- c("f1", "f2", "f3")
-  site_probability_columns <-  c("p1", "p2", "p3")
-  # calculations
-  pij <- prior_probability_matrix(
-    site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
-  # tests
-  expect_is(pij, "matrix")
-  expect_true(all(is.finite(pij)))
-  expect_lte(max(pij), 1)
-  expect_gte(min(pij), 0)
-  correct <- matrix(0, ncol = nrow(site_data), nrow = nrow(feature_data))
-  for (f in seq_len(nrow(feature_data))) {
-    for (j in seq_len(nrow(site_data))) {
-      h <- site_data[[site_occupancy_columns[f]]][j]
-      m <- site_data[[site_probability_columns[f]]][j]
-      if (!is.na(h)) {
-        if (h >= 0.5) {
-          correct[f, j] <- feature_data$sensitivity[f]
-        } else {
-          correct[f, j] <- 1 - feature_data$specificity[f]
-        }
-      } else {
-        if (m >= 0.5) {
-          correct[f, j] <- feature_data$model_sensitivity[f]
-        } else {
-          correct[f, j] <- 1 - feature_data$model_specificity[f]
-        }
-      }
-    }
-  }
-  expect_equivalent(pij, correct)
+  ## R and Rcpp give same answers
+  expect_equal(r1, r2)
+  ## feature 1 posterior
+  expect_equal(r1[1, 1:3], pij[1, 1:3])
+  expect_gt(r1[1, 4], pij[1, 4])
+  expect_gt(r1[1, 5], pij[1, 5])
+  expect_lt(r1[1, 6], pij[1, 6])
+  ## feature 2 posterior
+  expect_equal(r1[2, ], pij[2, ])
+  ## feature 3 posterior
+  expect_equal(r1[3, 1:3], pij[3, 1:3])
+  expect_lt(r1[3, 4], pij[3, 4])
+  expect_lt(r1[3, 5], pij[3, 5])
+  expect_lt(r1[3, 6], pij[3, 6])
 })
