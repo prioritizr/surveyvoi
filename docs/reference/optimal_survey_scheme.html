@@ -74,7 +74,7 @@ calculating the expected value of the decision given a survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -475,9 +475,14 @@ this algorithm, it can take a very long time to complete.</p>
   <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
   <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
-  <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as(rcpp_feasible_actions_ilp_matrix(costs), "dgCMatrix"): no method or default for coercing "matrix" to "dgCMatrix"</span></div><div class='input'>
+  <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%  |                                                                              |======================================================================| 100%</div><div class='input'>
 <span class='co'># print result</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>opt_survey</span>)</div><div class='output co'>#&gt; <span class='error'>Error in print(opt_survey): object 'opt_survey' not found</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>opt_survey</span>)</div><div class='output co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7] [,8]  [,9] [,10] [,11] [,12]
+#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE TRUE FALSE FALSE FALSE FALSE
+#&gt;      [,13] [,14] [,15]
+#&gt; [1,] FALSE FALSE FALSE
+#&gt; attr(,"ev")
+#&gt; [1] 89.93912</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -355,7 +355,7 @@ B = \sum_{i \in I}
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_current</span>)</pre></body></html></div>
-<pre><code>## [1] 176.229</code></pre>
+<pre><code>## [1] 176.0561</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -482,11 +482,11 @@ B = \sum_{i \in I}
 <pre><code>## # A tibble: 5 x 2
 ##   name           value
 ##   &lt;chr&gt;          &lt;dbl&gt;
-## 1 geo_scheme   176.087
-## 2 env_scheme   176.447
-## 3 unc_scheme   176.087
-## 4 cheap_scheme 176.087
-## 5 rich_scheme  176.192</code></pre>
+## 1 geo_scheme   175.972
+## 2 env_scheme   176.195
+## 3 unc_scheme   175.972
+## 4 cheap_scheme 175.972
+## 5 rich_scheme  175.834</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -497,11 +497,11 @@ B = \sum_{i \in I}
 <pre><code>## # A tibble: 5 x 3
 ##   name           value        roi
 ##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   176.087 -0.141894 
-## 2 env_scheme   176.447  0.217914 
-## 3 unc_scheme   176.087 -0.141894 
-## 4 cheap_scheme 176.087 -0.141894 
-## 5 rich_scheme  176.192 -0.0366875</code></pre>
+## 1 geo_scheme   175.972 -0.0840373
+## 2 env_scheme   176.195  0.138470 
+## 3 unc_scheme   175.972 -0.0840373
+## 4 cheap_scheme 175.972 -0.0840373
+## 5 rich_scheme  175.834 -0.221845</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -585,7 +585,7 @@ B = \sum_{i \in I}
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 176.8669</code></pre>
+<pre><code>## [1] 176.5171</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
@@ -596,12 +596,12 @@ B = \sum_{i \in I}
 <pre><code>## # A tibble: 6 x 3
 ##   name           value        roi
 ##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   176.087 -0.141894 
-## 2 env_scheme   176.447  0.217914 
-## 3 unc_scheme   176.087 -0.141894 
-## 4 cheap_scheme 176.087 -0.141894 
-## 5 rich_scheme  176.192 -0.0366875
-## 6 opt_scheme   176.867  0.637912</code></pre>
+## 1 geo_scheme   175.972 -0.0840373
+## 2 env_scheme   176.195  0.138470 
+## 3 unc_scheme   175.972 -0.0840373
+## 4 cheap_scheme 175.972 -0.0840373
+## 5 rich_scheme  175.834 -0.221845 
+## 6 opt_scheme   176.517  0.460970</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>

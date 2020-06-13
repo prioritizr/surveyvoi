@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -261,7 +261,7 @@
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">ev_survey</span>)</pre></body></html></div>
-<pre><code>## [1] 128.498</code></pre>
+<pre><code>## [1] 129.4626</code></pre>
 <p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating outcomes: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample outcomes and do not consider the prior probability of each outcome occurring. The weighted methods, on the other hand, are select outcomes that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the outcome of the random number generator – we will report means and standard errors for 25 replicates per number of approximation outcomes. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total outcomes, we will not explore the full range of subsets for this method.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># define function for calculating standard error</span>
 <span class="no">se</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">sqrt</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(<span class="no">x</span>) / <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>))

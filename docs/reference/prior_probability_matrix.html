@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
       </span>
     </div>
 
@@ -247,9 +247,18 @@ This should ideally be calculated using <code><a href='fit_occupancy_models.html
 P_{ij} = \\
 S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-{S'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-1 - {N'}_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
+{S'}_i \times S_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
+1 - ({N'}_i \times N_i), \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
 $$</p>
+<p>Note that the prior probability calculations account for the fact that the
+species distribution models were evaluated using the survey data. Since
+the species distribution models were evaluated using survey data, this
+means that sensitivity and specificity values of the models are
+conditional on uncertainty present in the survey methodology. To
+account for this, the prior probability of species \(i\) occurring within
+planning unit \(j\) when relying on the species distribution model
+predictions depends on the sensitivity and specificity of both the
+species distribution models and the survey methodology.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -290,8 +299,8 @@ $$</p>
 
 <span class='co'># preview prior probability matrix</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>prior_matrix</span>)</div><div class='output co'>#&gt;         [,1]      [,2]      [,3]      [,4]      [,5]
-#&gt; f1 0.9554571 0.1784514 0.7748368 0.1044942 0.9554571
-#&gt; f2 0.9612699 0.1713662 0.1212766 0.7233379 0.9612699</div></span></pre>
+#&gt; f1 0.9554571 0.1784514 0.7403233 0.2642984 0.9554571
+#&gt; f2 0.9612699 0.1713662 0.2718601 0.6953229 0.9612699</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
