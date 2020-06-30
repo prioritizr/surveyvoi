@@ -17,7 +17,8 @@ test_that("expected results", {
       e2 = rnorm(5),
       survey_cost = c(1, 1, 1, 5, 100000),
       management_cost = c(10, 10, 10, 10, 10),
-      locked_in = FALSE),
+      locked_in = FALSE,
+      locked_out = FALSE),
     coords = c("x", "y"))
   feature_data <- tibble::tibble(
     name = letters[1:3],
@@ -52,6 +53,7 @@ test_that("expected results", {
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
+    site_management_locked_out_column = "locked_out",
     optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
@@ -179,7 +181,8 @@ test_that("expected results (sparse)", {
       survey_cost = c(1, 1, 1, 5, 100000),
       survey_locked_out = c(TRUE, TRUE, FALSE, FALSE, FALSE),
       management_cost = c(10, 10, 10, 10, 10),
-      locked_in = FALSE),
+      locked_in = FALSE,
+      locked_out = FALSE),
     coords = c("x", "y"))
   feature_data <- tibble::tibble(
     name = letters[1:3],
@@ -215,6 +218,7 @@ test_that("expected results (sparse)", {
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
+    site_management_locked_out_column = "locked_out",
     optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,

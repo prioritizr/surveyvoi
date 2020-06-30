@@ -9,6 +9,7 @@ test_that("correct result", {
       solution = c(TRUE, FALSE, TRUE),
       management_cost = c(100, 500, 200),
       locked_in = c(FALSE, FALSE, FALSE),
+      locked_out = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
       f2 = c(0, 1, 0),
       p1 = c(0.99, 0.99, 0.99),
@@ -32,12 +33,12 @@ test_that("correct result", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$preweight, feature_data$postweight, feature_data$target,
-    301, 0)
+    site_data$locked_out, feature_data$preweight, feature_data$postweight,
+    feature_data$target, 301, 0)
   r2 <- r_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    feature_data$preweight, feature_data$postweight, feature_data$target,
-    301, 0)
+    site_data$locked_out, feature_data$preweight, feature_data$postweight,
+    feature_data$target, 301, 0)
   # tests
   expect_equal(r1, r2)
 })

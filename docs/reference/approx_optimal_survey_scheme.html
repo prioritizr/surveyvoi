@@ -74,7 +74,7 @@ for calculating the expected value of the decision given a survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
       </span>
     </div>
 
@@ -159,6 +159,7 @@ for calculating the expected value of the decision given a survey scheme.</p>
   <span class='no'>survey_budget</span>,
   <span class='no'>xgb_parameters</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>site_management_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>site_survey_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -339,6 +340,17 @@ conservation, or if some sites are already being managed for conservation.
 Defaults to <code>NULL</code> such that no sites are locked in.</p></td>
     </tr>
     <tr>
+      <th>site_management_locked_out_column</th>
+      <td><p><code>character</code> name of the column
+in the argument to <code>site_data</code> that contains <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) values indicating which sites should
+be locked out for (<code>TRUE</code>) being managed for conservation or
+(<code>FALSE</code>) not. No missing (<code>NA</code>) values are permitted in this
+column. This is useful if some sites could potentially be surveyed
+to improve model predictions even if they cannot be managed for
+conservation. Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
+    </tr>
+    <tr>
       <th>site_survey_locked_out_column</th>
       <td><p><code>character</code> name of the column
 in the argument to <code>site_data</code> that contains <code>logical</code>
@@ -391,7 +403,8 @@ approximating the expected value calculations. Defaults to 100.</p></td>
     </tr>
     <tr>
       <th>n_approx_outcomes_per_replicate</th>
-      <td><p><code>integer</code> number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.</p></td>
+      <td><p><code>integer</code> number of outcomes to
+use per replicate for approximation calculations. Defaults to 10000.</p></td>
     </tr>
     <tr>
       <th>method_approx_outcomes</th>
@@ -502,9 +515,15 @@ this algorithm, it can take a very long time to complete.</p>
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
   <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
   <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>,
-  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as(rcpp_feasible_actions_ilp_matrix(costs), "dgCMatrix"): no method or default for coercing "matrix" to "dgCMatrix"</span></div><div class='input'>
+  <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==========                                                            |  14%  |                                                                              |====================                                                  |  29%  |                                                                              |==============================                                        |  43%  |                                                                              |========================================                              |  57%  |                                                                              |==================================================                    |  71%  |                                                                              |============================================================          |  86%  |                                                                              |======================================================================| 100%</div><div class='input'>
 <span class='co'># print result</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>approx_opt_survey</span>)</div><div class='output co'>#&gt; <span class='error'>Error in print(approx_opt_survey): object 'approx_opt_survey' not found</span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>approx_opt_survey</span>)</div><div class='output co'>#&gt;       [,1]  [,2] [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11]
+#&gt; [1,] FALSE FALSE TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+#&gt; attr(,"ev")
+#&gt;          [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]
+#&gt; [1,] 108.9198 108.9198 107.1972 108.2488 108.2488 108.7117 108.9198 108.9198
+#&gt;          [,9]    [,10]
+#&gt; [1,] 107.1972 108.2488</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -10,6 +10,7 @@ double rcpp_expected_value_of_decision_given_current_info(
   Eigen::MatrixXd &pij,
   Eigen::VectorXd &pu_costs,
   Eigen::VectorXd &pu_locked_in,
+  Eigen::VectorXd &pu_locked_out,
   Eigen::VectorXd &preweight,
   Eigen::VectorXd &postweight,
   Eigen::VectorXd &target,
@@ -17,7 +18,8 @@ double rcpp_expected_value_of_decision_given_current_info(
   double gap) {
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
-  Prioritization p(pij.cols(), pij.rows(), pu_costs, pu_locked_in,
+  Prioritization p(pij.cols(), pij.rows(), pu_costs,
+                   pu_locked_in, pu_locked_out,
                    preweight, postweight, target, budget, gap);
 
 

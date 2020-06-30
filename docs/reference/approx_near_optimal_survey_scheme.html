@@ -75,7 +75,7 @@ and a greedy heuristic algorithm to maximize this metric." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
       </span>
     </div>
 
@@ -161,6 +161,7 @@ and a greedy heuristic algorithm to maximize this metric.</p>
   <span class='no'>survey_budget</span>,
   <span class='no'>xgb_parameters</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>site_management_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>site_survey_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -341,6 +342,17 @@ conservation, or if some sites are already being managed for conservation.
 Defaults to <code>NULL</code> such that no sites are locked in.</p></td>
     </tr>
     <tr>
+      <th>site_management_locked_out_column</th>
+      <td><p><code>character</code> name of the column
+in the argument to <code>site_data</code> that contains <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) values indicating which sites should
+be locked out for (<code>TRUE</code>) being managed for conservation or
+(<code>FALSE</code>) not. No missing (<code>NA</code>) values are permitted in this
+column. This is useful if some sites could potentially be surveyed
+to improve model predictions even if they cannot be managed for
+conservation. Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
+    </tr>
+    <tr>
       <th>site_survey_locked_out_column</th>
       <td><p><code>character</code> name of the column
 in the argument to <code>site_data</code> that contains <code>logical</code>
@@ -393,7 +405,8 @@ approximating the expected value calculations. Defaults to 100.</p></td>
     </tr>
     <tr>
       <th>n_approx_outcomes_per_replicate</th>
-      <td><p><code>integer</code> number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.</p></td>
+      <td><p><code>integer</code> number of outcomes to
+use per replicate for approximation calculations. Defaults to 10000.</p></td>
     </tr>
     <tr>
       <th>method_approx_outcomes</th>

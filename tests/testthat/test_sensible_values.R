@@ -431,3 +431,164 @@ test_that("current < optimal info, some pu selected", {
   # tests
   expect_gt(max(attr(evd_ss, "ev")), evd_current)
 })
+
+test_that("locking out planning units lowers voi", {
+  set.seed(500)
+  site_data <- sf::st_as_sf(
+    tibble::tibble(
+      x = seq_len(5),
+      y = x,
+      f1 = c(0, 1, 1, NA, NA),
+      f2 = c(0, 1, 0, NA, NA),
+      p1 = c(0.99, 0.99, 0.99, 0.99, 0.6),
+      p2 = c(0.05, 0.99, 0.05, 0.05, 0.4),
+      e1 = rnorm(5),
+      e2 = rnorm(5),
+      survey_cost = c(1, 1, 1, 1, 100000),
+      scheme = c(TRUE, TRUE, FALSE, TRUE, FALSE),
+      management_cost = c(10, 10, 10, 10, 10),
+      locked_in = FALSE,
+      locked_out = c(FALSE, TRUE, TRUE, TRUE, TRUE)),
+    coords = c("x", "y"))
+  feature_data <- tibble::tibble(
+    name = letters[1:2],
+    survey = rep(TRUE, 2),
+    survey_sensitivity = rep(0.95, 2),
+    survey_specificity = rep(0.9, 2),
+    model_sensitivity = rep(0.8, 2),
+    model_specificity = rep(0.85, 2),
+    preweight = runif(2, 100, 200),
+    postweight = runif(2, 5, 20),
+    target = c(1, 1))
+  xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
+                              objective = "binary:logistic"))[rep(1, 2)]
+  budget <- 50000
+  gap <- 1e-4
+  # calculate expected values
+  ## evd current
+  evd_ci1 <- evdci(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_management_cost_column = "management_cost",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    site_management_locked_in_column = "locked_in",
+    optimality_gap = gap)
+  evd_ci2 <- evdci(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_management_cost_column = "management_cost",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    site_management_locked_in_column = "locked_in",
+    site_management_locked_out_column = "locked_out",
+    optimality_gap = gap)
+  ## evdsi
+  evd_si1 <- evdsi(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    site_survey_scheme_column = "scheme",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    xgb_parameters = xgb_parameters,
+    site_management_locked_in_column = "locked_in",
+    optimality_gap = gap)
+  evd_si2 <- evdsi(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    site_survey_scheme_column = "scheme",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    xgb_parameters = xgb_parameters,
+    site_management_locked_in_column = "locked_in",
+    site_management_locked_out_column = "locked_out",
+    optimality_gap = gap)
+  ## evd optimal
+  evd_opt1 <- optimal_survey_scheme(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    survey_budget = 80,
+    xgb_parameters = xgb_parameters,
+    site_management_locked_in_column = "locked_in",
+    optimality_gap = gap)
+  evd_opt2 <- optimal_survey_scheme(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_occupancy_columns = c("f1", "f2"),
+    site_probability_columns = c("p1", "p2"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_preweight_column = "preweight",
+    feature_postweight_column = "postweight",
+    feature_target_column = "target",
+    total_budget = budget,
+    survey_budget = 80,
+    xgb_parameters = xgb_parameters,
+    site_management_locked_in_column = "locked_in",
+    site_management_locked_out_column = "locked_out",
+    optimality_gap = gap)
+  # tests
+  expect_lt(evd_ci2, evd_ci1)
+  expect_lt(evd_si2, evd_si1)
+  expect_lt(max(attr(evd_opt2, "ev")), attr(evd_opt1, "ev"))
+})

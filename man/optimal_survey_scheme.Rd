@@ -24,6 +24,7 @@ optimal_survey_scheme(
   survey_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
+  site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
   optimality_gap = 0,
@@ -159,6 +160,15 @@ be locked in for (\code{TRUE}) being managed for conservation or
 column. This is useful if some sites have already been earmarked for
 conservation, or if some sites are already being managed for conservation.
 Defaults to \code{NULL} such that no sites are locked in.}
+
+\item{site_management_locked_out_column}{\code{character} name of the column
+in the argument to \code{site_data} that contains \code{logical}
+(\code{TRUE} / \code{FALSE}) values indicating which sites should
+be locked out for (\code{TRUE}) being managed for conservation or
+(\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+column. This is useful if some sites could potentially be surveyed
+to improve model predictions even if they cannot be managed for
+conservation. Defaults to \code{NULL} such that no sites are locked out.}
 
 \item{site_survey_locked_out_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}

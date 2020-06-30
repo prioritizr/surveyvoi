@@ -74,7 +74,7 @@ calculating the expected value of the decision given a survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
       </span>
     </div>
 
@@ -159,6 +159,7 @@ calculating the expected value of the decision given a survey scheme.</p>
   <span class='no'>survey_budget</span>,
   <span class='no'>xgb_parameters</span>,
   <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>site_management_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>site_survey_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
@@ -334,6 +335,17 @@ be locked in for (<code>TRUE</code>) being managed for conservation or
 column. This is useful if some sites have already been earmarked for
 conservation, or if some sites are already being managed for conservation.
 Defaults to <code>NULL</code> such that no sites are locked in.</p></td>
+    </tr>
+    <tr>
+      <th>site_management_locked_out_column</th>
+      <td><p><code>character</code> name of the column
+in the argument to <code>site_data</code> that contains <code>logical</code>
+(<code>TRUE</code> / <code>FALSE</code>) values indicating which sites should
+be locked out for (<code>TRUE</code>) being managed for conservation or
+(<code>FALSE</code>) not. No missing (<code>NA</code>) values are permitted in this
+column. This is useful if some sites could potentially be surveyed
+to improve model predictions even if they cannot be managed for
+conservation. Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
     </tr>
     <tr>
       <th>site_survey_locked_out_column</th>

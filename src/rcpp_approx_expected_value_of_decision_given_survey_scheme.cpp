@@ -21,6 +21,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd &pu_survey_costs,   // cost of surveying planning units
   Eigen::VectorXd &pu_purchase_costs, // cost of purchasing planning units
   Eigen::VectorXd &pu_purchase_locked_in,  // planning units that are locked in
+  Eigen::VectorXd &pu_purchase_locked_out,  // planning units that locked out
   MatrixXfRM &pu_env_data, // environmental data
   std::vector<std::vector<std::string>> &xgb_parameter_names, // xgboost
                                                               // parameter names
@@ -179,7 +180,8 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
 
   /// initialize prioritization object
   Prioritization prioritize(
-    rij.cols(), rij.rows(), pu_purchase_costs, pu_purchase_locked_in,
+    rij.cols(), rij.rows(), pu_purchase_costs,
+    pu_purchase_locked_in, pu_purchase_locked_out,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     remaining_budget, optim_gap);
 
@@ -343,6 +345,7 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd pu_survey_costs,
   Eigen::VectorXd pu_purchase_costs,
   Eigen::VectorXd pu_purchase_locked_in,
+  Eigen::VectorXd pu_purchase_locked_out,
   Eigen::MatrixXf pu_env_data,
   Rcpp::List xgb_parameters,
   Rcpp::List xgb_train_folds,
@@ -397,7 +400,9 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     survey_features,
     survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_model_prediction_idx,
-    pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_env_data2,
+    pu_survey_costs, pu_purchase_costs,
+    pu_purchase_locked_in, pu_purchase_locked_out,
+    pu_env_data2,
     xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,

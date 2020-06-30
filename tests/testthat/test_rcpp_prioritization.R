@@ -11,17 +11,19 @@ test_that("expected result", {
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
+  pu_locked_out <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
+  pu_locked_in[as.logical(pu_locked_out)] <- 0
   budget <- sum(pu_costs) * 0.7
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "r2.lp")
   r3 <- r_pwl_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), 1000, budget, gap, "r3.lp")
   # tests
   objval <-
@@ -51,18 +53,20 @@ test_that("correct result", {
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
+  pu_locked_out <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
+  pu_locked_in[as.logical(pu_locked_out)] <- 0
   budget <- ceiling(sum(pu_costs) * 0.7)
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "")
   r3 <- brute_force_prioritization(
     rij, rep(prew, n_f), rep(postw, n_f), rep(target, n_f), pu_costs,
-    pu_locked_in, budget)
+    pu_locked_in, pu_locked_out, budget)
   # tests
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
@@ -83,17 +87,18 @@ test_that("expected result (one feature has all zeros)", {
   rij[1, ] <- 1
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
+  pu_locked_out <- rep(0, n_pu)
   budget <- sum(pu_costs) * 1.1
   gap <- 0.0
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), budget, gap, "r2.lp")
   r3 <- r_pwl_prioritization(
-    rij, pu_costs, pu_locked_in, rep(prew, n_f), rep(postw, n_f),
+    rij, pu_costs, pu_locked_in, pu_locked_out, rep(prew, n_f), rep(postw, n_f),
     rep(target, n_f), 1000, budget, gap, "r3.lp")
   # tests
   objval <-
@@ -131,15 +136,17 @@ test_that("complex example", {
                 55.49012, 68.57491)
   gap <- 0
   pu_locked_in <- rep(0, ncol(rij))
+  pu_locked_out <- rep(0, ncol(rij))
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, preweight, postweight, target, budget,
-    gap, "r1.lp")
+    rij, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight, target,
+    budget, gap, "r1.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, preweight, postweight, target, budget,
-    gap, "r2.lp")
+    rij, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight, target,
+    budget, gap, "r2.lp")
   r3 <- brute_force_prioritization(
-    rij, preweight, postweight, target, pu_costs, pu_locked_in, budget)
+    rij, preweight, postweight, target, pu_costs, pu_locked_in, pu_locked_out,
+    budget)
   # tests
   expect_lte(abs(r1$objval - r3$objval), 1e-4)
   expect_lte(abs(r2$objval - r3$objval), 1e-4)

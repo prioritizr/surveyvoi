@@ -1,5 +1,5 @@
-r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
-  postweight, target, n_approx_points, budget, gap, file_path) {
+r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, pu_locked_out,
+  preweight, postweight, target, n_approx_points, budget, gap, file_path) {
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
@@ -11,6 +11,9 @@ r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
     assertthat::noNA(pu_locked_in),
     all(pu_locked_in %in% c(0, 1)),
+    is.numeric(pu_locked_out), length(pu_locked_out) == ncol(rij),
+    assertthat::noNA(pu_locked_out),
+    all(pu_locked_out %in% c(0, 1)),
     assertthat::is.count(n_approx_points), assertthat::noNA(n_approx_points),
     assertthat::is.number(budget), assertthat::noNA(budget),
     assertthat::is.number(gap), assertthat::noNA(gap))
@@ -33,7 +36,7 @@ r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   # build problem
   p <- list()
   p$modelsense <- "max"
-  p$ub <- c(rep(1, n_pu), rep(Inf, n_f))
+  p$ub <- c(1 - pu_locked_out, rep(Inf, n_f))
   p$lb <- c(pu_locked_in, rep(0, n_f))
   p$obj <- rep(0, n_pu + n_f)
   p$rhs <- c(rep(0, n_f), budget)
@@ -64,8 +67,8 @@ r_pwl_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   list(x = as.logical(g$x[seq_len(n_pu)]), objval = g$objval, full_x = g$x)
 }
 
-r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
-  postweight, target, budget, gap, file_path) {
+r_prioritization <- function(rij, pu_costs, pu_locked_in, pu_locked_out,
+  preweight, postweight, target, budget, gap, file_path) {
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
@@ -77,6 +80,9 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
     assertthat::noNA(pu_locked_in),
     all(pu_locked_in %in% c(0, 1)),
+    is.numeric(pu_locked_out), length(pu_locked_out) == ncol(rij),
+    assertthat::noNA(pu_locked_out),
+    all(pu_locked_out %in% c(0, 1)),
     assertthat::is.number(budget), assertthat::noNA(budget),
     assertthat::is.number(gap), assertthat::noNA(gap))
   # init
@@ -95,7 +101,7 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
   # build problem
   p <- list()
   p$modelsense <- "max"
-  p$ub <- c(rep(1, n_pu), target, rep(Inf, n_f))
+  p$ub <- c(1 - pu_locked_out, target, rep(Inf, n_f))
   p$lb <- c(pu_locked_in, rep(0, n_f), rep(0, n_f))
   p$obj <- c(rep(0, n_pu), pre_target_slope, post_target_slope)
   p$vtype <- c(rep("B", n_pu), rep("C", n_f), rep("C", n_f))
@@ -115,7 +121,8 @@ r_prioritization <- function(rij, pu_costs, pu_locked_in, preweight,
 }
 
 brute_force_prioritization <- function(rij, preweight, postweight, target,
-                                       pu_costs, pu_locked_in, budget) {
+                                       pu_costs, pu_locked_in, pu_locked_out,
+                                       budget) {
   # assert that arguments are valid
   assertthat::assert_that(
     is.matrix(rij), ncol(rij) > 0, nrow(rij) > 0, assertthat::noNA(c(rij)),
@@ -125,6 +132,9 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
     is.numeric(pu_locked_in), length(pu_locked_in) == ncol(rij),
     assertthat::noNA(pu_locked_in),
     all(pu_locked_in %in% c(0, 1)),
+    is.numeric(pu_locked_out), length(pu_locked_out) == ncol(rij),
+    assertthat::noNA(pu_locked_out),
+    all(pu_locked_out %in% c(0, 1)),
     assertthat::is.number(budget), assertthat::noNA(budget))
   # set constants
   n_pu <- ncol(rij)
@@ -138,6 +148,9 @@ brute_force_prioritization <- function(rij, preweight, postweight, target,
     x <- rcpp_nth_state(i, m)
     # if any locked in planning units are not selected return -Inf
     if (any(x < pu_locked_in))
+      return(-Inf)
+    # if any locked out planning units are selected return -Inf
+    if (any((x + pu_locked_out) == 2))
       return(-Inf)
     # if budget is exceeded then return -Inf
     if (sum(x * pu_costs) > budget)

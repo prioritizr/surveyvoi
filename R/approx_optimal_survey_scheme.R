@@ -111,6 +111,7 @@ approx_optimal_survey_scheme <- function(
   survey_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
+  site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
   optimality_gap = 0,
@@ -256,6 +257,24 @@ approx_optimal_survey_scheme <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
+  ## site_management_locked_out_column
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      assertthat::is.string(site_management_locked_out_column),
+      all(assertthat::has_name(site_data, site_management_locked_out_column)),
+      is.logical(site_data[[site_management_locked_out_column]]),
+      assertthat::noNA(site_data[[site_management_locked_out_column]]))
+    if (all(site_data[[site_management_locked_out_column]]))
+      warning("all sites locked out")
+  }
+  ## validate locked arguments if some locked in and some locked out
+  if (!is.null(site_management_locked_in_column) &&
+      !is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(site_data[[site_management_locked_in_column]] +
+          site_data[[site_management_locked_out_column]] <= 1),
+      msg = "at least one planning unit is locked in and locked out")
+  }
   ## site_survey_locked_out_column
   if (!is.null(site_survey_locked_out_column)) {
     assertthat::assert_that(
@@ -300,6 +319,12 @@ approx_optimal_survey_scheme <- function(
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
   } else {
     site_management_locked_in <- rep(FALSE, nrow(site_data))
+  }
+  ## prepare locked out data
+  if (!is.null(site_management_locked_out_column)) {
+    site_management_locked_out <- site_data[[site_management_locked_out_column]]
+  } else {
+    site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
   ## prepare site survey locked out data
   if (!is.null(site_survey_locked_out_column)) {
@@ -351,6 +376,7 @@ approx_optimal_survey_scheme <- function(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
+      pu_locked_out = site_management_locked_out,
       preweight = feature_data[[feature_preweight_column]],
       postweight = feature_data[[feature_postweight_column]],
       target = feature_data[[feature_target_column]],
@@ -397,6 +423,7 @@ approx_optimal_survey_scheme <- function(
         pu_survey_costs = site_data[[site_survey_cost_column]],
         pu_purchase_costs = site_data[[site_management_cost_column]],
         pu_purchase_locked_in = site_management_locked_in,
+        pu_purchase_locked_out = site_management_locked_out,
         pu_env_data = ejx,
         xgb_parameters = xgb_parameters,
         xgb_train_folds = lapply(xgb_folds, `[[`, "train"),

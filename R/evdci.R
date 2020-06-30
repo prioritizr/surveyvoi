@@ -54,6 +54,7 @@ evdci <- function(
   feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
+  site_management_locked_out_column = NULL,
   prior_matrix = NULL,
   optimality_gap = 0) {
   # assert arguments are valid
@@ -148,6 +149,24 @@ evdci <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
+  ## site_management_locked_out_column
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      assertthat::is.string(site_management_locked_out_column),
+      all(assertthat::has_name(site_data, site_management_locked_out_column)),
+      is.logical(site_data[[site_management_locked_out_column]]),
+      assertthat::noNA(site_data[[site_management_locked_out_column]]))
+    if (all(site_data[[site_management_locked_out_column]]))
+      warning("all sites locked out")
+  }
+  ## validate locked arguments if some locked in and some locked out
+  if (!is.null(site_management_locked_in_column) &&
+      !is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(site_data[[site_management_locked_in_column]] +
+          site_data[[site_management_locked_out_column]] <= 1),
+      msg = "at least one planning unit is locked in and locked out")
+  }
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
@@ -175,11 +194,19 @@ evdci <- function(
     site_management_locked_in <- rep(FALSE, nrow(site_data))
   }
 
+  ## prepare locked out data
+  if (!is.null(site_management_locked_out_column)) {
+    site_management_locked_out <- site_data[[site_management_locked_out_column]]
+  } else {
+    site_management_locked_out <- rep(FALSE, nrow(site_data))
+  }
+
   # main calculation
   out <- rcpp_expected_value_of_decision_given_current_info(
     pij = pij,
     pu_costs = site_data[[site_management_cost_column]],
     pu_locked_in = site_management_locked_in,
+    pu_locked_out = site_management_locked_out,
     preweight = feature_data[[feature_preweight_column]],
     postweight = feature_data[[feature_postweight_column]],
     target = feature_data[[feature_target_column]],

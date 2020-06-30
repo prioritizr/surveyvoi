@@ -27,6 +27,7 @@ public:
   Prioritization(std::size_t n_pu, std::size_t n_f,
                  Eigen::VectorXd &pu_costs,
                  Eigen::VectorXd &pu_locked_in,
+                 Eigen::VectorXd &pu_locked_out,
                  Eigen::VectorXd &preweight,
                  Eigen::VectorXd &postweight,
                  Eigen::VectorXd &target,
@@ -86,7 +87,7 @@ public:
     /// upper bounds
     std::vector<double> ub(_n_vars);
     for (std::size_t i = 0; i < _n_pu; ++i)
-    ub[i] = 1.0;
+      ub[i] = 1.0 - pu_locked_out[i];
     for (std::size_t i = 0; i < _n_f; ++i)
       ub[_n_pu + i] = *(_target + i);
     for (std::size_t i = 0; i < _n_f; ++i)

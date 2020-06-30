@@ -74,6 +74,7 @@ test_that("equal weights", {
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
+    pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
     xgb_parameters =
       lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
@@ -165,6 +166,7 @@ test_that("variable weights", {
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
+    pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
     xgb_parameters =
       lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
@@ -263,6 +265,7 @@ test_that("sparse", {
     pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
+    pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
     xgb_parameters =
       lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),

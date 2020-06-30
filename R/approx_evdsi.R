@@ -10,7 +10,8 @@
 #' @param n_approx_replicates \code{integer} number of replicates to use for
 #'   approximating the expected value calculations. Defaults to 100.
 #'
-#' @param n_approx_outcomes_per_replicate \code{integer} number of outcomes to #'   use per replicate for approximation calculations. Defaults to 10000.
+#' @param n_approx_outcomes_per_replicate \code{integer} number of outcomes to
+#'   use per replicate for approximation calculations. Defaults to 10000.
 #'
 #' @param method_approx_outcomes \code{character} name of method that is
 #'   used to sample outcomes for approximating the expected value
@@ -104,6 +105,7 @@ approx_evdsi <- function(
   total_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
+  site_management_locked_out_column = NULL,
   prior_matrix = NULL,
   optimality_gap = 0,
   site_weight_columns = NULL,
@@ -246,6 +248,24 @@ approx_evdsi <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
+  ## site_management_locked_out_column
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      assertthat::is.string(site_management_locked_out_column),
+      all(assertthat::has_name(site_data, site_management_locked_out_column)),
+      is.logical(site_data[[site_management_locked_out_column]]),
+      assertthat::noNA(site_data[[site_management_locked_out_column]]))
+    if (all(site_data[[site_management_locked_out_column]]))
+      warning("all sites locked out")
+  }
+  ## validate locked arguments if some locked in and some locked out
+  if (!is.null(site_management_locked_in_column) &&
+      !is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(site_data[[site_management_locked_in_column]] +
+          site_data[[site_management_locked_out_column]] <= 1),
+      msg = "at least one planning unit is locked in and locked out")
+  }
   ## n_approx_outcomes_per_replicate
   if ((nrow(site_data) * nrow(feature_data)) < 50)
     assertthat::assert_that(
@@ -281,6 +301,12 @@ approx_evdsi <- function(
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
   } else {
     site_management_locked_in <- rep(FALSE, nrow(site_data))
+  }
+  ## prepare locked out data
+  if (!is.null(site_management_locked_out_column)) {
+    site_management_locked_out <- site_data[[site_management_locked_out_column]]
+  } else {
+    site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
@@ -338,6 +364,7 @@ approx_evdsi <- function(
       pu_survey_costs = site_data[[site_survey_cost_column]],
       pu_purchase_costs = site_data[[site_management_cost_column]],
       pu_purchase_locked_in = site_management_locked_in,
+      pu_purchase_locked_out = site_management_locked_out,
       pu_env_data = ejx,
       xgb_parameters = xgb_parameters,
       xgb_train_folds = lapply(xgb_folds, `[[`, "train"),

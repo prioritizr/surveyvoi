@@ -133,6 +133,15 @@
 #'   conservation, or if some sites are already being managed for conservation.
 #'   Defaults to \code{NULL} such that no sites are locked in.
 #'
+#' @param site_management_locked_out_column \code{character} name of the column
+#'   in the argument to \code{site_data} that contains \code{logical}
+#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
+#'   be locked out for (\code{TRUE}) being managed for conservation or
+#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#'   column. This is useful if some sites could potentially be surveyed
+#'   to improve model predictions even if they cannot be managed for
+#'   conservation. Defaults to \code{NULL} such that no sites are locked out.
+#'
 #' @param prior_matrix \code{numeric} \code{matrix} containing
 #'  the prior probability of each feature occupying each site.
 #'  Rows correspond to features, and columns correspond to sites.
@@ -237,6 +246,7 @@ evdsi <- function(
   total_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
+  site_management_locked_out_column = NULL,
   prior_matrix = NULL,
   optimality_gap = 0,
   site_weight_columns = NULL,
@@ -364,6 +374,24 @@ evdsi <- function(
       total_budget,
       msg = "cost of managing locked in sites exceeds total budget")
   }
+  ## site_management_locked_out_column
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      assertthat::is.string(site_management_locked_out_column),
+      all(assertthat::has_name(site_data, site_management_locked_out_column)),
+      is.logical(site_data[[site_management_locked_out_column]]),
+      assertthat::noNA(site_data[[site_management_locked_out_column]]))
+    if (all(site_data[[site_management_locked_out_column]]))
+      warning("all sites locked out")
+  }
+  ## validate locked arguments if some locked in and some locked out
+  if (!is.null(site_management_locked_in_column) &&
+      !is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(site_data[[site_management_locked_in_column]] +
+          site_data[[site_management_locked_out_column]] <= 1),
+      msg = "at least one planning unit is locked in and locked out")
+  }
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
@@ -394,6 +422,12 @@ evdsi <- function(
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
   } else {
     site_management_locked_in <- rep(FALSE, nrow(site_data))
+  }
+  ## prepare locked out data
+  if (!is.null(site_management_locked_out_column)) {
+    site_management_locked_out <- site_data[[site_management_locked_out_column]]
+  } else {
+    site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
@@ -451,6 +485,7 @@ evdsi <- function(
       pu_survey_costs = site_data[[site_survey_cost_column]],
       pu_purchase_costs = site_data[[site_management_cost_column]],
       pu_purchase_locked_in = site_management_locked_in,
+      pu_purchase_locked_out = site_management_locked_out,
       pu_env_data = ejx,
       xgb_parameters = xgb_parameters,
       xgb_train_folds = lapply(xgb_folds, `[[`, "train"),

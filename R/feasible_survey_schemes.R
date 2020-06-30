@@ -171,7 +171,7 @@ gurobi_feasible_survey_schemes <- function(cost, budget, locked_in,
                   nrow = 2, ncol = length(cost), byrow = TRUE)
   m <- list(
     obj = rep(1, length(costs)),
-    A = as(rcpp_feasible_actions_ilp_matrix(costs), "dgCMatrix"),
+    A = methods::as(rcpp_feasible_actions_ilp_matrix(costs), "dgCMatrix"),
     sense = c(rep("=", ncol(costs)), "<="),
     rhs = c(rep(1, ncol(costs)), budget),
     lb = rep(0, length(costs)),

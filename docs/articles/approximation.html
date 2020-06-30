@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
       </span>
     </div>
 
@@ -192,7 +192,7 @@
 <p>Next, we will simulate a survey scheme. This survey scheme will contain four of the five sites that have not previously been surveyed.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># generate survey scheme</span>
 <span class="no">site_data</span>$<span class="no">survey_scheme</span> <span class="kw">&lt;-</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/replace.html">replace</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">site_data</span>)), <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample.html">sample</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">site_data</span>$<span class="no">f1</span>)), <span class="fl">4</span>),
+  <span class="fu"><a href="https://rdrr.io/r/base/replace.html">replace</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span>(<span class="fl">FALSE</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">site_data</span>)), <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">site_data</span>$<span class="no">f1</span>)), <span class="fl">4</span>),
           <span class="fl">TRUE</span>)
 
 <span class="co"># print survey scheme</span>
