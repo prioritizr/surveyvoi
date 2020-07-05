@@ -16,7 +16,7 @@
 #' @param locked_in \code{logical} vector indicating if each planning unit
 #'   is (\code{TRUE}) locked into the solution or (\code{FALSE}) not. Defaults
 #'   to a vector of \code{FALSE} for each planning unit.
-
+#'
 #' @param locked_out \code{logical} vector indicating if each planning unit
 #'   is (\code{TRUE}) locked out of the solution or (\code{FALSE}) not. Defaults
 #'   to a vector of \code{FALSE} for each planning unit.
@@ -57,12 +57,6 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
   n <- nrow(x)
   ## create objective function
   obj <- c(rep(0, n), c(x))
-  ## create decision variable names
-  col_names <- c(paste0("X_", seq_len(n)),
-                 paste0("Y_", apply(expand.grid(n1 = seq_len(n),
-                                                n2 = seq_len(n)), 1,
-                                    function(x) paste(rev(x),
-                                                      collapse = "_"))))
   ## create constraint matrix
   A <- rcpp_pmedian_constraint_matrix(x, costs)
   A <- Matrix::sparseMatrix(i = A$i, j = A$j, x = A$x, index1 = FALSE)
