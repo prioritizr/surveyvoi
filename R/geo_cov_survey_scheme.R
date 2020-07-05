@@ -91,10 +91,15 @@ geo_cov_survey_scheme <- function(
   }
 
   # create geographic distance matrix
-  geo_dists <- sf::st_distance(site_data)
-  geo_dists <- matrix(as.numeric(geo_dists[]),
-                      ncol = ncol(geo_dists),
-                      nrow = nrow(geo_dists))
+  if (all(sapply(sf::st_geometry(site_data), inherits, "POINT"))) {
+    geo_dists <- as.matrix(dist(methods::as(site_data, "Spatial")@coords,
+                                method = "euclidean"))
+  } else {
+    geo_dists <- sf::st_distance(site_data)
+    geo_dists <- matrix(as.numeric(geo_dists[]),
+                        ncol = ncol(geo_dists),
+                        nrow = nrow(geo_dists))
+  }
 
   # rescale distances to avoid issues with large values
   geo_dists[] <- scales::rescale(geo_dists[], to = c(0, 1e+4))
