@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 0.0.10
+Version: 0.0.11
 Title: Survey Value of Information
 Description: Develop candidate survey schemes for sampling biodiversity, and
     and evaluate their return on investment using value of

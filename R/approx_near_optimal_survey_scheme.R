@@ -446,7 +446,8 @@ approx_near_optimal_survey_scheme <- function(
   if (isTRUE(verbose)) {
     pb <- progress::progress_bar$new(
       format = "  optimizing [:bar] :percent eta: :eta",
-      total = n_candidate_sites + 1, clear = FALSE, width = 60)
+      total = n_candidate_sites + 1, clear = FALSE, width = 60,
+      show_after = 0, force = TRUE)
     pb$tick(0)
   }
 
