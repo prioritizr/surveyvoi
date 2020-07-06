@@ -25,6 +25,9 @@ NULL
 #'   low chance of containing the target species).
 #'   Defaults to \code{NULL} such that no sites are locked out.
 #'
+#' @param verbose \code{logical} indicating if information should be
+#'   printed while generating the survey scheme(s). Defaults to \code{FALSE}.
+#'
 #' @details
 #' Ideally, the brute-force algorithm would be used to identify the optimal
 #' survey scheme. Unfortunately, it is not feasible to apply the brute-force
@@ -173,7 +176,8 @@ approx_near_optimal_survey_scheme <- function(
   n_approx_outcomes_per_replicate = 10000,
   method_approx_outcomes = "weighted_without_replacement",
   seed = 500,
-  n_threads = 1) {
+  n_threads = 1,
+  verbose = FALSE) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -295,7 +299,10 @@ approx_near_optimal_survey_scheme <- function(
       c("uniform_with_replacement", "uniform_without_replacement",
         "weighted_with_replacement", "weighted_without_replacement")),
     ## seed
-    assertthat::is.number(seed))
+    assertthat::is.number(seed),
+    ## verbose
+    assertthat::is.flag(verbose),
+    assertthat::noNA(verbose))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -434,6 +441,15 @@ approx_near_optimal_survey_scheme <- function(
                                    nrow = n_candidate_sites + 1)
   survey_solution_values <- numeric(n_candidate_sites + 1)
   survey_solution_values[1] <- mean(evd_current)
+
+  # initialize progress bar
+  if (isTRUE(verbose)) {
+    pb <- progress::progress_bar$new(
+      format = "  optimizing [:bar] :percent eta: :eta",
+      total = n_candidate_sites + 1, clear = FALSE, width = 60)
+    pb$tick(0)
+  }
+
   # iterate over the the total number of available sites
   for (s in (1 + seq_len(n_candidate_sites))) {
     # extract previous solution
@@ -516,6 +532,11 @@ approx_near_optimal_survey_scheme <- function(
     if (n_threads > 1) {
       doParallel::stopImplicitCluster()
       cl <- parallel::stopCluster(cl)
+    }
+
+    # update progress bar
+    if (isTRUE(verbose)) {
+      pb$tick()
     }
 
     # check to see if main loop should be exited

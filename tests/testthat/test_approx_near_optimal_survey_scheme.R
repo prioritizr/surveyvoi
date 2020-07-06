@@ -222,7 +222,8 @@ test_that("expected results (sparse)", {
     optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    verbose = TRUE)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
