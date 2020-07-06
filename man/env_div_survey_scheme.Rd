@@ -12,6 +12,7 @@ env_div_survey_scheme(
   method = "mahalanobis",
   locked_in_column = NULL,
   locked_out_column = NULL,
+  exclude_locked_out = FALSE,
   verbose = FALSE
 )
 }
@@ -50,6 +51,10 @@ the argument to \code{site_data} that contains \code{logical}
 locked out of the survey scheme.
 No missing (\code{NA}) values are permitted.
 Defaults to \code{NULL} such that no sites are locked out.}
+
+\item{exclude_locked_out}{\code{logical} should locked out planning units
+be entirely excluded from the optimization process?
+Defaults to \code{FALSE}.}
 
 \item{verbose}{\code{logical} indicating if information should be
 printed while generating survey scheme(s). Defaults to \code{FALSE}.}

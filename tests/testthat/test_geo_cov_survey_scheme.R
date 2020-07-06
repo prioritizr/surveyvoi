@@ -1,17 +1,15 @@
-context("env_div_survey_scheme")
+context("geo_cov_survey_scheme")
 
 test_that("single solution", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.3, 10),
-                   v2 = c(0.1, 0.2, 0.3, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.3, 10),
+                   y = c(0.1, 0.2, 0.3, 10),
                    locked_in = rep(FALSE, 4),
                    cost = rep(1, 4)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", 2, c("v1", "v2"), "euclidean")
+  r <- geo_cov_survey_scheme(x, "cost", 2)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -23,15 +21,13 @@ test_that("single solution", {
 test_that("multiple solutions", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.3, 10),
-                   v2 = c(0.1, 0.2, 0.3, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.3, 10),
+                   y = c(0.1, 0.2, 0.3, 10),
                    locked_in = rep(FALSE, 4),
                    cost = rep(1, 4)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", c(2, 3), c("v1", "v2"), "euclidean")
+  r <- geo_cov_survey_scheme(x, "cost", c(2, 3))
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 2)
@@ -44,15 +40,13 @@ test_that("multiple solutions", {
 test_that("variable costs", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.5, 10),
-                   v2 = c(0.1, 0.2, 0.5, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
+                   y = c(0.1, 0.2, 0.5, 10),
                    locked_in = rep(FALSE, 4),
                    cost = c(1, 100, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", 2, c("v1", "v2"), "euclidean")
+  r <- geo_cov_survey_scheme(x, "cost", 2)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -64,16 +58,13 @@ test_that("variable costs", {
 test_that("locked in", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.5, 10),
-                   v2 = c(0.1, 0.2, 0.5, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
+                   y = c(0.1, 0.2, 0.5, 10),
                    locked_in = c(TRUE, FALSE, TRUE, FALSE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", 2, c("v1", "v2"), "euclidean",
-                             "locked_in")
+  r <- geo_cov_survey_scheme(x, "cost", 2, "locked_in")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -85,16 +76,13 @@ test_that("locked in", {
 test_that("locked out", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.5, 10),
-                   v2 = c(0.1, 0.2, 0.5, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
+                   y = c(0.1, 0.2, 0.5, 10),
                    locked_out = c(FALSE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", 2, c("v1", "v2"), "euclidean",
-                             NULL, "locked_out")
+  r <- geo_cov_survey_scheme(x, "cost", 2, NULL, "locked_out")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -106,16 +94,14 @@ test_that("locked out", {
 test_that("locked out, exclude = TRUE", {
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.5, 10),
-                   v2 = c(0.1, 0.2, 0.5, 10),
+    tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
+                   y = c(0.1, 0.2, 0.5, 10),
                    locked_out = c(FALSE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- env_div_survey_scheme(x, "cost", 2, c("v1", "v2"), "euclidean",
-                             NULL, "locked_out", exclude_locked_out = TRUE)
+  r <- geo_cov_survey_scheme(x, "cost", 2, NULL, "locked_out",
+                             exclude_locked_out = TRUE)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)

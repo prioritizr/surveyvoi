@@ -41,6 +41,10 @@ NULL
 #'   No missing (\code{NA}) values are permitted.
 #'   Defaults to \code{NULL} such that no sites are locked out.
 #'
+#' @param exclude_locked_out \code{logical} should locked out planning units
+#'  be entirely excluded from the optimization process?
+#'  Defaults to \code{FALSE}.
+#'
 #' @param verbose \code{logical} indicating if information should be
 #'   printed while generating survey scheme(s). Defaults to \code{FALSE}.
 #'
@@ -86,7 +90,7 @@ NULL
 env_div_survey_scheme <- function(
   site_data, cost_column, survey_budget, env_vars_columns,
   method = "mahalanobis", locked_in_column = NULL, locked_out_column = NULL,
-  verbose = FALSE) {
+  exclude_locked_out = FALSE, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -103,6 +107,9 @@ env_div_survey_scheme <- function(
     all(assertthat::has_name(site_data, env_vars_columns)),
     all(sapply(cost_column, function(z) is.numeric(site_data[[z]]))),
     all(sapply(cost_column, function(z) assertthat::noNA(site_data[[z]]))),
+    ## exclude_locked_out
+    assertthat::is.flag(exclude_locked_out),
+    assertthat::noNA(exclude_locked_out),
     ## method
     assertthat::is.string(method),
     ## survey_budget
@@ -139,14 +146,38 @@ env_div_survey_scheme <- function(
     locked_out <- site_data[[locked_out_column]]
   }
 
+  # exclude locked out planning units if specified
+  if (isTRUE(exclude_locked_out)) {
+    cand_site_data <- site_data[!locked_out, , drop = FALSE]
+    cand_locked_in <- locked_in[!locked_out]
+    cand_locked_out <- locked_out[!locked_out]
+
+  } else {
+    cand_site_data <- site_data
+    cand_locked_in <- locked_in
+    cand_locked_out <- locked_out
+  }
+
   # create environmental distance matrix
   env_dists <-
-    as.matrix(vegan::vegdist(sf::st_drop_geometry(site_data)[, env_vars_columns,
-                                                             drop = FALSE],
-                             method = method))
+    as.matrix(vegan::vegdist(
+      sf::st_drop_geometry(cand_site_data)[, env_vars_columns, drop = FALSE],
+      method = method))
 
-  # return survey schemes
-  distance_based_prioritizations(
-    env_dists, survey_budget, site_data[[cost_column]],
-    locked_in, locked_out, verbose)
+  # run optimization
+  result <- distance_based_prioritizations(env_dists, survey_budget,
+    cand_site_data[[cost_column]], cand_locked_in, cand_locked_out, verbose)
+
+  # prepare output
+  if (isTRUE(exclude_locked_out)) {
+    out <- matrix(FALSE, nrow = nrow(result), ncol = nrow(site_data))
+    idx <- which(!locked_out)
+    for (i in seq_along(idx))
+      out[, idx[i]] <- result[, i]
+  } else {
+    out <- result
+  }
+
+  # return output
+  out
 }

@@ -45,7 +45,7 @@ NULL
 #' @export
 geo_cov_survey_scheme <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,
-  locked_out_column = NULL, verbose = FALSE) {
+  locked_out_column = NULL, exclude_locked_out = FALSE, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -56,6 +56,9 @@ geo_cov_survey_scheme <- function(
     is.numeric(site_data[[cost_column]]),
     assertthat::noNA(site_data[[cost_column]]),
     all(site_data[[cost_column]] >= 0),
+    ## exclude_locked_out
+    assertthat::is.flag(exclude_locked_out),
+    assertthat::noNA(exclude_locked_out),
     ## survey_budget
     is.numeric(survey_budget), assertthat::noNA(survey_budget),
     all(survey_budget >= 0))
@@ -90,12 +93,24 @@ geo_cov_survey_scheme <- function(
     locked_out <- site_data[[locked_out_column]]
   }
 
+  # exclude locked out planning units if specified
+  if (isTRUE(exclude_locked_out)) {
+    cand_site_data <- site_data[!locked_out, , drop = FALSE]
+    cand_locked_in <- locked_in[!locked_out]
+    cand_locked_out <- locked_out[!locked_out]
+
+  } else {
+    cand_site_data <- site_data
+    cand_locked_in <- locked_in
+    cand_locked_out <- locked_out
+  }
+
   # create geographic distance matrix
-  if (all(sapply(sf::st_geometry(site_data), inherits, "POINT"))) {
-    geo_dists <- as.matrix(dist(methods::as(site_data, "Spatial")@coords,
+  if (all(sapply(sf::st_geometry(cand_site_data), inherits, "POINT"))) {
+    geo_dists <- as.matrix(dist(methods::as(cand_site_data, "Spatial")@coords,
                                 method = "euclidean"))
   } else {
-    geo_dists <- sf::st_distance(site_data)
+    geo_dists <- sf::st_distance(cand_site_data)
     geo_dists <- matrix(as.numeric(geo_dists[]),
                         ncol = ncol(geo_dists),
                         nrow = nrow(geo_dists))
@@ -104,8 +119,20 @@ geo_cov_survey_scheme <- function(
   # rescale distances to avoid issues with large values
   geo_dists[] <- scales::rescale(geo_dists[], to = c(0, 1e+4))
 
-  # return survey schemes
-  distance_based_prioritizations(
-    geo_dists, survey_budget, site_data[[cost_column]],
-    locked_in, locked_out, verbose)
+  # run optimization
+  result <- distance_based_prioritizations(geo_dists, survey_budget,
+    cand_site_data[[cost_column]], cand_locked_in, cand_locked_out, verbose)
+
+  # prepare output
+  if (isTRUE(exclude_locked_out)) {
+    out <- matrix(FALSE, nrow = nrow(result), ncol = nrow(site_data))
+    idx <- which(!locked_out)
+    for (i in seq_along(idx))
+      out[, idx[i]] <- result[, i]
+  } else {
+    out <- result
+  }
+
+  # return output
+  out
 }
