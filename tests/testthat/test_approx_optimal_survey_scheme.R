@@ -55,7 +55,8 @@ test_that("expected results", {
     optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -105,7 +106,8 @@ test_that("consistent results", {
         total_budget = total_budget,
         xgb_parameters = xgb_model$parameters,
         n_approx_replicates = 10,
-        n_approx_outcomes_per_replicate = 100)
+        n_approx_outcomes_per_replicate = 100,
+        n_approx_states = 100)
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
@@ -155,7 +157,8 @@ test_that("consistent results (multiple threads)", {
         xgb_parameters = xgb_model$parameters,
         n_approx_replicates = 10,
         n_approx_outcomes_per_replicate = 100,
-        method_approx_outcomes = "uniform_without_replacement")
+        method_approx_outcomes = "uniform_without_replacement",
+        n_approx_states = 100)
     })
   })
   # verify that all repeat calculations are identical
@@ -220,7 +223,8 @@ test_that("expected results (sparse)", {
     optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)

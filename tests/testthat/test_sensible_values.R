@@ -606,7 +606,7 @@ test_that("evdsi >= evdci when solution is fixed", {
       e1 = rnorm(5),
       e2 = rnorm(5),
       survey_cost = c(1, 1, 1, 1, 1000),
-      scheme = c(TRUE, TRUE, FALSE, FALSE, TRUE),
+      scheme = c(FALSE, FALSE, FALSE, TRUE, TRUE),
       management_cost = c(10, 10, 10, 10, 10),
       locked_in = c(TRUE, FALSE, FALSE, FALSE, FALSE),
       locked_out = c(FALSE, TRUE, TRUE, TRUE, TRUE)),
@@ -623,7 +623,7 @@ test_that("evdsi >= evdci when solution is fixed", {
     target = c(0.5, 0.5))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
-  budget <- 1e+8
+  budget <- 1e+7
   gap <- 1e-4
   # calculate expected values
   ## evd current
@@ -666,5 +666,10 @@ test_that("evdsi >= evdci when solution is fixed", {
     site_management_locked_in_column = "locked_in",
     optimality_gap = gap)
   # tests
-  expect_gte(evd_si, evd_ci)
+  ## expect si greater than or approximately equal to ci
+  if (evd_si >= evd_ci) {
+    expect_gte(evd_si, evd_ci)
+  } else {
+    expect_lte(abs(evd_si - evd_ci), 1e-10)
+  }
 })

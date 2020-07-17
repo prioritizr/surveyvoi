@@ -6,7 +6,7 @@
 #include "rcpp_prioritization.h"
 #include "rcpp_posterior_probability_matrix.h"
 #include "rcpp_predict_missing_rij_data.h"
-#include "rcpp_expected_value_of_action.h"
+#include "rcpp_approx_expected_value_of_action.h"
 
 Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd &rij, // observed presence/absence matrix
@@ -38,7 +38,8 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   double optim_gap,    // optimality gap for prioritizations
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
-  std::string method_approx_outcomes) {
+  std::string method_approx_outcomes,
+  std::size_t n_approx_states) {
   // initialization
   /// constant variables
   const std::size_t n_pu = rij.cols();
@@ -51,6 +52,16 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
    std::vector<std::size_t> n_pu_model_prediction(n_f);
    for (std::size_t i = 0; i < n_f; ++i)
     n_pu_model_prediction[i] = pu_model_prediction_idx[i].size();
+
+  /// clamp number of approximation states to total number of states
+  mpz_class n_states_total;
+  mpz_class n_approx_states2 = n_approx_states;
+  if ((pij.cols() * pij.rows()) < 30) {
+    n_states(pij.cols() * pij.rows(), n_states_total);
+    n_states_total = n_states_total + 1; // increment to include all states
+    if (cmp(n_approx_states2, n_states_total) > 0)
+      n_approx_states = n_states_total.get_ui();
+  }
 
   /// clamp number of approximation outcomes to total number of outcomes across
   /// all features
@@ -124,6 +135,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   std::size_t curr_n_folds;
   double curr_expected_value_of_action_given_outcome;
   double curr_probability_of_outcome;
+  Eigen::MatrixXd curr_pij_log, curr_pij_log1m;
   Eigen::MatrixXd curr_oij = rij;
   Eigen::MatrixXd curr_pij(n_f, n_pu);
   curr_pij.setConstant(-100.0);
@@ -304,10 +316,15 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
       prioritize.get_solution(curr_solution);
 
       /// calculate expected value of the prioritisation
+      curr_pij_log = curr_pij;
+      curr_pij_log1m = curr_pij;
+      log_matrix(curr_pij_log);
+      log_1m_matrix(curr_pij_log1m);
       curr_expected_value_of_action_given_outcome =
-        expected_value_of_action(
-          curr_solution, curr_pij, obj_fun_preweight, obj_fun_postweight,
-          obj_fun_target);
+        approx_expected_value_of_action(
+          curr_solution, curr_pij, curr_pij_log, curr_pij_log1m,
+          obj_fun_preweight, obj_fun_postweight, obj_fun_target,
+          n_approx_states);
 
       /// calculate likelihood of outcome
       curr_probability_of_outcome = log_probability_of_outcome(
@@ -358,7 +375,8 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   double optim_gap,
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
-  std::string method_approx_outcomes) {
+  std::string method_approx_outcomes,
+  std::size_t n_approx_states) {
 
   // constant parameters
   const std::size_t n_f = rij.rows();
@@ -408,5 +426,5 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     total_budget, optim_gap,
     n_approx_replicates, n_approx_outcomes_per_replicate,
-    method_approx_outcomes);
+    method_approx_outcomes, n_approx_states);
 }

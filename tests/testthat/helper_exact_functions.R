@@ -1,8 +1,25 @@
 r_expected_value_of_action <- function(
   solution, prior_data, preweight, postweight, target) {
-    r_conservation_value_state(
-      prior_data[, solution > 0.5, drop = FALSE], preweight, postweight,
-      target, rep(ncol(prior_data), length(preweight)))
+  # subset prior data
+  total <- rep(ncol(prior_data), length(preweight))
+  prior_data <- prior_data[, solution > 0.5, drop = FALSE]
+  # determine number of states that affect solution quality
+  n_states_total <- rcpp_n_states(length(prior_data))
+  # calculate value
+  sum(vapply(seq_len(n_states_total), FUN.VALUE = numeric(1),
+             function(i) {
+    ## find the i'th state
+    curr_state <- rcpp_nth_state(i, prior_data)
+    ## calculate the conservation benefit given the state
+    curr_benefit_given_state <-
+      r_conservation_value_state(
+        curr_state, preweight, postweight, target, total)
+    ## calculate the probability of the state occurring
+    curr_prob_of_state <-
+      prod((curr_state * prior_data) + ((1 - curr_state) * (1 - prior_data)))
+    ## return expected value of action given state
+    curr_benefit_given_state * curr_prob_of_state
+  }))
 }
 
 r_expected_value_of_decision_given_current_info <- function(

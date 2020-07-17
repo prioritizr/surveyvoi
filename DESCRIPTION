@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 0.0.11
+Version: 0.0.12
 Title: Survey Value of Information
 Description: Develop candidate survey schemes for sampling biodiversity, and
     and evaluate their return on investment using value of
@@ -60,9 +60,10 @@ SystemRequirements:
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.1.0.9000
+RoxygenNote: 7.1.1
 Collate:
     'RcppExports.R'
+    'approx_evdci.R'
     'approx_evdsi.R'
     'evdsi.R'
     'internal.R'

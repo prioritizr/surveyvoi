@@ -1,3 +1,44 @@
+r_approx_expected_value_of_action <- function(
+  solution, prior_data, preweight, postweight, target, n_approx_states) {
+    # generate states
+    states <- rcpp_sample_n_weighted_states_without_replacement(
+      n_approx_states, prior_data)
+    # calculate values and probs
+    total <- rep(ncol(prior_data), length(preweight))
+    res <- vapply(states, FUN.VALUE = numeric(2), function(i) {
+      ## find the i'th state
+      curr_state <- rcpp_nth_state(i, prior_data)
+      ## calculate the conservation benefit given the state
+      curr_benefit_given_state <-
+        r_conservation_value_state(
+          curr_state[, solution, drop = FALSE], preweight, postweight, target,
+          total)
+      ## calculate the probability of the state occurring
+      curr_prob_of_state <-
+        prod((curr_state * prior_data) + ((1 - curr_state) * (1 - prior_data)))
+      ## return expected value of action given state
+      c(curr_benefit_given_state, curr_prob_of_state)
+    })
+    # calculated weighted sum
+    res[2, ] <- log(res[2, ])
+    total_prob <- rcpp_log_sum(res[2, ])
+    res <- res[, res[1, ] > 1e-10, drop = FALSE]
+    # print(res)
+    exp(rcpp_log_sum(log(res[1, ]) + (res[2, ] - total_prob)))
+}
+
+r_approx_expected_value_of_decision_given_current_info <- function(
+  prior_data, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight,
+  target, budget, gap, n_approx_states) {
+  # find optimal solution
+  solution <- rcpp_prioritization(
+    prior_data, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight,
+    target, budget, gap, "")$x
+  # calculate expected value
+  r_approx_expected_value_of_action(
+    solution, prior_data, preweight, postweight, target, n_approx_states)
+}
+
 r_approx_expected_value_of_decision_given_survey_scheme <- function(
     rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_model_prediction, pu_survey_costs,
@@ -5,22 +46,19 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
     pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
     total_budget, optim_gap,
-    n_approx_replicates, n_approx_outcomes_per_replicate) {
-  # generate outcomes
-  outcomes <- lapply(seq_len(n_approx_replicates), function(i) {
-    rcpp_sample_n_weighted_states_without_replacement(
-      n_approx_outcomes_per_replicate,
-      pij[survey_features, pu_survey_solution, drop = FALSE])
-  })
+    n_approx_replicates, n_approx_outcomes_per_replicate, n_approx_states) {
   # run calculations
   value <- sapply(seq_len(n_approx_replicates), function(i) {
+    outcomes <- rcpp_sample_n_weighted_states_without_replacement(
+      n_approx_outcomes_per_replicate,
+      pij[survey_features, pu_survey_solution, drop = FALSE])
     r_approx_expected_value_of_decision_given_survey_scheme_fixed_states(
       rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
       pu_survey_solution, pu_model_prediction, pu_survey_costs,
       pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
       pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds,
       xgb_test_folds, obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      total_budget, optim_gap, outcomes[[i]])
+      total_budget, optim_gap, outcomes, n_approx_states)
   })
   value
 }
@@ -32,7 +70,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    total_budget, optim_gap, outcomes) {
+    total_budget, optim_gap, outcomes, n_approx_states) {
   # init
   ## constants
   n_pu <- ncol(rij)
@@ -132,9 +170,9 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       remaining_budget, optim_gap, "")$x
 
     ## calculate approximate expected value of the prioritisation
-    curr_value <- r_expected_value_of_action(
+    curr_value <- r_approx_expected_value_of_action(
       curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
-      obj_fun_target)
+      obj_fun_target, n_approx_states)
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

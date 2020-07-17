@@ -10,8 +10,8 @@ test_that("equal weights", {
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  n_reps <- 3
-  n_outcomes_per_rep <- 4
+  n_reps <- 1
+  n_outcomes_per_rep <- 2
   # prepare data
   site_occ_columns <- c("f1", "f2")
   site_prb_columns <- c("p1", "p2")
@@ -68,7 +68,8 @@ test_that("equal weights", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
-    method_approx_outcomes = "weighted_without_replacement")
+    method_approx_outcomes = "weighted_without_replacement",
+    n_approx_states = 10)
   set.seed(1)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -93,7 +94,8 @@ test_that("equal weights", {
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    n_approx_states = 10)
   # tests
   expect_equal(r1, r2)
 })
@@ -110,8 +112,8 @@ test_that("variable weights", {
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   site_data$w1 <- runif(nrow(site_data)) + 1
   site_data$w2 <- runif(nrow(site_data)) + 1
-  n_reps <- 3
-  n_outcomes_per_rep <- 4
+  n_reps <- 1
+  n_outcomes_per_rep <- 2
   # prepare data
   site_occ_columns <- c("f1", "f2")
   site_prb_columns <- c("p1", "p2")
@@ -168,7 +170,8 @@ test_that("variable weights", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
-    method_approx_outcomes = "weighted_without_replacement")
+    method_approx_outcomes = "weighted_without_replacement",
+    n_approx_states = 10)
   set.seed(1)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -193,7 +196,8 @@ test_that("variable weights", {
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    n_approx_states = 10)
   # tests
   expect_equal(r1, r2)
 })
@@ -203,8 +207,8 @@ test_that("sparse", {
   RandomFields::RFoptions(seed = 501)
   set.seed(500)
   n_f <- 2
-  n_reps <- 3
-  n_outcomes_per_rep <- 4
+  n_reps <- 1
+  n_outcomes_per_rep <- 1
   site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
   feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   total_budget <- sum(site_data$management_cost * 0.8)
@@ -249,7 +253,6 @@ test_that("sparse", {
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
   # calculations
-  # calculations
   r1 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -276,7 +279,8 @@ test_that("sparse", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
-    method_approx_outcomes = "weighted_without_replacement")
+    method_approx_outcomes = "weighted_without_replacement",
+    n_approx_states = 10)
   set.seed(1)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -301,7 +305,8 @@ test_that("sparse", {
     total_budget = total_budget,
     optim_gap = 0,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    n_approx_states = 10)
   # tests
   expect_equal(r1, r2)
 })

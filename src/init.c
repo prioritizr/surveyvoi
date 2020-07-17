@@ -8,7 +8,9 @@
 */
 
 /* .Call calls */
-extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_action(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_conservation_value_amount(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_conservation_value_state(SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_action(SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -40,7 +42,9 @@ extern SEXP _surveyvoi_rcpp_which_state_sparse(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_xgboost(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme, 25},
+    {"_surveyvoi_rcpp_approx_expected_value_of_action",                       (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_action,                        6},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info",  (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_current_info,  10},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme, 26},
     {"_surveyvoi_rcpp_conservation_value_amount",                             (DL_FUNC) &_surveyvoi_rcpp_conservation_value_amount,                              5},
     {"_surveyvoi_rcpp_conservation_value_state",                              (DL_FUNC) &_surveyvoi_rcpp_conservation_value_state,                               5},
     {"_surveyvoi_rcpp_expected_value_of_action",                              (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_action,                               5},

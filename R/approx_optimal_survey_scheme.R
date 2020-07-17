@@ -120,6 +120,7 @@ approx_optimal_survey_scheme <- function(
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
   method_approx_outcomes = "weighted_without_replacement",
+  n_approx_states = 1000,
   seed = 500,
   n_threads = 1) {
   # assert arguments are valid
@@ -233,6 +234,9 @@ approx_optimal_survey_scheme <- function(
     ## n_approx_replicates
     assertthat::is.count(n_approx_replicates),
     assertthat::noNA(n_approx_replicates),
+    ## n_approx_states
+    assertthat::is.count(n_approx_states),
+    assertthat::noNA(n_approx_states),
     ## n_approx_outcomes_per_replicate
     assertthat::is.count(n_approx_outcomes_per_replicate),
     assertthat::noNA(n_approx_outcomes_per_replicate),
@@ -370,9 +374,10 @@ approx_optimal_survey_scheme <- function(
   # subset for debugging
   new_info_idx <- which(rowSums(all_feasible_schemes) > 0.5)
   current_idx <- which(rowSums(all_feasible_schemes) < 0.5)
+
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
-    rcpp_expected_value_of_decision_given_current_info(
+    rcpp_approx_expected_value_of_decision_given_current_info(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
@@ -381,7 +386,8 @@ approx_optimal_survey_scheme <- function(
       postweight = feature_data[[feature_postweight_column]],
       target = feature_data[[feature_target_column]],
       budget = total_budget,
-      gap = optimality_gap)
+      gap = optimality_gap,
+      n_approx_states = n_approx_states)
   })
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -436,7 +442,8 @@ approx_optimal_survey_scheme <- function(
         optim_gap = optimality_gap,
         n_approx_replicates = n_approx_replicates,
         n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-        method_approx_outcomes = method_approx_outcomes)
+        method_approx_outcomes = method_approx_outcomes,
+        n_approx_states = n_approx_states)
     })
   })
   ## kill cluster

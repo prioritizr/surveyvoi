@@ -36,6 +36,7 @@ double expected_value_of_decision_given_survey_scheme(
   double total_budget, // total budget for surveying + monitor costs
   double optim_gap    // optimality gap for prioritizations
 ) {
+
   // initialization
   /// constant variables
   const std::size_t n_pu = rij.cols();
@@ -120,6 +121,7 @@ double expected_value_of_decision_given_survey_scheme(
     std::numeric_limits<double>::infinity();
   Eigen::MatrixXd curr_oij = rij;
   Eigen::MatrixXd curr_mij = rij;
+  Eigen::MatrixXd curr_pij_log, curr_pij_log1m;
   Eigen::MatrixXd curr_pij(n_f, n_pu);
   curr_pij.setConstant(-100.0);
   Eigen::MatrixXd curr_total_probability_of_model_positive(n_f_survey, n_pu);
@@ -278,10 +280,14 @@ double expected_value_of_decision_given_survey_scheme(
     prioritize.get_solution(curr_solution);
 
     /// calculate expected value of the prioritisation
+    curr_pij_log = curr_pij;
+    curr_pij_log1m = curr_pij;
+    log_matrix(curr_pij_log);
+    log_1m_matrix(curr_pij_log1m);
     curr_expected_value_of_action_given_outcome =
       std::log(expected_value_of_action(
-        curr_solution, curr_pij, obj_fun_preweight, obj_fun_postweight,
-        obj_fun_target));
+        curr_solution, curr_pij, curr_pij_log, curr_pij_log1m,
+        obj_fun_preweight, obj_fun_postweight, obj_fun_target));
 
     /// calculate likelihood of outcome
     curr_probability_of_outcome = log_probability_of_outcome(

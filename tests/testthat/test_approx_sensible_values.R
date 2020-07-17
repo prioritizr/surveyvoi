@@ -54,7 +54,8 @@ test_that("lower voi when most of budget spent on surveys", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -79,7 +80,8 @@ test_that("lower voi when most of budget spent on surveys", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -142,7 +144,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -167,7 +170,8 @@ test_that("larger optimality gap produces lower voi of survey scheme", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -228,7 +232,8 @@ test_that("different voi when xgboost models trained with different weights", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   r2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -254,7 +259,8 @@ test_that("different voi when xgboost models trained with different weights", {
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_true(all(is.finite(r1)))
   expect_true(all(is.finite(r2)))
@@ -316,7 +322,8 @@ test_that("identical outputs given identical inputs", {
       seed = 1,
       n_approx_replicates = n_reps,
       n_approx_outcomes_per_replicate = n_states_per_rep,
-      method_approx_outcomes = "uniform_without_replacement")
+      method_approx_outcomes = "uniform_without_replacement",
+      n_approx_states = 100)
   })
   # tests
   for (i in seq_along(r)) {
@@ -358,7 +365,7 @@ test_that("current <= optimal info, when all pu selected", {
   n_reps <- 10
   n_states_per_rep <- 20
   # calculate expected values
-  evd_current <- evdci(
+  evd_current <- approx_evdci(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2"),
@@ -373,7 +380,8 @@ test_that("current <= optimal info, when all pu selected", {
     feature_target_column = "target",
     total_budget = 100,
     site_management_locked_in_column = "locked_in",
-    optimality_gap = 0)
+    optimality_gap = 0,
+    n_approx_states = 100)
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -397,7 +405,8 @@ test_that("current <= optimal info, when all pu selected", {
     optimality_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_true(all(rep(evd_current, n_reps) <= attr(evd_ss, "ev")[1, ]))
 })
@@ -436,7 +445,7 @@ test_that("current < optimal info, some pu selected", {
   n_reps <- 3
   n_states_per_rep <- 1000
   # calculate expected values
-  evd_current <- evdci(
+  evd_current <- approx_evdci(
     site_data = site_data,
     feature_data = feature_data,
     site_occupancy_columns = c("f1", "f2"),
@@ -451,7 +460,8 @@ test_that("current < optimal info, some pu selected", {
     feature_target_column = "target",
     total_budget = budget,
     site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    optimality_gap = gap,
+    n_approx_states = 100)
   evd_ss <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -475,12 +485,13 @@ test_that("current < optimal info, some pu selected", {
     optimality_gap = gap,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = 100)
   # tests
   expect_true(all(attr(evd_ss, "ev")[1, ] > evd_current))
 })
 
-test_that("approx = exact, when all states used (evdsi)", {
+test_that("approx ~= exact, when many states used (evdsi)", {
   # data
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
@@ -494,7 +505,8 @@ test_that("approx = exact, when all states used (evdsi)", {
   xgb_parameters <-
     list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
               nrounds = 3))[rep(1, n_f)]
-  n_states_per_rep <- n_states(nrow(site_data), nrow(feature_data))
+  n_states_per_rep <- 100
+  n_approx_states <- 20000
   # prepare data
   site_occ_columns <- paste0("f", seq_len(n_f))
   site_prb_columns <- paste0("p", seq_len(n_f))
@@ -524,7 +536,8 @@ test_that("approx = exact, when all states used (evdsi)", {
     seed = 1,
     n_approx_replicates = 5,
     n_approx_outcomes_per_replicate = n_states_per_rep,
-    method_approx_outcomes = "uniform_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement",
+    n_approx_states = n_approx_states)
   r2 <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -547,7 +560,7 @@ test_that("approx = exact, when all states used (evdsi)", {
     xgb_n_folds = rep(5, n_f),
     optimality_gap = 0,
     seed = 1)
-  expect_lte(max(abs(r1 - r2)), 1e-11)
+  expect_lte(max(abs(r1 - r2)), 0.1)
 })
 
 test_that("locking out planning units lowers voi", {
@@ -605,7 +618,8 @@ test_that("locking out planning units lowers voi", {
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
     optimality_gap = gap,
-    n_approx_outcomes_per_replicate = 20)
+    n_approx_outcomes_per_replicate = 20,
+    n_approx_states = 100)
   evd_approx_si2 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -628,7 +642,8 @@ test_that("locking out planning units lowers voi", {
     site_management_locked_in_column = "locked_in",
     site_management_locked_out_column = "locked_out",
     optimality_gap = gap,
-    n_approx_outcomes_per_replicate = 20)
+    n_approx_outcomes_per_replicate = 20,
+    n_approx_states = 100)
   ## evd approx optimal
   evd_approx_opt1 <- approx_optimal_survey_scheme(
     site_data = site_data,
@@ -651,7 +666,8 @@ test_that("locking out planning units lowers voi", {
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
     optimality_gap = gap,
-    n_approx_outcomes_per_replicate = 20)
+    n_approx_outcomes_per_replicate = 20,
+    n_approx_states = 100)
   evd_approx_opt2 <- approx_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -674,7 +690,8 @@ test_that("locking out planning units lowers voi", {
     site_management_locked_in_column = "locked_in",
     site_management_locked_out_column = "locked_out",
     optimality_gap = gap,
-    n_approx_outcomes_per_replicate = 20)
+    n_approx_outcomes_per_replicate = 20,
+    n_approx_states = 100)
   # tests
   expect_true(all(evd_approx_si2 < evd_approx_si1))
   expect_lt(max(attr(evd_approx_opt2, "ev")),

@@ -33,8 +33,10 @@ approx_near_optimal_survey_scheme(
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
   method_approx_outcomes = "weighted_without_replacement",
+  n_approx_states = 1000,
   seed = 500,
-  n_threads = 1
+  n_threads = 1,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -225,6 +227,10 @@ state, and weighted sampling methods are more likely to return
 outcomes with a higher prior probability of occurring.
 Defaults to \code{"weighted_without_replacement"}.}
 
+\item{n_approx_states}{\code{integer} number of states to
+use per replicate per state for approximation calculations.
+Defaults to 1000.}
+
 \item{seed}{\code{integer} state of the random number generator for
 partitioning data into folds cross-validation and fitting \pkg{xgboost}
 models. It is also used for generating outcomes.
@@ -232,6 +238,9 @@ This parameter must remain the same to compare results from different
 functions using the approximation methods. Defaults to 500.}
 
 \item{n_threads}{\code{integer} number of threads to use for computation.}
+
+\item{verbose}{\code{logical} indicating if information should be
+printed while generating the survey scheme(s). Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
