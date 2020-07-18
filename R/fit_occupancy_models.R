@@ -34,6 +34,10 @@ NULL
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 100.
 #'
+#' @param tree_method \code{character} method used for constructing trees.
+#'   Available options are: \code{"auto"}, \code{"exact"}, \code{"approx"},
+#'   and \code{"hist"}. Defaults to \code{"auto"}.
+#'
 #' @param n_rounds \code{numeric} model rounds for model fitting
 #'   See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 1000.
@@ -163,7 +167,7 @@ NULL
 #' @export
 fit_occupancy_models <- function(
   site_data, site_occupancy_columns, site_env_vars_columns, parameters,
-  early_stopping_rounds = 100, n_rounds = 1000,
+  early_stopping_rounds = 100, tree_method = "auto", n_rounds = 1000,
   n_folds = rep(5, length(site_occupancy_columns)),
   n_random_search_iterations = 10000,
   site_weight_columns = NULL, n_threads = 1, seed = 500, verbose = FALSE) {
@@ -187,6 +191,9 @@ fit_occupancy_models <- function(
     assertthat::noNA(early_stopping_rounds),
     assertthat::is.count(seed),
     assertthat::noNA(seed),
+    assertthat::is.string(tree_method),
+    assertthat::noNA(tree_method),
+    tree_method %in% c("auto", "hist", "exact", "approx"),
     assertthat::is.count(n_threads), assertthat::noNA(n_threads),
     is.list(parameters),
     isTRUE(n_random_search_iterations <= prod(lengths(parameters))))
@@ -282,6 +289,7 @@ fit_occupancy_models <- function(
                  folds = f[[i]],
                  parameters = parameters,
                  early_stopping_rounds = early_stopping_rounds,
+                 tree_method = tree_method,
                  n_rounds = n_rounds,
                  n_folds = n_folds[i],
                  n_random_search_iterations = n_random_search_iterations,
@@ -353,8 +361,9 @@ fit_occupancy_models <- function(
 }
 
 #' @noRd
-tune_model <- function(data, folds, parameters, early_stopping_rounds, n_rounds,
-  n_folds, n_random_search_iterations, n_threads, verbose) {
+tune_model <- function(data, folds, parameters, early_stopping_rounds,
+  tree_method, n_rounds, n_folds, n_random_search_iterations, n_threads,
+  verbose) {
   # assert arguments are valid
   assertthat::assert_that(
     isTRUE(n_folds == length(folds$train)),
@@ -364,6 +373,8 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds, n_rounds,
     assertthat::noNA(n_random_search_iterations),
     assertthat::is.count(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
+    assertthat::is.string(tree_method),
+    assertthat::noNA(tree_method),
     assertthat::is.count(n_threads),
     assertthat::noNA(n_threads),
     is.list(parameters),
@@ -408,7 +419,8 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds, n_rounds,
       params = list(objective = p$objective, verbose = 0,
                     max_depth = p$max_depth, eta = p$eta, nthread = 1,
                     lambda = p$lambda, subsample = p$subsample,
-                    colsample_bytree = p$colsample_bytree),
+                    colsample_bytree = p$colsample_bytree,
+                    tree_method = tree_method),
       data = xgboost::xgb.DMatrix(data$x, label = data$y, weight = data$w),
       folds = folds$test, train_folds = folds$train,
       nrounds = n_rounds, early_stopping_rounds = early_stopping_rounds,
@@ -437,6 +449,7 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds, n_rounds,
       nrounds = cv$nrounds[k],
       scale_pos_weight = spw,
       lambda = full_parameters$lambda[k],
+      tree_method = tree_method,
       subsample = full_parameters$subsample[k],
       colsample_bytree = full_parameters$colsample_bytree[k],
       objective = as.character(full_parameters$objective[k])),

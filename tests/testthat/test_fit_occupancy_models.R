@@ -18,6 +18,7 @@ test_that("single species", {
   suppressWarnings({
     r <- fit_occupancy_models(
       x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
+      tree_method = "hist",
       parameters = tuning_parameters, n_random_search_iterations = 20)
   })
   # tests
