@@ -88,7 +88,7 @@ validate_xgboost_parameters <- function(x) {
     assertthat::assert_that(
       assertthat::is.string(z$tree_method),
       z$tree_method %in% c("auto", "exact", "hist", "approx"),
-      msg = paste("invalid tree_method paramter in xgb_parameters"))
+      msg = paste("invalid tree_method parameter in xgb_parameters"))
     }
     extra_names <- names(z)[!names(z) %in% param_names]
     assertthat::assert_that(
