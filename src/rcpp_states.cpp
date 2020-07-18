@@ -42,37 +42,9 @@ std::size_t n_states(std::size_t n) {
 }
 
 void nth_state(mpz_class &n0, Eigen::MatrixXd &matrix) {
-  // create c-style version of gmpxx object
-  mpz_t n;
-  mpz_init_set(n, n0.get_mpz_t());
-  // if n is equal to zero then simply set all values to zero and exit
-  if (mpz_cmp_ui(n, 0) == 0) {
-    matrix.setZero();
-    return;
-  }
-  // initialization
-  const std::size_t n_cells = matrix.size();
-  mpz_t mask, bitwise_and, n2;
-  mpz_init(mask);
-  mpz_init(bitwise_and);
-  mpz_init(n2);
-  mpz_set(n2, n);
-  mpz_set_ui(mask, 1U << (n_cells - 1));
-  // store n'th state by converting the integer to binary representation,
-  // see https://stackoverflow.com/a/31578829/3483791
-  auto j = matrix.data();
-  for (std::size_t i = 0; i < n_cells; i++) {
-    mpz_and(bitwise_and, n2, mask);
-    *j = (mpz_cmp_ui(bitwise_and, 0) > 0) ? 1.0 : 0.0;
-    mpz_mul_2exp(n2, n2, 1);
-    ++j;
-  }
-  // clean-up
-  mpz_clear(mask);
-  mpz_clear(bitwise_and);
-  mpz_clear(n2);
-  mpz_clear(n);
-  // return void
+  std::vector<std::size_t> idx(matrix.size());
+  std::iota(idx.begin(), idx.end(), 0);
+  nth_state_sparse(n0, idx, matrix);
   return;
 }
 
@@ -80,43 +52,22 @@ void nth_state_sparse(
   mpz_class &n0,
   std::vector<std::size_t> &idx,
   Eigen::MatrixXd &matrix) {
-  // create c-style version of gmpxx object
-  mpz_t n;
-  mpz_init_set(n, n0.get_mpz_t());
-  // if n is equal to zero then simply set all values to zero and exit
-  if (mpz_cmp_ui(n, 0) == 0) {
-    for (auto itr = idx.cbegin(); itr != idx.cend(); ++itr)
-      matrix(*itr) = 0.0;
-    return;
+  // convert integer to string
+  std::string binary_string = n0.get_str(2);
+  // reset matrix
+  for (auto itr = idx.cbegin(); itr != idx.cend(); ++itr)
+    matrix(*itr) = 0.0;
+  // if n is not equal to zero then loop over each value and store values
+  std::string x;
+  auto str_itr = binary_string.rbegin();
+  if (binary_string != "0") {
+    for (auto matrix_itr = idx.rbegin();
+         (matrix_itr != idx.rend()) && (str_itr != binary_string.rend());
+         ++matrix_itr, ++str_itr) {
+      x = *str_itr;
+      matrix(*matrix_itr) = (x == "1") ? 1.0 : 0.0;
+    }
   }
-  // initialization
-  std::size_t n_cells = idx.size();
-  mpz_t mask, bitwise_and, n2;
-  mpz_init(mask);
-  mpz_init(bitwise_and);
-  mpz_init(n2);
-  mpz_set(n2, n);
-  mpz_set_ui(mask, 1U << (n_cells - 1));
-  // store n'th state by converting the integer to binary representation,
-  // see https://stackoverflow.com/a/31578829/3483791
-  auto j = idx.cbegin();
-  for (std::size_t i = 0; i < n_cells; i++) {
-    // original c++ implementation
-    /// matrix(*j) = (n & mask) ? 1.0 : 0.0;
-    /// n <<= 1;
-    /// ++j;
-
-    // gmp implementation for large integers
-    mpz_and(bitwise_and, n2, mask);
-    matrix(*j) = (mpz_cmp_ui(bitwise_and, 0) > 0) ? 1.0 : 0.0;
-    mpz_mul_2exp(n2, n2, 1);
-    ++j;
-  }
-  // clean-up
-  mpz_clear(mask);
-  mpz_clear(bitwise_and);
-  mpz_clear(n2);
-  mpz_clear(n);
   // return void
   return;
 }
