@@ -7,7 +7,8 @@ test_that("lower voi when most of budget spent on surveys", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites = 8, n_features = n_f, 0.5)
+  feature_data$target <- c(1, 1)
   total_budget <- 5
   # manually define costs
   site_data$management_cost <- 0.1
@@ -40,13 +41,10 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1)
   r2 <- evdsi(
     site_data = site_data,
@@ -62,98 +60,18 @@ test_that("lower voi when most of budget spent on surveys", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1)
   # tests
   expect_true(is.finite(r1))
   expect_true(is.finite(r2))
   expect_gt(r1, 0)
   expect_gt(r2, 0)
-  expect_gt(r2, r1)
-})
-
-test_that("larger optimality gap produces lower voi of survey scheme", {
-  # initialize rng
-  set.seed(501)
-  RandomFields::RFoptions(seed = 501)
-  # data
-  n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
-  total_budget <- 5
-  # manually define costs
-  site_data$management_cost <- 0.1
-  site_data$survey_cost <- c(4.8, rep(0.01, 7))
-  # create surveys
-  site_data$survey1 <- FALSE
-  site_data$survey1[1] <- TRUE
-  site_data$survey2 <- FALSE
-  site_data$survey2[c(3, 6)] <- TRUE
-  # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
-  site_env_columns <- c("e1", "e2", "e3")
-  # prepare xgboost inputs
-  xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <-
-    list(list(objective = "binary:logistic", scale_pos_weight = 1.5,
-              nrounds = 8, eta = 0.1))[rep(1, 2)]
-  # calculations
-  r1 <- evdsi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_occupancy_columns = site_occ_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_survey_scheme_column = "survey1",
-    site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",
-    feature_survey_column = "survey",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
-    feature_target_column = "target",
-    total_budget = total_budget,
-    xgb_parameters = xgb_parameters,
-    xgb_n_folds = rep(5, n_f),
-    optimality_gap = 100,
-    seed = 1)
-  r2 <- evdsi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_occupancy_columns = site_occ_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_survey_scheme_column = "survey2",
-    site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",
-    feature_survey_column = "survey",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
-    feature_target_column = "target",
-    total_budget = total_budget,
-    xgb_parameters = xgb_parameters,
-    xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
-    seed = 1)
-  # tests
-  expect_true(is.finite(r1))
-  expect_true(is.finite(r2))
-  expect_gt(r1, 0)
-  expect_gt(r2, 0)
+  expect_lte(r1, 1)
+  expect_lte(r2, 1)
   expect_gt(r2, r1)
 })
 
@@ -164,7 +82,8 @@ test_that("different voi when xgboost models trained with different weights", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites = 12, n_features = n_f, 0.5)
+  feature_data$target <- c(2, 3)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$w1 <- (runif(nrow(site_data)) * 100) + 1
   site_data$w2 <- (runif(nrow(site_data)) * 100) + 1
@@ -196,13 +115,10 @@ test_that("different voi when xgboost models trained with different weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1)
   r2 <- evdsi(
     site_data = site_data,
@@ -219,20 +135,19 @@ test_that("different voi when xgboost models trained with different weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1)
   # tests
   expect_true(is.finite(r1))
   expect_true(is.finite(r2))
   expect_gt(r1, 0)
   expect_gt(r2, 0)
-  expect_gte(abs(r2 - r1), 1e-3)
+  expect_lte(r1, 1)
+  expect_lte(r2, 1)
+  expect_gte(abs(r2 - r1), 1e-10)
 })
 
 test_that("identical outputs given identical inputs", {
@@ -242,7 +157,8 @@ test_that("identical outputs given identical inputs", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites = 8, n_features = n_f, 0.5)
+  feature_data$target <- c(2, 1)
   total_budget <- 5
   # manually define costs
   site_data$management_cost <- 0.1
@@ -275,18 +191,16 @@ test_that("identical outputs given identical inputs", {
       feature_survey_specificity_column = "survey_specificity",
       feature_model_sensitivity_column = "model_sensitivity",
       feature_model_specificity_column = "model_specificity",
-      feature_preweight_column = "preweight",
-      feature_postweight_column = "postweight",
       feature_target_column = "target",
       total_budget = total_budget,
       xgb_parameters = xgb_parameters,
       xgb_n_folds = rep(5, n_f),
-      optimality_gap = 0,
       seed = 1)
   })
   # tests
   expect_true(all(is.finite(r)))
   expect_true(all(r > 0))
+  expect_true(all(r <= 1))
   expect_lte(abs(diff(range(r))), 1e-10)
 })
 
@@ -313,8 +227,6 @@ test_that("current <= optimal info, when all pu selected", {
     survey_specificity = rep(0.9, 2),
     model_sensitivity = rep(0.8, 2),
     model_specificity = rep(0.85, 2),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
@@ -329,12 +241,9 @@ test_that("current <= optimal info, when all pu selected", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = 100,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = 0)
+    site_management_locked_in_column = "locked_in")
   evd_ss <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -348,14 +257,11 @@ test_that("current <= optimal info, when all pu selected", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = 100,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = 0)
+    site_management_locked_in_column = "locked_in")
   # tests
   expect_lte(evd_current, max(attr(evd_ss, "ev")))
 })
@@ -383,13 +289,10 @@ test_that("current < optimal info, some pu selected", {
     survey_specificity = rep(0.9, 2),
     model_sensitivity = rep(0.8, 2),
     model_specificity = rep(0.85, 2),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   budget <- 25
-  gap <- 1e-4
   # calculate expected values
   evd_current <- evdci(
     site_data = site_data,
@@ -401,12 +304,9 @@ test_that("current < optimal info, some pu selected", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   evd_ss <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -420,14 +320,11 @@ test_that("current < optimal info, some pu selected", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   # tests
   expect_gt(max(attr(evd_ss, "ev")), evd_current)
 })
@@ -457,13 +354,10 @@ test_that("locking out planning units lowers voi", {
     survey_specificity = rep(0.9, 2),
     model_sensitivity = rep(0.8, 2),
     model_specificity = rep(0.85, 2),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   budget <- 50000
-  gap <- 1e-4
   # calculate expected values
   ## evd current
   evd_ci1 <- evdci(
@@ -476,12 +370,9 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   evd_ci2 <- evdci(
     site_data = site_data,
     feature_data = feature_data,
@@ -492,13 +383,10 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     site_management_locked_in_column = "locked_in",
-    site_management_locked_out_column = "locked_out",
-    optimality_gap = gap)
+    site_management_locked_out_column = "locked_out")
   ## evdsi
   evd_si1 <- evdsi(
     site_data = site_data,
@@ -514,13 +402,10 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     xgb_parameters = xgb_parameters,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   evd_si2 <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -535,14 +420,11 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    site_management_locked_out_column = "locked_out",
-    optimality_gap = gap)
+    site_management_locked_out_column = "locked_out")
   ## evd optimal
   evd_opt1 <- optimal_survey_scheme(
     site_data = site_data,
@@ -557,14 +439,11 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     survey_budget = 80,
     xgb_parameters = xgb_parameters,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   evd_opt2 <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
@@ -578,15 +457,12 @@ test_that("locking out planning units lowers voi", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     survey_budget = 80,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    site_management_locked_out_column = "locked_out",
-    optimality_gap = gap)
+    site_management_locked_out_column = "locked_out")
   # tests
   expect_lt(evd_ci2, evd_ci1)
   expect_lt(evd_si2, evd_si1)
@@ -618,13 +494,10 @@ test_that("evdsi >= evdci when solution is fixed", {
     survey_specificity = rep(0.9, 2),
     model_sensitivity = rep(0.8, 2),
     model_specificity = rep(0.85, 2),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(0.5, 0.5))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 1.5,
                               objective = "binary:logistic"))[rep(1, 2)]
   budget <- 1e+8
-  gap <- 1e-4
   # calculate expected values
   ## evd current
   evd_ci <- evdci(
@@ -637,12 +510,9 @@ test_that("evdsi >= evdci when solution is fixed", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   ## evdsi
   evd_si <- evdsi(
     site_data = site_data,
@@ -658,13 +528,10 @@ test_that("evdsi >= evdci when solution is fixed", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = budget,
     xgb_parameters = xgb_parameters,
-    site_management_locked_in_column = "locked_in",
-    optimality_gap = gap)
+    site_management_locked_in_column = "locked_in")
   # tests
   expect_gte(evd_si, evd_ci)
 })

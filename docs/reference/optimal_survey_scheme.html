@@ -74,7 +74,7 @@ calculating the expected value of the decision given a survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
       </span>
     </div>
 
@@ -152,8 +152,6 @@ calculating the expected value of the decision given a survey scheme.</p>
   <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>feature_model_sensitivity_column</span>,
   <span class='no'>feature_model_specificity_column</span>,
-  <span class='no'>feature_preweight_column</span>,
-  <span class='no'>feature_postweight_column</span>,
   <span class='no'>feature_target_column</span>,
   <span class='no'>total_budget</span>,
   <span class='no'>survey_budget</span>,
@@ -162,7 +160,6 @@ calculating the expected value of the decision given a survey scheme.</p>
   <span class='kw'>site_management_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>site_survey_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>optimality_gap</span> <span class='kw'>=</span> <span class='fl'>0</span>,
   <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>feature_data</span>)),
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
@@ -275,26 +272,6 @@ one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
-      <th>feature_preweight_column</th>
-      <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(preweight\)
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have <code>numeric</code> values that
-are equal to or greater than zero. No missing (<code>NA</code>) values are
-permitted in this column.</p></td>
-    </tr>
-    <tr>
-      <th>feature_postweight_column</th>
-      <td><p><code>character</code> name of the column in the
-argument to <code>feature_data</code> that contains the \(postweight\)
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have <code>numeric</code> values that
-are equal to or greater than zero. No missing (<code>NA</code>) values are
-permitted in this column.</p></td>
-    </tr>
-    <tr>
       <th>feature_target_column</th>
       <td><p><code>character</code> name of the column in the
 argument to <code>feature_data</code> that contains the \(target\)
@@ -368,13 +345,6 @@ Defaults to <code>NULL</code> such that prior data is calculated automatically
 using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></td>
     </tr>
     <tr>
-      <th>optimality_gap</th>
-      <td><p><code>numeric</code> relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10% of optimality. Defaults to 0.</p></td>
-    </tr>
-    <tr>
       <th>site_weight_columns</th>
       <td><p><code>character</code> name of columns in
 <code>site_data</code> containing weights for model fitting for each
@@ -433,7 +403,9 @@ this algorithm, it can take a very long time to complete.</p>
 <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>15</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>,
+                                      <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='no'>feature_data</span>$<span class='no'>target</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='fl'>3</span>, <span class='fl'>3</span>)
 
 <span class='co'># preview simulated data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 15 features and 9 fields
@@ -459,13 +431,12 @@ this algorithm, it can take a very long time to complete.</p>
 #&gt; </span><span style='color: #555555;'>13</span><span>        5.96            70.3 -</span><span style='color: #BB0000;'>0.714</span><span>   -</span><span style='color: #BB0000;'>0.541</span><span> -</span><span style='color: #BB0000;'>0.077</span><span style='color: #BB0000;text-decoration: underline;'>7</span><span>     1     0 0.486 
 #&gt; </span><span style='color: #555555;'>14</span><span>        3.64            67.7  0.481    0.271 -</span><span style='color: #BB0000;'>0.868</span><span>      0     0 0.238 
 #&gt; </span><span style='color: #555555;'>15</span><span>        7.95            72.8  2.33     1.64   0.629     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.595 
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 9</span><span>
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.964            0.827            0.703
 #&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.960            0.835            0.800
-#&gt; </span><span style='color: #555555;'># ... with 4 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, preweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   postweight </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
@@ -486,15 +457,14 @@ this algorithm, it can take a very long time to complete.</p>
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_cost"</span>,
   <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
-  <span class='st'>"preweight"</span>, <span class='st'>"postweight"</span>, <span class='st'>"target"</span>,
-  <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%  |                                                                              |======================================================================| 100%</div><div class='input'>
+  <span class='st'>"target"</span>, <span class='no'>total_budget</span>, <span class='no'>survey_budget</span>, <span class='no'>xgb_parameters</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=========                                                             |  12%  |                                                                              |==================                                                    |  25%  |                                                                              |==========================                                            |  38%  |                                                                              |===================================                                   |  50%  |                                                                              |============================================                          |  62%  |                                                                              |====================================================                  |  75%  |                                                                              |=============================================================         |  88%  |                                                                              |======================================================================| 100%</div><div class='input'>
 <span class='co'># print result</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>opt_survey</span>)</div><div class='output co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7] [,8]  [,9] [,10] [,11] [,12]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE TRUE FALSE FALSE FALSE FALSE
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>opt_survey</span>)</div><div class='output co'>#&gt;      [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11] [,12]
+#&gt; [1,] TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 #&gt;      [,13] [,14] [,15]
 #&gt; [1,] FALSE FALSE FALSE
 #&gt; attr(,"ev")
-#&gt; [1] 89.93912</div><div class='input'>
+#&gt; [1] 0.990081</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

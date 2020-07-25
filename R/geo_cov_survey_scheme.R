@@ -107,8 +107,9 @@ geo_cov_survey_scheme <- function(
 
   # create geographic distance matrix
   if (all(sapply(sf::st_geometry(cand_site_data), inherits, "POINT"))) {
-    geo_dists <- as.matrix(dist(methods::as(cand_site_data, "Spatial")@coords,
-                                method = "euclidean"))
+    geo_dists <- as.matrix(
+      stats::dist(methods::as(cand_site_data, "Spatial")@coords,
+                  method = "euclidean"))
   } else {
     geo_dists <- sf::st_distance(cand_site_data)
     geo_dists <- matrix(as.numeric(geo_dists[]),

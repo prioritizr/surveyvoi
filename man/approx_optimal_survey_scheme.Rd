@@ -17,8 +17,6 @@ approx_optimal_survey_scheme(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   survey_budget,
@@ -27,7 +25,6 @@ approx_optimal_survey_scheme(
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
@@ -116,22 +113,6 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_preweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{preweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
-\item{feature_postweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{postweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
 \item{feature_target_column}{\code{character} name of the column in the
 argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
@@ -188,11 +169,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
 
 \item{site_weight_columns}{\code{character} name of columns in
 \code{site_data} containing weights for model fitting for each
@@ -270,7 +246,8 @@ RFoptions(seed = 201)
 
 # simulate data
 site_data <- simulate_site_data(n_sites = 11, n_features = 2, prop = 0.8)
-feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+feature_data <- simulate_feature_data(n_sites = 11, n_features = 2, prop = 1)
+feature_data$target <- c(3, 3)
 
 # preview simulated data
 print(site_data)
@@ -297,8 +274,7 @@ approx_opt_survey <- approx_optimal_survey_scheme(
   "management_cost", "survey_cost",
   "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "preweight", "postweight", "target",
-  total_budget, survey_budget, xgb_parameters,
+  "target", total_budget, survey_budget, xgb_parameters,
   n_approx_replicates = 10)
 
 # print result

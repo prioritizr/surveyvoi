@@ -47,4 +47,6 @@ void extract_xgboost_parameters(Rcpp::List&,
   std::vector<std::vector<std::string>>&,
   std::vector<std::vector<std::string>>&);
 
+double convolve_binomial(Eigen::VectorXd&, int);
+
 #endif

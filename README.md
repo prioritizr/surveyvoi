@@ -10,7 +10,7 @@ TODO OVERVIEW TODO.
 Installation
 ------------
 
-The *surveyvoi R* package has several dependencies that must first be installed before you can install this package. Specifically, you will first need to install the [Gurobi optimization suite](http://www.gurobi.com/), [*gurobi R* package](https://www.gurobi.com/documentation/8.1/refman/r_api_overview.html), and Intel Math Kernel Library [(Intel MKL)](https://software.intel.com/en-us/mkl). For instructions on installing *Gurobi* software, please refer to [this installation guide](https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html). Please note that package is configured to assume that you have installed *Gurobi* version 9.0.1. If you have a different version of *Gurobi*, please edit the `gurobi90` compilation flag specified in the `PKG_LIBS` variable within the `src/Makevars` file. For instructions on installing the Intel Math Kernel Library, please refer to the following bash commands (based on a [blog post by Dirk Eddelbuettel](http://dirk.eddelbuettel.com/blog/2018/04/15/)):
+The *surveyvoi R* package has several dependencies that must first be installed before you can install this package. Specifically, you will first need to install the Intel Math Kernel Library [(Intel MKL)](https://software.intel.com/en-us/mkl). For instructions on installing the Intel Math Kernel Library, please refer to the following bash commands (based on a [blog post by Dirk Eddelbuettel](http://dirk.eddelbuettel.com/blog/2018/04/15/)):
 
 ``` bash
 cd /tmp
@@ -52,7 +52,7 @@ Citation
     To cite package 'surveyvoi' in publications use:
 
       Jeffrey O Hanson and Joseph Bennett (NA). surveyvoi: Survey Value of
-      Information. R package version 0.0.5.
+      Information. R package version 0.0.15.
       https://github.com/jeffreyhanson/surveyvoi
 
     A BibTeX entry for LaTeX users is
@@ -60,6 +60,6 @@ Citation
       @Manual{,
         title = {surveyvoi: Survey Value of Information},
         author = {Jeffrey O Hanson and Joseph Bennett},
-        note = {R package version 0.0.5},
+        note = {R package version 0.0.15},
         url = {https://github.com/jeffreyhanson/surveyvoi},
       }

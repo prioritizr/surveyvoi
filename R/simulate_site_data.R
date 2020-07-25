@@ -114,7 +114,8 @@ simulate_site_data <- function(n_sites, n_features,
     assertthat::is.flag(output_probabilities),
     assertthat::noNA(output_probabilities))
   # site locations
-  site_data <- tibble::tibble(x = runif(n_sites), y = runif(n_sites))
+  site_data <- tibble::tibble(x = stats::runif(n_sites),
+                              y = stats::runif(n_sites))
   # cost data
   site_data$survey_cost <- suppressMessages(
     RandomFields::RFsimulate(
@@ -139,15 +140,15 @@ simulate_site_data <- function(n_sites, n_features,
                               n = n_env_vars)@data))
   env_data <- apply(env_data, 2, function(x) scale(x))
   # feature model coefficients
-  feature_coef <- matrix(rnorm(n_features * n_env_vars, sd = 5),
+  feature_coef <- matrix(stats::rnorm(n_features * n_env_vars, sd = 5),
                          ncol = n_env_vars, nrow = n_features)
   # probability data
   pij <- matrix(NA, ncol = n_features, nrow = n_sites)
   for (i in seq_len(n_features))
-    pij[, i] <- plogis(c(env_data  %*% feature_coef[i, ]))
+    pij[, i] <- stats::plogis(c(env_data  %*% feature_coef[i, ]))
   # presence/absence data
   rij <- pij
-  rij[] <- rbinom(n_sites * n_features, 1, c(pij))
+  rij[] <- stats::rbinom(n_sites * n_features, 1, c(pij))
   # randomly specify sites missing data
   missing_sites <- sample.int(n_sites,
     round(proportion_of_sites_missing_data * n_sites), replace = FALSE)
@@ -166,5 +167,5 @@ simulate_site_data <- function(n_sites, n_features,
       site_data[[paste0("p", i)]] <- pij[, i]
   }
   # return result
-  st_as_sf(site_data, coords = c("x", "y"))
+  sf::st_as_sf(site_data, coords = c("x", "y"))
 }

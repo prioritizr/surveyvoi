@@ -128,13 +128,16 @@ After simulating data for the sites, we will simulate data for the conservation 
 ```{r}
 # simulate feature data
 feature_data <- simulate_feature_data(
-  n_features = 1, proportion_of_survey_features = 1)
+  n_sites = 30, n_features = 1, proportion_of_survey_features = 1)
+
+# manually set target
+feature_data$target <- 20
 
 # print feature data
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `preweight`, `postweight`, and `target` columns contain values that specify the conservation value (or utility) accrued when a set of sites when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
+The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `target` column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
 
 ## Modelling probability of occupancy
 
@@ -197,36 +200,7 @@ stopifnot(all(feature_data$model_specificity > 0.5))
 
 ## Expected value given current information
 
-After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation value of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Before we can compute the _expected value of the decision given current information_, we first need to decide how well will measure the value (or utility) of a given management decision.
-
-We will use an equation based on the Zonation decision support tool [@r1] to parametrise the conservation value associated with managing a set of sites for conservation. It represents the objective function of the spatial prioritization component of the value of information calculations. To interpret this equation, let $J$ denote the set of sites (indexed by $j$), and $I$ denote the set of features (indexed by $i$). Also let $X_j$ contain binary (i.e. zero or one) values indicating if each site $i \in I$ is prioritized for conservation management or not, $Z_{ij}$ contain binary values indicating the presence or absence of features $i \in I$ occurring in sites $j \in J$, $\alpha_i$ denote the `preweight` column value(s), $\gamma_i$ denote the `postweight` column value(s), and $\tau_i$ denote the `target` column value(s). Furthermore, let $H_i$ denote the total number of occupied sites for features $i \in I$, and let $T$ denote the total number of sites $j \in J$.
-
-$$
-H_i = \sum_{j \in J} X_j Z_{ij} \\
-T =  \sum_{j \in J} 1 \\
-B = \sum_{i \in I}
-\begin{cases}
-\alpha \times \frac{H_i}{\tau_i}, \text{ if } H_i < \tau_i \\
-\alpha + \left( \gamma \times \frac{H_i - \tau_i}{T - \tau_i} \right), \text{ else } \\
-\end{cases}
-$$
-
-Let's visualize this equation by making a graph. Here, the x-axis shows the number of protected sites that occupied by the feature, and the y-axis shows the conservation value associated with this number.
-
-```{r, fig.height = h, fig.width = w * 2}
-# plot the value function
-plot_conservation_value(
-  site_data = site_data,
-  feature_data = feature_data,
-  site_occupancy_columns = "f1",
-  feature_preweight_column = "preweight",
-  feature_postweight_column = "postweight",
-  feature_target_column = "target")
-```
-
-We can see that conservation value increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). This is important because it means that we will always consider it more beneficial to protect more sites that contain the conservation features. Additionally, we can also see that the line has a bend in it -- specified using value(s) in the `target` column -- and so the rate of the conservation value accrued is much slower after crossing a the target threshold. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved "enough" of one feature (specified using the `target` column) that it can then focus on other features (broadly speaking). Furthermore, the solid line represents the range of conservation values that we could obtain if we protected sites that have _observed_ presences, and the dashed line represents the _potential_ values we could obtain if we also protected unsurveyed sites and those unsurveyed sites contained the feature.
-
-Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.
+After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation value of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.
 
 ```{r}
 # calculate total budget for surveying and managing sites
@@ -250,8 +224,6 @@ evd_current <- evdci(
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
   feature_model_specificity_column = "model_specificity",
-  feature_preweight_column = "preweight",
-  feature_postweight_column = "postweight",
   feature_target_column = "target",
   total_budget = total_budget)
 
@@ -390,8 +362,6 @@ evd_survey_schemes$value <- sapply(
       feature_survey_specificity_column = "survey_specificity",
       feature_model_sensitivity_column = "model_sensitivity",
       feature_model_specificity_column = "model_specificity",
-      feature_preweight_column = "preweight",
-      feature_postweight_column = "postweight",
       feature_target_column = "target",
       total_budget = total_budget,
       xgb_parameters = xgb_parameters,
@@ -448,8 +418,6 @@ opt_scheme <- optimal_survey_scheme(
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     survey_budget = survey_budget,
@@ -494,8 +462,6 @@ evd_opt <- evdsi(
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters = xgb_parameters,

@@ -57,4 +57,8 @@ check:
 install:
 	R --slave -e "devtools::install_local('../surveyroi', force = TRUE, upgrade = 'never')"
 
-.PHONY: initc docs site test check checkwb build install man readme vigns site quicksite benchmark
+examples:
+	R --slave -e "devtools::run_examples(test = TRUE);warnings()"  >> examples.log
+	rm -f Rplots.pdf
+
+.PHONY: initc docs site test check checkwb build install man readme vigns site quicksite benchmark examples

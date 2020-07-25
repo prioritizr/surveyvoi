@@ -73,7 +73,7 @@ planning units." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
       </span>
     </div>
 
@@ -143,6 +143,7 @@ planning units.</p>
   <span class='no'>site_env_vars_columns</span>,
   <span class='no'>parameters</span>,
   <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>100</span>,
+  <span class='kw'>tree_method</span> <span class='kw'>=</span> <span class='st'>"auto"</span>,
   <span class='kw'>n_rounds</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
   <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
   <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
@@ -192,6 +193,12 @@ parameter values for fitting models. Valid parameters include:
       <td><p><code>numeric</code> model rounds for parameter
 tuning. See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> for more information.
 Defaults to 100.</p></td>
+    </tr>
+    <tr>
+      <th>tree_method</th>
+      <td><p><code>character</code> method used for constructing trees.
+Available options are: <code>"auto"</code>, <code>"exact"</code>, <code>"approx"</code>,
+and <code>"hist"</code>. Defaults to <code>"auto"</code>.</p></td>
     </tr>
     <tr>
       <th>n_rounds</th>
@@ -340,6 +347,9 @@ tuning parameters for each feature.</p></dd>
 #&gt; [[1]]$lambda
 #&gt; [1] 0.3162278
 #&gt; 
+#&gt; [[1]]$tree_method
+#&gt; [1] "auto"
+#&gt; 
 #&gt; [[1]]$subsample
 #&gt; [1] 0.6
 #&gt; 
@@ -365,6 +375,9 @@ tuning parameters for each feature.</p></dd>
 #&gt; 
 #&gt; [[2]]$lambda
 #&gt; [1] 0.3162278
+#&gt; 
+#&gt; [[2]]$tree_method
+#&gt; [1] "auto"
 #&gt; 
 #&gt; [[2]]$subsample
 #&gt; [1] 0.7

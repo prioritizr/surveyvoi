@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
       </span>
     </div>
 
@@ -209,17 +209,19 @@
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># simulate feature data</span>
 <span class="no">feature_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simulate_feature_data.html">simulate_feature_data</a></span>(
-  <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
+  <span class="kw">n_sites</span> <span class="kw">=</span> <span class="fl">15</span>, <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
+
+<span class="co"># manually set targets</span>
+<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">5</span>
 
 <span class="co"># print feature data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">feature_data</span>)</pre></body></html></div>
-<pre><code>## # A tibble: 1 x 9
+<pre><code>## # A tibble: 1 x 7
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 f1    TRUE           0.959335         0.895506         0.778723
-## # … with 4 more variables: model_specificity &lt;dbl&gt;, preweight &lt;dbl&gt;,
-## #   postweight &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>preweight</code>, <code>postweight</code>, and <code>target</code> columns contain values that specify the conservation benefit gained when sites are managed for conservation. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
+## # … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>target</code> column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
 <p>Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the <code>fit_occupancy_models</code> function, but here we will define them manually to keep things simple.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># define parameters</span>
 <span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
@@ -253,15 +255,13 @@
   <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
   <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
   <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-  <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-  <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
   <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
   <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
   <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">ev_survey</span>)</pre></body></html></div>
-<pre><code>## [1] 129.4626</code></pre>
+<pre><code>## [1] 0.9943704</code></pre>
 <p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating outcomes: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample outcomes and do not consider the prior probability of each outcome occurring. The weighted methods, on the other hand, are select outcomes that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the outcome of the random number generator – we will report means and standard errors for 25 replicates per number of approximation outcomes. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total outcomes, we will not explore the full range of subsets for this method.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># define function for calculating standard error</span>
 <span class="no">se</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">sqrt</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(<span class="no">x</span>) / <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>))
@@ -291,8 +291,6 @@
         <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
         <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
         <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-        <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-        <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
         <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
         <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
         <span class="kw">n_approx_replicates</span> <span class="kw">=</span> <span class="fl">25</span>,

@@ -10,6 +10,7 @@ fit_occupancy_models(
   site_env_vars_columns,
   parameters,
   early_stopping_rounds = 100,
+  tree_method = "auto",
   n_rounds = 1000,
   n_folds = rep(5, length(site_occupancy_columns)),
   n_random_search_iterations = 10000,
@@ -47,6 +48,10 @@ parameter values for fitting models. Valid parameters include:
 \item{early_stopping_rounds}{\code{numeric} model rounds for parameter
 tuning. See \code{\link[xgboost]{xgboost}} for more information.
 Defaults to 100.}
+
+\item{tree_method}{\code{character} method used for constructing trees.
+Available options are: \code{"auto"}, \code{"exact"}, \code{"approx"},
+and \code{"hist"}. Defaults to \code{"auto"}.}
 
 \item{n_rounds}{\code{numeric} model rounds for model fitting
 See \code{\link[xgboost]{xgboost}} for more information.

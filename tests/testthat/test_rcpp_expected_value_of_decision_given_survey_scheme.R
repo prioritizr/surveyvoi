@@ -4,8 +4,10 @@ test_that("equal weights", {
   # data
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  n_sites <- 8
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data$target <- c(2, 1)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -51,11 +53,8 @@ test_that("equal weights", {
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     n_xgb_nrounds = rep(10, n_f),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
     survey_features = feature_data$survey,
@@ -71,12 +70,9 @@ test_that("equal weights", {
     xgb_parameters = xgb_parameters,
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    xgb_nrounds = rep(8, n_f),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
+    xgb_nrounds = rep(10, n_f),
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   # tests
   expect_equal(r1, r2)
 })
@@ -85,9 +81,11 @@ test_that("variables weights", {
   # data
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  n_sites <- 8
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
   total_budget <- sum(site_data$management_cost * 0.8)
+  feature_data$target <- c(2, 1)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   # prepare data
@@ -132,11 +130,8 @@ test_that("variables weights", {
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     n_xgb_nrounds = rep(10, n_f),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
     survey_features = feature_data$survey,
@@ -152,12 +147,9 @@ test_that("variables weights", {
     xgb_parameters = xgb_parameters,
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    xgb_nrounds = rep(8, n_f),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
+    xgb_nrounds = rep(10, n_f),
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   # tests
   expect_equal(r1, r2)
 })

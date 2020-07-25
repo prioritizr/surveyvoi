@@ -111,7 +111,8 @@ NULL
 #'
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 11, n_features = 2, prop = 0.8)
-#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+#' feature_data <- simulate_feature_data(n_sites = 11, n_features = 2, prop = 1)
+#' feature_data$target <- c(3, 3)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -138,8 +139,7 @@ NULL
 #'   "management_cost", "survey_cost",
 #'   "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "preweight", "postweight", "target",
-#'   total_budget, survey_budget, xgb_parameters,
+#'   "target", total_budget, survey_budget, xgb_parameters,
 #'   n_approx_replicates = 10)
 #'
 #' # print result
@@ -159,8 +159,6 @@ approx_near_optimal_survey_scheme <- function(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   survey_budget,
@@ -169,7 +167,6 @@ approx_near_optimal_survey_scheme <- function(
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
@@ -245,18 +242,6 @@ approx_near_optimal_survey_scheme <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_preweight_column
-    assertthat::is.string(feature_preweight_column),
-    all(assertthat::has_name(feature_data, feature_preweight_column)),
-    is.numeric(feature_data[[feature_preweight_column]]),
-    assertthat::noNA(feature_data[[feature_preweight_column]]),
-    all(feature_data[[feature_preweight_column]] >= 0),
-    ## feature_postweight_column
-    assertthat::is.string(feature_postweight_column),
-    all(assertthat::has_name(feature_data, feature_postweight_column)),
-    is.numeric(feature_data[[feature_postweight_column]]),
-    assertthat::noNA(feature_data[[feature_postweight_column]]),
-    all(feature_data[[feature_postweight_column]] >= 0),
     ## feature_target_column
     assertthat::is.string(feature_target_column),
     all(assertthat::has_name(feature_data, feature_target_column)),
@@ -279,10 +264,6 @@ approx_near_optimal_survey_scheme <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0),
     ## n_threads
     assertthat::is.count(n_threads),
     assertthat::noNA(n_threads),
@@ -358,6 +339,14 @@ approx_near_optimal_survey_scheme <- function(
       site_weight_columns)
   ## validate xgboost parameters
   validate_xgboost_parameters(xgb_parameters)
+  ## verify targets
+  assertthat::assert_that(
+    all(feature_data[[feature_target_column]] <= nrow(site_data)))
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(feature_data[[feature_target_column]] <=
+          sum(!site_data[[site_management_locked_out_column]])))
+  }
 
   # prepare data for analysis
   ## drop spatial information
@@ -391,6 +380,15 @@ approx_near_optimal_survey_scheme <- function(
   } else {
     site_survey_locked_out <- rep(FALSE, nrow(site_data))
   }
+  ## validate that targets are feasible given budget and locked out units
+  sorted_costs <- sort(
+    site_data[[site_management_cost_column]][!site_management_locked_out])
+  sorted_costs <- sorted_costs[
+    seq_len(max(feature_data[[feature_target_column]]))]
+  assertthat::assert_that(
+    sum(sorted_costs) <= total_budget,
+    msg = paste("targets cannot be achieved given budget and locked out",
+                "planning units"))
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
                         "nrounds")
@@ -427,11 +425,8 @@ approx_near_optimal_survey_scheme <- function(
       pu_costs = site_data[[site_management_cost_column]],
       pu_locked_in = site_management_locked_in,
       pu_locked_out = site_management_locked_out,
-      preweight = feature_data[[feature_preweight_column]],
-      postweight = feature_data[[feature_postweight_column]],
-      target = feature_data[[feature_target_column]],
-      budget = total_budget,
-      gap = optimality_gap)
+      target = round(feature_data[[feature_target_column]]),
+      budget = total_budget)
   })
 
   # initialize looping variables
@@ -516,11 +511,8 @@ approx_near_optimal_survey_scheme <- function(
           xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
           xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
           n_xgb_nrounds = xgb_nrounds,
-          obj_fun_preweight = feature_data[[feature_preweight_column]],
-          obj_fun_postweight = feature_data[[feature_postweight_column]],
-          obj_fun_target = feature_data[[feature_target_column]],
+          obj_fun_target = round(feature_data[[feature_target_column]]),
           total_budget = total_budget,
-          optim_gap = optimality_gap,
           n_approx_replicates = n_approx_replicates,
           n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
           method_approx_outcomes = method_approx_outcomes)

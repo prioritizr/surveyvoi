@@ -19,17 +19,17 @@ XGB_RFLAGS = -DXGBOOST_STRICT_R_MODE=1 -DDMLC_LOG_BEFORE_THROW=0\
 
 $(foreach v, $(XGB_RFLAGS), $(warning $(v)))
 
-# xgboost, gurobi, Intel MKL configuration
+# gmp, gmpxx, xgboost, Intel MKL configuration
 PKG_CPPFLAGS = -I$(PKGROOT)/include\
                -I$(PKGROOT)/dmlc-core/include\
                -I$(PKGROOT)/rabit/include\
                -I$(PKGROOT)\
                $(XGB_RFLAGS)\
-                -I../inst/include/ -I"${GUROBI_HOME}/include" -lm\
-               -DMKL_ILP64 -m64 -I"${MKLROOT}/include"
+               -DMKL_ILP64 -m64 -I"${MKLROOT}/include" -DEIGEN_USE_MKL_ALL
+
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS) -pthread
+
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
-           -L"${GUROBI_HOME}/lib" -lgurobi_c++ -lgurobi90\
            -lgmp -lgmpxx\
            -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl
 
@@ -37,7 +37,6 @@ PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
 OBJECTS =\
   $(PKGROOT)/init.o\
   $(PKGROOT)/rcpp_sample_states.o\
-  $(PKGROOT)/rcpp_conservation_value.o\
   $(PKGROOT)/rcpp_approx_expected_value_of_decision_given_survey_scheme.o\
   $(PKGROOT)/rcpp_expected_value_of_action.o\
   $(PKGROOT)/rcpp_predict_missing_rij_data.o\

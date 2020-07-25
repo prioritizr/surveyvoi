@@ -4,9 +4,11 @@
 \alias{simulate_feature_data}
 \title{Simulate feature data}
 \usage{
-simulate_feature_data(n_features, proportion_of_survey_features)
+simulate_feature_data(n_sites, n_features, proportion_of_survey_features)
 }
 \arguments{
+\item{n_sites}{\code{integer} number of sites.}
+
 \item{n_features}{\code{integer} number of features.}
 
 \item{proportion_of_survey_features}{\code{numeric} proportion of features
@@ -34,12 +36,6 @@ data:
 \item{\code{model_specificity}}{\code{numeric} specificity (true negative
   rate) of the occupancy models for each features.}
 
-\item{\code{preweight}}{\code{numeric} weight values used to parametrize
-  the conservation benefit of managing of each feature.}
-
-\item{\code{postweight}}{\code{numeric} weight values used to parametrize
-  the conservation benefit of managing of each feature.}
-
 \item{\code{target}}{\code{numeric} target values used to parametrize
   the conservation benefit of managing of each feature.}
 
@@ -53,7 +49,7 @@ Simulate feature data for developing simulated survey schemes.
 set.seed(123)
 
 # simulate data
-d <- simulate_feature_data(n_features = 5,
+d <- simulate_feature_data(n_sites = 10, n_features = 5,
                            proportion_of_survey_features = 0.5)
 # print data
 print(d)

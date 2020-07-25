@@ -54,7 +54,7 @@
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 5, n_features = 2,
 #'                                 prop = 0.5)
-#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+#' feature_data <- simulate_feature_data(n_sites = 5, n_features = 2, prop = 1)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -122,7 +122,7 @@ prior_probability_matrix <- function(
     all(feature_data[[feature_model_specificity_column]] <= 1))
   # drop spatial data
   if (inherits(site_data, "sf"))
-    site_data <- st_drop_geometry(site_data)
+    site_data <- sf::st_drop_geometry(site_data)
   # extract data
   rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
   mij <- t(as.matrix(site_data[, site_probability_columns, drop = FALSE]))

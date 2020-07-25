@@ -14,14 +14,11 @@ evdci(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL,
-  optimality_gap = 0
+  prior_matrix = NULL
 )
 }
 \arguments{
@@ -82,22 +79,6 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_preweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{preweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
-\item{feature_postweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{postweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
 \item{feature_target_column}{\code{character} name of the column in the
 argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
@@ -132,11 +113,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
 }
 \value{
 \code{numeric} value.
@@ -160,7 +136,8 @@ RFoptions(seed = 123)
 
 # simulate data
 site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
-feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+feature_data <- simulate_feature_data(n_sites = 5, n_features = 2, prop = 1)
+feature_data$target <- c(1, 1)
 
 # preview simulated data
 print(site_data)
@@ -175,7 +152,7 @@ ev_current <- evdci(
   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
   "management_cost", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "preweight", "postweight", "target", total_budget)
+  "target", total_budget)
 
 # print exact value
 print(ev_current)

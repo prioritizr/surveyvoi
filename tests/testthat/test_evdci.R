@@ -21,8 +21,6 @@ test_that("expected result", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
@@ -32,13 +30,11 @@ test_that("expected result", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$preweight, feature_data$postweight,
-    feature_data$target, 301, 0)
+    site_data$locked_out, feature_data$target, 301)
   r2 <- evdci(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "model_specificity", "preweight", "postweight", "target",
-    301, "locked_in", "locked_out", NULL, 0)
+    "model_specificity", "target", 301, "locked_in", "locked_out", NULL)
   # tests
   expect_equal(r1, r2)
 })
@@ -64,8 +60,6 @@ test_that("expected result (sparse)", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
@@ -75,13 +69,11 @@ test_that("expected result (sparse)", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$preweight, feature_data$postweight,
-    feature_data$target, 301, 0)
+    site_data$locked_out, feature_data$target, 301)
   r2 <- evdci(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "model_specificity", "preweight", "postweight", "target",
-    301, "locked_in", "locked_out", NULL, 0)
+    "model_specificity", "target", 301, "locked_in", "locked_out", NULL)
   # tests
   expect_equal(r1, r2)
 })

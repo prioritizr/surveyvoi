@@ -21,9 +21,13 @@ check.log
 spell.log
 gp.log
 benchmark.log
+examples.log
 
 # system files
 .directory
+
+# debugging files
+debug*R
 
 # do not ignore the following files
 !.gitkeep

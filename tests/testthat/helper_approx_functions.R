@@ -3,8 +3,7 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
     pu_survey_solution, pu_model_prediction, pu_survey_costs,
     pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
-    obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    total_budget, optim_gap,
+    obj_fun_target, total_budget,
     n_approx_replicates, n_approx_outcomes_per_replicate) {
   # generate outcomes
   outcomes <- lapply(seq_len(n_approx_replicates), function(i) {
@@ -19,8 +18,7 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
       pu_survey_solution, pu_model_prediction, pu_survey_costs,
       pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
       pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds,
-      xgb_test_folds, obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      total_budget, optim_gap, outcomes[[i]])
+      xgb_test_folds, obj_fun_target, total_budget, outcomes[[i]])
   })
   value
 }
@@ -31,8 +29,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     pu_survey_solution, pu_model_prediction, pu_survey_costs,
     pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
-    obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-    total_budget, optim_gap, outcomes) {
+    obj_fun_target, total_budget, outcomes) {
   # init
   ## constants
   n_pu <- ncol(rij)
@@ -128,13 +125,11 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     curr_solution <- r_prioritization(
       curr_postij, pu_purchase_costs,
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
-      obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      remaining_budget, optim_gap, "")$x
+      obj_fun_target, remaining_budget)$x
 
     ## calculate approximate expected value of the prioritisation
     curr_value <- r_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
-      obj_fun_target)
+      curr_solution, curr_postij, obj_fun_target)
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

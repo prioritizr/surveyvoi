@@ -2,7 +2,7 @@ context("simulate_feature_data")
 
 test_that("simulate_feature_data", {
   # data
-  d <- simulate_feature_data(5, 0.5)
+  d <- simulate_feature_data(10, 5, 0.5)
   # tests
   expect_is(d, "tbl_df")
   expect_equal(nrow(d), 5)
@@ -10,12 +10,6 @@ test_that("simulate_feature_data", {
   expect_equal(anyDuplicated(d$name), 0)
   expect_is(d$survey, "logical")
   expect_equal(sum(d$survey), 3)
-  expect_is(d$preweight, "numeric")
-  expect_gt(min(d$preweight), 0)
-  expect_true(all(is.finite(d$preweight)))
-  expect_is(d$postweight, "numeric")
-  expect_gt(min(d$postweight), 0)
-  expect_true(all(is.finite(d$postweight)))
   expect_is(d$target, "numeric")
   expect_gt(min(d$target), 0)
   expect_true(all(is.finite(d$target)))

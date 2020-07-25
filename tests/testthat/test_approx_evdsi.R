@@ -5,8 +5,10 @@ test_that("equal weights", {
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  n_sites <- 8
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data$target <- c(1, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -57,14 +59,11 @@ test_that("equal weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters =
       lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
@@ -87,11 +86,8 @@ test_that("equal weights", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
-    optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep)
   # tests
@@ -103,8 +99,10 @@ test_that("variable weights", {
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 2
-  site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  n_sites <- 8
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data$target <- c(1, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -157,14 +155,11 @@ test_that("variable weights", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters =
       lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
@@ -187,11 +182,8 @@ test_that("variable weights", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
-    optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep)
   # tests
@@ -205,8 +197,10 @@ test_that("sparse", {
   n_f <- 2
   n_reps <- 3
   n_outcomes_per_rep <- 4
-  site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  n_sites <- 12
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data$target <- c(3, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -265,14 +259,11 @@ test_that("sparse", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_parameters =
       lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
     xgb_n_folds = rep(5, n_f),
-    optimality_gap = 0,
     seed = 1,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
@@ -295,11 +286,8 @@ test_that("sparse", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
-    optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep)
   # tests

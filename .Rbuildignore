@@ -17,6 +17,7 @@ test.log
 gp.log
 spell.log
 benchmark.log
+examples.log
 README.Rmd
 inst/extdata/dictionary.txt
 ^_pkgdown\.yml$
@@ -26,3 +27,4 @@ src/amalgamation/dmlc-minimum0.o
 src/amalgamation/xgboost-all0.o
 src/rabit/src/c_api.o
 src/rabit/src/engine_empty.o
+^debug*

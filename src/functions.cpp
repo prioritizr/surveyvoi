@@ -140,6 +140,24 @@ void extract_xgboost_parameters(Rcpp::List &x,
   return;
 }
 
+double convolve_binomial(Eigen::VectorXd& x, int threshold) {
+  // initialize
+  std::size_t n = x.size() + 1;
+  std::size_t n_copy = x.size();
+  Eigen::VectorXd z(n);
+  z.setZero();
+  z[0] = 1.0;
+  Eigen::VectorXd new_z(n);
+  new_z[0] = 0.0;
+  // perform convolution
+  for (std::size_t i = 0; i < x.size(); ++i) {
+    std::copy(z.data(), z.data() + n_copy, new_z.data() + 1);
+    z = ((1.0 - x[i]) * z.array()) + (x[i] * new_z.array());
+  }
+  // calculate probability
+  return (1.0 - z.segment(0, threshold).sum());
+}
+
 /* Copyright (c) 2015 by Xgboost Contributors */
 // This file contains the customization implementations of R module
 // to change behavior of libxgboost

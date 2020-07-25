@@ -132,13 +132,16 @@ After simulating data for the sites, we will simulate data for the conservation 
 ```{r}
 # simulate feature data
 feature_data <- simulate_feature_data(
-  n_features = 1, proportion_of_survey_features = 1)
+  n_sites = 15, n_features = 1, proportion_of_survey_features = 1)
+
+# manually set targets
+feature_data$target <- 5
 
 # print feature data
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `preweight`, `postweight`, and `target` columns contain values that specify the conservation benefit gained when sites are managed for conservation. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
+The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `target` column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
 
 Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the `fit_occupancy_models` function, but here we will define them manually to keep things simple.
 
@@ -180,8 +183,6 @@ ev_survey <- evdsi(
   feature_survey_specificity_column = "survey_specificity",
   feature_model_sensitivity_column = "model_sensitivity",
   feature_model_specificity_column = "model_specificity",
-  feature_preweight_column = "preweight",
-  feature_postweight_column = "postweight",
   feature_target_column = "target",
   total_budget = total_budget,
   xgb_parameters = xgb_parameters)
@@ -221,8 +222,6 @@ ev_prime_survey <-
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
         feature_model_specificity_column = "model_specificity",
-        feature_preweight_column = "preweight",
-        feature_postweight_column = "postweight",
         feature_target_column = "target",
         total_budget = total_budget,
         n_approx_replicates = 25,

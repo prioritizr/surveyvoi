@@ -122,7 +122,7 @@ RFoptions(seed = 123)
 # simulate data
 site_data <- simulate_site_data(n_sites = 5, n_features = 2,
                                 prop = 0.5)
-feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+feature_data <- simulate_feature_data(n_sites = 5, n_features = 2, prop = 1)
 
 # preview simulated data
 print(site_data)

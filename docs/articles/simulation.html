@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
       </span>
     </div>
 
@@ -194,17 +194,19 @@
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># simulate feature data</span>
 <span class="no">feature_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simulate_feature_data.html">simulate_feature_data</a></span>(
-  <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
+  <span class="kw">n_sites</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
+
+<span class="co"># manually set target</span>
+<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
 
 <span class="co"># print feature data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">feature_data</span>)</pre></body></html></div>
-<pre><code>## # A tibble: 1 x 9
+<pre><code>## # A tibble: 1 x 7
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 f1    TRUE           0.952171         0.815544         0.731463
-## # … with 4 more variables: model_specificity &lt;dbl&gt;, preweight &lt;dbl&gt;,
-## #   postweight &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>preweight</code>, <code>postweight</code>, and <code>target</code> columns contain values that specify the conservation value (or utility) accrued when a set of sites when sites are managed for conservation (e.g. sites are prioritised for protected area establishment; we will explore this further below). Finally, the <code>sensitivity</code> and <code>specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.</p>
+## # … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>target</code> column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. Finally, the <code>sensitivity</code> and <code>specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.</p>
 </div>
 <div id="modelling-probability-of-occupancy" class="section level2">
 <h2 class="hasAnchor">
@@ -253,6 +255,9 @@
 ## 
 ## [[1]]$lambda
 ## [1] 0.3162278
+## 
+## [[1]]$tree_method
+## [1] "auto"
 ## 
 ## [[1]]$subsample
 ## [1] 0.7
@@ -307,29 +312,7 @@
 <div id="expected-value-given-current-information" class="section level2">
 <h2 class="hasAnchor">
 <a href="#expected-value-given-current-information" class="anchor"></a>Expected value given current information</h2>
-<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation value of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Before we can compute the <em>expected value of the decision given current information</em>, we first need to decide how well will measure the value (or utility) of a given management decision.</p>
-<p>We will use an equation based on the Zonation decision support tool <span class="citation">(Moilanen 2007)</span> to parametrise the conservation value associated with managing a set of sites for conservation. It represents the objective function of the spatial prioritization component of the value of information calculations. To interpret this equation, let <span class="math inline">\(J\)</span> denote the set of sites (indexed by <span class="math inline">\(j\)</span>), and <span class="math inline">\(I\)</span> denote the set of features (indexed by <span class="math inline">\(i\)</span>). Also let <span class="math inline">\(X_j\)</span> contain binary (i.e. zero or one) values indicating if each site <span class="math inline">\(i \in I\)</span> is prioritized for conservation management or not, <span class="math inline">\(Z_{ij}\)</span> contain binary values indicating the presence or absence of features <span class="math inline">\(i \in I\)</span> occurring in sites <span class="math inline">\(j \in J\)</span>, <span class="math inline">\(\alpha_i\)</span> denote the <code>preweight</code> column value(s), <span class="math inline">\(\gamma_i\)</span> denote the <code>postweight</code> column value(s), and <span class="math inline">\(\tau_i\)</span> denote the <code>target</code> column value(s). Furthermore, let <span class="math inline">\(H_i\)</span> denote the total number of occupied sites for features <span class="math inline">\(i \in I\)</span>, and let <span class="math inline">\(T\)</span> denote the total number of sites <span class="math inline">\(j \in J\)</span>.</p>
-<p><span class="math display">\[
-H_i = \sum_{j \in J} X_j Z_{ij} \\
-T =  \sum_{j \in J} 1 \\
-B = \sum_{i \in I}
-\begin{cases}
-\alpha \times \frac{H_i}{\tau_i}, \text{ if } H_i &lt; \tau_i \\
-\alpha + \left( \gamma \times \frac{H_i - \tau_i}{T - \tau_i} \right), \text{ else } \\
-\end{cases}
-\]</span></p>
-<p>Let’s visualize this equation by making a graph. Here, the x-axis shows the number of protected sites that occupied by the feature, and the y-axis shows the conservation value associated with this number.</p>
-<div class="sourceCode"><html><body><pre class="r"><span class="co"># plot the value function</span>
-<span class="fu"><a href="../reference/plot_conservation_value.html">plot_conservation_value</a></span>(
-  <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
-  <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,
-  <span class="kw">site_occupancy_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
-  <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-  <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
-  <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;"></p>
-<p>We can see that conservation value increases with the amount of the conservation feature held in the prioritization (i.e. the line is always increasing). This is important because it means that we will always consider it more beneficial to protect more sites that contain the conservation features. Additionally, we can also see that the line has a bend in it – specified using value(s) in the <code>target</code> column – and so the rate of the conservation value accrued is much slower after crossing a the target threshold. This is useful if we have multiple features, because it tells the conservation prioritization algorithm that once we have conserved “enough” of one feature (specified using the <code>target</code> column) that it can then focus on other features (broadly speaking). Furthermore, the solid line represents the range of conservation values that we could obtain if we protected sites that have <em>observed</em> presences, and the dashed line represents the <em>potential</em> values we could obtain if we also protected unsurveyed sites and those unsurveyed sites contained the feature.</p>
-<p>Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.</p>
+<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation value of the optimal spatial prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set as 80% of the total site management costs.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># calculate total budget for surveying and managing sites</span>
 <span class="no">total_budget</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">site_data</span>$<span class="no">management_cost</span>) * <span class="fl">0.8</span>
 
@@ -348,14 +331,12 @@ B = \sum_{i \in I}
   <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
   <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
   <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-  <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-  <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
   <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
   <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>)
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_current</span>)</pre></body></html></div>
-<pre><code>## [1] 176.0561</code></pre>
+<pre><code>## [1] 0.159335</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -440,7 +421,7 @@ B = \sum_{i \in I}
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-20-1.png" width="604.8" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-19-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <p>We can see that different approaches yield different survey schemes – but which survey scheme is the best?</p>
 </div>
 <div id="expected-value-of-the-decision-given-the-candidate-survey-schemes" class="section level2">
@@ -469,8 +450,6 @@ B = \sum_{i \in I}
       <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
       <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
       <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-      <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-      <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
       <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
       <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
       <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
@@ -480,13 +459,13 @@ B = \sum_{i \in I}
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 2
-##   name           value
-##   &lt;chr&gt;          &lt;dbl&gt;
-## 1 geo_scheme   175.972
-## 2 env_scheme   176.195
-## 3 unc_scheme   175.972
-## 4 cheap_scheme 175.972
-## 5 rich_scheme  175.834</code></pre>
+##   name            value
+##   &lt;chr&gt;           &lt;dbl&gt;
+## 1 geo_scheme   0.140864
+## 2 env_scheme   0.176847
+## 3 unc_scheme   0.140864
+## 4 cheap_scheme 0.140864
+## 5 rich_scheme  0.122467</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -495,13 +474,13 @@ B = \sum_{i \in I}
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 3
-##   name           value        roi
-##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   175.972 -0.0840373
-## 2 env_scheme   176.195  0.138470 
-## 3 unc_scheme   175.972 -0.0840373
-## 4 cheap_scheme 175.972 -0.0840373
-## 5 rich_scheme  175.834 -0.221845</code></pre>
+##   name            value        roi
+##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
+## 1 geo_scheme   0.140864 -0.0184707
+## 2 env_scheme   0.176847  0.0175119
+## 3 unc_scheme   0.140864 -0.0184707
+## 4 cheap_scheme 0.140864 -0.0184707
+## 5 rich_scheme  0.122467 -0.0368677</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -515,7 +494,7 @@ B = \sum_{i \in I}
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-22-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-21-1.png" width="700" style="display: block; margin: auto;"></p>
 <p>In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. <code>env_scheme</code>) have positive return on investment values—meaning that the <em>expected value of the management decision</em> is greater when we conduct these surveys (even when accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (e.g. <code>rich_scheme</code>) have negative values. But what is the best possible – the optimal – survey scheme?</p>
 </div>
 <div id="optimal-survey-scheme" class="section level2">
@@ -536,8 +515,6 @@ B = \sum_{i \in I}
     <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
     <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
     <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-    <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-    <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
     <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
     <span class="kw">survey_budget</span> <span class="kw">=</span> <span class="no">survey_budget</span>,
@@ -559,7 +536,7 @@ B = \sum_{i \in I}
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme (<code>opt_scheme</code>) is different to the scheme based on surveying sites to increase the environmental diversity of surveyed sites (<code>env_scheme</code>). Interestingly, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># calculate return on investment of the optimal scheme</span>
 <span class="no">evd_opt</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span>(
@@ -576,8 +553,6 @@ B = \sum_{i \in I}
     <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
     <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
     <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
-    <span class="kw">feature_preweight_column</span> <span class="kw">=</span> <span class="st">"preweight"</span>,
-    <span class="kw">feature_postweight_column</span> <span class="kw">=</span> <span class="st">"postweight"</span>,
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
     <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
     <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
@@ -585,7 +560,7 @@ B = \sum_{i \in I}
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 176.5171</code></pre>
+<pre><code>## [1] 0.2137153</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
@@ -594,14 +569,14 @@ B = \sum_{i \in I}
 <span class="co"># print updated results table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 6 x 3
-##   name           value        roi
-##   &lt;chr&gt;          &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   175.972 -0.0840373
-## 2 env_scheme   176.195  0.138470 
-## 3 unc_scheme   175.972 -0.0840373
-## 4 cheap_scheme 175.972 -0.0840373
-## 5 rich_scheme  175.834 -0.221845 
-## 6 opt_scheme   176.517  0.460970</code></pre>
+##   name            value        roi
+##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
+## 1 geo_scheme   0.140864 -0.0184707
+## 2 env_scheme   0.176847  0.0175119
+## 3 unc_scheme   0.140864 -0.0184707
+## 4 cheap_scheme 0.140864 -0.0184707
+## 5 rich_scheme  0.122467 -0.0368677
+## 6 opt_scheme   0.213715  0.0543803</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -615,7 +590,7 @@ B = \sum_{i \in I}
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme has the highest <em>return on investment</em> of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let’s compute their relative optimality and visualize them.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># express values in terms of optimality</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">optimality</span> <span class="kw">&lt;-</span>
@@ -636,7 +611,7 @@ B = \sum_{i \in I}
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme performs much better than all the other survey schemes. This result shows that value of information analyses can potentially improve management decisions by strategically allocating funds to surveys and conservation management.</p>
 </div>
 <div id="references" class="section level2 unnumbered">
@@ -645,9 +620,6 @@ B = \sum_{i \in I}
 <div id="refs" class="references">
 <div id="ref-r2">
 <p>Faith, D.P. &amp; Walker, P. (1996). Environmental diversity: On the best-possible use of surrogate data for assessing the relative biodiversity of sets of areas. <em>Biodiversity &amp; Conservation</em>, <em>5</em>, 399–415.</p>
-</div>
-<div id="ref-r1">
-<p>Moilanen, A. (2007). Landscape zonation, benefit functions and target-based planning: Unifying reserve selection strategies. <em>Biological Conservation</em>, <em>134</em>, 571–579.</p>
 </div>
 </div>
 </div>

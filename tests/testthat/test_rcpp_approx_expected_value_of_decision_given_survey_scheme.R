@@ -5,10 +5,10 @@ test_that("correct result", {
   RandomFields::RFoptions(seed = 700)
   set.seed(500)
   n_f <- 3
-  site_data <- simulate_site_data(n_sites = 7, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
-  feature_data$preweight = round(feature_data$preweight)
-  feature_data$postweight = round(feature_data$postweight)
+  n_sites <- 7
+  site_data <- simulate_site_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data$target <- c(1, 2, 1)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -60,11 +60,8 @@ test_that("correct result", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
-    optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
     method_approx_outcomes = "weighted_without_replacement")
@@ -85,11 +82,8 @@ test_that("correct result", {
     n_xgb_nrounds = rep(8, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-    obj_fun_preweight = feature_data$preweight,
-    obj_fun_postweight = feature_data$postweight,
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
-    optim_gap = 0,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep)
   # tests

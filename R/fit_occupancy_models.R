@@ -326,17 +326,17 @@ fit_occupancy_models <- function(
     })
     data.frame(feature = site_occupancy_columns[i],
                train_auc_mean = mean(out$train_auc),
-               train_auc_std = sd(out$train_auc),
+               train_auc_std = stats::sd(out$train_auc),
                train_sensitivity_mean = mean(out$train_sensitivity),
-               train_sensitivity_std = sd(out$train_sensitivity),
+               train_sensitivity_std = stats::sd(out$train_sensitivity),
                train_specificity_mean = mean(out$train_specificity),
-               train_specificity_std = sd(out$train_specificity),
+               train_specificity_std = stats::sd(out$train_specificity),
                test_auc_mean = mean(out$test_auc),
-               test_auc_std = sd(out$test_auc),
+               test_auc_std = stats::sd(out$test_auc),
                test_sensitivity_mean = mean(out$test_sensitivity),
-               test_sensitivity_std = sd(out$test_sensitivity),
+               test_sensitivity_std = stats::sd(out$test_sensitivity),
                test_specificity_mean = mean(out$test_specificity),
-               test_specificity_std = sd(out$test_specificity),
+               test_specificity_std = stats::sd(out$test_specificity),
                stringsAsFactors = FALSE)
   })
   perf <- tibble::as_tibble(perf)

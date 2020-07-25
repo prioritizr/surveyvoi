@@ -26,8 +26,6 @@ test_that("expected results", {
     survey_specificity = rep(0.9, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
-    preweight = runif(3, 100, 200),
-    postweight = runif(3, 5, 20),
     target = c(1, 1, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
@@ -45,14 +43,11 @@ test_that("expected results", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = 49,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
     method_approx_outcomes = "uniform_without_replacement")
@@ -73,7 +68,7 @@ test_that("consistent results", {
     n_sites = 10, n_features = 1, proportion_of_sites_missing_data = 0.5,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
-    n_features = 1, proportion_of_survey_features = 1)
+    n_sites = 10, n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
   xgb_params <- list(
@@ -98,8 +93,6 @@ test_that("consistent results", {
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
         feature_model_specificity_column = "model_specificity",
-        feature_preweight_column = "preweight",
-        feature_postweight_column = "postweight",
         feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
@@ -121,7 +114,7 @@ test_that("consistent results (multiple threads)", {
     n_sites = 10, n_features = 1, proportion_of_sites_missing_data = 0.5,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
-    n_features = 1, proportion_of_survey_features = 1)
+    n_sites = 10, n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
   xgb_params <- list(
@@ -147,8 +140,6 @@ test_that("consistent results (multiple threads)", {
         feature_survey_specificity_column = "survey_specificity",
         feature_model_sensitivity_column = "model_sensitivity",
         feature_model_specificity_column = "model_specificity",
-        feature_preweight_column = "preweight",
-        feature_postweight_column = "postweight",
         feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
@@ -190,8 +181,6 @@ test_that("expected results (sparse)", {
     survey_specificity = rep(0.9, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
-    preweight = runif(3, 100, 200),
-    postweight = runif(3, 5, 20),
     target = c(1, 1, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
@@ -210,14 +199,11 @@ test_that("expected results (sparse)", {
     feature_survey_specificity_column = "survey_specificity",
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
-    feature_preweight_column = "preweight",
-    feature_postweight_column = "postweight",
     feature_target_column = "target",
     total_budget = 49,
     survey_budget = 10,
     xgb_parameters = xgb_parameters,
     site_management_locked_in_column = "locked_in",
-    optimality_gap = 0,
     n_approx_replicates = 10,
     n_approx_outcomes_per_replicate = 10000,
     method_approx_outcomes = "uniform_without_replacement")

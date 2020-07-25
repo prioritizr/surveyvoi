@@ -97,22 +97,6 @@
 #'   one. No missing (\code{NA}) values are permitted in this column.
 #'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
 #'
-#' @param feature_preweight_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{preweight}
-#'   values used to parametrize  the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
-#' @param feature_postweight_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{postweight}
-#'   values used to parametrize  the conservation benefit of managing of each
-#'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
-#'   permitted in this column.
-#'
 #' @param feature_target_column \code{character} name of the column in the
 #'   argument to \code{feature_data} that contains the \eqn{target}
 #'   values used to parametrize the conservation benefit of managing of each
@@ -165,11 +149,6 @@
 #'   argument in \link{fit_occupancy_models} when generating parameters
 #'  for \code{xgb_parameters}).
 #'
-#' @param optimality_gap \code{numeric} relative optimality gap for generating
-#'   conservation prioritizations. A value of zero indicates that
-#'   prioritizations must be solved to optimality. A value of 0.1 indicates
-#'   prioritizations must be within 10\% of optimality. Defaults to 0.
-#'
 #' @param seed \code{integer} state of the random number generator for
 #'  partitioning data into folds cross-validation and fitting \pkg{xgboost}
 #'  models. This parameter must remain the same to compare results for
@@ -191,7 +170,9 @@
 #'
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 15, n_features = 2, prop = 0.5)
-#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+#' feature_data <- simulate_feature_data(n_sites = 15, n_features = 2,
+#'                                       prop = 0.5)
+#' feature_data$target <- c(3, 3)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -219,8 +200,7 @@
 #'   c("e1", "e2", "e3"), "management_cost", "survey_site",
 #'   "survey_cost", "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "preweight", "postweight", "target",
-#'   total_budget, xgb_parameters)
+#'   "target", total_budget, xgb_parameters)
 #'
 #' # print exact value
 #' print(ev_survey)
@@ -240,15 +220,12 @@ evdsi <- function(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   xgb_parameters,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   seed = 500) {
@@ -325,18 +302,6 @@ evdsi <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_preweight_column
-    assertthat::is.string(feature_preweight_column),
-    all(assertthat::has_name(feature_data, feature_preweight_column)),
-    is.numeric(feature_data[[feature_preweight_column]]),
-    assertthat::noNA(feature_data[[feature_preweight_column]]),
-    all(feature_data[[feature_preweight_column]] >= 0),
-    ## feature_postweight_column
-    assertthat::is.string(feature_postweight_column),
-    all(assertthat::has_name(feature_data, feature_postweight_column)),
-    is.numeric(feature_data[[feature_postweight_column]]),
-    assertthat::noNA(feature_data[[feature_postweight_column]]),
-    all(feature_data[[feature_postweight_column]] >= 0),
     ## feature_target_column
     assertthat::is.string(feature_target_column),
     all(assertthat::has_name(feature_data, feature_target_column)),
@@ -355,10 +320,6 @@ evdsi <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0),
     ## seed
     assertthat::is.number(seed))
   ## site_management_locked_in_column
@@ -402,6 +363,14 @@ evdsi <- function(
       site_weight_columns)
   ## validate xgboost parameters
   validate_xgboost_parameters(xgb_parameters)
+  ## verify targets
+  assertthat::assert_that(
+    all(feature_data[[feature_target_column]] <= nrow(site_data)))
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(feature_data[[feature_target_column]] <=
+          sum(!site_data[[site_management_locked_out_column]])))
+  }
 
   # prepare data for analysis
   ## drop spatial information
@@ -429,6 +398,15 @@ evdsi <- function(
   } else {
     site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
+  ## validate that targets are feasible given budget and locked out units
+  sorted_costs <- sort(
+    site_data[[site_management_cost_column]][!site_management_locked_out])
+  sorted_costs <- sorted_costs[
+    seq_len(max(feature_data[[feature_target_column]]))]
+  assertthat::assert_that(
+    sum(sorted_costs) <= total_budget,
+    msg = paste("targets cannot be achieved given budget and locked out",
+                "planning units"))
   ## xgb_nrounds
   xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
                         "nrounds")
@@ -491,11 +469,8 @@ evdsi <- function(
       xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
       xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
       n_xgb_nrounds = xgb_nrounds,
-      obj_fun_preweight = feature_data[[feature_preweight_column]],
-      obj_fun_postweight = feature_data[[feature_postweight_column]],
-      obj_fun_target = feature_data[[feature_target_column]],
-      total_budget = total_budget,
-      optim_gap = optimality_gap)
+      obj_fun_target = round(feature_data[[feature_target_column]]),
+      total_budget = total_budget)
   })
   # return result
   out

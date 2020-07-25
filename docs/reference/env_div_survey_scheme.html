@@ -73,7 +73,7 @@ conditions that are surveyed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
       </span>
     </div>
 
@@ -145,6 +145,7 @@ conditions that are surveyed.</p>
   <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"mahalanobis"</span>,
   <span class='kw'>locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>exclude_locked_out</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
@@ -201,6 +202,12 @@ No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
     </tr>
     <tr>
+      <th>exclude_locked_out</th>
+      <td><p><code>logical</code> should locked out planning units
+be entirely excluded from the optimization process?
+Defaults to <code>FALSE</code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating if information should be
 printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></td>
@@ -229,7 +236,7 @@ areas. <em>Biodiversity &amp; Conservation</em>, <strong>5</strong>, 399--415.</
 
 <span class='co'># simulate data</span>
  <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>sf</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/sf/man/st_as_sf.html'>st_as_sf</a></span>(
-   <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/tibble/man/tibble.html'>tibble</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>4</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>4</span>),
+   <span class='kw pkg'>tibble</span><span class='kw ns'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>4</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span>(<span class='fl'>4</span>),
                   <span class='kw'>v1</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span>), <span class='co'># environmental axis 1</span>
                   <span class='kw'>v2</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span>), <span class='co'># environmental axis 2</span>
                   <span class='kw'>cost</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>4</span>)),
