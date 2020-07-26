@@ -32,10 +32,11 @@ r_prioritization <- function(
   # main iteration loop
   while(sum(curr_solution * pu_costs) > budget) {
     ## find remaining planning units
-    curr_pu_rem_idx <- which(curr_solution & (!pu_locked_in) & (pu_costs > 0))
+    curr_pu_rem_idx <-
+      which(curr_solution & (pu_locked_in < 0.5) & (pu_costs > 1e-10))
     ## calculate the cost of the cheapest n-1 remaining planning units
     curr_min_feasible_pu_cost <-
-      sum(sort(pu_costs[curr_solution])[seq_len(max(target) - 1)])
+      sum(sort(pu_costs[curr_solution])[seq_len(max(target))])
     ## calculate benefit associated with dropping each remaining planning unit
     curr_alt_obj <- vapply(curr_pu_rem_idx, FUN.VALUE = numeric(2),
                            function(i) {
@@ -53,11 +54,12 @@ r_prioritization <- function(
     })
     ## find idx with lowest performance
     if (any(curr_alt_obj[1, ] > 0.5)) {
-      curr_idx <- which(curr_alt_obj[1, ] > 0.5)[1]
+      curr_idx <- which.max(pu_costs[curr_pu_rem_idx])
     } else {
       curr_ce <- (curr_obj - curr_alt_obj[2, ]) / pu_costs[curr_pu_rem_idx]
       curr_idx <- which.min(curr_ce)
     }
+
     ## update curr_solution and curr_obj
     curr_solution[curr_pu_rem_idx[curr_idx]] <- FALSE
     curr_obj <- curr_alt_obj[2, curr_idx]

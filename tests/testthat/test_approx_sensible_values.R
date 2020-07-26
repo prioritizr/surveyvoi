@@ -365,7 +365,7 @@ test_that("current < optimal info, some pu selected", {
     n_approx_outcomes_per_replicate = n_states_per_rep,
     method_approx_outcomes = "uniform_without_replacement")
   # tests
-  expect_true(all(attr(evd_ss, "ev")[1, ] > evd_current))
+  expect_true(all(attr(evd_ss, "ev")[1, ] >= evd_current))
 })
 
 test_that("approx = exact, when all states used (evdsi)", {

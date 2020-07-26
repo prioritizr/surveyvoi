@@ -110,3 +110,30 @@ test_that("complex example", {
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
 })
+
+test_that("highly variable costs", {
+  # data
+  set.seed(123)
+  n_sites <- 12
+  n_f <- 2
+  target <- c(2, 3)
+  rij <- matrix(runif(n_sites * n_f), ncol = n_sites, nrow = n_f)
+  pu_costs <- runif(n_sites)
+  budget <- sum(pu_costs) * 0.3
+  pu_costs[c(3:7)] <- 1e+5
+  pu_locked_in <- rep(0, ncol(rij))
+  pu_locked_out <- rep(0, ncol(rij))
+  # results
+  r1 <- r_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r2 <- rcpp_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r3 <- brute_force_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  # tests
+  expect_lte(abs(r1$objval - r3$objval), 1e-4)
+  expect_lte(abs(r2$objval - r3$objval), 1e-4)
+  expect_equal(r1$x, r2$x)
+  expect_equal(r1$x, r3$x)
+  expect_equal(r2$x, r3$x)
+})
