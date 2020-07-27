@@ -25,6 +25,7 @@ optimal_survey_scheme(
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
+  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   seed = 500,
@@ -167,6 +168,11 @@ Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
 
+\item{optimality_gap}{\code{numeric} relative optimality gap for generating
+conservation prioritizations. A value of zero indicates that
+prioritizations must be solved to optimality. A value of 0.1 indicates
+prioritizations must be within 10\% of optimality. Defaults to 0.}
+
 \item{site_weight_columns}{\code{character} name of columns in
 \code{site_data} containing weights for model fitting for each
 feature. These columns must contain \code{numeric} values greater
@@ -221,8 +227,7 @@ RFoptions(seed = 123)
 
 # simulate data
 site_data <- simulate_site_data(n_sites = 15, n_features = 2, prop = 0.5)
-feature_data <- simulate_feature_data(n_sites = 15, n_features = 2,
-                                      prop = 1)
+feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 feature_data$target <- c(3, 3)
 
 # preview simulated data

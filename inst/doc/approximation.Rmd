@@ -132,7 +132,7 @@ After simulating data for the sites, we will simulate data for the conservation 
 ```{r}
 # simulate feature data
 feature_data <- simulate_feature_data(
-  n_sites = 15, n_features = 1, proportion_of_survey_features = 1)
+  n_features = 1, proportion_of_survey_features = 1)
 
 # manually set targets
 feature_data$target <- 5

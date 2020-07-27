@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.20</span>
       </span>
     </div>
 
@@ -194,7 +194,7 @@
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># simulate feature data</span>
 <span class="no">feature_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simulate_feature_data.html">simulate_feature_data</a></span>(
-  <span class="kw">n_sites</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
+  <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
 
 <span class="co"># manually set target</span>
 <span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
@@ -461,11 +461,11 @@
 <pre><code>## # A tibble: 5 x 2
 ##   name            value
 ##   &lt;chr&gt;           &lt;dbl&gt;
-## 1 geo_scheme   0.140864
-## 2 env_scheme   0.176847
-## 3 unc_scheme   0.140864
-## 4 cheap_scheme 0.140864
-## 5 rich_scheme  0.122467</code></pre>
+## 1 geo_scheme   0.140895
+## 2 env_scheme   0.176860
+## 3 unc_scheme   0.140895
+## 4 cheap_scheme 0.140895
+## 5 rich_scheme  0.122486</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -476,11 +476,11 @@
 <pre><code>## # A tibble: 5 x 3
 ##   name            value        roi
 ##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   0.140864 -0.0184707
-## 2 env_scheme   0.176847  0.0175119
-## 3 unc_scheme   0.140864 -0.0184707
-## 4 cheap_scheme 0.140864 -0.0184707
-## 5 rich_scheme  0.122467 -0.0368677</code></pre>
+## 1 geo_scheme   0.140895 -0.0184400
+## 2 env_scheme   0.176860  0.0175253
+## 3 unc_scheme   0.140895 -0.0184400
+## 4 cheap_scheme 0.140895 -0.0184400
+## 5 rich_scheme  0.122486 -0.0368485</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -560,7 +560,7 @@
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 0.2137153</code></pre>
+<pre><code>## [1] 0.2137335</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
@@ -571,12 +571,12 @@
 <pre><code>## # A tibble: 6 x 3
 ##   name            value        roi
 ##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   0.140864 -0.0184707
-## 2 env_scheme   0.176847  0.0175119
-## 3 unc_scheme   0.140864 -0.0184707
-## 4 cheap_scheme 0.140864 -0.0184707
-## 5 rich_scheme  0.122467 -0.0368677
-## 6 opt_scheme   0.213715  0.0543803</code></pre>
+## 1 geo_scheme   0.140895 -0.0184400
+## 2 env_scheme   0.176860  0.0175253
+## 3 unc_scheme   0.140895 -0.0184400
+## 4 cheap_scheme 0.140895 -0.0184400
+## 5 rich_scheme  0.122486 -0.0368485
+## 6 opt_scheme   0.213733  0.0543985</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>

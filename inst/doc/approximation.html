@@ -130,7 +130,7 @@ site_data &lt;-<span class="st"> </span><span class="kw">simulate_site_data</spa
 ## 13     5.49527         58.2507 -1.44014   -0.152584   1.18873      1 9.91781e-1
 ## 14     7.11370         64.8953 -0.608469  -0.0494300  0.128359     1 7.81913e-1
 ## 15     5.19364         70.5367 -1.23370    1.56944    2.35114      0 8.62330e-1
-## # … with 1 more variable: geometry &lt;POINT&gt;</code></pre>
+NA</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the spatial location of the sites</span>
 <span class="kw">ggplot</span>(site_data) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_sf</span>() <span class="op">+</span>
@@ -189,7 +189,7 @@ total_budget &lt;-<span class="st"> </span><span class="kw">sum</span>(site_data
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate feature data</span>
 feature_data &lt;-<span class="st"> </span><span class="kw">simulate_feature_data</span>(
-  <span class="dt">n_sites =</span> <span class="dv">15</span>, <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_survey_features =</span> <span class="dv">1</span>)
+  <span class="dt">n_features =</span> <span class="dv">1</span>, <span class="dt">proportion_of_survey_features =</span> <span class="dv">1</span>)
 
 <span class="co"># manually set targets</span>
 feature_data<span class="op">$</span>target &lt;-<span class="st"> </span><span class="dv">5</span>
@@ -197,10 +197,10 @@ feature_data<span class="op">$</span>target &lt;-<span class="st"> </span><span 
 <span class="co"># print feature data</span>
 <span class="kw">print</span>(feature_data)</code></pre></div>
 <pre><code>## # A tibble: 1 x 7
-##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
+NA
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1 f1    TRUE           0.959335         0.895506         0.778723
-## # … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
+NA</code></pre>
 <p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>target</code> column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
 <p>Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the <code>fit_occupancy_models</code> function, but here we will define them manually to keep things simple.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define parameters</span>

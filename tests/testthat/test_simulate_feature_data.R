@@ -2,7 +2,7 @@ context("simulate_feature_data")
 
 test_that("simulate_feature_data", {
   # data
-  d <- simulate_feature_data(10, 5, 0.5)
+  d <- simulate_feature_data(5, 0.5)
   # tests
   expect_is(d, "tbl_df")
   expect_equal(nrow(d), 5)

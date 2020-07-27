@@ -125,7 +125,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     curr_solution <- r_prioritization(
       curr_postij, pu_purchase_costs,
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
-      obj_fun_target, remaining_budget)$x
+      obj_fun_target, remaining_budget, gap = 0, "")$x
 
     ## calculate approximate expected value of the prioritisation
     curr_value <- r_expected_value_of_action(

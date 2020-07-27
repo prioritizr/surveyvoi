@@ -31,7 +31,7 @@ test_that("correct result", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$target, 301)
+    site_data$locked_out, feature_data$target, 301, 0)
   r2 <- r_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
     site_data$locked_out, feature_data$target, 301)

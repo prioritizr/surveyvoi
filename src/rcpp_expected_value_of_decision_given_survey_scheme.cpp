@@ -31,7 +31,8 @@ double expected_value_of_decision_given_survey_scheme(
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_train_folds,
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
   Eigen::VectorXi &obj_fun_target,  // objective function calculation term
-  double total_budget // total budget for surveying + monitor costs
+  double total_budget, // total budget for surveying + monitor costs
+  double optim_gap // optimality gap
 ) {
   // initialization
   /// constant variables
@@ -167,6 +168,12 @@ double expected_value_of_decision_given_survey_scheme(
   log_matrix(total_probability_of_survey_positive_log);
   log_matrix(total_probability_of_survey_negative_log);
 
+  /// initialize prioritization object
+  Prioritization prioritize(
+    rij.cols(), rij.rows(), pu_purchase_costs,
+    pu_purchase_locked_in, pu_purchase_locked_out,
+    obj_fun_target.maxCoeff(), remaining_budget, optim_gap);
+
   /// overwrite outcome data with prior data for features we are
   /// not interested in surveying: planning units needing model predictions
   for (std::size_t i = 0; i < n_f; ++i)
@@ -263,9 +270,9 @@ double expected_value_of_decision_given_survey_scheme(
       curr_pij, "issue calculating posterior probabilities");
 
     /// generate prioritisation
-    prioritization(
-      curr_pij, pu_purchase_costs, pu_purchase_locked_in,
-      pu_purchase_locked_out, obj_fun_target, remaining_budget, curr_solution);
+    prioritize.add_rij_data(curr_pij);
+    prioritize.solve();
+    prioritize.get_solution(curr_solution);
 
     /// calculate expected value of the prioritisation
     curr_expected_value_of_action_given_outcome =
@@ -317,7 +324,8 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   Rcpp::List xgb_test_folds,
   std::vector<std::size_t> n_xgb_nrounds,
   Eigen::VectorXi obj_fun_target,
-  double total_budget) {
+  double total_budget,
+  double optim_gap) {
 
   // constant parameters
   const std::size_t n_f = rij.rows();
@@ -362,5 +370,5 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
     pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data2, xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
     xgb_train_folds2, xgb_test_folds2,
-    obj_fun_target, total_budget);
+    obj_fun_target, total_budget, optim_gap);
 }

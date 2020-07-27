@@ -7,9 +7,9 @@ test_that("expected results", {
     tibble::tibble(
       x = seq_len(5),
       y = x,
-      f1 = c(0, 1, 1, NA, NA),
-      f2 = c(0, 1, 0, NA, NA),
-      f3 = c(0, 0, 1, NA, NA),
+      f1 = c(0, 1, 1, NA, 1),
+      f2 = c(0, 1, 0, NA, 0),
+      f3 = c(0, 0, 1, NA, 1),
       p1 = c(0.99, 0.99, 0.99, 0.99, 0.99),
       p2 = c(0.05, 0.99, 0.05, 0.05, 0.99),
       p3 = c(0.05, 0.05, 0.05, 0.05, 0.99),
@@ -27,7 +27,7 @@ test_that("expected results", {
     survey_specificity = rep(0.9, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
-    target = c(1, 1, 3))
+    target = c(3, 3, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
   # generate prioritisation
@@ -70,7 +70,7 @@ test_that("consistent results", {
     n_sites = 10, n_features = 1, proportion_of_sites_missing_data = 0.5,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
-    n_sites = 10, n_features = 1, proportion_of_survey_features = 1)
+    n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
   xgb_params <- list(
@@ -116,7 +116,7 @@ test_that("consistent results (multiple threads)", {
     n_sites = 10, n_features = 1, proportion_of_sites_missing_data = 0.5,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
-    n_sites = 10, n_features = 1, proportion_of_survey_features = 1)
+    n_features = 1, proportion_of_survey_features = 1)
   total_budget <- 500.128863597055
   survey_budget <- 26.4498218037885
   xgb_params <- list(
@@ -182,7 +182,7 @@ test_that("expected results (sparse)", {
     survey_specificity = rep(0.9, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
-    target = c(1, 1, 3))
+    target = c(3, 3, 3))
   xgb_parameters <- list(list(nrounds = 3, eta = 0.3, scale_pos_weight = 2,
                               objective = "binary:logistic"))[rep(1, 3)]
   # generate prioritisation

@@ -7,7 +7,7 @@ test_that("equal weights", {
   n_f <- 2
   n_sites <- 5
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_f, 0.5)
   feature_data$target <- c(1, 1)
   total_budget <- sum(site_data$management_cost) * 0.6
   site_data$survey <- FALSE
@@ -93,7 +93,7 @@ test_that("variable weights", {
   n_f <- 2
   n_sites <- 12
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
+  feature_data <- simulate_feature_data(n_f, 0.5)
   feature_data$target <- c(1, 1)
   total_budget <- sum(site_data$management_cost * 0.9)
   site_data$survey <- FALSE
@@ -181,8 +181,8 @@ test_that("sparse", {
   n_f <- 2
   n_sites <- 12
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
-  feature_data$target <- c(2, 3)
+  feature_data <- simulate_feature_data(n_f, 0.5)
+  feature_data$target <- c(2, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE

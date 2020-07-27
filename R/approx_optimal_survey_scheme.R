@@ -56,7 +56,7 @@ NULL
 #'
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 11, n_features = 2, prop = 0.8)
-#' feature_data <- simulate_feature_data(n_sites = 11, n_features = 2, prop = 1)
+#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #' feature_data$target <- c(3, 3)
 #'
 #' # preview simulated data
@@ -112,6 +112,7 @@ approx_optimal_survey_scheme <- function(
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
+  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
@@ -208,6 +209,10 @@ approx_optimal_survey_scheme <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
+    ## optimality_gap
+    assertthat::is.number(optimality_gap),
+    assertthat::noNA(optimality_gap),
+    isTRUE(optimality_gap >= 0),
     ## n_threads
     assertthat::is.count(n_threads),
     assertthat::noNA(n_threads),
@@ -270,6 +275,8 @@ approx_optimal_survey_scheme <- function(
     assertthat::assert_that(
     isTRUE(n_approx_outcomes_per_replicate <=
            n_states(nrow(site_data), nrow(feature_data))))
+  ## validate targets
+  validate_target_data(feature_data, feature_target_column)
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
@@ -376,7 +383,8 @@ approx_optimal_survey_scheme <- function(
       pu_locked_in = site_management_locked_in,
       pu_locked_out = site_management_locked_out,
       target = round(feature_data[[feature_target_column]]),
-      budget = total_budget)
+      budget = total_budget,
+      optim_gap = optimality_gap)
   })
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -426,6 +434,7 @@ approx_optimal_survey_scheme <- function(
         n_xgb_nrounds = xgb_nrounds,
         obj_fun_target = round(feature_data[[feature_target_column]]),
         total_budget = total_budget,
+        optim_gap = optimality_gap,
         n_approx_replicates = n_approx_replicates,
         n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
         method_approx_outcomes = method_approx_outcomes)

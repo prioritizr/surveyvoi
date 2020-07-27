@@ -9,20 +9,20 @@ rcpp_log_sum <- function(x) {
     .Call(`_surveyvoi_rcpp_log_sum`, x)
 }
 
-rcpp_approx_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes) {
-    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes)
+rcpp_approx_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, optim_gap, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes) {
+    .Call(`_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, optim_gap, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes)
 }
 
 rcpp_expected_value_of_action <- function(solution, pij, target) {
     .Call(`_surveyvoi_rcpp_expected_value_of_action`, solution, pij, target)
 }
 
-rcpp_expected_value_of_decision_given_current_info <- function(pij, pu_costs, pu_locked_in, pu_locked_out, target, budget) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_current_info`, pij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+rcpp_expected_value_of_decision_given_current_info <- function(pij, pu_costs, pu_locked_in, pu_locked_out, target, budget, optim_gap) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_current_info`, pij, pu_costs, pu_locked_in, pu_locked_out, target, budget, optim_gap)
 }
 
-rcpp_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget) {
-    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget)
+rcpp_expected_value_of_decision_given_survey_scheme <- function(rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, optim_gap) {
+    .Call(`_surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme`, rij, pij, wij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data, xgb_parameters, xgb_train_folds, xgb_test_folds, n_xgb_nrounds, obj_fun_target, total_budget, optim_gap)
 }
 
 rcpp_feasible_actions_ilp_matrix <- function(x) {
@@ -41,8 +41,8 @@ rcpp_predict_missing_rij_data <- function(rij, wij, pu_env_data_raw, survey_feat
     .Call(`_surveyvoi_rcpp_predict_missing_rij_data`, rij, wij, pu_env_data_raw, survey_features, pu_model_prediction, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds)
 }
 
-rcpp_prioritization <- function(rij, pu_costs, pu_locked_in, pu_locked_out, target, budget) {
-    .Call(`_surveyvoi_rcpp_prioritization`, rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+rcpp_prioritization <- function(rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, gap, file_path) {
+    .Call(`_surveyvoi_rcpp_prioritization`, rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, gap, file_path)
 }
 
 rcpp_total_probability_of_positive_result <- function(prior, sensitivity, specificity) {

@@ -30,11 +30,11 @@ test_that("expected result", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$target, 301)
+    site_data$locked_out, feature_data$target, 301, 0)
   r2 <- evdci(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "model_specificity", "target", 301, "locked_in", "locked_out", NULL)
+    "model_specificity", "target", 301, "locked_in", "locked_out", NULL, 0)
   # tests
   expect_equal(r1, r2)
 })
@@ -69,11 +69,11 @@ test_that("expected result (sparse)", {
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$target, 301)
+    site_data$locked_out, feature_data$target, 301, 0)
   r2 <- evdci(
     site_data, feature_data, site_occupancy_columns, site_probability_columns,
     "management_cost", "sensitivity", "specificity", "model_sensitivity",
-    "model_specificity", "target", 301, "locked_in", "locked_out", NULL)
+    "model_specificity", "target", 301, "locked_in", "locked_out", NULL, 0)
   # tests
   expect_equal(r1, r2)
 })

@@ -7,8 +7,8 @@ test_that("correct result", {
   n_f <- 3
   n_sites <- 7
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
-  feature_data$target <- c(1, 2, 1)
+  feature_data <- simulate_feature_data(n_f, 0.5)
+  feature_data$target <- c(2, 2, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -64,7 +64,8 @@ test_that("correct result", {
     total_budget = total_budget,
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
-    method_approx_outcomes = "weighted_without_replacement")
+    method_approx_outcomes = "weighted_without_replacement",
+    optim_gap = 0)
   set.seed(1)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,

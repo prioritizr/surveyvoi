@@ -17,7 +17,7 @@
 #'
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
-#' feature_data <- simulate_feature_data(n_sites = 5, n_features = 2, prop = 1)
+#' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #' feature_data$target <- c(1, 1)
 #'
 #' # preview simulated data
@@ -54,7 +54,8 @@ evdci <- function(
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL) {
+  prior_matrix = NULL,
+  optimality_gap = 0) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -117,7 +118,11 @@ evdci <- function(
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
     ## prior_matrix
-    inherits(prior_matrix, c("matrix", "NULL")))
+    inherits(prior_matrix, c("matrix", "NULL")),
+    ## optimality_gap
+    assertthat::is.number(optimality_gap),
+    assertthat::noNA(optimality_gap),
+    isTRUE(optimality_gap >= 0))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -149,6 +154,8 @@ evdci <- function(
           site_data[[site_management_locked_out_column]] <= 1),
       msg = "at least one planning unit is locked in and locked out")
   }
+  ## validate targets
+  validate_target_data(feature_data, feature_target_column)
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
@@ -208,7 +215,8 @@ evdci <- function(
     pu_locked_in = site_management_locked_in,
     pu_locked_out = site_management_locked_out,
     target = round(feature_data[[feature_target_column]]),
-    budget = total_budget)
+    budget = total_budget,
+    optim_gap =  optimality_gap)
 
   # return result
   out

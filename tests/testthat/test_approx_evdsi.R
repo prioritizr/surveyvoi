@@ -7,8 +7,8 @@ test_that("equal weights", {
   n_f <- 2
   n_sites <- 8
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
-  feature_data$target <- c(1, 2)
+  feature_data <- simulate_feature_data(n_f, 0.5)
+  feature_data$target <- c(1, 1)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -101,8 +101,8 @@ test_that("variable weights", {
   n_f <- 2
   n_sites <- 8
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
-  feature_data$target <- c(1, 2)
+  feature_data <- simulate_feature_data(n_f, 0.5)
+  feature_data$target <- c(2, 2)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -199,8 +199,8 @@ test_that("sparse", {
   n_outcomes_per_rep <- 4
   n_sites <- 12
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites, n_f, 0.5)
-  feature_data$target <- c(3, 2)
+  feature_data <- simulate_feature_data(n_f, 0.5)
+  feature_data$target <- c(6, 6)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
@@ -243,7 +243,7 @@ test_that("sparse", {
   ## set NA rij values to -1
   rij[is.na(rij)] <- -1
   # calculations
-  # calculations
+  set.seed(1)
   r1 <- approx_evdsi(
     site_data = site_data,
     feature_data = feature_data,

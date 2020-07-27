@@ -12,11 +12,17 @@ double rcpp_expected_value_of_decision_given_current_info(
   Eigen::VectorXd &pu_locked_in,
   Eigen::VectorXd &pu_locked_out,
   Eigen::VectorXi &target,
-  double budget) {
+  double budget,
+  double optim_gap) {
+
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
-  prioritization(
-    pij, pu_costs, pu_locked_in, pu_locked_out, target, budget, solution);
+  Prioritization p(pij.cols(), pij.rows(), pu_costs,
+                   pu_locked_in, pu_locked_out, target.maxCoeff(),
+                   budget, optim_gap);
+  p.add_rij_data(pij);
+  p.solve();
+  p.get_solution(solution);
 
   // calculate expected value of management action
   return expected_value_of_action(solution, pij, target);

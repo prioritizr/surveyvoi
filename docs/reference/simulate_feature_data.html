@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.15</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.20</span>
       </span>
     </div>
 
@@ -135,15 +135,11 @@
     <p>Simulate feature data for developing simulated survey schemes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_feature_data</span>(<span class='no'>n_sites</span>, <span class='no'>n_features</span>, <span class='no'>proportion_of_survey_features</span>)</pre>
+    <pre class="usage"><span class='fu'>simulate_feature_data</span>(<span class='no'>n_features</span>, <span class='no'>proportion_of_survey_features</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>n_sites</th>
-      <td><p><code>integer</code> number of sites.</p></td>
-    </tr>
     <tr>
       <th>n_features</th>
       <td><p><code>integer</code> number of features.</p></td>
@@ -192,7 +188,7 @@ data:</p><dl'>
 <span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
 
 <span class='co'># simulate data</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>5</span>,
+<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_feature_data</span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>5</span>,
                            <span class='kw'>proportion_of_survey_features</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)
 <span class='co'># print data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 5 x 7</span><span>

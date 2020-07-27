@@ -43,18 +43,16 @@ NULL
 #' set.seed(123)
 #'
 #' # simulate data
-#' d <- simulate_feature_data(n_sites = 10, n_features = 5,
+#' d <- simulate_feature_data(n_features = 5,
 #'                            proportion_of_survey_features = 0.5)
 #' # print data
 #' print(d)
 #'
 #' @export
-simulate_feature_data <- function(n_sites, n_features,
-  proportion_of_survey_features) {
+simulate_feature_data <- function(n_features, proportion_of_survey_features) {
   # assert that arguments are valid
   assertthat::assert_that(
     assertthat::is.count(n_features), assertthat::noNA(n_features),
-    assertthat::is.count(n_sites), assertthat::noNA(n_sites),
     assertthat::is.number(proportion_of_survey_features),
     assertthat::noNA(proportion_of_survey_features),
     isTRUE(proportion_of_survey_features > 0),
@@ -72,5 +70,5 @@ simulate_feature_data <- function(n_sites, n_features,
     survey_specificity = stats::runif(n_features, 0.8, 0.9),
     model_sensitivity = stats::runif(n_features, 0.7, 0.8),
     model_specificity = stats::runif(n_features, 0.8, 0.9),
-    target = ceiling(stats::runif(n_features, 1, n_sites)))
+    target = 1)
 }

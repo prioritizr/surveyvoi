@@ -149,6 +149,11 @@
 #'   argument in \link{fit_occupancy_models} when generating parameters
 #'  for \code{xgb_parameters}).
 #'
+#' @param optimality_gap \code{numeric} relative optimality gap for generating
+#'   conservation prioritizations. A value of zero indicates that
+#'   prioritizations must be solved to optimality. A value of 0.1 indicates
+#'   prioritizations must be within 10\% of optimality. Defaults to 0.
+#'
 #' @param seed \code{integer} state of the random number generator for
 #'  partitioning data into folds cross-validation and fitting \pkg{xgboost}
 #'  models. This parameter must remain the same to compare results for
@@ -170,8 +175,7 @@
 #'
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 15, n_features = 2, prop = 0.5)
-#' feature_data <- simulate_feature_data(n_sites = 15, n_features = 2,
-#'                                       prop = 0.5)
+#' feature_data <- simulate_feature_data(n_features = 2, prop = 0.5)
 #' feature_data$target <- c(3, 3)
 #'
 #' # preview simulated data
@@ -226,6 +230,7 @@ evdsi <- function(
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   prior_matrix = NULL,
+  optimality_gap = 0,
   site_weight_columns = NULL,
   xgb_n_folds = rep(5, nrow(feature_data)),
   seed = 500) {
@@ -320,6 +325,10 @@ evdsi <- function(
     assertthat::noNA(xgb_n_folds),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
+    ## optimality_gap
+    assertthat::is.number(optimality_gap),
+    assertthat::noNA(optimality_gap),
+    isTRUE(optimality_gap >= 0),
     ## seed
     assertthat::is.number(seed))
   ## site_management_locked_in_column
@@ -353,6 +362,8 @@ evdsi <- function(
           site_data[[site_management_locked_out_column]] <= 1),
       msg = "at least one planning unit is locked in and locked out")
   }
+  ## validate targets
+  validate_target_data(feature_data, feature_target_column)
   ## validate rij values
   validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
@@ -470,7 +481,8 @@ evdsi <- function(
       xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
       n_xgb_nrounds = xgb_nrounds,
       obj_fun_target = round(feature_data[[feature_target_column]]),
-      total_budget = total_budget)
+      total_budget = total_budget,
+      optim_gap = optimality_gap)
   })
   # return result
   out

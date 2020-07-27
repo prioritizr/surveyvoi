@@ -3,9 +3,9 @@ context("prioritization")
 test_that("expected result", {
   # data
   set.seed(123)
-  n_pu <- 300
-  n_f <- 40
-  target <- 100
+  n_pu <- 100
+  n_f <- 5
+  target <- rep(20, n_f)
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
@@ -15,15 +15,15 @@ test_that("expected result", {
   budget <- sum(pu_costs) * 0.7
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
   # tests
-  objval <- r_conservation_value(
-      rij[, which(r1$x), drop = FALSE], rep(target, n_f))
-  expect_lte(abs(r1$objval - objval), 1e-4)
-  expect_lte(abs(r2$objval - objval), 1e-4)
+  expect_lte(abs(r1$objval - r2$objval), 1e-5)
   expect_equal(r1$x, r2$x)
+  # clean up
+  if (file.exists("r.lp")) unlink("r.lp")
+  if (file.exists("rcpp.lp")) unlink("rcpp.lp")
 })
 
 test_that("correct result", {
@@ -31,7 +31,7 @@ test_that("correct result", {
   set.seed(123)
   n_pu <- 20
   n_f <- 5
-  target <- 3
+  target <- rep(3, n_f)
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
@@ -41,16 +41,24 @@ test_that("correct result", {
   budget <- ceiling(sum(pu_costs) * 0.7)
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
   r3 <- brute_force_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
   # tests
+  prob_objval_r1 <- r_conservation_value(
+      rij[, which(r1$x), drop = FALSE], target)
+  prob_objval_r2 <- r_conservation_value(
+      rij[, which(r2$x), drop = FALSE], target)
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
-  expect_lte(abs(r1$objval - r3$objval), 1e-4)
-  expect_lte(abs(r2$objval - r3$objval), 1e-4)
+  expect_lte(abs(r1$objval - r2$objval), 1e-5)
+  expect_lte(abs(prob_objval_r1 - r3$objval), 1e-4)
+  expect_lte(abs(prob_objval_r2 - r3$objval), 1e-4)
+  # clean up
+  if (file.exists("r.lp")) unlink("r.lp")
+  if (file.exists("rcpp.lp")) unlink("rcpp.lp")
 })
 
 test_that("expected result (one feature has all 0s)", {
@@ -58,7 +66,7 @@ test_that("expected result (one feature has all 0s)", {
   set.seed(123)
   n_pu <- 15
   n_f <- 2
-  target <- 10
+  target <- rep(10, n_f)
   rij <- matrix(0, ncol = n_pu, nrow = n_f)
   rij[1, ] <- 1
   pu_costs <- runif(n_pu)
@@ -67,25 +75,31 @@ test_that("expected result (one feature has all 0s)", {
   budget <- sum(pu_costs) * 1.1
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
   r3 <- brute_force_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, rep(target, n_f), budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
   # tests
-  objval <- r_conservation_value(
-      rij[, which(r1$x), drop = FALSE], rep(target, n_f))
-  expect_lte(abs(r1$objval - objval), 1e-4)
-  expect_lte(abs(r2$objval - objval), 1e-4)
+  prob_objval_r1 <- r_conservation_value(
+      rij[, which(r1$x), drop = FALSE], target)
+  prob_objval_r2 <- r_conservation_value(
+      rij[, which(r2$x), drop = FALSE], target)
+  expect_lte(abs(r1$objval - r2$objval), 1e-5)
+  expect_lte(abs(prob_objval_r1 - r3$objval), 1e-4)
+  expect_lte(abs(prob_objval_r2 - r3$objval), 1e-4)
   expect_equal(r1$x, r2$x)
   expect_true(all(r1$x))
   expect_true(all(r2$x))
+  # clean up
+  if (file.exists("r.lp")) unlink("r.lp")
+  if (file.exists("rcpp.lp")) unlink("rcpp.lp")
 })
 
 test_that("complex example", {
   # data
   set.seed(123)
-  target <- c(2, 3)
+  target <- c(2, 2)
   rij <- matrix(c(
     0.8887591, 0.8642433, 0.1467236, 0.9039545, 0.8795562,  0.002713299,
     0.7849601, 0.14347625,
@@ -99,16 +113,24 @@ test_that("complex example", {
   pu_locked_out <- rep(0, ncol(rij))
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
   r3 <- brute_force_prioritization(
     rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
   # tests
-  expect_lte(abs(r1$objval - r3$objval), 1e-4)
-  expect_lte(abs(r2$objval - r3$objval), 1e-4)
+  prob_objval_r1 <- r_conservation_value(
+      rij[, which(r1$x), drop = FALSE], target)
+  prob_objval_r2 <- r_conservation_value(
+      rij[, which(r2$x), drop = FALSE], target)
+  expect_equal(r1$x, r2$x)
+  expect_lte(abs(prob_objval_r1 - r3$objval), 1e-4)
+  expect_lte(abs(prob_objval_r2 - r3$objval), 1e-4)
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
+  # clean up
+  if (file.exists("r.lp")) unlink("r.lp")
+  if (file.exists("rcpp.lp")) unlink("rcpp.lp")
 })
 
 test_that("highly variable costs", {
@@ -116,7 +138,7 @@ test_that("highly variable costs", {
   set.seed(123)
   n_sites <- 12
   n_f <- 2
-  target <- c(2, 3)
+  target <- c(2, n_f)
   rij <- matrix(runif(n_sites * n_f), ncol = n_sites, nrow = n_f)
   pu_costs <- runif(n_sites)
   budget <- sum(pu_costs) * 0.3
@@ -125,15 +147,22 @@ test_that("highly variable costs", {
   pu_locked_out <- rep(0, ncol(rij))
   # results
   r1 <- r_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
   r2 <- rcpp_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
   r3 <- brute_force_prioritization(
     rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
   # tests
-  expect_lte(abs(r1$objval - r3$objval), 1e-4)
-  expect_lte(abs(r2$objval - r3$objval), 1e-4)
+  prob_objval_r1 <- r_conservation_value(
+      rij[, which(r1$x), drop = FALSE], target)
+  prob_objval_r2 <- r_conservation_value(
+      rij[, which(r2$x), drop = FALSE], target)
+  expect_lte(abs(prob_objval_r1 - r3$objval), 1e-4)
+  expect_lte(abs(prob_objval_r2 - r3$objval), 1e-4)
   expect_equal(r1$x, r2$x)
   expect_equal(r1$x, r3$x)
   expect_equal(r2$x, r3$x)
+  # clean up
+  if (file.exists("r.lp")) unlink("r.lp")
+  if (file.exists("rcpp.lp")) unlink("rcpp.lp")
 })

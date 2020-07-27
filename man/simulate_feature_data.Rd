@@ -4,11 +4,9 @@
 \alias{simulate_feature_data}
 \title{Simulate feature data}
 \usage{
-simulate_feature_data(n_sites, n_features, proportion_of_survey_features)
+simulate_feature_data(n_features, proportion_of_survey_features)
 }
 \arguments{
-\item{n_sites}{\code{integer} number of sites.}
-
 \item{n_features}{\code{integer} number of features.}
 
 \item{proportion_of_survey_features}{\code{numeric} proportion of features
@@ -49,7 +47,7 @@ Simulate feature data for developing simulated survey schemes.
 set.seed(123)
 
 # simulate data
-d <- simulate_feature_data(n_sites = 10, n_features = 5,
+d <- simulate_feature_data(n_features = 5,
                            proportion_of_survey_features = 0.5)
 # print data
 print(d)

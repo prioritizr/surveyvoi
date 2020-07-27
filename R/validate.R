@@ -99,3 +99,19 @@ validate_xgboost_parameters <- function(x) {
   })
   invisible(TRUE)
 }
+
+validate_target_data <- function(feature_data, feature_target_column) {
+  assertthat::assert_that(
+    inherits(feature_data, "data.frame"),
+    assertthat::is.string(feature_target_column),
+    assertthat::has_name(feature_data, feature_target_column))
+  assertthat::assert_that(
+    all(vapply(feature_data[[feature_target_column]], assertthat::is.count,
+           logical(1))),
+    msg = paste("feature target values must be count values",
+                "(i.e. integer values >= 1"))
+  assertthat::assert_that(
+    dplyr::n_distinct(feature_data[[feature_target_column]]) == 1,
+    msg = paste("all features must have exactly the same target value"))
+  invisible(TRUE)
+}

@@ -7,7 +7,7 @@ test_that("lower voi when most of budget spent on surveys", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites = 8, n_features = n_f, 0.5)
+  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   feature_data$target <- c(1, 1)
   total_budget <- 5
   # manually define costs
@@ -92,8 +92,8 @@ test_that("different voi when xgboost models trained with different weights", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 12, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites = 12, n_features = n_f, 0.5)
-  feature_data$target <- c(2, 3)
+  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data$target <- c(3, 3)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$w1 <- (runif(nrow(site_data)) * 100) + 1
   site_data$w2 <- (runif(nrow(site_data)) * 100) + 1
@@ -176,8 +176,8 @@ test_that("identical outputs given identical inputs", {
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data$target <- c(1, 2)
+  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
+  feature_data$target <- c(2, 2)
   total_budget <- 5
   # manually define costs
   site_data$management_cost <- 0.1
@@ -374,7 +374,7 @@ test_that("approx = exact, when all states used (evdsi)", {
   set.seed(500)
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 8, n_features = n_f, 0.5)
-  feature_data <- simulate_feature_data(n_sites = 8, n_features = n_f, 0.5)
+  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
   feature_data$target <- c(1, 1)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
