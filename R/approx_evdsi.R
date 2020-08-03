@@ -358,7 +358,7 @@ approx_evdsi <- function(
   }
 
   # main calculation
-  withr::with_seed(seed, {
+  # withr::with_seed(seed, {
     out <- rcpp_approx_expected_value_of_decision_given_survey_scheme(
       rij = rij, pij = pij, wij = wij,
       survey_features = feature_data[[feature_survey_column]],
@@ -380,8 +380,9 @@ approx_evdsi <- function(
       optim_gap = optimality_gap,
       n_approx_replicates = n_approx_replicates,
       n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-      method_approx_outcomes = method_approx_outcomes)
-  })
+      method_approx_outcomes = method_approx_outcomes,
+      seed = seed)
+  # })
   # return result
   out
 }

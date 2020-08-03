@@ -85,7 +85,7 @@ public:
     GRBsetdblparam(GRBgetenv(_model), "MIPGap", gap); // optimal solutions
     GRBsetintparam(GRBgetenv(_model), "Presolve", -1); // enable presolve
     GRBsetintparam(GRBgetenv(_model), "Threads", 1);  // disable multi-threads
-    GRBsetintparam(GRBgetenv(_model), "NumericFocus", 2);  // default precision
+    GRBsetintparam(GRBgetenv(_model), "NumericFocus", 0);  // default precision
     GRBsetintparam(GRBgetenv(_model), "OutputFlag", 0);  // disable output
     GRBsetintparam(GRBgetenv(_model), "Seed", 1);  // disable output
 
@@ -111,13 +111,13 @@ public:
     min_feature_held_col_idx[0] = 1.0;
     min_feature_held_col_idx[1] = _n_pu + _n_f;
     std::vector<double> min_feature_held_col_val(2);
-    min_feature_held_col_val[0] = 1.0;
-    min_feature_held_col_val[1] = -1.0;
+    min_feature_held_col_val[0] = -1.0;
+    min_feature_held_col_val[1] = 1.0;
     //// add constraints
     for (std::size_t j = 0; j < _n_f; ++j) {
       min_feature_held_col_idx[0] = _n_pu + j;
       GRBaddconstr(_model, 2, &min_feature_held_col_idx[0],
-                    &min_feature_held_col_val[0], GRB_LESS_EQUAL, 0.0, NULL);
+                    &min_feature_held_col_val[0], GRB_GREATER_EQUAL, 0.0, NULL);
     }
     /// minimum number of planning units in solution constraint
     //// initialize vectors

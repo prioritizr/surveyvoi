@@ -48,7 +48,8 @@ LinkingTo:
     Rcpp (>= 0.12.19),
     RcppEigen (>= 0.3.3.7.0),
     RcppProgress (>= 0.4.1),
-    RcppNumerical (>= 0.3-3)
+    RcppNumerical (>= 0.3-3),
+    PoissonBinomial (>= 1.1.1)
 License: GPL-3
 LazyData: true
 OS_type: unix

@@ -25,14 +25,35 @@ double expected_value_of_action(
 
   // calculate probability of each species meeting the targets
   Eigen::VectorXd spp_prob(n_f);
-  Eigen::VectorXd curr_spp_probs;
+  Rcpp::NumericVector curr_spp_probs;
+  Rcpp::NumericVector curr_density_probs;
+  Rcpp::IntegerVector curr_target_values((rij.cols() - target[0]) + 1);
+  std::iota(curr_target_values.begin(), curr_target_values.end(), target[0]);
   for (std::size_t i = 0; i < n_f; ++i) {
-    curr_spp_probs = rij.row(i);
-    spp_prob[i] = convolve_binomial(curr_spp_probs, target[i]);
+    curr_spp_probs = wrap(rij.row(i));
+    curr_density_probs = PoissonBinomial::dpb_dc(
+      curr_target_values, curr_spp_probs);
+    spp_prob[i] = Rcpp::sum(curr_density_probs);
   }
 
   // calculate probability of all species meeting targets
   return spp_prob.prod();
+}
+
+double approx_expected_value_of_action(
+  Eigen::MatrixXd &pij,
+  Rcpp::IntegerVector &target_values) {
+  double out = 1.0;
+  const std::size_t n_f = pij.rows();
+  Rcpp::NumericVector curr_density_probs;
+  Rcpp::NumericVector curr_spp_probs;
+  for (std::size_t i = 0; i < n_f; ++i) {
+    curr_spp_probs = wrap(pij.row(i));
+    curr_density_probs = PoissonBinomial::dpb_na(
+      target_values, curr_spp_probs, false);
+    out *= Rcpp::sum(curr_density_probs);
+  }
+  return out;
 }
 
 // [[Rcpp::export]]

@@ -14,6 +14,7 @@
 #include <RcppNumerical.h>
 #include <progress.hpp>
 #include <progress_bar.hpp>
+ #include <PoissonBinomial.h>
 // GMP library for large numbers
 #include <gmp.h>
 #include <gmpxx.h>

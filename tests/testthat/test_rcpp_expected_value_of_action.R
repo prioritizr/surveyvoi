@@ -34,7 +34,7 @@ test_that("correct result (target = 1)", {
   expect_equal(r1, r2)
 })
 
-test_that("correct result (target = c(2, 1))", {
+test_that("correct result (target = c(2, 2))", {
   # data
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -53,7 +53,7 @@ test_that("correct result (target = c(2, 1))", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    target = c(2, 1))
+    target = c(2, 2))
   site_occupancy_columns <- c("f1", "f2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(

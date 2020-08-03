@@ -14,6 +14,12 @@ void factorial(std::size_t x, mpz_t out) {
   }
 }
 
+void set_seed(double seed) {
+    Rcpp::Environment base_env("package:base");
+    Rcpp::Function set_seed_r = base_env["set.seed"];
+    set_seed_r(std::floor(std::fabs(seed)));
+}
+
 void log_matrix(Eigen::MatrixXd &x) {
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wenum-compare"

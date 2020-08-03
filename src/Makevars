@@ -50,6 +50,7 @@ OBJECTS =\
   $(PKGROOT)/rcpp_pmedian_constraint_matrix.o\
   $(PKGROOT)/rcpp_xgboost.o\
   $(PKGROOT)/rcpp_prioritization.o\
+  $(PKGROOT)/rcpp_heuristic_prioritization.o\
   $(PKGROOT)/RcppExports.o\
   ./xgboost_R.o ./xgboost_custom.o ./xgboost_assert.o\
   $(PKGROOT)/amalgamation/xgboost-all0.o\

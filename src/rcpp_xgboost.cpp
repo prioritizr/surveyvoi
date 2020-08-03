@@ -150,15 +150,18 @@ void fit_xgboost_models_and_assess_performance(
       fold_specificity.sum() / static_cast<double>(curr_n_folds));
     // store model performance
     model_performance[curr_key] = curr_performance;
-    // sotre model predictions
+    // store model predictions
     curr_predictions.array() /= static_cast<double>(curr_n_folds);
     model_yhat[curr_key] = curr_predictions;
   }
 
+  // Rcout << "  [sens, spec]" << std::endl;
+  
   // extract performance statistics for output
   for (std::size_t i = 0; i < n_f; ++i) {
     // create key
     curr_key = std::make_pair(survey_features_idx[i], feature_outcome_idx[i]);
+    // Rcout << curr_performance.first << ", " << curr_performance.second << std::endl;
     // extract performance values
     curr_performance = model_performance.find(curr_key)->second;
     output_model_sensitivity[i] = curr_performance.first;

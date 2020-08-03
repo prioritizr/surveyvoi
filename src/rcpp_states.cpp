@@ -147,7 +147,7 @@ void which_feature_state(
 Eigen::MatrixXd rcpp_nth_state_sparse(
   std::size_t n, std::vector<std::size_t> idx, Eigen::MatrixXd matrix) {
   // initialization
-  for(auto& i : idx)
+  for (auto& i : idx)
     i -= 1;
   mpz_class m = n;
   // main processing
@@ -173,7 +173,7 @@ std::size_t rcpp_n_states(std::size_t n) {
 // [[Rcpp::export]]
 std::size_t rcpp_which_state_sparse(
   Eigen::MatrixXd matrix, std::vector<std::size_t> idx) {
-  for(auto& i : idx)
+  for (auto& i : idx)
     i -= 1;
   return which_state_sparse(matrix, idx);
 }

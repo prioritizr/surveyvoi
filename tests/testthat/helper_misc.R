@@ -38,6 +38,15 @@ r_conservation_value <- function(pij, target) {
   prod(out)
 }
 
+r_approx_conservation_value <- function(pij, target) {
+  assertthat::assert_that(all(target <= ncol(pij)))
+  out <- vapply(seq_along(target), FUN.VALUE = numeric(1), function(i) {
+    sum(PoissonBinomial::dpbinom(
+      seq(target[i], ncol(pij)), pij[i, ], method = "Normal"))
+  })
+  prod(out)
+}
+
 r_conservation_value_amount <- function(amount, target) {
   assertthat::assert_that(is.numeric(amount), is.numeric(target))
   out <- rep(0, length(amount))

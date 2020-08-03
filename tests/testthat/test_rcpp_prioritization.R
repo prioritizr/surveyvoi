@@ -3,24 +3,33 @@ context("prioritization")
 test_that("expected result", {
   # data
   set.seed(123)
-  n_pu <- 100
-  n_f <- 5
-  target <- rep(20, n_f)
+  n_pu <- 5
+  n_f <- 2
+  target <- rep(1, n_f)
   rij <- matrix(runif(n_pu * n_f), ncol = n_pu, nrow = n_f)
   pu_costs <- runif(n_pu)
   pu_locked_in <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
   pu_locked_out <- sample(c(0, 1), n_pu, replace = TRUE, prob = c(0.8, 0.2))
-  pu_costs[sample(which(pu_locked_in < 0.5), 5)] <- 5000
+  # pu_costs[sample(which(pu_locked_in < 0.5), 5)] <- 5000
   pu_locked_in[as.logical(pu_locked_out)] <- 0
   budget <- sum(pu_costs) * 0.7
   # results
   r1 <- r_prioritization(
     rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "r.lp")
-  r2 <- rcpp_prioritization(
+  r2 <- r_stingy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r3 <- r_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r4 <- rcpp_prioritization(
     rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, 0, "rcpp.lp")
+  r5 <- rcpp_stingy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r6 <- rcpp_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
   # tests
-  expect_lte(abs(r1$objval - r2$objval), 1e-5)
-  expect_equal(r1$x, r2$x)
+  expect_equal(r1$x, r4$x)
+  expect_equal(r2$x, r5$x)
+  expect_equal(r3$x, r6$x)
   # clean up
   if (file.exists("r.lp")) unlink("r.lp")
   if (file.exists("rcpp.lp")) unlink("rcpp.lp")

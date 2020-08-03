@@ -5,6 +5,8 @@
 
 void factorial(std::size_t, mpz_t);
 
+void set_seed(double);
+
 void log_matrix(Eigen::MatrixXd&);
 
 void log_1m_matrix(Eigen::MatrixXd&);

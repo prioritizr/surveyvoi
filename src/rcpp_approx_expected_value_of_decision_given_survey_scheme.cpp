@@ -4,6 +4,7 @@
 #include "rcpp_sample_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_prioritization.h"
+#include "rcpp_heuristic_prioritization.h"
 #include "rcpp_posterior_probability_matrix.h"
 #include "rcpp_predict_missing_rij_data.h"
 #include "rcpp_expected_value_of_action.h"
@@ -36,7 +37,8 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   double optim_gap, // optimality gap
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
-  std::string method_approx_outcomes) {
+  std::string method_approx_outcomes,
+  double seed) {
   // initialization
   /// constant variables
   const std::size_t n_pu = rij.cols();
@@ -115,9 +117,8 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   }
 
   /// declare temporary variables used in the main loop
-  double curr_expected_value_of_decision;
   Eigen::VectorXd out(n_approx_replicates);
-  Eigen::VectorXd outcome_probabiliies(n_approx_outcomes_per_replicate);
+  Eigen::VectorXd outcome_probabilities(n_approx_outcomes_per_replicate);
   Eigen::VectorXd outcome_values(n_approx_outcomes_per_replicate);
   std::size_t curr_n_folds;
   double curr_expected_value_of_action_given_outcome;
@@ -221,13 +222,13 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
 
   // main processing
   for (std::size_t r = 0; r < n_approx_replicates; ++r) {
-    /// initialize current value
-    curr_expected_value_of_decision = std::numeric_limits<double>::infinity();
-
-    /// generate outcomes
+    /// generate outcomes,
+    // manually adjust seed to ensure different samples per replicate
+    set_seed(seed + static_cast<double>(r));
     sample_n_states(
       n_approx_outcomes_per_replicate, survey_pij, method_approx_outcomes,
       outcomes);
+    set_seed(seed);
 
     // calculate values based outcomes
     for (std::size_t o = 0; o < n_approx_outcomes_per_replicate; ++o) {
@@ -251,7 +252,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
         curr_model_sensitivity, curr_model_specificity);
 
       /// update model sensitivity and speciifcity values based on
-      /// survey sensitivity and speciifcity values, because the
+      /// survey sensitivity and specificity values, because the
       /// model values are dependent on the survey data
       for (std::size_t i = 0; i < n_f_survey; ++i)
         curr_model_sensitivity[i] *= survey_sensitivity[survey_features_idx[i]];
@@ -295,10 +296,22 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
       assert_valid_probability_data(
         curr_pij, "issue calculating posterior probabilities");
 
-      /// generate prioritisation
+  /// overwrite outcome data with prior data for planning units without surveys
+  for (std::size_t i = 0; i < n_f; ++i)
+      for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
+        curr_pij(i, pu_model_prediction_idx[i][j]) =
+          pij(i, pu_model_prediction_idx[i][j]);
+
+      // /// generate prioritisation
       prioritize.add_rij_data(curr_pij);
       prioritize.solve();
       prioritize.get_solution(curr_solution);
+
+    /// generate prioritisation
+    // heuristic_prioritization(
+    //   curr_pij, pu_purchase_costs, pu_purchase_locked_in,
+    //   pu_purchase_locked_out, obj_fun_target, remaining_budget, curr_solution);
+
 
       /// calculate expected value of the prioritisation
       curr_expected_value_of_action_given_outcome =
@@ -311,15 +324,14 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
 
       /// calculate values of action
       outcome_values[o] = curr_expected_value_of_action_given_outcome;
-      outcome_probabiliies[o] = curr_probability_of_outcome;
+      outcome_probabilities[o] = curr_probability_of_outcome;
     }
 
-    // apply correction to approximate the true value
-    outcome_probabiliies.array() -= log_sum(outcome_probabiliies);
-    outcome_probabiliies.array() += outcome_values.array().log();
+    outcome_probabilities.array() -= log_sum(outcome_probabilities);
+    outcome_probabilities.array() += outcome_values.array().log();
 
     // store result
-    out[r] = log_sum(outcome_probabiliies);
+    out[r] = log_sum(outcome_probabilities);
   }
 
   // exports
@@ -351,7 +363,8 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   double optim_gap,
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
-  std::string method_approx_outcomes) {
+  std::string method_approx_outcomes,
+  double seed) {
 
   // constant parameters
   const std::size_t n_f = rij.rows();
@@ -381,7 +394,7 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   MatrixXfRM pu_env_data2 = pu_env_data;
 
   // increment model weights for planning units selected in survey scheme
-  // and species that will be considerd in future surveys
+  // and species that will be considered in future surveys
   for (std::size_t i = 0; i < n_f; ++i)
     for (std::size_t j = 0; j < n_pu; ++j)
       wij(i, j) +=
@@ -402,5 +415,5 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     total_budget,
     optim_gap,
     n_approx_replicates, n_approx_outcomes_per_replicate,
-    method_approx_outcomes);
+    method_approx_outcomes, seed);
 }
