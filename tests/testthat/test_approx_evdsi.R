@@ -89,7 +89,8 @@ test_that("equal weights", {
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    seed = 1)
   # tests
   expect_equal(r1, r2)
 })
@@ -185,7 +186,8 @@ test_that("variable weights", {
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    seed = 1)
   # tests
   expect_equal(r1, r2)
 })
@@ -289,7 +291,8 @@ test_that("sparse", {
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
     n_approx_replicates = n_reps,
-    n_approx_outcomes_per_replicate = n_outcomes_per_rep)
+    n_approx_outcomes_per_replicate = n_outcomes_per_rep,
+    seed = 1)
   # tests
   expect_equal(r1, r2)
 })

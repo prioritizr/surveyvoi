@@ -28,6 +28,11 @@ log_sum <- function(u, v) {
   max(u, v) + log(exp(u - max(u, v)) + exp(v -max(u, v)))
 }
 
+# https://stackoverflow.com/a/778273/3483791
+log_minus <- function(u, v) {
+  u + log(1 + (-exp(v - u)))
+}
+
 se <- function(x) sqrt(var(x) / length(x))
 
 r_conservation_value <- function(pij, target) {
@@ -45,6 +50,10 @@ r_approx_conservation_value <- function(pij, target) {
       seq(target[i], ncol(pij)), pij[i, ], method = "Normal"))
   })
   prod(out)
+}
+
+r_proxy_conservation_value <- function(pij, target) {
+  r_conservation_value(pij, rep(1, nrow(pij)))
 }
 
 r_conservation_value_amount <- function(amount, target) {

@@ -1,9 +1,6 @@
 context("optimal_survey_scheme")
 
 test_that("expected results", {
-  # note that this example does not use any modelled predictions since
-  # models that perform worse than random will lead to poorer outcomes
-
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(

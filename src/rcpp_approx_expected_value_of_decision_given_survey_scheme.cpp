@@ -177,12 +177,6 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   log_matrix(total_probability_of_survey_positive_log);
   log_matrix(total_probability_of_survey_negative_log);
 
-  /// initialize prioritization object
-  Prioritization prioritize(
-    rij.cols(), rij.rows(), pu_purchase_costs,
-    pu_purchase_locked_in, pu_purchase_locked_out,
-    obj_fun_target.maxCoeff(), remaining_budget, optim_gap);
-
   /// overwrite outcome data with prior data for features we are
   /// not interested in surveying: planning units needing model predictions
   for (std::size_t i = 0; i < n_f; ++i)
@@ -296,22 +290,11 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
       assert_valid_probability_data(
         curr_pij, "issue calculating posterior probabilities");
 
-  /// overwrite outcome data with prior data for planning units without surveys
-  for (std::size_t i = 0; i < n_f; ++i)
-      for (std::size_t j = 0; j < n_pu_model_prediction[i]; ++j)
-        curr_pij(i, pu_model_prediction_idx[i][j]) =
-          pij(i, pu_model_prediction_idx[i][j]);
-
-      // /// generate prioritisation
-      prioritize.add_rij_data(curr_pij);
-      prioritize.solve();
-      prioritize.get_solution(curr_solution);
-
-    /// generate prioritisation
-    // heuristic_prioritization(
-    //   curr_pij, pu_purchase_costs, pu_purchase_locked_in,
-    //   pu_purchase_locked_out, obj_fun_target, remaining_budget, curr_solution);
-
+      // generate prioritisation
+      greedy_heuristic_prioritization(
+        curr_pij, pu_purchase_costs, pu_purchase_locked_in,
+        pu_purchase_locked_out, obj_fun_target, remaining_budget,
+        curr_solution);
 
       /// calculate expected value of the prioritisation
       curr_expected_value_of_action_given_outcome =

@@ -56,6 +56,14 @@ double approx_expected_value_of_action(
   return out;
 }
 
+double log_proxy_expected_value_of_action(
+  Eigen::MatrixXd &log_1m_pij) {
+  Eigen::VectorXd out = log_1m_pij.rowwise().sum();
+  for (auto itr = out.data(); itr != out.data() + out.size(); ++itr)
+    *itr = log_substract(0.0, *itr);
+  return out.sum();
+}
+
 // [[Rcpp::export]]
 double rcpp_expected_value_of_action(
   std::vector<bool> solution,

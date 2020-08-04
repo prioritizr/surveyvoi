@@ -24,16 +24,13 @@ test_that("rcpp_conservation_value_amount", {
 test_that("rcpp_conservation_value_states", {
   # data
   set.seed(500)
-  prew <- runif(3, 100, 200)
-  postw <- runif(3, 5, 10)
-  target <- ceiling(runif(3, 5, 20))
+  target <- rep(1, 3)
   m <- matrix(0, ncol = 5, nrow = 3)
   states <- lapply(seq_len(n_states(5, 3)), function(i) rcpp_nth_state(i, m))
   # calculations
-  r1 <- sapply(states, r_conservation_value_state, preweight = prew,
-    postweight = postw, target = target, total = ncol(states[[1]]))
-  r2 <- sapply(states, rcpp_conservation_value_state, preweight = prew,
-    postweight = postw, target = target, total = ncol(states[[1]]))
+  r1 <- sapply(states, r_conservation_value, target = target)
+  r2 <- sapply(states, rcpp_expected_value_of_action,
+               solution = rep(TRUE, ncol(m)), target = target)
   # tests
   expect_equal(r1, r2)
 })

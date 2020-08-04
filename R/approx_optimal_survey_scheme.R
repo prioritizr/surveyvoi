@@ -437,7 +437,8 @@ approx_optimal_survey_scheme <- function(
         optim_gap = optimality_gap,
         n_approx_replicates = n_approx_replicates,
         n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-        method_approx_outcomes = method_approx_outcomes)
+        method_approx_outcomes = method_approx_outcomes,
+        seed = seed)
     })
   })
   ## kill cluster

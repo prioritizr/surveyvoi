@@ -4,13 +4,15 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
     pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
     obj_fun_target, total_budget,
-    n_approx_replicates, n_approx_outcomes_per_replicate) {
+    n_approx_replicates, n_approx_outcomes_per_replicate, seed) {
   # generate outcomes
   outcomes <- lapply(seq_len(n_approx_replicates), function(i) {
+    set.seed(seed + i - 1)
     rcpp_sample_n_weighted_states_without_replacement(
       n_approx_outcomes_per_replicate,
       pij[survey_features, pu_survey_solution, drop = FALSE])
   })
+  set.seed(seed)
   # run calculations
   value <- sapply(seq_len(n_approx_replicates), function(i) {
     r_approx_expected_value_of_decision_given_survey_scheme_fixed_states(
@@ -122,10 +124,10 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       curr_models_sens, curr_models_spec)
 
     ## generate prioritisation
-    curr_solution <- r_prioritization(
+    curr_solution <- r_greedy_heuristic_prioritization(
       curr_postij, pu_purchase_costs,
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
-      obj_fun_target, remaining_budget, gap = 0, "")$x
+      obj_fun_target, remaining_budget)$x
 
     ## calculate approximate expected value of the prioritisation
     curr_value <- r_expected_value_of_action(

@@ -107,7 +107,7 @@ r_stingy_heuristic_prioritization <- function(
       ## calculate the alternate obj fun for the i'th planning unit
       s <- curr_solution
       s[i] <- FALSE
-      obj <- rcpp_expected_value_of_action(s, rij, target)
+      obj <- r_proxy_conservation_value(rij[, which(s), drop = FALSE], target)
       ## return data
       c(curr_infeasible, obj)
     })
@@ -115,7 +115,7 @@ r_stingy_heuristic_prioritization <- function(
     if (any(curr_alt_obj[1, ] > 0.5)) {
       curr_idx <- which.max(pu_costs[curr_pu_rem_idx])
     } else {
-      curr_ce <- (curr_obj - curr_alt_obj[2, ]) / pu_costs[curr_pu_rem_idx]
+      curr_ce <- curr_alt_obj[2, ] / pu_costs[curr_pu_rem_idx]
       curr_idx <- which.min(curr_ce)
     }
     ## update curr_solution and curr_obj
@@ -174,35 +174,39 @@ r_greedy_heuristic_prioritization <- function(
 
   while(keep_looping) {
     ## update target
-    curr_target <- pmin(target, sum(curr_solution) + 1)
+    curr_solution_cost <- sum(pu_costs * curr_solution)
     ## calculate the cost of the cheapest n-1 remaining planning units
     if (sum(curr_solution) < max(target)) {
       curr_min_feasible_pu_cost <- budget -
         (sum(curr_solution * pu_costs) +
-         sum(sort(pu_costs[!curr_solution])[seq_len(max(curr_target) -
+         sum(sort(pu_costs[!curr_solution])[seq_len(max(target) -
                                                     sum(curr_solution))]))
     } else {
       curr_min_feasible_pu_cost <- Inf
     }
+
     ## calculate benefit associated with dropping each remaining planning unit
     curr_alt_obj <- vapply(curr_pu_rem_idx, FUN.VALUE = numeric(2),
                            function(i) {
       ## determine if selecting the i'th planning unit would prevent the final
       ## solution from containing n number of planning units
       ## (where n = max(targets))
-      curr_infeasible <- !(pu_costs[i] <= curr_min_feasible_pu_cost)
+      curr_feasible <-
+        (((curr_min_feasible_pu_cost >= pu_costs[i]) ||
+          ((abs(pu_costs[i] - min(pu_costs)) < 1.0e-15))) &&
+        ((pu_costs[i] + curr_solution_cost) <= budget))
       ## calculate the alternate obj fun for the i'th planning unit
       s <- curr_solution
       s[i] <- TRUE
-      obj <- r_approx_conservation_value(
+      obj <- r_proxy_conservation_value(
         rij[, which(s), drop = FALSE], curr_target)
       ## return data
-      c(curr_infeasible, obj)
+      c(!curr_feasible, obj)
     })
 
     ## find idx with best performance
     curr_ce <- curr_alt_obj[2, ] / pu_costs[curr_pu_rem_idx]
-    curr_ce[curr_alt_obj[1, ]] <- -Inf
+    curr_ce[curr_alt_obj[1, ] > 0.5] <- -Inf
     curr_idx <- which.max(curr_ce)
 
     ## update curr_solution and curr_obj

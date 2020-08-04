@@ -6,10 +6,11 @@ r_expected_value_of_action <- function(
 r_expected_value_of_decision_given_current_info <- function(
   prior_data, pu_costs, pu_purchase_locked_in, pu_purchase_locked_out, target, budget) {
   # find optimal solution
-  solution <- r_prioritization(
+  solution <- r_greedy_heuristic_prioritization(
     prior_data, pu_costs, as.numeric(pu_purchase_locked_in),
     as.numeric(pu_purchase_locked_out), target, budget)$x
   # calculate expected value
+  print(solution)
   r_expected_value_of_action(
     solution, prior_data, target)
 }
@@ -112,7 +113,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
       curr_models_sens, curr_models_spec)
 
     ## generate prioritisation
-    curr_solution <- r_prioritization(
+    curr_solution <- r_greedy_heuristic_prioritization(
       curr_postij, pu_purchase_costs,
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
       obj_fun_target, remaining_budget)$x

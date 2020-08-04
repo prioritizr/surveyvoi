@@ -13,6 +13,8 @@ void log_1m_matrix(Eigen::MatrixXd&);
 
 double log_sum(double, double);
 
+double log_substract(double, double);
+
 double log_sum(Eigen::VectorXd&);
 
 double mean_value(Eigen::VectorXd&);
