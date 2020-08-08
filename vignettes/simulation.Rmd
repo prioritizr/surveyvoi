@@ -141,38 +141,28 @@ The `feature_data` object is a table (i.e. `tibble` object) that contains inform
 
 ## Modelling probability of occupancy
 
-After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/) -- using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches. Since gradient boosted regression trees have many tuning parameters that influence their performance, we will also supply parameters to perform a preliminary calibration procedure using _k_-fold cross-validation.
+After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/) -- using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches.
 
 ```{r}
 # create list of candidate parameter value for calibration procedure
-candidate_xgb_parameters <- list(
-  max_depth = seq(1, 10, 1),
-  eta = seq(0.1, 0.5, 0.1),
-  lambda = 10 ^ seq(-1.0, 0.0, 0.25),
-  subsample = seq(0.5, 1.0, 0.1),
-  colsample_bytree = seq(0.4, 1.0, 0.1),
-  objective = "binary:logistic")
-
-# preview candidate parameters
-str(candidate_xgb_parameters)
+xgb_parameters <- list(eta = c(0.1, 0.3, 1), lambda = c(0.01, 0.1, 0.5),
+                       objective = "binary:logistic")
 
 # identify suitable parameters for model fitting
-# ideally, we would set n_random_search_iterations much higher (e.g. 10000),
+# ideally, we would try a larger range of values,
 # but we will keep it low to reduce processing time for this example
 xgb_results <- fit_occupancy_models(
-  site_data, "f1", c("e1", "e2"), n_folds = 2,
-  n_random_search_iterations = 100, parameters = candidate_xgb_parameters)
+  site_data, "f1", c("e1", "e2"), xgb_n_folds = 2,
+  xgb_tuning_parameters = xgb_parameters)
 ```
 
 After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.
 
 ```{r}
 # print best parameters
-xgb_parameters <- xgb_results$parameters
-print(xgb_parameters)
+print(xgb_results$parameters)
 
-# print model performance (AUC value)
-# since this value is greater than 0.8, our model is "good enough"
+# print model performance (TSS value)
 xgb_performance <- xgb_results$performance
 print(data.frame(xgb_performance))
 
@@ -193,7 +183,7 @@ ggplot(site_data) +
 ```
 
 ```{r, include = FALSE}
-stopifnot(xgb_performance$test_auc_mean >= 0.8)
+stopifnot(xgb_performance$test_tss_mean > 0)
 stopifnot(all(feature_data$model_sensitivity > 0.5))
 stopifnot(all(feature_data$model_specificity > 0.5))
 ```
@@ -364,7 +354,7 @@ evd_survey_schemes$value <- sapply(
       feature_model_specificity_column = "model_specificity",
       feature_target_column = "target",
       total_budget = total_budget,
-      xgb_parameters = xgb_parameters,
+      xgb_tuning_parameters = xgb_parameters,
       xgb_n_folds = 2)
 })
 
@@ -421,7 +411,7 @@ opt_scheme <- optimal_survey_scheme(
     feature_target_column = "target",
     total_budget = total_budget,
     survey_budget = survey_budget,
-    xgb_parameters = xgb_parameters,
+    xgb_tuning_parameters = xgb_parameters,
     xgb_n_folds = 2)
 ```
 
@@ -464,7 +454,7 @@ evd_opt <- evdsi(
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters = xgb_parameters,
+    xgb_tuning_parameters = xgb_parameters,
     xgb_n_folds = 2)
 
 # calculate value

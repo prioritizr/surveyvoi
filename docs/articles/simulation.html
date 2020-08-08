@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.20</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -147,7 +147,7 @@
 ##  4     7.11699         68.7759 -0.00550767 -1.14857      1 (0.0907369 0.425329)
 ##  5     6.13178         64.6530  0.590071   -0.841855    NA (0.0207079 0.913594)
 ##  6     4.31864         67.0997  1.44469     1.86069      0  (0.785583 0.976051)
-##  7     5.46042         63.6544  0.786510   -0.619393     0  (0.174191 0.795111)
+##  7     5.46042         63.6544  0.786510   -0.619393     1  (0.174191 0.795111)
 ##  8     8.88090         69.5445 -0.794324   -1.09249      1  (0.127675 0.195547)
 ##  9     6.39256         72.6893 -1.00987    -0.651723     1  (0.304969 0.200439)
 ## 10     7.20251         72.0285 -1.14882    -0.707694     1   (0.30489 0.164804)
@@ -211,74 +211,46 @@
 <div id="modelling-probability-of-occupancy" class="section level2">
 <h2 class="hasAnchor">
 <a href="#modelling-probability-of-occupancy" class="anchor"></a>Modelling probability of occupancy</h2>
-<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches. Since gradient boosted regression trees have many tuning parameters that influence their performance, we will also supply parameters to perform a preliminary calibration procedure using <em>k</em>-fold cross-validation.</p>
+<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># create list of candidate parameter value for calibration procedure</span>
-<span class="no">candidate_xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">max_depth</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">1</span>, <span class="fl">10</span>, <span class="fl">1</span>),
-  <span class="kw">eta</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span>),
-  <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">10</span> ^ <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(-<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.25</span>),
-  <span class="kw">subsample</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
-  <span class="kw">colsample_bytree</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">0.4</span>, <span class="fl">1.0</span>, <span class="fl">0.1</span>),
-  <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>)
+<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">eta</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">1</span>), <span class="kw">lambda</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>),
+                       <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>)
 
-<span class="co"># preview candidate parameters</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">candidate_xgb_parameters</span>)</pre></body></html></div>
-<pre><code>## List of 6
-##  $ max_depth       : num [1:10] 1 2 3 4 5 6 7 8 9 10
-##  $ eta             : num [1:5] 0.1 0.2 0.3 0.4 0.5
-##  $ lambda          : num [1:5] 0.1 0.178 0.316 0.562 1
-##  $ subsample       : num [1:6] 0.5 0.6 0.7 0.8 0.9 1
-##  $ colsample_bytree: num [1:7] 0.4 0.5 0.6 0.7 0.8 0.9 1
-##  $ objective       : chr "binary:logistic"</code></pre>
-<div class="sourceCode"><html><body><pre class="r"><span class="co"># identify suitable parameters for model fitting</span>
-<span class="co"># ideally, we would set n_random_search_iterations much higher (e.g. 10000),</span>
+<span class="co"># identify suitable parameters for model fitting</span>
+<span class="co"># ideally, we would try a larger range of values,</span>
 <span class="co"># but we will keep it low to reduce processing time for this example</span>
 <span class="no">xgb_results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_occupancy_models.html">fit_occupancy_models</a></span>(
-  <span class="no">site_data</span>, <span class="st">"f1"</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>), <span class="kw">n_folds</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">n_random_search_iterations</span> <span class="kw">=</span> <span class="fl">100</span>, <span class="kw">parameters</span> <span class="kw">=</span> <span class="no">candidate_xgb_parameters</span>)</pre></body></html></div>
+  <span class="no">site_data</span>, <span class="st">"f1"</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>), <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>,
+  <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)</pre></body></html></div>
 <p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print best parameters</span>
-<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="no">xgb_results</span>$<span class="no">parameters</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">xgb_parameters</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">xgb_results</span>$<span class="no">parameters</span>)</pre></body></html></div>
 <pre><code>## [[1]]
-## [[1]]$max_depth
-## [1] 2
-## 
 ## [[1]]$eta
 ## [1] 0.1
 ## 
-## [[1]]$nrounds
-## [1] 80
-## 
-## [[1]]$scale_pos_weight
-## [1] 0.8333333
-## 
 ## [[1]]$lambda
-## [1] 0.3162278
-## 
-## [[1]]$tree_method
-## [1] "auto"
-## 
-## [[1]]$subsample
-## [1] 0.7
-## 
-## [[1]]$colsample_bytree
-## [1] 0.5
+## [1] 0.01
 ## 
 ## [[1]]$objective
-## [1] "binary:logistic"</code></pre>
-<div class="sourceCode"><html><body><pre class="r"><span class="co"># print model performance (AUC value)</span>
-<span class="co"># since this value is greater than 0.8, our model is "good enough"</span>
+## [1] "binary:logistic"
+## 
+## [[1]]$nrounds
+## [1] 1
+## 
+## [[1]]$scale_pos_weight
+## [1] 0.8166667</code></pre>
+<div class="sourceCode"><html><body><pre class="r"><span class="co"># print model performance (TSS value)</span>
 <span class="no">xgb_performance</span> <span class="kw">&lt;-</span> <span class="no">xgb_results</span>$<span class="no">performance</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">xgb_performance</span>))</pre></body></html></div>
-<pre><code>##   feature train_auc_mean train_auc_std train_sensitivity_mean
-## 1      f1      0.8870833     0.0465512              0.7166667
+<pre><code>##   feature train_tss_mean train_tss_std train_sensitivity_mean
+## 1      f1              1             0                      1
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
-## 1             0.1649916                  0.875             0.1767767
-##   test_auc_mean test_auc_std test_sensitivity_mean test_sensitivity_std
-## 1     0.9695833   0.01355288             0.8333333            0.2357023
+## 1                     0                      1                     0
+##   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
+## 1     0.7916667   0.05892557             0.9166667            0.1178511
 ##   test_specificity_mean test_specificity_std
-## 1                   0.9            0.1414214</code></pre>
+## 1                 0.875            0.1767767</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># store the model sensitivities and specificities in the feature_data object</span>
 <span class="no">feature_data</span>$<span class="no">model_sensitivity</span> <span class="kw">&lt;-</span> <span class="no">xgb_performance</span>$<span class="no">test_sensitivity_mean</span>
 <span class="no">feature_data</span>$<span class="no">model_specificity</span> <span class="kw">&lt;-</span> <span class="no">xgb_performance</span>$<span class="no">test_specificity_mean</span>
@@ -289,16 +261,16 @@
 <pre><code>## # A tibble: 30 x 1
 ##          f1
 ##       &lt;dbl&gt;
-##  1 0.518793
-##  2 0.500435
-##  3 0.518793
-##  4 0.563083
-##  5 0.518793
-##  6 0.425734
-##  7 0.518793
-##  8 0.594216
-##  9 0.594216
-## 10 0.594216
+##  1 0.549393
+##  2 0.500045
+##  3 0.549393
+##  4 0.549393
+##  5 0.549393
+##  6 0.450608
+##  7 0.549393
+##  8 0.549393
+##  9 0.549393
+## 10 0.549393
 ## # … with 20 more rows</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">site_data</span>$<span class="no">p1</span> <span class="kw">&lt;-</span> <span class="no">xgb_predictions</span>$<span class="no">f1</span>
 
@@ -336,7 +308,7 @@
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_current</span>)</pre></body></html></div>
-<pre><code>## [1] 0.159335</code></pre>
+<pre><code>## [1] 0.001751786</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -452,20 +424,20 @@
       <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
       <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
       <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-      <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
+      <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
       <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)
 })
 
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 2
-##   name            value
-##   &lt;chr&gt;           &lt;dbl&gt;
-## 1 geo_scheme   0.140895
-## 2 env_scheme   0.176860
-## 3 unc_scheme   0.140895
-## 4 cheap_scheme 0.140895
-## 5 rich_scheme  0.122486</code></pre>
+##   name               value
+##   &lt;chr&gt;              &lt;dbl&gt;
+## 1 geo_scheme   0.00180626 
+## 2 env_scheme   0.000902544
+## 3 unc_scheme   0.00180626 
+## 4 cheap_scheme 0.00180626 
+## 5 rich_scheme  0.000880966</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -474,13 +446,13 @@
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 3
-##   name            value        roi
-##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   0.140895 -0.0184400
-## 2 env_scheme   0.176860  0.0175253
-## 3 unc_scheme   0.140895 -0.0184400
-## 4 cheap_scheme 0.140895 -0.0184400
-## 5 rich_scheme  0.122486 -0.0368485</code></pre>
+##   name               value           roi
+##   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;
+## 1 geo_scheme   0.00180626   0.0000544704
+## 2 env_scheme   0.000902544 -0.000849242 
+## 3 unc_scheme   0.00180626   0.0000544704
+## 4 cheap_scheme 0.00180626   0.0000544704
+## 5 rich_scheme  0.000880966 -0.000870820</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -518,7 +490,7 @@
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
     <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
     <span class="kw">survey_budget</span> <span class="kw">=</span> <span class="no">survey_budget</span>,
-    <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
+    <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
     <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print number of optimal survey schemes</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">opt_scheme</span>))</pre></body></html></div>
@@ -555,12 +527,12 @@
     <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
     <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-    <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
+    <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
     <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 0.2137335</code></pre>
+<pre><code>## [1] 0.002376995</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
@@ -569,14 +541,14 @@
 <span class="co"># print updated results table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 6 x 3
-##   name            value        roi
-##   &lt;chr&gt;           &lt;dbl&gt;      &lt;dbl&gt;
-## 1 geo_scheme   0.140895 -0.0184400
-## 2 env_scheme   0.176860  0.0175253
-## 3 unc_scheme   0.140895 -0.0184400
-## 4 cheap_scheme 0.140895 -0.0184400
-## 5 rich_scheme  0.122486 -0.0368485
-## 6 opt_scheme   0.213733  0.0543985</code></pre>
+##   name               value           roi
+##   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;
+## 1 geo_scheme   0.00180626   0.0000544704
+## 2 env_scheme   0.000902544 -0.000849242 
+## 3 unc_scheme   0.00180626   0.0000544704
+## 4 cheap_scheme 0.00180626   0.0000544704
+## 5 rich_scheme  0.000880966 -0.000870820 
+## 6 opt_scheme   0.00237700   0.000625210</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>

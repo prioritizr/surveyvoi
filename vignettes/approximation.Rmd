@@ -147,9 +147,8 @@ Furthermore, our calculations will involve fitting new species distribution mode
 
 ```{r}
 # define parameters
-xgb_parameters <- list(list(
-  eta = 0.3, nrounds = 10, objective = "binary:logistic",
-  scale_pos_weight = 1))
+xgb_parameters <- list(eta = c(0.1, 0.3, 1), lambda = c(0.01, 0.1, 0.5),
+                       objective = "binary:logistic")
 ```
 
 ## Benchmark analysis
@@ -185,7 +184,7 @@ ev_survey <- evdsi(
   feature_model_specificity_column = "model_specificity",
   feature_target_column = "target",
   total_budget = total_budget,
-  xgb_parameters = xgb_parameters)
+  xgb_tuning_parameters = xgb_parameters)
 
 # print value
 print(ev_survey)
@@ -227,7 +226,7 @@ ev_prime_survey <-
         n_approx_replicates = 25,
         n_approx_outcomes_per_replicate = x$n,
         method_approx_outcomes = as.character(x$method),
-        xgb_parameters = xgb_parameters)
+        xgb_tuning_parameters = xgb_parameters)
     data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
   as_tibble() %>%

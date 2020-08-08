@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.20</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -135,21 +135,21 @@
 ## # A tibble: 15 x 8
 ##    survey_cost management_cost         e1         e2        e3    f1         p1
 ##          &lt;dbl&gt;           &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;
-##  1     8.78717         69.5624  0.352685  -0.615935  -0.728549     0 4.60086e-1
-##  2     5.36696         64.8589 -0.612633   1.15596    0.718512    NA 2.69503e-1
-##  3     6.25925         57.5309 -1.53741   -0.281868   1.29149     NA 9.95906e-1
-##  4     8.81519         66.1143  1.14228   -1.24025   -0.839952     1 5.56238e-1
-##  5     5.45039         62.7456 -1.01539   -0.409767   0.518910     1 9.74110e-1
-##  6     4.37280         60.5701  1.43650    2.52796   -0.253192     0 6.06472e-5
-##  7     8.76247         67.2501  0.0259090 -0.402047  -0.519918    NA 5.28076e-1
-##  8     8.80315         65.1071  0.838224  -0.894822  -0.878425     0 4.08044e-1
-##  9     9.57884         66.6267  0.347615  -0.0776230 -0.635106    NA 1.83623e-1
-## 10     6.37048         65.9617  1.08574   -0.560094  -0.813593     0 1.74159e-1
-## 11     8.75928         67.5310  0.496681   0.0117405 -0.682279     1 1.13847e-1
-## 12     9.58011         64.8944  0.722107  -0.580667  -0.846134    NA 2.64076e-1
-## 13     5.49527         58.2507 -1.44014   -0.152584   1.18873      1 9.91781e-1
-## 14     7.11370         64.8953 -0.608469  -0.0494300  0.128359     1 7.81913e-1
-## 15     5.19364         70.5367 -1.23370    1.56944    2.35114      0 8.62330e-1
+##  1     8.78717         69.5624  0.352685  -0.615935  -0.728549     0 4.36348e-1
+##  2     5.36696         64.8589 -0.612633   1.15596    0.718512    NA 1.68621e-1
+##  3     6.25925         57.5309 -1.53741   -0.281868   1.29149     NA 9.99848e-1
+##  4     8.81519         66.1143  1.14228   -1.24025   -0.839952     1 5.89391e-1
+##  5     5.45039         62.7456 -1.01539   -0.409767   0.518910     1 9.96994e-1
+##  6     4.37280         60.5701  1.43650    2.52796   -0.253192     0 1.78871e-7
+##  7     8.76247         67.2501  0.0259090 -0.402047  -0.519918    NA 5.44848e-1
+##  8     8.80315         65.1071  0.838224  -0.894822  -0.878425     0 3.55422e-1
+##  9     9.57884         66.6267  0.347615  -0.0776230 -0.635106    NA 8.41553e-2
+## 10     6.37048         65.9617  1.08574   -0.560094  -0.813593     0 7.65414e-2
+## 11     8.75928         67.5310  0.496681   0.0117405 -0.682279     0 3.61501e-2
+## 12     9.58011         64.8944  0.722107  -0.580667  -0.846134    NA 1.62489e-1
+## 13     5.49527         58.2507 -1.44014   -0.152584   1.18873      1 9.99533e-1
+## 14     7.11370         64.8953 -0.608469  -0.0494300  0.128359     1 8.85234e-1
+## 15     5.19364         70.5367 -1.23370    1.56944    2.35114      1 9.49581e-1
 ## # … with 1 more variable: geometry &lt;POINT&gt;</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># plot the spatial location of the sites</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">site_data</span>) +
@@ -224,9 +224,8 @@
 <p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code>) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>target</code> column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the <code>model_sensitivity</code> and <code>model_specificity</code> columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the <code>site_data</code> object (i.e. values in the <code>p1</code> column).</p>
 <p>Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the <code>fit_occupancy_models</code> function, but here we will define them manually to keep things simple.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># define parameters</span>
-<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">eta</span> <span class="kw">=</span> <span class="fl">0.3</span>, <span class="kw">nrounds</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>,
-  <span class="kw">scale_pos_weight</span> <span class="kw">=</span> <span class="fl">1</span>))</pre></body></html></div>
+<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">eta</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">1</span>), <span class="kw">lambda</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>),
+                       <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>)</pre></body></html></div>
 </div>
 <div id="benchmark-analysis" class="section level2">
 <h2 class="hasAnchor">
@@ -257,11 +256,11 @@
   <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
   <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
   <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-  <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)
+  <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">ev_survey</span>)</pre></body></html></div>
-<pre><code>## [1] 0.9943704</code></pre>
+<pre><code>## [1] 0.8594081</code></pre>
 <p>Next, we will benchmark the approximation methods for calculating the expected value of the decision given current information using the simulated data. Here, we will examine four methods for generating outcomes: <em>uniform with replacement</em>, <em>uniform without replacement</em>, <em>weighted with replacement</em>, and <em>weighted without replacement</em>. The uniform methods randomly sample outcomes and do not consider the prior probability of each outcome occurring. The weighted methods, on the other hand, are select outcomes that have a greater chance of occurring. To account for stochasticity in the approximation methods – i.e. each run will give a different answer depending on the outcome of the random number generator – we will report means and standard errors for 25 replicates per number of approximation outcomes. Furthermore since the <em>weighted without replacement</em> method is computationally inefficient for generating subsets that contain a high proportion of the total outcomes, we will not explore the full range of subsets for this method.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># define function for calculating standard error</span>
 <span class="no">se</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">sqrt</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(<span class="no">x</span>) / <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>))
@@ -296,7 +295,7 @@
         <span class="kw">n_approx_replicates</span> <span class="kw">=</span> <span class="fl">25</span>,
         <span class="kw">n_approx_outcomes_per_replicate</span> <span class="kw">=</span> <span class="no">x</span>$<span class="no">n</span>,
         <span class="kw">method_approx_outcomes</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">x</span>$<span class="no">method</span>),
-        <span class="kw">xgb_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)
+        <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)
     <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">n</span> <span class="kw">=</span> <span class="no">x</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">result</span>), <span class="kw">se</span> <span class="kw">=</span> <span class="fu">se</span>(<span class="no">result</span>))
   }) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>() <span class="kw">%&gt;%</span>
