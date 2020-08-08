@@ -19,19 +19,18 @@ XGB_RFLAGS = -DXGBOOST_STRICT_R_MODE=1 -DDMLC_LOG_BEFORE_THROW=0\
 
 $(foreach v, $(XGB_RFLAGS), $(warning $(v)))
 
-# xgboost, gurobi, Intel MKL configuration
+# xgboost and Intel MKL configuration
 PKG_CPPFLAGS = -I$(PKGROOT)/include\
                -I$(PKGROOT)/dmlc-core/include\
                -I$(PKGROOT)/rabit/include\
                -I$(PKGROOT)\
                $(XGB_RFLAGS)\
-                -I../inst/include/ -I"${GUROBI_HOME}/include" -lm\
-               -DMKL_ILP64 -m64 -I"${MKLROOT}/include"
+               -lm -DMKL_ILP64 -m64 -I"${MKLROOT}/include"
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS) -pthread
 PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
-           -L"${GUROBI_HOME}/lib" -lgurobi_c++ -lgurobi90\
            -lgmp -lgmpxx\
-           -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl
+           -L${MKLROOT}/lib/intel64 -Wl,--no-as-needed\
+           -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl
 
 # define objects
 OBJECTS =\
@@ -49,7 +48,6 @@ OBJECTS =\
   $(PKGROOT)/rcpp_probability.o\
   $(PKGROOT)/rcpp_feasible_actions_ilp_matrix.o\
   $(PKGROOT)/rcpp_pmedian_constraint_matrix.o\
-  $(PKGROOT)/rcpp_prioritization.o\
   $(PKGROOT)/rcpp_heuristic_prioritization.o\
   $(PKGROOT)/RcppExports.o\
   ./xgboost_R.o ./xgboost_custom.o ./xgboost_assert.o\

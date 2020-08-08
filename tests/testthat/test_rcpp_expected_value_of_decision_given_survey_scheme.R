@@ -64,8 +64,7 @@ test_that("equal weights", {
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
     survey_features = feature_data$survey,
@@ -154,8 +153,7 @@ test_that("variables weights", {
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
-    total_budget = total_budget,
-    optim_gap = 0)
+    total_budget = total_budget)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
     survey_features = feature_data$survey,

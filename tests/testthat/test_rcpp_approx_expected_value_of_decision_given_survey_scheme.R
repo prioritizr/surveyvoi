@@ -71,7 +71,6 @@ test_that("correct result", {
     n_approx_replicates = n_reps,
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
     method_approx_outcomes = "weighted_without_replacement",
-    optim_gap = 0,
     seed = 500)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,

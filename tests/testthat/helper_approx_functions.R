@@ -121,7 +121,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
 
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
-      curr_oij, wij, pu_env_data, survey_features_idx,
+      curr_oij, wij, pu_env_data, survey_features,
       xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds,
       xgb_train_folds, xgb_test_folds, pu_model_prediction)
 

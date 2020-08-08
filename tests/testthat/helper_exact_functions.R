@@ -10,7 +10,6 @@ r_expected_value_of_decision_given_current_info <- function(
     prior_data, pu_costs, as.numeric(pu_purchase_locked_in),
     as.numeric(pu_purchase_locked_out), target, budget)$x
   # calculate expected value
-  print(solution)
   r_expected_value_of_action(
     solution, prior_data, target)
 }
@@ -99,7 +98,7 @@ r_expected_value_of_decision_given_survey_scheme <- function(
 
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
-      curr_oij, wij, pu_env_data, survey_features_idx,
+      curr_oij, wij, pu_env_data, survey_features,
       xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds,
       xgb_train_folds, xgb_test_folds, pu_model_prediction)
 

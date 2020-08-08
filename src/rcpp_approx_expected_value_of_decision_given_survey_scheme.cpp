@@ -3,7 +3,6 @@
 #include "rcpp_states.h"
 #include "rcpp_sample_states.h"
 #include "rcpp_probability.h"
-#include "rcpp_prioritization.h"
 #include "rcpp_heuristic_prioritization.h"
 #include "rcpp_posterior_probability_matrix.h"
 #include "rcpp_predict_missing_rij_data.h"
@@ -32,7 +31,6 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
   Eigen::VectorXi &obj_fun_target,  // objective function calculation term
   double total_budget, // total budget for surveying + monitor costs
-  double optim_gap, // optimality gap
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
   std::string method_approx_outcomes,
@@ -364,7 +362,6 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   Rcpp::List xgb_test_folds,
   Eigen::VectorXi obj_fun_target,
   double total_budget,
-  double optim_gap,
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
   std::string method_approx_outcomes,
@@ -414,7 +411,7 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     xgb_parameter_names, xgb_parameter_values2,
     n_xgb_rounds, n_xgb_early_stopping_rounds,
     xgb_train_folds2, xgb_test_folds2,
-    obj_fun_target, total_budget, optim_gap,
+    obj_fun_target, total_budget,
     n_approx_replicates, n_approx_outcomes_per_replicate,
     method_approx_outcomes, seed);
 }

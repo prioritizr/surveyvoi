@@ -1,109 +1,5 @@
 #include "rcpp_heuristic_prioritization.h"
 
-void stingy_heuristic_prioritization(
-  Eigen::MatrixXd& rij, Eigen::VectorXd& pu_costs,
-  Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& pu_locked_out,
-  Eigen::VectorXi& target, double budget, std::vector<bool>& solution) {
-  // Initialization
-  // declare constants
-  const std::size_t n_pu = rij.cols();
-  const std::size_t n_f = rij.rows();
-  const std::size_t max_target_m1 =
-    static_cast<std::size_t>(target.maxCoeff());
-  // reset solution
-  std::fill(solution.begin(), solution.end(), true);
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (pu_locked_out[i] > 0.5)
-      solution[i] = false;
-  // calculate objective value of initial solotion
-  double solution_cost = 0.0;
-  for (std::size_t i = 0; i < n_pu; ++i)
-    solution_cost += static_cast<double>(solution[i]) * pu_costs[i];
-  // declare loop variables
-  /// variables to keep track of planning units in the solution that
-  /// will be considered for step-wise removal from the algorithm
-  std::vector<bool> solution_rem_pu = solution;
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (pu_locked_in[i] > 0.5)
-      solution_rem_pu[i] = false;
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (pu_costs[i] < 1.0e-15)
-      solution_rem_pu[i] = false;
-  double curr_min_feasible_pu_cost;
-  double curr_ce;
-  double new_ce;
-  double log_obj;
-  double curr_cost;
-  std::size_t curr_idx;
-  Eigen::VectorXd costs_rem_pu = pu_costs;
-  Eigen::VectorXd costs_rem_pu_sorted;
-  std::vector<bool> new_solution;
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (!solution[i])
-      costs_rem_pu[i] = std::numeric_limits<double>::max();
-  // declare logged data
-  Eigen::VectorXd log_pu_costs = (pu_costs.array() + 1.0e-5).array().log();
-  Eigen::MatrixXd log_1m_rij = rij;
-  log_1m_matrix(log_1m_rij);
-  Eigen::MatrixXd log_1m_rij_rem_pu = log_1m_rij;
-  for (std::size_t i = 0; i < n_pu; ++i)
-    if (!solution[i])
-      log_1m_rij_rem_pu.col(i).setZero();
-
-  // Main processing
-  while(solution_cost > budget) {
-    // calculate the cost of the cheapest n-1 remaining planning units
-    costs_rem_pu_sorted = costs_rem_pu;
-    std::partial_sort(
-      costs_rem_pu_sorted.data(), costs_rem_pu_sorted.data() + max_target_m1,
-      costs_rem_pu_sorted.data() + costs_rem_pu_sorted.size());
-    curr_min_feasible_pu_cost = std::accumulate(
-      costs_rem_pu_sorted.data(), costs_rem_pu_sorted.data() + max_target_m1,
-      0.0);
-
-    // find most expensive planning unit in the solution
-    curr_cost = std::numeric_limits<double>::lowest();
-    for (std::size_t i = 0; i < n_pu; ++i) {
-      if (solution_rem_pu[i]) {
-        if (pu_costs[i] > curr_cost) {
-          curr_cost = pu_costs[i];
-          curr_idx = i;
-        }
-      }
-    }
-
-    // if the most expensive planning unit doesn't violate feasbility,
-    // then find the least cost-effective planning unit to exclude
-    if ((curr_min_feasible_pu_cost + curr_cost) <= budget) {
-      curr_ce = std::numeric_limits<double>::max();
-      for (std::size_t i = 0; i < n_pu; ++i) {
-        if (solution_rem_pu[i]) {
-          // calculate objective with i'th planning unit excluded
-          log_1m_rij_rem_pu.col(i).setZero();
-          log_obj = log_proxy_expected_value_of_action(log_1m_rij_rem_pu);
-          log_1m_rij_rem_pu.col(i).array() = log_1m_rij.col(i).array();
-          // calculate cost effectiveness
-          new_ce = log_obj - log_pu_costs[i]; // note this is logged
-          if (new_ce < curr_ce) {
-            curr_ce = new_ce;
-            curr_idx = i;
-          }
-        }
-      }
-    }
-    log_1m_rij_rem_pu.col(curr_idx).setZero();
-
-    // update loop variables
-    solution_cost -= pu_costs[curr_idx];
-    costs_rem_pu[curr_idx] = std::numeric_limits<double>::max();
-    solution[curr_idx] = false;
-    solution_rem_pu[curr_idx] = false;
-  }
-
-  // Exports
-  return;
-}
-
 void greedy_heuristic_prioritization(
   Eigen::MatrixXd& rij, Eigen::VectorXd& pu_costs,
   Eigen::VectorXd& pu_locked_in, Eigen::VectorXd& pu_locked_out,
@@ -154,6 +50,7 @@ void greedy_heuristic_prioritization(
   // log data
   Eigen::VectorXd log_pu_costs = (pu_costs.array() + 1.0e-5).array().log();
   Eigen::MatrixXd log_1m_rij = rij;
+  log_1m_rij = log_1m_rij.cwiseMax(1.0 - 1.0e-10);
   log_1m_matrix(log_1m_rij);
   Eigen::MatrixXd curr_log_1m_rij = log_1m_rij;
   for (std::size_t i = 0; i < n_pu; ++i) {
@@ -225,25 +122,6 @@ void greedy_heuristic_prioritization(
 }
 
 // [[Rcpp::export]]
-Rcpp::List rcpp_stingy_heuristic_prioritization(
-  Eigen::MatrixXd rij,
-  Eigen::VectorXd pu_costs,
-  Eigen::VectorXd pu_locked_in,
-  Eigen::VectorXd pu_locked_out,
-  Eigen::VectorXi target,
-  double budget) {
-  // initialization
-  std::vector<bool> solution(rij.cols());
-  stingy_heuristic_prioritization(
-    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, solution);
-
-  // export
-  return Rcpp::List::create(
-    Rcpp::Named("x") = Rcpp::wrap(solution),
-    Rcpp::Named("objval") = expected_value_of_action(solution, rij, target));
-}
-
-// [[Rcpp::export]]
 Rcpp::List rcpp_greedy_heuristic_prioritization(
   Eigen::MatrixXd rij,
   Eigen::VectorXd pu_costs,
@@ -255,7 +133,6 @@ Rcpp::List rcpp_greedy_heuristic_prioritization(
   std::vector<bool> solution(rij.cols());
   greedy_heuristic_prioritization(
     rij, pu_costs, pu_locked_in, pu_locked_out, target, budget, solution);
-
   // export
   return Rcpp::List::create(
     Rcpp::Named("x") = Rcpp::wrap(solution),

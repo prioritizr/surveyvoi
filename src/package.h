@@ -4,16 +4,11 @@
 /* Set plugins */
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppEigen)]]
-// [[Rcpp::depends(RcppProgress)]]
-// [[Rcpp::depends(RcppNumerical)]]
 
 /* Load header files */
 // R includes package
 #include <Rcpp.h>
 #include <RcppEigen.h>
-#include <RcppNumerical.h>
-#include <progress.hpp>
-#include <progress_bar.hpp>
 #include <PoissonBinomial.h>
 // GMP library for large numbers
 #include <gmp.h>
@@ -42,7 +37,6 @@
 /* Import namespaces */
 using namespace Rcpp;
 using namespace Eigen;
-using namespace Numer;
 using namespace dmlc;
 
 /* hash functions */

@@ -2,7 +2,6 @@
 #include "functions.h"
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
-#include "rcpp_prioritization.h"
 #include "rcpp_heuristic_prioritization.h"
 #include "rcpp_expected_value_of_action.h"
 
@@ -13,8 +12,7 @@ double rcpp_expected_value_of_decision_given_current_info(
   Eigen::VectorXd &pu_locked_in,
   Eigen::VectorXd &pu_locked_out,
   Eigen::VectorXi &target,
-  double budget,
-  double optim_gap) {
+  double budget) {
 
   // find optimal management action using prior data
   std::vector<bool> solution(pij.cols());
