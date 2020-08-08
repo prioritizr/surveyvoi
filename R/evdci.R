@@ -54,8 +54,7 @@ evdci <- function(
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL,
-  optimality_gap = 0) {
+  prior_matrix = NULL) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -118,11 +117,7 @@ evdci <- function(
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
     ## prior_matrix
-    inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0))
+    inherits(prior_matrix, c("matrix", "NULL")))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -215,8 +210,7 @@ evdci <- function(
     pu_locked_in = site_management_locked_in,
     pu_locked_out = site_management_locked_out,
     target = round(feature_data[[feature_target_column]]),
-    budget = total_budget,
-    optim_gap =  optimality_gap)
+    budget = total_budget)
 
   # return result
   out
