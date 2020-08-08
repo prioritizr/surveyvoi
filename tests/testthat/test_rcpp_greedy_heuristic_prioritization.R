@@ -106,6 +106,32 @@ test_that("complex example", {
   expect_lte(abs(r1$objval - r3$objval), 1e-4)
 })
 
+test_that("edge case", {
+  # data
+  site_data <- tibble::tibble(
+    p1 = c(0.05, 0.99, 0.99, 0.05, 0.5, 0.99),
+    p2 = c(0.05, 0.99, 0.05, 0.99, 0.5, 0.05),
+    p3 = c(0.05, 0.05, 0.99, 0.99, 0.5, 0.99))
+  rij <- t(as.matrix(site_data))
+  pu_costs <- rep(10, ncol(rij))
+  budget <- 59
+  pu_locked_in <- rep(0, ncol(rij))
+  pu_locked_out <- rep(0, ncol(rij))
+  target <- c(3, 3, 3)
+  # results
+  r1 <- r_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r2 <- rcpp_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r3 <- brute_force_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  # tests
+  expect_equal(r1$x, r2$x)
+  expect_equal(r1$x, r3$x)
+  expect_lte(abs(r1$objval - r2$objval), 1e-4)
+  expect_lte(abs(r1$objval - r3$objval), 1e-4)
+})
+
 test_that("highly variable costs", {
   # data
   set.seed(123)

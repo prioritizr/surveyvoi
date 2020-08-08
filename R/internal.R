@@ -228,9 +228,9 @@ create_folds <- function(x, n, index = seq_along(x), seed = 500,
     !all(is.na(x)))
   if (na.fail)
     assertthat::assert_that(assertthat::noNA(x))
-  assertthat::assert_that(sum(x, na.rm = TRUE) >= (n + 1),
+  assertthat::assert_that(sum(x, na.rm = TRUE) >= n,
     msg = "not enough presences to create the specified number of folds")
-  assertthat::assert_that(sum(1 - x, na.rm = TRUE) >= (n + 1),
+  assertthat::assert_that(sum(1 - x, na.rm = TRUE) >= n,
     msg = "not enough absence to create the specified number of folds")
   # initialization
   data <- tibble::tibble(x = x, xc = as.character(x), idx = index)

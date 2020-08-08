@@ -355,7 +355,7 @@ evdsi <- function(
   if (!is.null(site_weight_columns))
     validate_site_weight_data(site_data, site_occupancy_columns,
       site_weight_columns)
-  ## validate xgboost parameters
+  ## validate xgboost tuning parameters
   validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
   assertthat::assert_that(

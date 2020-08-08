@@ -99,14 +99,15 @@ optimal_survey_scheme <- function(
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_parameters,
+  xgb_tuning_parameters,
+  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
+  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
+  xgb_n_folds = rep(5, length(site_occupancy_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
-  xgb_n_folds = rep(5, nrow(feature_data)),
   seed = 500,
   n_threads = 1) {
   # assert arguments are valid
@@ -190,18 +191,20 @@ optimal_survey_scheme <- function(
     isTRUE(survey_budget > 0), isTRUE(survey_budget <= total_budget),
     isTRUE(survey_budget >= min(site_data[[site_survey_cost_column]])),
     ## xgb_parameters
-    is.list(xgb_parameters),
-    identical(length(xgb_parameters), nrow(feature_data)),
+    is.list(xgb_tuning_parameters),
     ## xgb_n_folds
-    is.numeric(xgb_n_folds),
-    all(xgb_n_folds > 0), identical(length(xgb_n_folds), nrow(feature_data)),
-    assertthat::noNA(xgb_n_folds),
+    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
+    length(xgb_n_folds) == length(site_occupancy_columns),
+    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
+    length(xgb_n_rounds) == length(site_occupancy_columns),
+    all(xgb_n_rounds > 0),
+    ## xgb_early_stopping_rounds
+    is.numeric(xgb_early_stopping_rounds),
+    assertthat::noNA(xgb_early_stopping_rounds),
+    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0),
     ## n_threads
     assertthat::is.count(n_threads),
     assertthat::noNA(n_threads),
@@ -257,8 +260,8 @@ optimal_survey_scheme <- function(
   if (!is.null(site_weight_columns))
     validate_site_weight_data(site_data, site_occupancy_columns,
       site_weight_columns)
-  ## validate xgboost parameters
-  validate_xgboost_parameters(xgb_parameters)
+  ## validate xgboost tuning parameters
+  validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
   assertthat::assert_that(
     all(feature_data[[feature_target_column]] <= nrow(site_data)))
@@ -309,17 +312,17 @@ optimal_survey_scheme <- function(
     sum(sorted_costs) <= total_budget,
     msg = paste("targets cannot be achieved given budget and locked out",
                 "planning units"))
-  ## xgb_nrounds
-  xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
-                        "nrounds")
-  ## format xgb_parameters
-  xgb_parameters <- lapply(xgb_parameters, function(x) {
-    out <- x[names(x) != "nrounds"]
-    out <- lapply(out, as.character)
-    out$nthread <- "1" # force single thread for reproducibility
-    out$seed <- as.character(seed)
-    out
-  })
+  ## prepare parameter combinations for model tuning
+  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
+  attr(xgb_full_parameters, "out.attrs") <- NULL
+  xgb_full_parameters$nthread <- "1" # force single thread for reproducibility
+  xgb_full_parameters$verbose <- "0" # force quiet
+  xgb_full_parameters$seed <- as.character(seed) # set seed
+  if (is.null(xgb_full_parameters$objective)) {
+    xgb_full_parameters$objective <- "binary:logistic"
+    warning(paste("no objective specified for model fitting,",
+                  "assuming binary:logistic"))
+  }
   ## extract site occupancy data
   rij <- t(as.matrix(site_data[, site_occupancy_columns]))
   ## identify planning units that have been surveyed for all species
@@ -356,8 +359,7 @@ optimal_survey_scheme <- function(
       pu_locked_in = site_management_locked_in,
       pu_locked_out = site_management_locked_out,
       target = round(feature_data[[feature_target_column]]),
-      budget = total_budget,
-      optim_gap = optimality_gap)
+      budget = total_budget)
 
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -401,13 +403,14 @@ optimal_survey_scheme <- function(
         pu_purchase_locked_in = site_management_locked_in,
         pu_purchase_locked_out = site_management_locked_out,
         pu_env_data = ejx,
-        xgb_parameters = xgb_parameters,
+        xgb_parameter_names = names(xgb_full_parameters),
+        xgb_parameter_values = as.matrix(xgb_full_parameters),
+        n_xgb_rounds = xgb_n_rounds,
+        n_xgb_early_stopping_rounds = xgb_early_stopping_rounds,
         xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
         xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-        n_xgb_nrounds = xgb_nrounds,
         obj_fun_target = round(feature_data[[feature_target_column]]),
-        total_budget = total_budget,
-        optim_gap = optimality_gap)
+        total_budget = total_budget)
     })
   })
   ## kill cluster
