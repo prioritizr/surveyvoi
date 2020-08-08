@@ -68,38 +68,6 @@ validate_site_weight_data <- function(site_data, site_occupancy_columns,
     msg = "site_data values in site_weight_columns must not be NA")
 }
 
-validate_xgboost_parameters <- function(x) {
-  param_names <- c("scale_pos_weight", "max_depth", "eta", "nrounds",
-                   "lambda", "subsample",  "colsample_bytree", "objective",
-                   "tree_method")
-  lapply(x, function(z) {
-    assertthat::assert_that(
-      assertthat::is.string(z$objective),
-      msg = "a feature is missing the objective parameter in xgb_parameters")
-    assertthat::assert_that(
-      assertthat::is.number(z$scale_pos_weight),
-      msg = paste("a feature is missing the scale_pos_weight parameter",
-                  "in xgb_parameters"))
-    assertthat::assert_that(
-      assertthat::is.number(z$nrounds),
-      msg = paste("a feature is missing the nrounds parameter",
-                  "in xgb_parameters"))
-    if (!is.null(z$tree_method)) {
-    assertthat::assert_that(
-      assertthat::is.string(z$tree_method),
-      z$tree_method %in% c("auto", "exact", "hist", "approx"),
-      msg = paste("invalid tree_method parameter in xgb_parameters"))
-    }
-    extra_names <- names(z)[!names(z) %in% param_names]
-    assertthat::assert_that(
-      length(extra_names) == 0,
-      msg = paste("argument to xgb_parameters has unrecognized parameters:",
-                  paste(extra_names, collapse = ",")))
-    invisible(TRUE)
-  })
-  invisible(TRUE)
-}
-
 validate_target_data <- function(feature_data, feature_target_column) {
   assertthat::assert_that(
     inherits(feature_data, "data.frame"),
@@ -113,5 +81,20 @@ validate_target_data <- function(feature_data, feature_target_column) {
   assertthat::assert_that(
     dplyr::n_distinct(feature_data[[feature_target_column]]) == 1,
     msg = paste("all features must have exactly the same target value"))
+  invisible(TRUE)
+}
+
+validate_xgboost_tuning_parameters <- function(x) {
+  param_names <- c("max_depth", "eta", "lambda", "subsample",
+                   "colsample_bytree", "objective", "tree_method")
+  assertthat::assert_that(
+    all(names(x) %in% param_names),
+    msg = paste("argument to xgb_tuning_parameters has unrecognised elements:",
+               paste(setdiff(names(x), param_names),
+                     collapse = ", ")))
+  if ("tree_method" %in% names(x))
+    assertthat::assert_that(
+      all(x$tree_method %in% c("auto", "hist", "exact", "approx")),
+      msg = "argument to xgb_tuning_parameters has invalid tree_method value")
   invisible(TRUE)
 }

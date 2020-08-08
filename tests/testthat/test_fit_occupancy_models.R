@@ -16,7 +16,7 @@ test_that("single species", {
   suppressWarnings({
     r <- fit_occupancy_models(
       x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      tuning_parameters = tuning_parameters)
+      xgb_tuning_parameters = tuning_parameters)
   })
   # tests
   expect_is(r, "list")
@@ -85,7 +85,7 @@ test_that("multiple species", {
   suppressWarnings({
     r <- fit_occupancy_models(
       x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      tuning_parameters = tuning_parameters, n_threads = 2)
+      xgb_tuning_parameters = tuning_parameters, n_threads = 2)
   })
   # tests
   expect_is(r, "list")
@@ -161,7 +161,7 @@ test_that("multiple species (sparse)", {
   suppressWarnings({
     r <- fit_occupancy_models(
       x2, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      tuning_parameters = tuning_parameters, n_threads = 2)
+      xgb_tuning_parameters = tuning_parameters, n_threads = 2)
   })
   # tests
   expect_is(r, "list")

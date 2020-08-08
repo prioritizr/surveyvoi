@@ -23,7 +23,7 @@ NULL
 #'   and contain \code{numeric}, \code{factor}, or \code{character} data.
 #'   No missing (\code{NA}) values are permitted in these columns.
 #'
-#' @param tuning_parameters \code{list} object containing the candidate
+#' @param xgb_tuning_parameters \code{list} object containing the candidate
 #'  parameter values for fitting models. Valid parameters include:
 #'  \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
 #'  \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
@@ -181,7 +181,7 @@ NULL
 #' results <- fit_occupancy_models(
 #'    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
 #'    xgb_n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
-#'    tuning_parameters = all_parameters, n_threads = 1)
+#'    xgb_tuning_parameters = all_parameters, n_threads = 1)
 #'
 #' # print best found model parameters
 #' print(results$parameters)
@@ -194,7 +194,8 @@ NULL
 #'
 #' @export
 fit_occupancy_models <- function(
-  site_data, site_occupancy_columns, site_env_vars_columns, tuning_parameters,
+  site_data, site_occupancy_columns, site_env_vars_columns,
+  xgb_tuning_parameters,
   xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
   xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
   xgb_n_folds = rep(5, length(site_occupancy_columns)),
@@ -221,17 +222,7 @@ fit_occupancy_models <- function(
     assertthat::is.count(seed),
     assertthat::noNA(seed),
     assertthat::is.count(n_threads), assertthat::noNA(n_threads),
-    is.list(tuning_parameters))
-    param_names <- c("max_depth", "eta", "lambda", "subsample",
-                     "colsample_bytree", "objective", "tree_method")
-    assertthat::assert_that(
-      all(names(tuning_parameters) %in% param_names),
-      msg = paste("argument to tuning_parameters has unrecognised elements:",
-                 paste(setdiff(names(tuning_parameters), param_names),
-                       collapse = ", ")))
-  if ("tree_method" %in% names(tuning_parameters))
-    assertthat::assert_that(all(tuning_parameters$tree_method %in%
-                                c("auto", "hist", "exact", "approx")))
+    is.list(xgb_tuning_parameters))
   if (!is.null(site_weight_columns)) {
     assertthat::assert_that(
       is.character(site_weight_columns),
@@ -269,7 +260,8 @@ fit_occupancy_models <- function(
     all(sapply(site_env_vars_columns,
                function(x) assertthat::noNA(site_data[[x]]))),
     msg = "site_data values in site_env_vars_columns must not be NA")
-
+  ## validate tuning parameters
+  validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   # drop geometry
   site_data <- sf::st_drop_geometry(site_data)
 
@@ -316,7 +308,7 @@ fit_occupancy_models <- function(
     withr::with_seed(seed, {
       tune_model(data = d[[i]],
                  folds = f[[i]],
-                 parameters = tuning_parameters,
+                 parameters = xgb_tuning_parameters,
                  early_stopping_rounds = xgb_early_stopping_rounds[i],
                  n_rounds = xgb_n_rounds[i],
                  n_folds = xgb_n_folds[i],
