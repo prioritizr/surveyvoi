@@ -157,7 +157,7 @@ NULL
 #'  \item{test_specificity_std}{
 #'    standard deviation in specificity statistics for models calculated using
 #'    test data in cross-validation.}
-#'  }
+#'  }}
 #'
 #' }
 #'

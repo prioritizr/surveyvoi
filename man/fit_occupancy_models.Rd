@@ -8,12 +8,10 @@ fit_occupancy_models(
   site_data,
   site_occupancy_columns,
   site_env_vars_columns,
-  parameters,
-  early_stopping_rounds = 100,
-  tree_method = "auto",
-  n_rounds = 1000,
-  n_folds = rep(5, length(site_occupancy_columns)),
-  n_random_search_iterations = 10000,
+  xgb_tuning_parameters,
+  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
+  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
+  xgb_n_folds = rep(5, length(site_occupancy_columns)),
   site_weight_columns = NULL,
   n_threads = 1,
   seed = 500,
@@ -38,35 +36,24 @@ Each column should correspond to a different environmental variable,
 and contain \code{numeric}, \code{factor}, or \code{character} data.
 No missing (\code{NA}) values are permitted in these columns.}
 
-\item{parameters}{\code{list} object containing the candidate
+\item{xgb_tuning_parameters}{\code{list} object containing the candidate
 parameter values for fitting models. Valid parameters include:
 \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
 \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
 \code{"objective"}. See documentation for the \code{params} argument in
 \code{\link[xgboost]{xgb.train}} for more information.}
 
-\item{early_stopping_rounds}{\code{numeric} model rounds for parameter
+\item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
 tuning. See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 100.}
+Defaults to 100 for each feature.}
 
-\item{tree_method}{\code{character} method used for constructing trees.
-Available options are: \code{"auto"}, \code{"exact"}, \code{"approx"},
-and \code{"hist"}. Defaults to \code{"auto"}.}
-
-\item{n_rounds}{\code{numeric} model rounds for model fitting
+\item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
 See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 1000.}
+Defaults to 1000 for each feature.}
 
-\item{n_folds}{\code{numeric} number of folds to split the training
+\item{xgb_n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
-Defaults to 10 if there are more than 1000
-rows in the argument \code{site_data}, otherwise defaults to 5.
-Note that if the maximum number of minority cases (e.g. 1 presence and
-1000 absences) is fewer than the number of folds then one minority case
-is sampled per fold.}
-
-\item{n_random_search_iterations}{\code{numeric} number of random search
-iterations to use when tuning model parameters. Defaults to 10000.}
+Defaults to 5 for each feature.}
 
 \item{site_weight_columns}{\code{character} name of columns in
 \code{site_data} containing weights for model fitting. These columns must
@@ -86,6 +73,7 @@ printed during computations. Defaults to \code{FALSE}.}
 \value{
 \code{list} object containing:
 \describe{
+
 \item{parameters}{\code{list} of \code{list} objects containing the best
 tuning parameters for each feature.}
 
@@ -93,7 +81,48 @@ tuning parameters for each feature.}
  predictions for each feature.}
 
 \item{performance}{\code{\link[tibble]{tibble}} object containing the
- performance of the best cross-validation models for each feature.}
+ performance of the best models for each feature. It contains the following
+ columns:
+
+ \describe{
+ \item{feature}{name of the feature.}
+ \item{train_tss_mean}{
+   mean TSS statistic for models calculated using training data in
+   cross-validation.}
+ \item{train_tss_std}{
+   standard deviation in TSS statistics for models calculated using training
+   data in cross-validation.}
+ \item{train_sensitivity_mean}{
+   mean sensitivity statistic for models calculated using training data in
+   cross-validation.}
+ \item{train_sensitivity_std}{
+   standard deviation in sensitivity statistics for models calculated using
+   training data in cross-validation.}
+ \item{train_specificity_mean}{
+   mean specificity statistic for models calculated using training data in
+   cross-validation.}
+ \item{train_specificity_std}{
+   standard deviation in specificity statistics for models calculated using
+   training data in cross-validation.}
+ \item{test_tss_mean}{
+   mean TSS statistic for models calculated using test data in
+   cross-validation.}
+ \item{test_tss_std}{
+   standard deviation in TSS statistics for models calculated using test
+   data in cross-validation.}
+ \item{test_sensitivity_mean}{
+   mean sensitivity statistic for models calculated using test data in
+   cross-validation.}
+ \item{test_sensitivity_std}{
+   standard deviation in sensitivity statistics for models calculated using
+   test data in cross-validation.}
+ \item{test_specificity_mean}{
+   mean specificity statistic for models calculated using test data in
+   cross-validation.}
+ \item{test_specificity_std}{
+   standard deviation in specificity statistics for models calculated using
+   test data in cross-validation.}
+ }}
 
 }
 }
@@ -111,29 +140,29 @@ This function (i) prepares the data for model fitting, (ii) calibrates
  \enumerate{
 
  \item The data are prepared for model fitting by partitioning the data using
- k-fold cross-validation (set via argument to \code{n_folds}). The training
- and evaluation folds are constructed
+ k-fold cross-validation (set via argument to \code{xgb_n_folds}). The
+ training and evaluation folds are constructed
  in such a manner as to ensure that each training and evaluation
  fold contains at least one presence and one absence observation.
 
- \item A random search method is used to tune the model parameters. The
+ \item A grid search method is used to tune the model parameters. The
  candidate values for each parameter (specified via \code{parameters}) are
- used to generate a full set of parameter combinations, and then
- a subset of these parameter combinations is randomly selected for
- the tuning procedure (specified via \code{n_random_search_iterations}).
+ used to generate a full set of parameter combinations, and these
+ parameter combinations are subsequently used for tuning the models.
  To account for unbalanced datasets, the
  \code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
  is calculated as the mean value across each of the training folds
  (i.e. number of absence divided by number of presences per feature).
  For a given parameter combination, models are fit using k-fold cross-
  validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
- mentioned training and evaluation folds -- and the average area under the
- curve (AUC) statistic calculated using the data held out from each fold is
- used to quantify the performance. These models are also fitted using the
+ mentioned training and evaluation folds -- and the True Skill Statistic
+ (TSS) calculated using the data held out from each fold is
+ used to quantify the performance (i.e. \code{"test_tss_mean"} column in
+ output). These models are also fitted using the
  \code{early_stopping_rounds} parameter to reduce time-spent
  tuning models. If relevant, they are also fitted using the supplied weights
- (per by the argument to \code{site_weights_data}).After exploring the
- subset of parameter combinations, the best parameter combination is
+ (per by the argument to \code{site_weights_data}). After exploring the
+ full set of parameter combinations, the best parameter combination is
  identified, and the associated parameter values and models are stored for
  later use.
 
@@ -143,10 +172,10 @@ This function (i) prepares the data for model fitting, (ii) calibrates
   been surveyed before, and also sites that have not been surveyed before.
 
  \item The performance of the cross-validation models is evaluated.
- Specifically, the AUC, sensitivity, and specificity statistics are
- calculated
- (if relevant, weighted by the argument to \code{site_weights_data}).
- These performance values are calculated using the models' evaluation folds.
+ Specifically, the TSS, sensitivity, and specificity statistics are
+ calculated (if relevant, weighted by the argument to
+ \code{site_weights_data}). These performance values are calculated using
+ the models' training and evaluation folds.
 
 }
 }
@@ -160,11 +189,8 @@ RFoptions(seed = 123)
  x <- simulate_site_data(200, 2, 0.5, n_env_vars = 3)
 
 # create list of possible tuning parameters for modelling
-all_parameters <- list(max_depth = seq(1, 10, 1),
-                       eta = seq(0.1, 0.5, 0.1),
-                       lambda = 10 ^ seq(-1.0, 0.0, 0.25),
-                       subsample = seq(0.5, 1.0, 0.1),
-                       colsample_bytree = seq(0.4, 1.0, 0.1),
+all_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
+                       lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
                        objective = "binary:logistic")
 
 # fit models
@@ -172,8 +198,8 @@ all_parameters <- list(max_depth = seq(1, 10, 1),
 # finishes quickly, you would probably want something like 1000+
 results <- fit_occupancy_models(
    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
-   n_folds = rep(5, 2), n_random_search_iterations = 10,
-   early_stopping_rounds = 100, parameters = all_parameters, n_threads = 1)
+   xgb_n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
+   xgb_tuning_parameters = all_parameters, n_threads = 1)
 
 # print best found model parameters
 print(results$parameters)

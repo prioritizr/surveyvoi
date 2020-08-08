@@ -20,14 +20,15 @@ approx_optimal_survey_scheme(
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_parameters,
+  xgb_tuning_parameters,
+  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
+  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
+  xgb_n_folds = rep(5, length(site_occupancy_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
-  xgb_n_folds = rep(5, nrow(feature_data)),
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
   method_approx_outcomes = "weighted_without_replacement",
@@ -128,14 +129,24 @@ for conducting surveys and managing sites for conservation.}
 \item{survey_budget}{\code{numeric} maximum expenditure permitted
 for conducting surveys.}
 
-\item{xgb_parameters}{\code{list} of \code{list} objects
-containing the parameters for fitting models for each
-feature. See documentation for the \code{params} argument in
-\code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
-these parameters would be determined using the
-\code{\link{fit_occupancy_models}} function. Note that arguments must
-have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
-elements (see example below).}
+\item{xgb_tuning_parameters}{\code{list} object containing the candidate
+parameter values for fitting models. Valid parameters include:
+\code{"max_depth"}, \code{"eta"}, \code{"lambda"},
+\code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
+\code{"objective"}. See documentation for the \code{params} argument in
+\code{\link[xgboost]{xgb.train}} for more information.}
+
+\item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
+tuning. See \code{\link[xgboost]{xgboost}} for more information.
+Defaults to 100 for each feature.}
+
+\item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
+See \code{\link[xgboost]{xgboost}} for more information.
+Defaults to 1000 for each feature.}
+
+\item{xgb_n_folds}{\code{numeric} number of folds to split the training
+data into when fitting models for each feature.
+Defaults to 5 for each feature.}
 
 \item{site_management_locked_in_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}
@@ -171,25 +182,12 @@ Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
 
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
-
 \item{site_weight_columns}{\code{character} name of columns in
 \code{site_data} containing weights for model fitting for each
 feature. These columns must contain \code{numeric} values greater
 than or equal to zero. No missing (\code{NA}) values are
 permitted. Defaults to \code{NULL} such that all data are given
 equal weight when fitting models.}
-
-\item{xgb_n_folds}{\code{integer} vector containing the number of
- k-fold cross-validation folds to use for fitting models and
- assessing model performance for each feature. Ideally, the number of folds
- should be exactly the same as the number used for tuning the
- model parameters (i.e. same parameter to the \code{n_folds}
- argument in \link{fit_occupancy_models} when generating parameters
-for \code{xgb_parameters}).}
 
 \item{n_approx_replicates}{\code{integer} number of replicates to use for
 approximating the expected value calculations. Defaults to 100.}

@@ -18,8 +18,7 @@ evdci(
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL,
-  optimality_gap = 0
+  prior_matrix = NULL
 )
 }
 \arguments{
@@ -114,11 +113,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
 }
 \value{
 \code{numeric} value.
