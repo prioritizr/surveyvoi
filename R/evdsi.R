@@ -132,32 +132,12 @@
 #'  Defaults to \code{NULL} such that prior data is calculated automatically
 #'  using \code{\link{prior_probability_matrix}}.
 #'
-#' @param xgb_parameters \code{list} of \code{list} objects
-#'   containing the parameters for fitting models for each
-#'   feature. See documentation for the \code{params} argument in
-#'   \code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
-#'   these parameters would be determined using the
-#'   \code{\link{fit_occupancy_models}} function. Note that arguments must
-#'   have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
-#'   elements (see example below).
-#'
-#' @param xgb_n_folds \code{integer} vector containing the number of
-#'   k-fold cross-validation folds to use for fitting models and
-#'   assessing model performance for each feature. Ideally, the number of folds
-#'   should be exactly the same as the number used for tuning the
-#'   model parameters (i.e. same parameter to the \code{n_folds}
-#'   argument in \link{fit_occupancy_models} when generating parameters
-#'  for \code{xgb_parameters}).
-#'
-#' @param optimality_gap \code{numeric} relative optimality gap for generating
-#'   conservation prioritizations. A value of zero indicates that
-#'   prioritizations must be solved to optimality. A value of 0.1 indicates
-#'   prioritizations must be within 10\% of optimality. Defaults to 0.
-#'
 #' @param seed \code{integer} state of the random number generator for
 #'  partitioning data into folds cross-validation and fitting \pkg{xgboost}
 #'  models. This parameter must remain the same to compare results for
 #'  different survey schemes. Defaults to 500.
+#'
+#' @inheritParams fit_occupancy_models
 #'
 #' @details This function calculates the expected value and does not
 #'  use approximation methods. As such, this function can only be applied
@@ -226,13 +206,14 @@ evdsi <- function(
   feature_model_specificity_column,
   feature_target_column,
   total_budget,
-  xgb_parameters,
+  xgb_tuning_parameters,
+  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
+  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
+  xgb_n_folds = rep(5, length(site_occupancy_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
   site_weight_columns = NULL,
-  xgb_n_folds = rep(5, nrow(feature_data)),
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -316,19 +297,21 @@ evdsi <- function(
     ## total_budget
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
-    ## xgb_parameters
-    is.list(xgb_parameters),
-    identical(length(xgb_parameters), nrow(feature_data)),
+    ## xgb_tuning_parameters
+    is.list(xgb_tuning_parameters),
     ## xgb_n_folds
-    is.numeric(xgb_n_folds),
-    all(xgb_n_folds > 0), identical(length(xgb_n_folds), nrow(feature_data)),
-    assertthat::noNA(xgb_n_folds),
+    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
+    length(xgb_n_folds) == length(site_occupancy_columns),
+    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
+    length(xgb_n_rounds) == length(site_occupancy_columns),
+    all(xgb_n_rounds > 0),
+    ## xgb_early_stopping_rounds
+    is.numeric(xgb_early_stopping_rounds),
+    assertthat::noNA(xgb_early_stopping_rounds),
+    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0),
     ## seed
     assertthat::is.number(seed))
   ## site_management_locked_in_column
@@ -373,7 +356,7 @@ evdsi <- function(
     validate_site_weight_data(site_data, site_occupancy_columns,
       site_weight_columns)
   ## validate xgboost parameters
-  validate_xgboost_parameters(xgb_parameters)
+  validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
   assertthat::assert_that(
     all(feature_data[[feature_target_column]] <= nrow(site_data)))
@@ -418,17 +401,17 @@ evdsi <- function(
     sum(sorted_costs) <= total_budget,
     msg = paste("targets cannot be achieved given budget and locked out",
                 "planning units"))
-  ## xgb_nrounds
-  xgb_nrounds <- vapply(xgb_parameters, `[[`,  FUN.VALUE = numeric(1),
-                        "nrounds")
-  ## format xgb_parameters
-  xgb_parameters <- lapply(xgb_parameters, function(x) {
-    out <- x[names(x) != "nrounds"]
-    out <- lapply(out, as.character)
-    out$nthread <- "1" # force single thread for reproducibility
-    out$seed <- as.character(seed)
-    out
-  })
+  ## prepare parameter combinations for model tuning
+  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
+  attr(xgb_full_parameters, "out.attrs") <- NULL
+  xgb_full_parameters$nthread <- "1" # force single thread for reproducibility
+  xgb_full_parameters$verbose <- "0" # force quiet
+  xgb_full_parameters$seed <- as.character(seed) # set seed
+  if (is.null(xgb_full_parameters$objective)) {
+    xgb_full_parameters$objective <- "binary:logistic"
+    warning(paste("no objective specified for model fitting,",
+                  "assuming binary:logistic"))
+  }
   ## extract site occupancy data
   rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
   ## identify sites that need model predictions for each feature
@@ -441,7 +424,8 @@ evdsi <- function(
       pu_train_idx <-
         which(site_data[[site_survey_scheme_column]] | !is.na(rij[i, ]))
       withr::with_seed(seed, {
-        create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
+        create_folds(unname(rij[i, pu_train_idx]),
+                     n = xgb_n_folds[i],
                      index = pu_train_idx,
                      na.fail = FALSE, seed = seed)
       })
@@ -476,13 +460,14 @@ evdsi <- function(
       pu_purchase_locked_in = site_management_locked_in,
       pu_purchase_locked_out = site_management_locked_out,
       pu_env_data = ejx,
-      xgb_parameters = xgb_parameters,
+      xgb_parameter_names = names(xgb_full_parameters),
+      xgb_parameter_values = as.matrix(xgb_full_parameters),
+      n_xgb_rounds = xgb_n_rounds,
+      n_xgb_early_stopping_rounds = xgb_early_stopping_rounds,
       xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
       xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-      n_xgb_nrounds = xgb_nrounds,
       obj_fun_target = round(feature_data[[feature_target_column]]),
-      total_budget = total_budget,
-      optim_gap = optimality_gap)
+      total_budget = total_budget)
   })
   # return result
   out

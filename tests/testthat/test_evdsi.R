@@ -5,15 +5,16 @@ test_that("equal weights", {
   RandomFields::RFoptions(seed = 501)
   set.seed(500)
   n_f <- 2
-  n_sites <- 12
+  n_sites <- 30
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
   feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(1, 1)
+  feature_data$target <- c(15, 15)
   total_budget <- sum(site_data$management_cost * 0.9)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   site_data$w1 <- 1
   site_data$w2 <- 1
+  xgb_n_folds <- rep(5, n_f)
   # prepare data
   site_occ_columns <- c("f1", "f2")
   site_prb_columns <- c("p1", "p2")
@@ -30,8 +31,11 @@ test_that("equal weights", {
     which(!site_data$survey & is.na(rij[i, ]))
   })
   # prepare xgboost inputs
-  xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
+  xgb_tuning_parameters <-
+    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
+  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
+  attr(xgb_full_parameters, "out.attrs") <- NULL
+  xgb_full_parameters$seed <- as.character(1) # set seed
   ## folds for training and testing models
   xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
     pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
@@ -61,9 +65,10 @@ test_that("equal weights", {
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
-    xgb_n_folds = rep(5, n_f),
+    xgb_tuning_parameters = xgb_tuning_parameters,
+    xgb_early_stopping_rounds = rep(5, n_f),
+    xgb_n_rounds = rep(10, n_f),
+    xgb_n_folds = xgb_n_folds,
     seed = 1)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -77,9 +82,10 @@ test_that("equal weights", {
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
-    xgb_nrounds = rep(8, n_f),
+    xgb_parameter_names = names(xgb_full_parameters),
+    xgb_parameter_values = as.matrix(xgb_full_parameters),
+    n_xgb_rounds = rep(10, n_f),
+    n_xgb_early_stopping_rounds = rep(5, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
@@ -93,15 +99,16 @@ test_that("variable weights", {
   RandomFields::RFoptions(seed = 501)
   set.seed(500)
   n_f <- 2
-  n_sites <- 12
+  n_sites <- 30
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
   feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(1, 1)
+  feature_data$target <- c(15, 15)
   total_budget <- sum(site_data$management_cost * 0.9)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   site_data$w1 <- runif(nrow(site_data)) + 1
   site_data$w2 <- runif(nrow(site_data)) + 1
+  xgb_n_folds <- rep(5, n_f)
   # prepare data
   site_occ_columns <- c("f1", "f2")
   site_prb_columns <- c("p1", "p2")
@@ -118,8 +125,11 @@ test_that("variable weights", {
     which(!site_data$survey & is.na(rij[i, ]))
   })
   # prepare xgboost inputs
-  xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
+  xgb_tuning_parameters <-
+    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
+  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
+  attr(xgb_full_parameters, "out.attrs") <- NULL
+  xgb_full_parameters$seed <- as.character(1) # set seed
   ## folds for training and testing models
   xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
     pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
@@ -149,9 +159,10 @@ test_that("variable weights", {
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
-    xgb_n_folds = rep(5, n_f),
+    xgb_tuning_parameters = xgb_tuning_parameters,
+    xgb_early_stopping_rounds = rep(5, n_f),
+    xgb_n_rounds = rep(10, n_f),
+    xgb_n_folds = xgb_n_folds,
     seed = 1)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -165,9 +176,10 @@ test_that("variable weights", {
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
-    xgb_nrounds = rep(8, n_f),
+    xgb_parameter_names = names(xgb_full_parameters),
+    xgb_parameter_values = as.matrix(xgb_full_parameters),
+    n_xgb_rounds = rep(10, n_f),
+    n_xgb_early_stopping_rounds = rep(5, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
@@ -181,20 +193,20 @@ test_that("sparse", {
   RandomFields::RFoptions(seed = 501)
   set.seed(500)
   n_f <- 2
-  n_sites <- 12
+  n_sites <- 30
   site_data <- simulate_site_data(n_sites, n_f, 0.5)
   feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(2, 2)
-  total_budget <- sum(site_data$management_cost * 0.8)
+  feature_data$target <- c(15, 15)
+  total_budget <- sum(site_data$management_cost * 0.9)
   site_data$survey <- FALSE
   site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
   site_data$w1 <- runif(nrow(site_data)) + 1
   site_data$w2 <- runif(nrow(site_data)) + 1
+  xgb_n_folds <- rep(5, n_f)
   # randomly add sparsity to survey data
-  set.seed(800)
   for (i in paste0("f", seq_len(n_f))) {
     na_idx <- which(is.na(site_data[[i]]))
-    idx <- sample(na_idx, ceiling(length(na_idx) * 0.3))
+    idx <- sample(na_idx, ceiling(length(na_idx) * 0.5))
     site_data[[i]][idx] <- round(runif(length(idx)))
   }
   # prepare data
@@ -213,8 +225,11 @@ test_that("sparse", {
     which(!site_data$survey & is.na(rij[i, ]))
   })
   # prepare xgboost inputs
-  xgb_n_folds <- rep(5, n_f)
-  xgb_parameters <- list(list(objective = "binary:logistic"))[rep(1, n_f)]
+  xgb_tuning_parameters <-
+    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
+  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
+  attr(xgb_full_parameters, "out.attrs") <- NULL
+  xgb_full_parameters$seed <- as.character(1) # set seed
   ## folds for training and testing models
   xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
     pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
@@ -244,9 +259,10 @@ test_that("sparse", {
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
     total_budget = total_budget,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(nrounds = 8, scale_pos_weight = 2)),
-    xgb_n_folds = rep(5, n_f),
+    xgb_tuning_parameters = xgb_tuning_parameters,
+    xgb_early_stopping_rounds = rep(5, n_f),
+    xgb_n_rounds = rep(10, n_f),
+    xgb_n_folds = xgb_n_folds,
     seed = 1)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
     rij = rij, pij = pij, wij = wij,
@@ -260,9 +276,10 @@ test_that("sparse", {
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
     pu_env_data = ejx,
-    xgb_parameters =
-      lapply(xgb_parameters, append, list(seed = "1", scale_pos_weight = "2")),
-    xgb_nrounds = rep(8, n_f),
+    xgb_parameter_names = names(xgb_full_parameters),
+    xgb_parameter_values = as.matrix(xgb_full_parameters),
+    n_xgb_rounds = rep(10, n_f),
+    n_xgb_early_stopping_rounds = rep(5, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
