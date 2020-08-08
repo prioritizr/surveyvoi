@@ -110,9 +110,9 @@ NULL
 #' RFoptions(seed = 201)
 #'
 #' # simulate data
-#' site_data <- simulate_site_data(n_sites = 11, n_features = 2, prop = 0.8)
+#' site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
-#' feature_data$target <- c(3, 3)
+#' feature_data$target <- c(15, 15)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -127,9 +127,9 @@ NULL
 #' survey_budget <- sum(site_data$survey_cost) * 0.1
 #'
 #' # define xgboost tuning parameters
-#' xgb_parameters <-
-#'  list(list(objective = "binary:logistic", scale_pos_weight = 1,
-#'            nrounds = 8, eta = 0.1))[rep(1, 2)]
+#' xgb_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
+#'                        lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
+#'                        objective = "binary:logistic")
 #'
 #' # find survey scheme using approximate method and greedy heuristic algorithm
 #' # (using 10 replicates so that this example completes relatively quickly)

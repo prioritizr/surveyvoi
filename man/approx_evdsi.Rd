@@ -229,9 +229,9 @@ set.seed(123)
 RFoptions(seed = 123)
 
 # simulate data
-site_data <- simulate_site_data(n_sites = 15, n_features = 2, prop = 0.5)
+site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
-feature_data$target <- c(3, 3)
+feature_data$target <- c(15, 15)
 
 # preview simulated data
 print(site_data)
@@ -247,10 +247,9 @@ site_data$survey_site <- FALSE
 site_data$survey_site[which(is.na(site_data$f1))[1:2]] <- TRUE
 
 # define xgboost tuning parameters
-# these should ideally be determined using fit_occupancy_models
-xgb_parameters <-
- list(list(objective = "binary:logistic", nrounds = 8,
-           scale_pos_weight = 1, eta = 0.1))[rep(1, 2)]
+xgb_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
+                       lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
+                       objective = "binary:logistic")
 
 # calculate expected value of management decision given the survey
 # information using exact method

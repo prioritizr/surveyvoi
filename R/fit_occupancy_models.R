@@ -171,9 +171,9 @@ NULL
 #'  x <- simulate_site_data(200, 2, 0.5, n_env_vars = 3)
 #'
 #' # create list of possible tuning parameters for modelling
-#' all_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
-#'                        lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
-#'                        objective = "binary:logistic")
+#' parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
+#'                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
+#'                    objective = "binary:logistic")
 #'
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
@@ -181,7 +181,7 @@ NULL
 #' results <- fit_occupancy_models(
 #'    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
 #'    xgb_n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
-#'    xgb_tuning_parameters = all_parameters, n_threads = 1)
+#'    xgb_tuning_parameters = parameters, n_threads = 1)
 #'
 #' # print best found model parameters
 #' print(results$parameters)
