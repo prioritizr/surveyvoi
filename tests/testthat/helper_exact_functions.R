@@ -19,7 +19,9 @@ r_expected_value_of_decision_given_survey_scheme <- function(
   rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
   pu_survey_solution, pu_model_prediction, pu_survey_costs,
   pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data,
-  xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
+  xgb_parameter_names, xgb_parameter_values,
+  n_xgb_rounds, n_xgb_early_stopping_rounds,
+  xgb_train_folds, xgb_test_folds,
   obj_fun_target, total_budget) {
   # init
   ## constants
@@ -90,14 +92,16 @@ r_expected_value_of_decision_given_survey_scheme <- function(
 
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
-      curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
-      xgb_nrounds, xgb_train_folds, xgb_test_folds)
+      curr_oij, wij, pu_env_data, as.logical(survey_features),
+      xgb_parameter_names, xgb_parameter_values,
+      n_xgb_rounds, n_xgb_early_stopping_rounds,
+      xgb_train_folds, xgb_test_folds)
 
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
       curr_oij, wij, pu_env_data, survey_features_idx,
-      pu_model_prediction, xgb_parameters, xgb_nrounds, xgb_train_folds,
-      xgb_test_folds)
+      xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds,
+      xgb_train_folds, xgb_test_folds, pu_model_prediction)
 
     ## generate posterior matrix
     curr_models_sens <- rep(NA, n_f)

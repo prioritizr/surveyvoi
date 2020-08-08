@@ -24,12 +24,10 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd &pu_purchase_locked_in,  // planning units that are locked in
   Eigen::VectorXd &pu_purchase_locked_out,  // planning units that locked out
   MatrixXfRM &pu_env_data, // environmental data
-  std::vector<std::vector<std::string>> &xgb_parameter_names, // xgboost
-                                                              // parameter names
-  std::vector<std::vector<std::string>> &xgb_parameter_values, // xgboost
-                                                               // parameter
-                                                               // values
-  std::vector<std::size_t> &n_xgb_nrounds,  // xgboost training rounds
+  std::vector<std::string> &xgb_parameter_names, // xgboost parameter names
+  MatrixXs &xgb_parameter_values, // xgboost parameter combination values
+  std::vector<std::size_t> &n_xgb_rounds,  // xgboost training rounds
+  std::vector<std::size_t> &n_xgb_early_stopping_rounds,  // xgboost early stop
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_train_folds,
   std::vector<std::vector<std::vector<std::size_t>>> &xgb_test_folds,
   Eigen::VectorXi &obj_fun_target,  // objective function calculation term
@@ -214,16 +212,32 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   for (std::size_t i = 0; i < (n_f_survey * n_pu_surveyed_in_scheme); ++i)
     survey_pij(i) = pij(rij_outcome_idx[i]);
 
+  /// extract xgboost data structures for model fitting
+  std::vector<std::vector<Eigen::VectorXf>> train_y;
+  std::vector<std::vector<Eigen::VectorXf>> train_w;
+  std::vector<std::vector<MatrixXfRM>> train_x;
+  extract_k_fold_vector_data_from_indices(
+    wij, xgb_train_folds, survey_features_idx, train_w);
+  extract_k_fold_matrix_data_from_indices(
+    pu_env_data, xgb_train_folds, survey_features_idx, train_x);
+
+  // prepare xgboost data structures for model evaluation
+  std::vector<std::vector<Eigen::VectorXf>> test_y;
+  std::vector<std::vector<Eigen::VectorXf>> test_w;
+  std::vector<std::vector<MatrixXfRM>> test_x;
+  extract_k_fold_vector_data_from_indices(
+    wij, xgb_test_folds, survey_features_idx, test_w);
+  extract_k_fold_matrix_data_from_indices(
+    pu_env_data, xgb_test_folds, survey_features_idx, test_x);
+
   // main processing
   for (std::size_t r = 0; r < n_approx_replicates; ++r) {
     /// generate outcomes,
     // manually adjust seed to ensure different samples per replicate
-    set_seed(seed + static_cast<double>(r));
     sample_n_states(
       n_approx_outcomes_per_replicate, survey_pij, method_approx_outcomes,
-      outcomes);
+      seed + static_cast<double>(r), outcomes);
     set_seed(seed);
-
     // calculate values based outcomes
     for (std::size_t o = 0; o < n_approx_outcomes_per_replicate; ++o) {
       /// generate the o'th outcome from surveying the planning units across
@@ -235,17 +249,22 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
         curr_oij, survey_features_idx, pu_survey_solution_idx,
         feature_outcome_idx);
 
-      // fit models for the feature's outcomes if needed
+      // prepare rij data for modelling
+      extract_k_fold_vector_data_from_indices(
+        curr_oij, xgb_train_folds, survey_features_idx, train_y);
+      extract_k_fold_vector_data_from_indices(
+        curr_oij, xgb_test_folds, survey_features_idx, test_y);
+
+      /// fit models for the feature's outcomes if needed
       fit_xgboost_models_and_assess_performance(
-        curr_oij, wij,
-        pu_env_data, pu_predict_env_data,
-        survey_features_idx, feature_outcome_idx,
-        xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
-        xgb_train_folds, xgb_test_folds,
+        curr_oij, wij, survey_features_idx, feature_outcome_idx,
+        xgb_parameter_names, xgb_parameter_values,
+        n_xgb_rounds, n_xgb_early_stopping_rounds,
+        train_x, train_y, train_w, test_x, test_y, test_w, pu_predict_env_data,
         model_yhat, model_performance,
         curr_model_sensitivity, curr_model_specificity);
 
-      /// update model sensitivity and speciifcity values based on
+      /// update model sensitivity and specificity values based on
       /// survey sensitivity and specificity values, because the
       /// model values are dependent on the survey data
       for (std::size_t i = 0; i < n_f_survey; ++i)
@@ -253,7 +272,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
       for (std::size_t i = 0; i < n_f_survey; ++i)
         curr_model_specificity[i] *= survey_specificity[survey_features_idx[i]];
 
-      /// generate modelled predictions for survey species
+      /// generate modelled predictions for surveyed species
       predict_missing_rij_data(
         curr_oij, survey_features_idx, feature_outcome_idx,
         pu_model_prediction_idx, model_yhat);
@@ -337,10 +356,12 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd pu_purchase_locked_in,
   Eigen::VectorXd pu_purchase_locked_out,
   Eigen::MatrixXf pu_env_data,
-  Rcpp::List xgb_parameters,
+  std::vector<std::string> xgb_parameter_names,
+  Rcpp::CharacterMatrix xgb_parameter_values,
+  std::vector<std::size_t> n_xgb_rounds,
+  std::vector<std::size_t> n_xgb_early_stopping_rounds,
   Rcpp::List xgb_train_folds,
   Rcpp::List xgb_test_folds,
-  std::vector<std::size_t> n_xgb_nrounds,
   Eigen::VectorXi obj_fun_target,
   double total_budget,
   double optim_gap,
@@ -355,23 +376,21 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   const std::size_t n_f_survey =
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
 
-  // format xgboost parameters
-  std::vector<std::vector<std::string>> xgb_parameter_names;
-  std::vector<std::vector<std::string>> xgb_parameter_values;
-  extract_xgboost_parameters(xgb_parameters,xgb_parameter_names,
-                             xgb_parameter_values);
-
-  // format xgboost fold indices
-  std::vector<std::vector<std::vector<std::size_t>>>
-    xgb_train_folds2;
-  std::vector<std::vector<std::vector<std::size_t>>>
-    xgb_test_folds2;
-  extract_k_fold_indices(xgb_train_folds, xgb_train_folds2);
-  extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
-
   // format pu model prediction indices
   std::vector<std::vector<std::size_t>> pu_model_prediction_idx;
   extract_list_of_list_of_indices(pu_model_prediction, pu_model_prediction_idx);
+
+  // extract xgboost parameter values
+  MatrixXs xgb_parameter_values2(
+    xgb_parameter_values.rows(), xgb_parameter_values.cols());
+  for (std::size_t i = 0; i != xgb_parameter_values2.size(); ++i)
+    xgb_parameter_values2(i) = Rcpp::as<std::string>(xgb_parameter_values[i]);
+
+  // format xgboost fold indices
+  std::vector<std::vector<std::vector<std::size_t>>> xgb_train_folds2;
+  std::vector<std::vector<std::vector<std::size_t>>> xgb_test_folds2;
+  extract_k_fold_indices(xgb_train_folds, xgb_train_folds2);
+  extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
 
   // convert environmental data to row major format
   MatrixXfRM pu_env_data2 = pu_env_data;
@@ -392,11 +411,10 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     pu_survey_costs, pu_purchase_costs,
     pu_purchase_locked_in, pu_purchase_locked_out,
     pu_env_data2,
-    xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
+    xgb_parameter_names, xgb_parameter_values2,
+    n_xgb_rounds, n_xgb_early_stopping_rounds,
     xgb_train_folds2, xgb_test_folds2,
-    obj_fun_target,
-    total_budget,
-    optim_gap,
+    obj_fun_target, total_budget, optim_gap,
     n_approx_replicates, n_approx_outcomes_per_replicate,
     method_approx_outcomes, seed);
 }

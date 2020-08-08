@@ -1,8 +1,12 @@
 r_approx_expected_value_of_decision_given_survey_scheme <- function(
     rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-    pu_survey_solution, pu_model_prediction, pu_survey_costs,
-    pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
-    pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
+    pu_survey_solution, pu_model_prediction,
+    pu_survey_costs, pu_purchase_costs,
+    pu_purchase_locked_in, pu_purchase_locked_out,
+    pu_env_data,
+    xgb_parameter_names, xgb_parameter_values,
+    n_xgb_rounds, n_xgb_early_stopping_rounds,
+    xgb_train_folds, xgb_test_folds,
     obj_fun_target, total_budget,
     n_approx_replicates, n_approx_outcomes_per_replicate, seed) {
   # generate outcomes
@@ -10,17 +14,22 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
     set.seed(seed + i - 1)
     rcpp_sample_n_weighted_states_without_replacement(
       n_approx_outcomes_per_replicate,
-      pij[survey_features, pu_survey_solution, drop = FALSE])
+      pij[survey_features, pu_survey_solution, drop = FALSE],
+      seed + i - 1)
   })
   set.seed(seed)
   # run calculations
   value <- sapply(seq_len(n_approx_replicates), function(i) {
     r_approx_expected_value_of_decision_given_survey_scheme_fixed_states(
       rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-      pu_survey_solution, pu_model_prediction, pu_survey_costs,
-      pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
-      pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds,
-      xgb_test_folds, obj_fun_target, total_budget, outcomes[[i]])
+      pu_survey_solution, pu_model_prediction,
+      pu_survey_costs, pu_purchase_costs,
+      pu_purchase_locked_in, pu_purchase_locked_out,
+      pu_env_data,
+      xgb_parameter_names, xgb_parameter_values,
+      n_xgb_rounds, n_xgb_early_stopping_rounds,
+      xgb_train_folds, xgb_test_folds,
+      obj_fun_target, total_budget, outcomes[[i]])
   })
   value
 }
@@ -28,9 +37,13 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
 r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   function(
     rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-    pu_survey_solution, pu_model_prediction, pu_survey_costs,
-    pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out,
-    pu_env_data, xgb_parameters, n_xgb_nrounds, xgb_train_folds, xgb_test_folds,
+    pu_survey_solution, pu_model_prediction,
+    pu_survey_costs, pu_purchase_costs,
+    pu_purchase_locked_in, pu_purchase_locked_out,
+    pu_env_data,
+    xgb_parameter_names, xgb_parameter_values,
+    n_xgb_rounds, n_xgb_early_stopping_rounds,
+    xgb_train_folds, xgb_test_folds,
     obj_fun_target, total_budget, outcomes) {
   # init
   ## constants
@@ -101,14 +114,16 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
 
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
-      curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
-      n_xgb_nrounds, xgb_train_folds, xgb_test_folds)
+      curr_oij, wij, pu_env_data, as.logical(survey_features),
+      xgb_parameter_names, xgb_parameter_values,
+      n_xgb_rounds, n_xgb_early_stopping_rounds,
+      xgb_train_folds, xgb_test_folds)
 
     ## generate model predictions for unsurveyed planning units
     curr_oij2 <- r_predict_missing_rij_data(
       curr_oij, wij, pu_env_data, survey_features_idx,
-      pu_model_prediction, xgb_parameters, n_xgb_nrounds, xgb_train_folds,
-      xgb_test_folds)
+      xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds,
+      xgb_train_folds, xgb_test_folds, pu_model_prediction)
 
     ## generate posterior matrix
     curr_models_sens <- rep(NA, n_f)

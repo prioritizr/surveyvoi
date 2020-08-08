@@ -23,35 +23,24 @@ NULL
 #'   and contain \code{numeric}, \code{factor}, or \code{character} data.
 #'   No missing (\code{NA}) values are permitted in these columns.
 #'
-#' @param parameters \code{list} object containing the candidate
+#' @param tuning_parameters \code{list} object containing the candidate
 #'  parameter values for fitting models. Valid parameters include:
 #'  \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
 #'  \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
 #'  \code{"objective"}. See documentation for the \code{params} argument in
 #'  \code{\link[xgboost]{xgb.train}} for more information.
 #'
-#' @param early_stopping_rounds \code{numeric} model rounds for parameter
+#' @param xgb_early_stopping_rounds \code{numeric} model rounds for parameter
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 100.
+#'   Defaults to 100 for each feature.
 #'
-#' @param tree_method \code{character} method used for constructing trees.
-#'   Available options are: \code{"auto"}, \code{"exact"}, \code{"approx"},
-#'   and \code{"hist"}. Defaults to \code{"auto"}.
-#'
-#' @param n_rounds \code{numeric} model rounds for model fitting
+#' @param xgb_n_rounds \code{numeric} model rounds for model fitting
 #'   See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 1000.
+#'   Defaults to 1000 for each feature.
 #'
-#' @param n_folds \code{numeric} number of folds to split the training
+#' @param xgb_n_folds \code{numeric} number of folds to split the training
 #'   data into when fitting models for each feature.
-#'   Defaults to 10 if there are more than 1000
-#'   rows in the argument \code{site_data}, otherwise defaults to 5.
-#'   Note that if the maximum number of minority cases (e.g. 1 presence and
-#'   1000 absences) is fewer than the number of folds then one minority case
-#'   is sampled per fold.
-#'
-#' @param n_random_search_iterations \code{numeric} number of random search
-#'    iterations to use when tuning model parameters. Defaults to 10000.
+#'   Defaults to 5 for each feature.
 #'
 #' @param site_weight_columns \code{character} name of columns in
 #'  \code{site_data} containing weights for model fitting. These columns must
@@ -78,29 +67,29 @@ NULL
 #'  \enumerate{
 #'
 #'  \item The data are prepared for model fitting by partitioning the data using
-#'  k-fold cross-validation (set via argument to \code{n_folds}). The training
-#'  and evaluation folds are constructed
+#'  k-fold cross-validation (set via argument to \code{xgb_n_folds}). The
+#'  training and evaluation folds are constructed
 #'  in such a manner as to ensure that each training and evaluation
 #'  fold contains at least one presence and one absence observation.
 #'
-#'  \item A random search method is used to tune the model parameters. The
+#'  \item A grid search method is used to tune the model parameters. The
 #'  candidate values for each parameter (specified via \code{parameters}) are
-#'  used to generate a full set of parameter combinations, and then
-#'  a subset of these parameter combinations is randomly selected for
-#'  the tuning procedure (specified via \code{n_random_search_iterations}).
+#'  used to generate a full set of parameter combinations, and these
+#'  parameter combinations are subsequently used for tuning the models.
 #'  To account for unbalanced datasets, the
 #'  \code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
 #'  is calculated as the mean value across each of the training folds
 #'  (i.e. number of absence divided by number of presences per feature).
 #'  For a given parameter combination, models are fit using k-fold cross-
 #'  validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
-#'  mentioned training and evaluation folds -- and the average area under the
-#'  curve (AUC) statistic calculated using the data held out from each fold is
-#'  used to quantify the performance. These models are also fitted using the
+#'  mentioned training and evaluation folds -- and the True Skill Statistic
+#'  (TSS) calculated using the data held out from each fold is
+#'  used to quantify the performance (i.e. \code{"test_tss_mean"} column in
+#'  output). These models are also fitted using the
 #'  \code{early_stopping_rounds} parameter to reduce time-spent
 #'  tuning models. If relevant, they are also fitted using the supplied weights
-#'  (per by the argument to \code{site_weights_data}).After exploring the
-#'  subset of parameter combinations, the best parameter combination is
+#'  (per by the argument to \code{site_weights_data}). After exploring the
+#'  full set of parameter combinations, the best parameter combination is
 #'  identified, and the associated parameter values and models are stored for
 #'  later use.
 #'
@@ -110,15 +99,16 @@ NULL
 #'   been surveyed before, and also sites that have not been surveyed before.
 #'
 #'  \item The performance of the cross-validation models is evaluated.
-#'  Specifically, the AUC, sensitivity, and specificity statistics are
-#'  calculated
-#'  (if relevant, weighted by the argument to \code{site_weights_data}).
-#'  These performance values are calculated using the models' evaluation folds.
+#'  Specifically, the TSS, sensitivity, and specificity statistics are
+#'  calculated (if relevant, weighted by the argument to
+#'  \code{site_weights_data}). These performance values are calculated using
+#'  the models' training and evaluation folds.
 #'
 #' }
 #'
 #' @return \code{list} object containing:
 #' \describe{
+#'
 #' \item{parameters}{\code{list} of \code{list} objects containing the best
 #' tuning parameters for each feature.}
 #'
@@ -126,7 +116,48 @@ NULL
 #'  predictions for each feature.}
 #'
 #' \item{performance}{\code{\link[tibble]{tibble}} object containing the
-#'  performance of the best cross-validation models for each feature.}
+#'  performance of the best models for each feature. It contains the following
+#'  columns:
+#'
+#'  \describe{
+#'  \item{feature}{name of the feature.}
+#'  \item{train_tss_mean}{
+#'    mean TSS statistic for models calculated using training data in
+#'    cross-validation.}
+#'  \item{train_tss_std}{
+#'    standard deviation in TSS statistics for models calculated using training
+#'    data in cross-validation.}
+#'  \item{train_sensitivity_mean}{
+#'    mean sensitivity statistic for models calculated using training data in
+#'    cross-validation.}
+#'  \item{train_sensitivity_std}{
+#'    standard deviation in sensitivity statistics for models calculated using
+#'    training data in cross-validation.}
+#'  \item{train_specificity_mean}{
+#'    mean specificity statistic for models calculated using training data in
+#'    cross-validation.}
+#'  \item{train_specificity_std}{
+#'    standard deviation in specificity statistics for models calculated using
+#'    training data in cross-validation.}
+#'  \item{test_tss_mean}{
+#'    mean TSS statistic for models calculated using test data in
+#'    cross-validation.}
+#'  \item{test_tss_std}{
+#'    standard deviation in TSS statistics for models calculated using test
+#'    data in cross-validation.}
+#'  \item{test_sensitivity_mean}{
+#'    mean sensitivity statistic for models calculated using test data in
+#'    cross-validation.}
+#'  \item{test_sensitivity_std}{
+#'    standard deviation in sensitivity statistics for models calculated using
+#'    test data in cross-validation.}
+#'  \item{test_specificity_mean}{
+#'    mean specificity statistic for models calculated using test data in
+#'    cross-validation.}
+#'  \item{test_specificity_std}{
+#'    standard deviation in specificity statistics for models calculated using
+#'    test data in cross-validation.}
+#'  }
 #'
 #' }
 #'
@@ -140,11 +171,8 @@ NULL
 #'  x <- simulate_site_data(200, 2, 0.5, n_env_vars = 3)
 #'
 #' # create list of possible tuning parameters for modelling
-#' all_parameters <- list(max_depth = seq(1, 10, 1),
-#'                        eta = seq(0.1, 0.5, 0.1),
-#'                        lambda = 10 ^ seq(-1.0, 0.0, 0.25),
-#'                        subsample = seq(0.5, 1.0, 0.1),
-#'                        colsample_bytree = seq(0.4, 1.0, 0.1),
+#' all_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
+#'                        lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
 #'                        objective = "binary:logistic")
 #'
 #' # fit models
@@ -152,8 +180,8 @@ NULL
 #' # finishes quickly, you would probably want something like 1000+
 #' results <- fit_occupancy_models(
 #'    x, paste0("f", seq_len(2)), paste0("e", seq_len(3)),
-#'    n_folds = rep(5, 2), n_random_search_iterations = 10,
-#'    early_stopping_rounds = 100, parameters = all_parameters, n_threads = 1)
+#'    xgb_n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
+#'    tuning_parameters = all_parameters, n_threads = 1)
 #'
 #' # print best found model parameters
 #' print(results$parameters)
@@ -166,10 +194,10 @@ NULL
 #'
 #' @export
 fit_occupancy_models <- function(
-  site_data, site_occupancy_columns, site_env_vars_columns, parameters,
-  early_stopping_rounds = 100, tree_method = "auto", n_rounds = 1000,
-  n_folds = rep(5, length(site_occupancy_columns)),
-  n_random_search_iterations = 10000,
+  site_data, site_occupancy_columns, site_env_vars_columns, tuning_parameters,
+  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
+  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
+  xgb_n_folds = rep(5, length(site_occupancy_columns)),
   site_weight_columns = NULL, n_threads = 1, seed = 500, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
@@ -181,29 +209,29 @@ fit_occupancy_models <- function(
     is.character(site_env_vars_columns),
     assertthat::noNA(site_env_vars_columns),
     all(assertthat::has_name(site_data, site_env_vars_columns)),
-    is.numeric(n_folds), assertthat::noNA(n_folds),
-    length(n_folds) == length(site_occupancy_columns),
-    assertthat::is.count(n_random_search_iterations),
-    assertthat::noNA(n_random_search_iterations),
-    assertthat::is.count(n_rounds),
-    assertthat::noNA(n_rounds),
-    assertthat::is.count(early_stopping_rounds),
-    assertthat::noNA(early_stopping_rounds),
+    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
+    length(xgb_n_folds) == length(site_occupancy_columns),
+    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
+    length(xgb_n_rounds) == length(site_occupancy_columns),
+    all(xgb_n_rounds > 0),
+    is.numeric(xgb_early_stopping_rounds),
+    assertthat::noNA(xgb_early_stopping_rounds),
+    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    all(xgb_early_stopping_rounds > 0),
     assertthat::is.count(seed),
     assertthat::noNA(seed),
-    assertthat::is.string(tree_method),
-    assertthat::noNA(tree_method),
-    tree_method %in% c("auto", "hist", "exact", "approx"),
     assertthat::is.count(n_threads), assertthat::noNA(n_threads),
-    is.list(parameters),
-    isTRUE(n_random_search_iterations <= prod(lengths(parameters))))
+    is.list(tuning_parameters))
     param_names <- c("max_depth", "eta", "lambda", "subsample",
-                     "colsample_bytree", "objective")
+                     "colsample_bytree", "objective", "tree_method")
     assertthat::assert_that(
-      all(names(parameters) %in% param_names),
-      msg = paste("argument to parameters has unrecognised elements:",
-                 paste(setdiff(names(parameters), param_names),
+      all(names(tuning_parameters) %in% param_names),
+      msg = paste("argument to tuning_parameters has unrecognised elements:",
+                 paste(setdiff(names(tuning_parameters), param_names),
                        collapse = ", ")))
+  if ("tree_method" %in% names(tuning_parameters))
+    assertthat::assert_that(all(tuning_parameters$tree_method %in%
+                                c("auto", "hist", "exact", "approx")))
   if (!is.null(site_weight_columns)) {
     assertthat::assert_that(
       is.character(site_weight_columns),
@@ -279,7 +307,8 @@ fit_occupancy_models <- function(
   # prepare folds
   f <- lapply(seq_along(site_occupancy_columns), function(i) {
     withr::with_seed(seed, {
-      create_folds(d[[i]]$y, n = n_folds[i])})
+      create_folds(d[[i]]$y, n = xgb_n_folds[i])
+    })
   })
 
   # tune and fit models
@@ -287,12 +316,10 @@ fit_occupancy_models <- function(
     withr::with_seed(seed, {
       tune_model(data = d[[i]],
                  folds = f[[i]],
-                 parameters = parameters,
-                 early_stopping_rounds = early_stopping_rounds,
-                 tree_method = tree_method,
-                 n_rounds = n_rounds,
-                 n_folds = n_folds[i],
-                 n_random_search_iterations = n_random_search_iterations,
+                 parameters = tuning_parameters,
+                 early_stopping_rounds = xgb_early_stopping_rounds[i],
+                 n_rounds = xgb_n_rounds[i],
+                 n_folds = xgb_n_folds[i],
                  n_threads = n_threads,
                  verbose = verbose)
     })
@@ -300,10 +327,10 @@ fit_occupancy_models <- function(
 
   # assess models
   perf <- plyr::ldply(seq_along(site_occupancy_columns), function(i) {
-    out <- plyr::ldply(seq_len(n_folds[i]), function(k) {
-      # extract data
+    out <- plyr::ldply(seq_len(xgb_n_folds[i]), function(k) {
+      # extract fold training and test data
       m_k <- m[[i]]$models[[k]]
-      nround_k <- m[[i]]$parameters$nround
+      nround_k <- m[[i]]$parameters$nrounds
       x_train_k <- d[[i]]$x[f[[i]]$train[[k]], , drop = FALSE]
       x_test_k <- d[[i]]$x[f[[i]]$test[[k]], , drop = FALSE]
       y_train_k <- d[[i]]$y[f[[i]]$train[[k]]]
@@ -317,22 +344,22 @@ fit_occupancy_models <- function(
         stats::predict(m_k, x_test_k, ntreelimit = nround_k)))
       ## calculate performance
       data.frame(
-        train_auc = weighted_auc(y_train_k, p_train_k, w_train_k),
+        train_tss = weighted_tss(y_train_k, p_train_k, w_train_k),
         train_sensitivity = sensitivity(y_train_k, p_train_k, w_train_k),
         train_specificity = specificity(y_train_k, p_train_k, w_train_k),
-        test_auc = weighted_auc(y_test_k, p_test_k, w_test_k),
+        test_tss = weighted_tss(y_test_k, p_test_k, w_test_k),
         test_sensitivity = sensitivity(y_test_k, p_test_k, w_test_k),
         test_specificity = specificity(y_test_k, p_test_k, w_test_k))
     })
     data.frame(feature = site_occupancy_columns[i],
-               train_auc_mean = mean(out$train_auc),
-               train_auc_std = stats::sd(out$train_auc),
+               train_tss_mean = mean(out$train_tss),
+               train_tss_std = stats::sd(out$train_tss),
                train_sensitivity_mean = mean(out$train_sensitivity),
                train_sensitivity_std = stats::sd(out$train_sensitivity),
                train_specificity_mean = mean(out$train_specificity),
                train_specificity_std = stats::sd(out$train_specificity),
-               test_auc_mean = mean(out$test_auc),
-               test_auc_std = stats::sd(out$test_auc),
+               test_tss_mean = mean(out$test_tss),
+               test_tss_std = stats::sd(out$test_tss),
                test_sensitivity_mean = mean(out$test_sensitivity),
                test_sensitivity_std = stats::sd(out$test_sensitivity),
                test_specificity_mean = mean(out$test_specificity),
@@ -362,19 +389,14 @@ fit_occupancy_models <- function(
 
 #' @noRd
 tune_model <- function(data, folds, parameters, early_stopping_rounds,
-  tree_method, n_rounds, n_folds, n_random_search_iterations, n_threads,
-  verbose) {
+  n_rounds, n_folds, n_threads, verbose) {
   # assert arguments are valid
   assertthat::assert_that(
     isTRUE(n_folds == length(folds$train)),
     isTRUE(n_folds == length(folds$test)),
     assertthat::is.count(n_folds), assertthat::noNA(n_folds),
-    assertthat::is.count(n_random_search_iterations),
-    assertthat::noNA(n_random_search_iterations),
     assertthat::is.count(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
-    assertthat::is.string(tree_method),
-    assertthat::noNA(tree_method),
     assertthat::is.count(n_threads),
     assertthat::noNA(n_threads),
     is.list(parameters),
@@ -383,6 +405,7 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   # create full parameters
   ## generate all combinations
   full_parameters <- do.call(expand.grid, parameters)
+  attr(full_parameters, "out.attrs") <- NULL
   ## add objective if missing
   if (is.null(full_parameters$objective)) {
     full_parameters$objective <- "binary:logistic"
@@ -392,10 +415,6 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
     assertthat::assert_that(length(unique(full_parameters$objective)) == 1,
       msg = "only one objective can be specified")
   }
-  ## subset tuning parameters to number of random search iterations
-  full_parameters <-
-    full_parameters[sample.int(nrow(full_parameters),
-                               n_random_search_iterations), , drop = FALSE]
 
   # calculate scale_pos_weight
   spw <- mean(vapply(seq_len(n_folds), FUN.VALUE = numeric(1), function(k) {
@@ -413,24 +432,22 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   cv <- plyr::ldply(seq_len(nrow(full_parameters)), .parallel = is_parallel,
                     function(i)  {
     ## extract tuning parameters
-    p <- full_parameters[i, , drop = FALSE]
+    p <- as.list(full_parameters[i, , drop = FALSE])
+    p$verbose <- 0
+    p$nthread <- 1
     ## run cross-validation
     cv <- xgboost::xgb.cv(
-      params = list(objective = p$objective, verbose = 0,
-                    max_depth = p$max_depth, eta = p$eta, nthread = 1,
-                    lambda = p$lambda, subsample = p$subsample,
-                    colsample_bytree = p$colsample_bytree,
-                    tree_method = tree_method),
+      params = p,
       data = xgboost::xgb.DMatrix(data$x, label = data$y, weight = data$w),
       folds = folds$test, train_folds = folds$train,
       nrounds = n_rounds, early_stopping_rounds = early_stopping_rounds,
-      eval_metric = "auc", metrics = "auc", maximize = TRUE,
+      feval = feval_tss, maximize = TRUE,
       scale_pos_weight = spw, prediction = FALSE, showsd = TRUE,
       verbose = verbose,
       callback = list(xgboost::cb.cv.predict(save_models = TRUE)))
     ## store the model performance
     tibble::tibble(
-      eval = cv$evaluation_log$test_auc_mean[cv$best_ntreelimit],
+      eval = cv$evaluation_log$test_tss_mean[cv$best_ntreelimit],
       nrounds = cv$best_ntreelimit,
       models = list(cv$models))
   })
@@ -442,18 +459,11 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   cv <- tibble::as_tibble(cv)
   k <- which.max(cv$eval)
   # return best parameters and models
-  list(
-    parameters = list(
-      max_depth = full_parameters$max_depth[k],
-      eta = full_parameters$eta[k],
-      nrounds = cv$nrounds[k],
-      scale_pos_weight = spw,
-      lambda = full_parameters$lambda[k],
-      tree_method = tree_method,
-      subsample = full_parameters$subsample[k],
-      colsample_bytree = full_parameters$colsample_bytree[k],
-      objective = as.character(full_parameters$objective[k])),
-    models = cv$models[[k]])
+  best_params <- as.list(full_parameters[k, , drop = FALSE])
+  best_params$nrounds <- cv$nrounds[k]
+  best_params$scale_pos_weight <- spw
+  best_params$objective <- as.character(best_params$objective)
+  list(parameters = best_params, models = cv$models[[k]])
 }
 
 #' @noRd
@@ -489,12 +499,21 @@ specificity <- function(actual, predicted, weights = rep(1, length(actual))) {
 }
 
 #' @noRd
-weighted_auc <- function(actual, predicted, weights = rep(1, length(actual))) {
+weighted_tss <- function(actual, predicted, weights = rep(1, length(actual))) {
   assertthat::assert_that(
     is.numeric(actual), assertthat::noNA(actual),
     is.numeric(predicted), assertthat::noNA(predicted),
     is.numeric(weights), assertthat::noNA(weights),
     identical(length(actual), length(predicted)),
     identical(length(actual), length(weights)))
-  WeightedROC::WeightedAUC(WeightedROC::WeightedROC(predicted, actual, weights))
+  specificity(actual, predicted, weights) +
+  sensitivity(actual, predicted, weights) - 1
+}
+
+#' @noRd
+feval_tss <- function(preds, dtrain) {
+  labels <- xgboost::getinfo(dtrain, "label")
+  wts <- xgboost::getinfo(dtrain, "weight")
+  value <- weighted_tss(labels, plogis(preds), wts)
+  list(metric = "tss", value = value)
 }

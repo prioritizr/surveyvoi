@@ -140,7 +140,7 @@ simulate_site_data <- function(n_sites, n_features,
                               n = n_env_vars)@data))
   env_data <- apply(env_data, 2, function(x) scale(x))
   # feature model coefficients
-  feature_coef <- matrix(stats::rnorm(n_features * n_env_vars, sd = 5),
+  feature_coef <- matrix(stats::rnorm(n_features * n_env_vars, sd = 8),
                          ncol = n_env_vars, nrow = n_features)
   # probability data
   pij <- matrix(NA, ncol = n_features, nrow = n_sites)

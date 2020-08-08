@@ -41,11 +41,13 @@ Eigen::MatrixXd rcpp_predict_missing_rij_data(
   Eigen::MatrixXd wij,
   Eigen::MatrixXf pu_env_data_raw,
   std::vector<bool> survey_features,
-  Rcpp::List pu_model_prediction,
-  Rcpp::List xgb_parameters,
-  std::vector<std::size_t> n_xgb_nrounds,
+  std::vector<std::string> xgb_parameter_names,
+  Rcpp::CharacterMatrix xgb_parameter_values,
+  std::vector<std::size_t> n_xgb_rounds,
+  std::vector<std::size_t> n_xgb_early_stopping_rounds,
   Rcpp::List xgb_train_folds,
-  Rcpp::List xgb_test_folds) {
+  Rcpp::List xgb_test_folds,
+  Rcpp::List pu_model_prediction) {
 
   // init
   MatrixXfRM pu_env_data = pu_env_data_raw;
@@ -92,26 +94,46 @@ Eigen::MatrixXd rcpp_predict_missing_rij_data(
     }
   }
 
-  // extract xgboost parameters
-  std::vector<std::vector<std::string>> xgb_parameter_names;
-  std::vector<std::vector<std::string>> xgb_parameter_values;
-  extract_xgboost_parameters(xgb_parameters, xgb_parameter_names,
-                             xgb_parameter_values);
+  // extract xgboost parameter values
+  MatrixXs xgb_parameter_values2(
+    xgb_parameter_values.rows(), xgb_parameter_values.cols());
+  for (std::size_t i = 0; i != xgb_parameter_values2.size(); ++i)
+    xgb_parameter_values2(i) = Rcpp::as<std::string>(xgb_parameter_values[i]);
 
   // format xgboost fold indices
-  std::vector<std::vector<std::vector<std::size_t>>>
-    xgb_train_folds2;
-  std::vector<std::vector<std::vector<std::size_t>>>
-    xgb_test_folds2;
+  std::vector<std::vector<std::vector<std::size_t>>> xgb_train_folds2;
+  std::vector<std::vector<std::vector<std::size_t>>> xgb_test_folds2;
   extract_k_fold_indices(xgb_train_folds, xgb_train_folds2);
   extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
 
+  // prepare xgboost data structures for model training
+  std::vector<std::vector<Eigen::VectorXf>> train_y;
+  std::vector<std::vector<Eigen::VectorXf>> train_w;
+  std::vector<std::vector<MatrixXfRM>> train_x;
+  extract_k_fold_vector_data_from_indices(
+    rij, xgb_train_folds2, survey_features_idx, train_y);
+  extract_k_fold_vector_data_from_indices(
+    wij, xgb_train_folds2, survey_features_idx, train_w);
+  extract_k_fold_matrix_data_from_indices(
+    pu_env_data, xgb_train_folds2, survey_features_idx, train_x);
+
+  // prepare xgboost data structures for model evaluation
+  std::vector<std::vector<Eigen::VectorXf>> test_y;
+  std::vector<std::vector<Eigen::VectorXf>> test_w;
+  std::vector<std::vector<MatrixXfRM>> test_x;
+  extract_k_fold_vector_data_from_indices(
+    rij, xgb_test_folds2, survey_features_idx, test_y);
+  extract_k_fold_vector_data_from_indices(
+    wij, xgb_test_folds2, survey_features_idx, test_w);
+  extract_k_fold_matrix_data_from_indices(
+    pu_env_data, xgb_test_folds2, survey_features_idx, test_x);
+
   // fit models
   fit_xgboost_models_and_assess_performance(
-    rij, wij, pu_env_data, pu_predict_env_data,
-    survey_features_idx, feature_outcome_idx,
-    xgb_parameter_names, xgb_parameter_values, n_xgb_nrounds,
-    xgb_train_folds2, xgb_test_folds2,
+    rij, wij, survey_features_idx, feature_outcome_idx,
+    xgb_parameter_names, xgb_parameter_values2,
+    n_xgb_rounds, n_xgb_early_stopping_rounds,
+    train_x, train_y, train_w, test_x, test_y, test_w, pu_predict_env_data,
     model_yhat, model_performance,
     curr_sensitivity, curr_specificity);
 

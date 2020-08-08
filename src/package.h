@@ -14,7 +14,7 @@
 #include <RcppNumerical.h>
 #include <progress.hpp>
 #include <progress_bar.hpp>
- #include <PoissonBinomial.h>
+#include <PoissonBinomial.h>
 // GMP library for large numbers
 #include <gmp.h>
 #include <gmpxx.h>
@@ -63,6 +63,10 @@ struct model_key_equal {
 
 /* typedefs */
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXfRM;
+
+typedef Eigen::Matrix<BoosterHandle, Eigen::Dynamic, Eigen::Dynamic> MatrixXbh;
+
+typedef Eigen::Matrix<std::string, Eigen::Dynamic, Eigen::Dynamic> MatrixXs;
 
 typedef std::unordered_map<std::pair<std::size_t, mpz_class>, std::vector<BoosterHandle>*, model_key_hash, model_key_equal> model_beta_map;
 

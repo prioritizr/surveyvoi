@@ -224,46 +224,39 @@ create_folds <- function(x, n, index = seq_along(x), seed = 500,
     is.numeric(index), assertthat::noNA(index),
     identical(length(x), length(index)),
     assertthat::is.count(seed),
-    assertthat::is.flag(na.fail))
+    assertthat::is.flag(na.fail),
+    !all(is.na(x)))
   if (na.fail)
     assertthat::assert_that(assertthat::noNA(x))
+  assertthat::assert_that(sum(x, na.rm = TRUE) >= (n + 1),
+    msg = "not enough presences to create the specified number of folds")
+  assertthat::assert_that(sum(1 - x, na.rm = TRUE) >= (n + 1),
+    msg = "not enough absence to create the specified number of folds")
+  # initialization
+  data <- tibble::tibble(x = x, xc = as.character(x), idx = index)
+  data_no_na <- data[!is.na(data$x), , drop = FALSE]
+  data_na <- data[is.na(data$x), , drop = FALSE]
 
-  # define functions for adding presence/absences to fold partitions
-  add_idx <- function(i, x, type) {
-    if (type == "presence") {
-      j <- abs(x - 1) < 1e-10
-    } else {
-      j <- abs(x - 0) < 1e-10
-    }
-    if (sum(j[i], na.rm = TRUE) == 0) {
-      idx <- which(j)
-      if (length(idx) == 1) {
-        i <- c(i, idx)
-      } else {
-        i <- c(i, sample(idx, 1, replace = FALSE))
-      }
-    }
-    i
-  }
-
-  # generate folds
+  # generate folds within model fitting/training data
   withr::with_seed(seed, {
-    # create test folds
-    test <- rBayesianOptimization::KFold(x, nfolds = n, seed = seed,
-                                         stratified = FALSE)
-    # create train folds
-    train <- lapply(test, function(i) seq_along(x)[-i])
-    # make sure train/test partitions have at least one presence in all folds
-    train <- lapply(train, add_idx, x = x, type = "presence")
-    test <- lapply(test, add_idx, x = x, type = "presence")
-    # make sure train/test partitions have at least one presence in all folds
-    train <- lapply(train, add_idx, x = x, type = "absence")
-    test <- lapply(test, add_idx, x = x, type = "absence")
+    # create folds indices
+    data_no_na <- groupdata2::fold(data_no_na, cat_col = "xc", k = n)
+    if (nrow(data_na) >= n) {
+      data_na <- groupdata2::fold(data_na, k = n)
+      data2 <- rbind(data_no_na, data_na)
+    } else if (nrow(data_na) > 0) {
+      # randomly assign to folds
+      data_na$.fold <- sample.int(n, nrow(data_na), replace = nrow(data_na) > n)
+      data2 <- rbind(data_no_na, data_na)
+    } else if (nrow(data_na) == 0) {
+      data2 <- data_no_na
+    }
   })
+  data3 <- split(data2, data2$.folds)
 
-  # convert to indices
-  train <- lapply(train, function(i) index[i])
-  test <- lapply(test, function(i) index[i])
+  # extract indices for folds
+  train <- lapply(data3, function(i) setdiff(index, i$idx))
+  test <- lapply(data3, function(i) i$idx)
 
   # return result
   list(train = train, test = test)

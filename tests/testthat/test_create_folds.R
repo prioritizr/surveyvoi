@@ -9,7 +9,6 @@ test_that("expected result", {
   expect_is(f, "list")
   expect_length(f, 2)
   expect_equal(names(f), c("train", "test"))
-  expect_equivalent(lengths(f), rep(3, 2))
   for (i in seq_along(f$train)) {
     expect_gte(sum(y[f$train[[i]]] > 0.5), 1)
     expect_gte(sum(y[f$train[[i]]] < 0.5), 1)
@@ -20,36 +19,15 @@ test_that("expected result", {
   }
 })
 
-test_that("few presences and absences", {
+test_that("a single missing value", {
   # data
-  y <- c(0, 1)
+  y <- c(rep(0, 10), rep(1, 5), rep(NA_real_, 1))
   # calculations
-  f <- create_folds(y, 10)
+  f <- create_folds(y, 4, na.fail = FALSE)
   # tests
   expect_is(f, "list")
   expect_length(f, 2)
   expect_equal(names(f), c("train", "test"))
-  expect_equivalent(lengths(f), rep(10, 2))
-  for (i in seq_along(f$train)) {
-    expect_gte(sum(y[f$train[[i]]] > 0.5), 1)
-    expect_gte(sum(y[f$train[[i]]] < 0.5), 1)
-  }
-  for (i in seq_along(f$test)) {
-    expect_gte(sum(y[f$test[[i]]] > 0.5), 1)
-    expect_gte(sum(y[f$test[[i]]] < 0.5), 1)
-  }
-})
-
-test_that("missing values", {
-  # data
-  y <- c(0, 1, NA)
-  # calculations
-  f <- create_folds(y, 10, na.fail = FALSE)
-  # tests
-  expect_is(f, "list")
-  expect_length(f, 2)
-  expect_equal(names(f), c("train", "test"))
-  expect_equivalent(lengths(f), rep(10, 2))
   for (i in seq_along(f$train)) {
     expect_gte(sum(y[f$train[[i]]] > 0.5, na.rm = TRUE), 1)
     expect_gte(sum(y[f$train[[i]]] < 0.5, na.rm = TRUE), 1)
@@ -58,29 +36,48 @@ test_that("missing values", {
     expect_gte(sum(y[f$test[[i]]] > 0.5, na.rm = TRUE), 1)
     expect_gte(sum(y[f$test[[i]]] < 0.5, na.rm = TRUE), 1)
   }
-  expect_true(3 %in% unlist(f))
+  expect_true(which(is.na(y)) %in% unlist(f))
 })
 
-test_that("custom indices", {
+test_that("lots of missing values", {
   # data
-  x <- c(0, 1, NA)
-  index <- c(14, 100, 300)
+  y <- c(rep(0, 10), rep(1, 5), rep(NA_real_, 20))
   # calculations
-  f <- create_folds(x, 3, index = index, na.fail = FALSE)
+  f <- create_folds(y, 3, na.fail = FALSE)
   # tests
   expect_is(f, "list")
   expect_length(f, 2)
   expect_equal(names(f), c("train", "test"))
-  expect_equivalent(lengths(f), rep(3, 2))
+  for (i in seq_along(f$train)) {
+    expect_gte(sum(y[f$train[[i]]] > 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[f$train[[i]]] < 0.5, na.rm = TRUE), 1)
+  }
+  for (i in seq_along(f$test)) {
+    expect_gte(sum(y[f$test[[i]]] > 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[f$test[[i]]] < 0.5, na.rm = TRUE), 1)
+  }
+  expect_true(all(which(is.na(y)) %in% unlist(f)))
+})
+
+test_that("custom indices", {
+  # data
+  y <- c(rep(0, 10), rep(1, 5), rep(NA_real_, 20))
+  index <- sample.int(1000, length(y))
+  # calculations
+  f <- create_folds(y, 3, index = index, na.fail = FALSE)
+  # tests
+  expect_is(f, "list")
+  expect_length(f, 2)
+  expect_equal(names(f), c("train", "test"))
   for (i in seq_along(f$train)) {
     idx <- match(f$train[[i]], index)
-    expect_gte(sum(x[idx] > 0.5, na.rm = TRUE), 1)
-    expect_gte(sum(x[idx] < 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[idx] > 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[idx] < 0.5, na.rm = TRUE), 1)
   }
   for (i in seq_along(f$test)) {
     idx <- match(f$test[[i]], index)
-    expect_gte(sum(x[idx] > 0.5, na.rm = TRUE), 1)
-    expect_gte(sum(x[idx] < 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[idx] > 0.5, na.rm = TRUE), 1)
+    expect_gte(sum(y[idx] < 0.5, na.rm = TRUE), 1)
   }
   expect_true(setequal(index, unlist(f)))
 })

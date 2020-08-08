@@ -169,6 +169,75 @@ double convolve_binomial(Eigen::VectorXd& x, int threshold) {
   return (1.0 - z.segment(0, threshold).sum());
 }
 
+
+void extract_k_fold_vector_data_from_indices(
+  Eigen::MatrixXd &x,
+  std::vector<std::vector<std::vector<std::size_t>>> &idx,
+  std::vector<std::size_t> &survey_features_idx,
+  std::vector<std::vector<Eigen::VectorXf>> &out) {
+  // preallocate output
+  out.resize(survey_features_idx.size());
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    out[i].resize(idx[survey_features_idx[i]].size());
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      out[i][j].resize(idx[survey_features_idx[i]][j].size());
+    }
+  }
+  // populate data
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      for (std::size_t k = 0; k < idx[survey_features_idx[i]][j].size(); ++k) {
+        out[i][j][k] =
+          static_cast<float>(x(survey_features_idx[i],
+                               idx[survey_features_idx[i]][j][k]));
+      }
+    }
+  }
+  // return void
+  return;
+}
+
+void extract_k_fold_matrix_data_from_indices(
+  MatrixXfRM &x,
+  std::vector<std::vector<std::vector<std::size_t>>> &idx,
+  std::vector<std::size_t> &survey_features_idx,
+  std::vector<std::vector<MatrixXfRM>> &out) {
+  // preallocate output
+  out.resize(survey_features_idx.size());
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    out[i].resize(idx[survey_features_idx[i]].size());
+  }
+  // populate data
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      // create subset matrix
+      out[i][j].resize(idx[survey_features_idx[i]][j].size(), x.cols());
+      for (std::size_t k = 0; k < idx[survey_features_idx[i]][j].size();
+           ++k) {
+        out[i][j].row(k).array() =
+          x.row(idx[survey_features_idx[i]][j][k]).array();
+      }
+    }
+  }
+  // return void
+  return;
+}
+
+
+void initialize_DMatrixHandle(
+  Eigen::VectorXf &y, Eigen::VectorXf &w, MatrixXfRM &x, DMatrixHandle &h) {
+  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -1.0f, &h);
+  XGDMatrixSetFloatInfo(h, "label", y.data(), y.size());
+  XGDMatrixSetFloatInfo(h, "weight", w.data(), w.size());
+ return;
+}
+
+void initialize_DMatrixHandle(
+  MatrixXfRM &x, DMatrixHandle &h) {
+  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -1.0f, &h);
+ return;
+}
+
 /* Copyright (c) 2015 by Xgboost Contributors */
 // This file contains the customization implementations of R module
 // to change behavior of libxgboost

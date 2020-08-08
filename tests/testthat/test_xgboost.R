@@ -1,7 +1,6 @@
 context("xgboost")
 
-r_xgboost <- function(y, x_train, predict_x, xgb_parameters,
-                              xgb_nrounds) {
+r_xgboost <- function(y, x_train, predict_x, xgb_parameters, xgb_nrounds) {
   set.seed(as.numeric(xgb_parameters$seed))
   model <- xgboost::xgboost(
     data = x_train, label = y, nrounds = xgb_nrounds,

@@ -36,6 +36,8 @@ PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
 # define objects
 OBJECTS =\
   $(PKGROOT)/init.o\
+  $(PKGROOT)/functions.o\
+  $(PKGROOT)/rcpp_xgboost.o\
   $(PKGROOT)/rcpp_sample_states.o\
   $(PKGROOT)/rcpp_approx_expected_value_of_decision_given_survey_scheme.o\
   $(PKGROOT)/rcpp_expected_value_of_action.o\
@@ -43,12 +45,10 @@ OBJECTS =\
   $(PKGROOT)/rcpp_posterior_probability_matrix.o\
   $(PKGROOT)/rcpp_expected_value_of_decision_given_current_info.o\
   $(PKGROOT)/rcpp_expected_value_of_decision_given_survey_scheme.o\
-  $(PKGROOT)/functions.o\
   $(PKGROOT)/rcpp_states.o\
   $(PKGROOT)/rcpp_probability.o\
   $(PKGROOT)/rcpp_feasible_actions_ilp_matrix.o\
   $(PKGROOT)/rcpp_pmedian_constraint_matrix.o\
-  $(PKGROOT)/rcpp_xgboost.o\
   $(PKGROOT)/rcpp_prioritization.o\
   $(PKGROOT)/rcpp_heuristic_prioritization.o\
   $(PKGROOT)/RcppExports.o\
