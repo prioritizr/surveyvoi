@@ -51,6 +51,7 @@ void greedy_heuristic_prioritization(
   Eigen::VectorXd log_pu_costs = (pu_costs.array() + 1.0e-5).array().log();
   Eigen::MatrixXd log_1m_rij = rij;
   log_1m_rij = log_1m_rij.cwiseMin(1.0 - 1.0e-10);
+  log_1m_rij = log_1m_rij.cwiseMax(1.0e-10);
   log_1m_matrix(log_1m_rij);
   Eigen::MatrixXd curr_log_1m_rij = log_1m_rij;
   for (std::size_t i = 0; i < n_pu; ++i) {
