@@ -99,7 +99,7 @@
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations—this is not a trivial task.</p>
-<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management <em>decision</em>). Methods are provided to calculate the <em>expected value of the decision given current information</em> (<code>evdci</code> function), and the <em>expected value of the decision given a survey scheme</em> (<code>evdsi</code> function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (<code>optimal_survey_scheme</code> function). This package requires the <a href="https://www.gurobi.com"><em>Gurobi</em> software suite</a>. In this vignette, we will use a simulated dataset to explore these methods.</p>
+<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management <em>decision</em>). Methods are provided to calculate the <em>expected value of the decision given current information</em> (<code>evdci</code> function), and the <em>expected value of the decision given a survey scheme</em> (<code>evdsi</code> function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (<code>optimal_survey_scheme</code> function). In this vignette, we will use a simulated dataset to explore these methods.</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
@@ -197,7 +197,7 @@
   <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
 
 <span class="co"># manually set target</span>
-<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">20</span>
+<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">10</span>
 
 <span class="co"># print feature data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">feature_data</span>)</pre></body></html></div>
@@ -308,7 +308,7 @@
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_current</span>)</pre></body></html></div>
-<pre><code>## [1] 0.001751786</code></pre>
+<pre><code>## [1] 0.9992836</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -431,13 +431,13 @@
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 2
-##   name               value
-##   &lt;chr&gt;              &lt;dbl&gt;
-## 1 geo_scheme   0.00180626 
-## 2 env_scheme   0.000902544
-## 3 unc_scheme   0.00180626 
-## 4 cheap_scheme 0.00180626 
-## 5 rich_scheme  0.000880966</code></pre>
+##   name            value
+##   &lt;chr&gt;           &lt;dbl&gt;
+## 1 geo_scheme   0.999015
+## 2 env_scheme   0.998694
+## 3 unc_scheme   0.999015
+## 4 cheap_scheme 0.999015
+## 5 rich_scheme  0.997666</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -446,13 +446,13 @@
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 5 x 3
-##   name               value           roi
-##   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;
-## 1 geo_scheme   0.00180626   0.0000544704
-## 2 env_scheme   0.000902544 -0.000849242 
-## 3 unc_scheme   0.00180626   0.0000544704
-## 4 cheap_scheme 0.00180626   0.0000544704
-## 5 rich_scheme  0.000880966 -0.000870820</code></pre>
+##   name            value          roi
+##   &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+## 1 geo_scheme   0.999015 -0.000268822
+## 2 env_scheme   0.998694 -0.000589986
+## 3 unc_scheme   0.999015 -0.000268822
+## 4 cheap_scheme 0.999015 -0.000268822
+## 5 rich_scheme  0.997666 -0.00161718</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -498,18 +498,15 @@
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># add optimal scheme to site data</span>
 <span class="no">site_data</span>$<span class="no">opt_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="no">opt_scheme</span>[<span class="fl">1</span>, ])
 
-<span class="co"># plot optimal scheme and the environmental diversity scheme</span>
+<span class="co"># plot optimal scheme</span>
 <span class="no">site_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">opt_scheme</span>, <span class="no">env_scheme</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">name</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html">mutate_if</a></span>(<span class="no">is.logical</span>, <span class="no">as.character</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">name</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="no">name</span>))) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">"opt_scheme"</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">opt_scheme</span>)) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
 <p><img src="simulation_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>We can see that the optimal survey scheme (<code>opt_scheme</code>) is different to the scheme based on surveying sites to increase the environmental diversity of surveyed sites (<code>env_scheme</code>). Interestingly, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.</p>
+<p>We can see that the optimal survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes. In particular, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey schemes need to ensure adequate funds remain for actually achieving conservation objectives.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># calculate return on investment of the optimal scheme</span>
 <span class="no">evd_opt</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span>(
     <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
@@ -532,7 +529,7 @@
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 0.002376995</code></pre>
+<pre><code>## [1] 0.9999009</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
@@ -541,14 +538,14 @@
 <span class="co"># print updated results table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 6 x 3
-##   name               value           roi
-##   &lt;chr&gt;              &lt;dbl&gt;         &lt;dbl&gt;
-## 1 geo_scheme   0.00180626   0.0000544704
-## 2 env_scheme   0.000902544 -0.000849242 
-## 3 unc_scheme   0.00180626   0.0000544704
-## 4 cheap_scheme 0.00180626   0.0000544704
-## 5 rich_scheme  0.000880966 -0.000870820 
-## 6 opt_scheme   0.00237700   0.000625210</code></pre>
+##   name            value          roi
+##   &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;
+## 1 geo_scheme   0.999015 -0.000268822
+## 2 env_scheme   0.998694 -0.000589986
+## 3 unc_scheme   0.999015 -0.000268822
+## 4 cheap_scheme 0.999015 -0.000268822
+## 5 rich_scheme  0.997666 -0.00161718 
+## 6 opt_scheme   0.999901  0.000617265</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>

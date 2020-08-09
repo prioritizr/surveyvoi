@@ -1,6 +1,10 @@
 #' @include internal.R
 NULL
 
+#' @import sf
+#' @import Matrix
+NULL
+
 #' @useDynLib surveyvoi, .registration = TRUE
 NULL
 

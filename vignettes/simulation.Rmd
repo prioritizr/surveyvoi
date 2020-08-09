@@ -38,7 +38,7 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 
 The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations---this is not a trivial task.
 
-The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management _decision_). Methods are provided to calculate the _expected value of the decision given current information_ (`evdci` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (`optimal_survey_scheme` function). This package requires the [_Gurobi_ software suite](https://www.gurobi.com). In this vignette, we will use a simulated dataset to explore these methods.
+The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management _decision_). Methods are provided to calculate the _expected value of the decision given current information_ (`evdci` function), and the _expected value of the decision given a survey scheme_ (`evdsi` function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (`optimal_survey_scheme` function). In this vignette, we will use a simulated dataset to explore these methods.
 
 ## Setup
 
@@ -131,7 +131,7 @@ feature_data <- simulate_feature_data(
   n_features = 1, proportion_of_survey_features = 1)
 
 # manually set target
-feature_data$target <- 20
+feature_data$target <- 10
 
 # print feature data
 print(feature_data)
@@ -422,19 +422,16 @@ print(nrow(opt_scheme))
 # add optimal scheme to site data
 site_data$opt_scheme <- c(opt_scheme[1, ])
 
-# plot optimal scheme and the environmental diversity scheme
+# plot optimal scheme
 site_data %>%
-  select(opt_scheme, env_scheme) %>%
-  gather(name, value, -geometry) %>%
-  mutate_if(is.logical, as.character) %>%
-  mutate(name = factor(name, levels = unique(name))) %>%
-  ggplot() +
-    geom_sf(aes(color = value)) +
-    facet_wrap(~ name, nrow = 1) +
-    scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"))
+mutate(name = "opt_scheme") %>%
+ggplot() +
+geom_sf(aes(color = opt_scheme)) +
+facet_wrap(~ name, nrow = 1) +
+scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"))
 ```
 
-We can see that the optimal survey scheme (`opt_scheme`) is different to the scheme based on surveying sites to increase the environmental diversity of surveyed sites (`env_scheme`). Interestingly, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey strategies need to ensure adequate funds remain for actually achieving conservation objectives.
+We can see that the optimal survey scheme (`opt_scheme`) is different to the previous survey schemes. In particular, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey schemes need to ensure adequate funds remain for actually achieving conservation objectives.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # calculate return on investment of the optimal scheme

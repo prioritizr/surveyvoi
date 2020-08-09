@@ -28,3 +28,6 @@ src/amalgamation/xgboost-all0.o
 src/rabit/src/c_api.o
 src/rabit/src/engine_empty.o
 ^debug*
+.editorconfig
+.travis.yml
+^src/dmlc-core/tracker/yarn*
