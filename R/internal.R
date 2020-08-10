@@ -241,18 +241,25 @@ create_folds <- function(x, n, index = seq_along(x), seed = 500,
   withr::with_seed(seed, {
     # create folds indices
     data_no_na <- groupdata2::fold(data_no_na, cat_col = "xc", k = n)
+    fold_column <- setdiff(names(data_no_na), names(data))
+    data_no_na$fold <- as.integer(as.character(data_no_na[[fold_column]]))
+    col_names <- c(names(data), "fold")
+    data_no_na <- data_no_na[, col_names, drop = FALSE]
     if (nrow(data_na) >= n) {
       data_na <- groupdata2::fold(data_na, k = n)
-      data2 <- rbind(data_no_na, data_na)
+      data_na$fold <- as.integer(as.character(data_na[[fold_column]]))
+      data_na <- data_na[, col_names, drop = FALSE]
+      data2 <- rbind(as.data.frame(data_no_na), as.data.frame(data_na))
     } else if (nrow(data_na) > 0) {
       # randomly assign to folds
-      data_na$.fold <- sample.int(n, nrow(data_na), replace = nrow(data_na) > n)
-      data2 <- rbind(data_no_na, data_na)
+      data_na$fold <-
+        sample.int(n, nrow(data_na), replace = nrow(data_na) > n)
+      data2 <- rbind(as.data.frame(data_no_na), as.data.frame(data_na))
     } else if (nrow(data_na) == 0) {
       data2 <- data_no_na
     }
   })
-  data3 <- split(data2, data2$.folds)
+  data3 <- split(data2, data2$fold)
 
   # extract indices for folds
   train <- lapply(data3, function(i) setdiff(index, i$idx))
