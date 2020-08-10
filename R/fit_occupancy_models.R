@@ -506,6 +506,8 @@ weighted_tss <- function(actual, predicted, weights = rep(1, length(actual))) {
 feval_tss <- function(preds, dtrain) {
   labels <- xgboost::getinfo(dtrain, "label")
   wts <- xgboost::getinfo(dtrain, "weight")
-  value <- weighted_tss(labels, stats::plogis(preds), wts)
+  if (packageVersion("xgboost") > "1.1")
+    preds <- stats::plogis(preds)
+  value <- weighted_tss(labels, preds, wts)
   list(metric = "tss", value = value)
 }
