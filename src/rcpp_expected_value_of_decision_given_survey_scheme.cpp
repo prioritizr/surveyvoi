@@ -123,7 +123,6 @@ double expected_value_of_decision_given_survey_scheme(
   std::vector<mpz_class> feature_outcome_idx(n_f_survey);
   model_yhat_map model_yhat;
   model_performance_map model_performance;
-  std::vector<std::vector<BoosterHandle> *> curr_models(n_f_survey);
   Eigen::VectorXd curr_model_sensitivity(n_f_survey);
   Eigen::VectorXd curr_model_specificity(n_f_survey);
 
@@ -241,8 +240,8 @@ double expected_value_of_decision_given_survey_scheme(
       model_yhat, model_performance,
       curr_model_sensitivity, curr_model_specificity);
 
-    /// update model sensitivity and speciifcity values based on
-    /// survey sensitivity and speciifcity values, because the
+    /// update model sensitivity and specificity values based on
+    /// survey sensitivity and specificity values, because the
     /// model values are dependent on the survey data
     for (std::size_t i = 0; i < n_f_survey; ++i)
       curr_model_sensitivity[i] *= survey_sensitivity[survey_features_idx[i]];

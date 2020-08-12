@@ -90,7 +90,7 @@ void posterior_probability_matrix(
         }
         /// if posterior probability is NaN because the total
         /// probability of a model giving a positive result is zero,
-        /// because it is an exceptionally poor model than that cannot
+        /// because it is an exceptionally poor model that cannot
         /// make any correct presence predictions, then manually set
         /// the posterior probability to a really small non-zero number
         /// (since we have to take the log of this number later

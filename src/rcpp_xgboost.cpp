@@ -238,7 +238,7 @@ void xgboost_model_sensitivity_and_specificity(
 
   // calculate model sensitivity
   if (std::abs(total_positive) > 1.0e-10) {
-    // if there are actual positives then calculate correclty
+    // if there are actual positives then calculate correctly
     // sens = true_positive / (true_positive + false_negative);
     sens = true_positive / total_positive;
   } else {
@@ -249,7 +249,7 @@ void xgboost_model_sensitivity_and_specificity(
 
   // calculate model specificity
   if (std::abs(total_negative) > 1.0e-10) {
-    // if there are actual negatives then calculate correclty
+    // if there are actual negatives then calculate correctly
     // spec = true_negative / (true_negative + false_positive);
     spec = true_negative / total_negative;
   } else {
