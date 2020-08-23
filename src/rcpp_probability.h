@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROB_H
 #define PROB_H
 

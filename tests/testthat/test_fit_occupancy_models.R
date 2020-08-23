@@ -4,21 +4,26 @@ test_that("single species", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
-  n_pu <- 10000
+  n_pu <- 1000
   n_f <- 1
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  y <- sf::st_drop_geometry(x)
+  f <- simulate_feature_data(n_f = 1)
+  f$survey_sensitivity <- 0.9
+  f$survey_specificity <- 0.999
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
          objective = "binary:logistic", tree_method = "auto")
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
+      x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
       xgb_tuning_parameters = tuning_parameters)
   })
   # tests
+  y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
   expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
@@ -73,21 +78,25 @@ test_that("multiple species", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
-  n_pu <- 2000
-  n_f <- 4
+  n_pu <- 300
+  n_f <- 3
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  y <- sf::st_drop_geometry(x)
+  f <- simulate_feature_data(n_f)
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
          objective = "binary:logistic")
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      xgb_tuning_parameters = tuning_parameters, n_threads = 2)
+      x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
+      xgb_tuning_parameters = tuning_parameters,
+      xgb_early_stopping_rounds = rep(5, n_f))
   })
   # tests
+  y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
   expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
@@ -146,22 +155,29 @@ test_that("multiple species (sparse)", {
   n_f <- 4
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  x2 <- x
+  f <- simulate_feature_data(n_f)
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
          objective = "binary:logistic")
-  # randomly add a missing values to each species
-  for (i in paste0("f", n_f)) {
-    non_na <- which(!is.na(x[[i]]))
-    idx <- sample(non_na, ceiling(length(non_na) * 0.25))
-    x2[[i]][idx] <- NA_real_
-    expect_gt(sum(is.na(x2[[i]])), sum(is.na(x[[i]])))
+  # randomly set sites to hvae 0 surveys for certain species
+  x2 <- x
+  for (i in seq_len(n_f)) {
+    fn <- paste0("f", i)
+    nn <- paste0("n", i)
+    non_zero <- which(x[[fn]] > 0)
+    idx <- sample(non_zero, ceiling(length(non_zero) * 0.25))
+    x2[[fn]][idx] <- 0
+    x2[[nn]][idx] <- 0
+    expect_gt(sum(x2[[fn]]), 0)
   }
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x2, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      xgb_tuning_parameters = tuning_parameters, n_threads = 2)
+      x2, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
+      xgb_tuning_parameters = tuning_parameters,
+      xgb_early_stopping_rounds = rep(5, n_f))
   })
   # tests
   expect_is(r, "list")

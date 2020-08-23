@@ -170,26 +170,26 @@ double convolve_binomial(Eigen::VectorXd& x, int threshold) {
 }
 
 
-void extract_k_fold_vector_data_from_indices(
-  Eigen::MatrixXd &x,
+void extract_k_fold_y_data_from_indices(
   std::vector<std::vector<std::vector<std::size_t>>> &idx,
   std::vector<std::size_t> &survey_features_idx,
   std::vector<std::vector<Eigen::VectorXf>> &out) {
   // preallocate output
+  std::size_t n_pu_in_species_fold;
   out.resize(survey_features_idx.size());
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
     out[i].resize(idx[survey_features_idx[i]].size());
     for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
-      out[i][j].resize(idx[survey_features_idx[i]][j].size());
+      out[i][j].resize(idx[survey_features_idx[i]][j].size() * 2);
     }
   }
   // populate data
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
     for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
-      for (std::size_t k = 0; k < idx[survey_features_idx[i]][j].size(); ++k) {
-        out[i][j][k] =
-          static_cast<float>(x(survey_features_idx[i],
-                               idx[survey_features_idx[i]][j][k]));
+      n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
+      for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
+        out[i][j][k] = 1.0;
+        out[i][j][k + n_pu_in_species_fold] = 0.0;
       }
     }
   }
@@ -197,24 +197,90 @@ void extract_k_fold_vector_data_from_indices(
   return;
 }
 
-void extract_k_fold_matrix_data_from_indices(
+void extract_k_fold_train_w_data_from_indices(
+  Eigen::MatrixXd &x,
+  std::vector<std::vector<std::vector<std::size_t>>> &idx,
+  std::vector<std::size_t> &survey_features_idx,
+  std::vector<std::vector<Eigen::VectorXf>> &out) {
+  // preallocate output
+  std::size_t n_pu_in_species_fold;
+  out.resize(survey_features_idx.size());
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    out[i].resize(idx[survey_features_idx[i]].size());
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      out[i][j].resize(idx[survey_features_idx[i]][j].size() * 2);
+    }
+  }
+  // populate data
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
+      for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
+        out[i][j][k] = static_cast<float>(
+          x(survey_features_idx[i], idx[survey_features_idx[i]][j][k]));
+        out[i][j][k + n_pu_in_species_fold] = 1.0f - out[i][j][k];
+      }
+    }
+  }
+  // return void
+  return;
+}
+
+void extract_k_fold_test_w_data_from_indices(
+  Eigen::MatrixXd &dij,
+  Eigen::MatrixXd &nij,
+  std::vector<std::vector<std::vector<std::size_t>>> &idx,
+  std::vector<std::size_t> &survey_features_idx,
+  std::vector<std::vector<Eigen::VectorXf>> &out) {
+  // preallocate output
+  std::size_t n_pu_in_species_fold;
+  double curr_det;
+  double curr_total;
+  out.resize(survey_features_idx.size());
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    out[i].resize(idx[survey_features_idx[i]].size());
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      out[i][j].resize(idx[survey_features_idx[i]][j].size() * 2);
+    }
+  }
+  // populate data
+  for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
+    for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
+      n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
+      for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
+        curr_det =
+          dij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]);
+        curr_total =
+          nij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]);
+        out[i][j][k] = static_cast<float>(curr_det / curr_total);
+        out[i][j][k + n_pu_in_species_fold] = 1.0f - out[i][j][k];
+      }
+    }
+  }
+  // return void
+  return;
+}
+
+void extract_k_fold_x_data_from_indices(
   MatrixXfRM &x,
   std::vector<std::vector<std::vector<std::size_t>>> &idx,
   std::vector<std::size_t> &survey_features_idx,
   std::vector<std::vector<MatrixXfRM>> &out) {
   // preallocate output
+  std::size_t n_pu_in_species_fold;
   out.resize(survey_features_idx.size());
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
-    out[i].resize(idx[survey_features_idx[i]].size());
+    out[i].resize(idx[survey_features_idx[i]].size() * 2);
   }
   // populate data
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
     for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
-      // create subset matrix
-      out[i][j].resize(idx[survey_features_idx[i]][j].size(), x.cols());
-      for (std::size_t k = 0; k < idx[survey_features_idx[i]][j].size();
-           ++k) {
+      n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
+      out[i][j].resize(n_pu_in_species_fold * 2, x.cols());
+      for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
         out[i][j].row(k).array() =
+          x.row(idx[survey_features_idx[i]][j][k]).array();
+        out[i][j].row(k + n_pu_in_species_fold).array() =
           x.row(idx[survey_features_idx[i]][j][k]).array();
       }
     }

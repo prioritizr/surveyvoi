@@ -27,13 +27,25 @@ void assert_valid_probability_data(Eigen::MatrixXd&, std::string msg);
 
 void assert_valid_probability_data(double, std::string msg);
 
-void extract_k_fold_vector_data_from_indices(
+void extract_k_fold_y_data_from_indices(
+  std::vector<std::vector<std::vector<std::size_t>>>&,
+  std::vector<std::size_t>&,
+  std::vector<std::vector<Eigen::VectorXf>>&);
+
+void extract_k_fold_train_w_data_from_indices(
   Eigen::MatrixXd&,
   std::vector<std::vector<std::vector<std::size_t>>>&,
   std::vector<std::size_t>&,
   std::vector<std::vector<Eigen::VectorXf>>&);
 
-void extract_k_fold_matrix_data_from_indices(
+void extract_k_fold_test_w_data_from_indices(
+  Eigen::MatrixXd&,
+  Eigen::MatrixXd&,
+  std::vector<std::vector<std::vector<std::size_t>>>&,
+  std::vector<std::size_t>&,
+  std::vector<std::vector<Eigen::VectorXf>>&);
+
+void extract_k_fold_x_data_from_indices(
   MatrixXfRM&,
   std::vector<std::vector<std::vector<std::size_t>>>&,
   std::vector<std::size_t>&,

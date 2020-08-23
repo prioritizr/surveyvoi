@@ -9,7 +9,7 @@ NULL
 #'
 #' @param proportion_of_survey_features \code{numeric} proportion of features
 #'   that will be examined in the new surveys. Values must be between
-#'   zero and one.
+#'   zero and one. Defaults to 1 such that all features should be surveyed.
 #'
 #' @return \code{\link[tibble]{tibble}} object. It contains the following
 #' data:
@@ -49,7 +49,8 @@ NULL
 #' print(d)
 #'
 #' @export
-simulate_feature_data <- function(n_features, proportion_of_survey_features) {
+simulate_feature_data <- function(
+  n_features, proportion_of_survey_features = 1) {
   # assert that arguments are valid
   assertthat::assert_that(
     assertthat::is.count(n_features), assertthat::noNA(n_features),

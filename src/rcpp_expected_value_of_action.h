@@ -1,3 +1,4 @@
+#pragma once
 #ifndef EXPECTED_VALUE_OF_ACTION_H
 #define EXPECTED_VALUE_OF_ACTION_H
 

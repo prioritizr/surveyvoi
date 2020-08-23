@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PREDICT_MISSING_RIJ_DATA_H
 #define PREDICT_MISSING_RIJ_DATA_H
 

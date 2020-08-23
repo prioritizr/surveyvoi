@@ -41,10 +41,8 @@
 #'
 #' @export
 evdci <- function(
-  site_data,
-  feature_data,
-  site_occupancy_columns,
-  site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns, site_probability_columns,
   site_management_cost_column,
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
@@ -63,16 +61,18 @@ evdci <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
-    ## site_probability_columns
-    is.character(site_probability_columns),
-    identical(nrow(feature_data), length(site_probability_columns)),
-    assertthat::noNA(site_probability_columns),
-    all(assertthat::has_name(site_data, site_probability_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
     ## site_management_cost_column
     assertthat::is.string(site_management_cost_column),
     all(assertthat::has_name(site_data, site_management_cost_column)),
@@ -149,10 +149,11 @@ evdci <- function(
           site_data[[site_management_locked_out_column]] <= 1),
       msg = "at least one planning unit is locked in and locked out")
   }
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
-  ## validate rij values
-  validate_site_occupancy_data(site_data, site_occupancy_columns)
   ## validate pij values
   validate_site_prior_data(site_data, site_probability_columns)
   ## verify targets
@@ -171,7 +172,8 @@ evdci <- function(
   # calculate prior matrix
   if (is.null(prior_matrix)) {
     pij <- prior_probability_matrix(
-      site_data, feature_data, site_occupancy_columns, site_probability_columns,
+      site_data, feature_data, site_detection_columns,
+      site_n_surveys_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
       feature_model_sensitivity_column, feature_model_specificity_column)
   } else {

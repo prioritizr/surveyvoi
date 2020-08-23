@@ -4,43 +4,6 @@
 #'
 #' @inheritParams evdci
 #'
-#' @details The prior matrix is constructed using a combination of previous
-#'   survey results and modelled predictions for sites that have not been
-#'   surveyed. Let \eqn{I} denote the set of features (indexed by \eqn{i}) and
-#'   let \eqn{J} denote the set of sites (indexed by \eqn{j}).
-#'   Let \eqn{D_j} indicate which sites have already been surveyed (using zeros
-#'   and ones).
-#'   Let \eqn{S_i} and \eqn{N_i} denote sensitivity and specificity
-#'   of the survey method for features \eqn{i \in I} (respectively).
-#'   Also let \eqn{H_{ij}} denote the presence or absence of each feature
-#'   in each site if they have been surveyed (using zeros or ones),
-#'   with unsurveyed sites denoted with -1 values
-#'   Let \eqn{{H'}_{ij}} indicate the modelled probability of each feature
-#'   occupying each site.
-#'   Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
-#'   sensitivity and specificity of the model for feature \eqn{i \in I}
-#'   (respectively).
-#'   Given such data, the (\eqn{P_{ij}}) prior probability of feature \eqn{i}
-#'   occupying site \eqn{j} is:
-#'
-#' \deqn{
-#' P_{ij} = \\
-#' S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
-#' 1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-#' {S'}_i \times S_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-#' 1 - ({N'}_i \times N_i), \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
-#' }
-#'
-#' Note that the prior probability calculations account for the fact that the
-#' species distribution models were evaluated using the survey data. Since
-#' the species distribution models were evaluated using survey data, this
-#' means that sensitivity and specificity values of the models are
-#' conditional on uncertainty present in the survey methodology. To
-#' account for this, the prior probability of species \eqn{i} occurring within
-#' planning unit \eqn{j} when relying on the species distribution model
-#' predictions depends on the sensitivity and specificity of both the
-#' species distribution models and the survey methodology.
-#'
 #' @return \code{matrix} object containing the prior probabilities of each
 #'   feature occupying each site. Each row corresponds to a different
 #'   feature and each column corresponds to a different site.
@@ -70,7 +33,9 @@
 #' print(prior_matrix)
 #' @export
 prior_probability_matrix <- function(
-  site_data, feature_data, site_occupancy_columns, site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns,
+  site_probability_columns,
   feature_survey_sensitivity_column, feature_survey_specificity_column,
   feature_model_sensitivity_column, feature_model_specificity_column) {
   # assert arguments are valid
@@ -81,11 +46,16 @@ prior_probability_matrix <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    identical(nrow(feature_data), length(site_detection_columns)),
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    identical(nrow(feature_data), length(site_n_surveys_columns)),
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
     ## site_probability_columns
     is.character(site_probability_columns),
     identical(nrow(feature_data), length(site_probability_columns)),
@@ -120,40 +90,103 @@ prior_probability_matrix <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1))
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+
   # drop spatial data
   if (inherits(site_data, "sf"))
     site_data <- sf::st_drop_geometry(site_data)
+
   # extract data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
-  mij <- t(as.matrix(site_data[, site_probability_columns, drop = FALSE]))
+  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
+  nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
+  pij <- t(as.matrix(site_data[, site_probability_columns, drop = FALSE]))
   # calculate prior matrix
   ## initialize matrix
-  prior <- matrix(0, ncol = ncol(rij), nrow = nrow(rij))
-  ## add in prior probabilities for surveys that detected features
-  for (f in seq_len(nrow(rij)))
-    prior[f, which(rij[f, ] >= 0.5)] <-
-      feature_data[[feature_survey_sensitivity_column]][f]
-  ## add in prior probabilities for surveys that did not detect features
-  for (f in seq_len(nrow(rij)))
-    prior[f, which(rij[f, ] < 0.5)] <-
-      1 - feature_data[[feature_survey_specificity_column]][f]
-  ## add in prior probabilities for sites units without surveys
-  for (f in seq_len(nrow(rij))) {
-    ### add model sensitivity for predicted presence,
-    ### and 1 - model specificity for predicted absence
-    pos <- which(is.na(rij[f, ]))
-    prior[f, pos] <-
-      ((feature_data[[feature_model_sensitivity_column]][f] *
-        feature_data[[feature_survey_sensitivity_column]][f]) *
-       (mij[f, pos] >= 0.5)) +
-      ((1 - (feature_data[[feature_model_specificity_column]][f] *
-             feature_data[[feature_survey_specificity_column]][f])) *
-       (mij[f, pos] < 0.5))
+  prior <- matrix(0, ncol = ncol(dij), nrow = nrow(dij))
+  ## calculate values for each feature within each site
+  for (j in seq_len(ncol(dij))) {
+    for (i in seq_len(nrow(dij))) {
+      if (nij[i, j] > 0) {
+        ### calculate values if has survey data
+        prior[i, j] <- prior_probability_of_occupancy_given_survey_data(
+          round(dij[i, j] * nij[i, j]), round((1 - dij[i, j]) * nij[i, j]),
+          feature_data[[feature_survey_sensitivity_column]][i],
+          feature_data[[feature_survey_specificity_column]][i],
+          prior = 0.5, clamp = FALSE)
+      } else if (pij[i, j] >= 0.5) {
+        ### calculate values if no data available, and model predicts presence
+        prior[i, j] <- feature_data[[feature_survey_sensitivity_column]][i]
+      } else {
+        ### calculate values if no data available, and model predicts absence
+        prior[i, j] <- 1 - feature_data[[feature_survey_specificity_column]][i]
+      }
+    }
   }
-  # clamp values that are exactly zero or one
+
+  # clamp values to avoid issues with probabilities that are exactly zero or one
   prior[] <- pmin(prior[], 1 - 1e-10)
   prior[] <- pmax(prior[], 1e-10)
+
   # return result
-  rownames(prior) <- site_occupancy_columns
+  rownames(prior) <- site_detection_columns
   prior
+}
+
+#' Prior probability of occupancy given survey data
+#'
+#' Calculate the prior probability of a species occupying a site
+#' given that a series of surveys which protected a number of
+#' detections and non-detections.
+#'
+#' @param n_det \code{numeric} number of detections.
+#'
+#' @param n_nondet \code{numeric} number of non-detections.
+#'
+#' @param sensitivity \code{numeric} sensitivity of the surveys.
+#'
+#' @param specificity \code{numeric} specificity of the surveys.
+#'
+#' @param prior \code{numeric} initial prior probability of occupancy.
+#'   Defaults to 0.5.
+#'
+#' @param clamp \code{logical} should values be clamped to between 1e-10
+#'   and 1-1e10 to avoid issues with probabilities that are exactly equal to
+#'   zero and one.
+#'
+#' @return \code{numeric} probability value.
+#'
+#' @noRd
+prior_probability_of_occupancy_given_survey_data <- function(
+  n_det, n_nondet, sensitivity, specificity, prior = 0.5, clamp = TRUE) {
+  # assert that arguments are valid
+  assertthat::assert_that(
+    assertthat::is.number(n_det), assertthat::is.number(n_nondet),
+    assertthat::is.number(sensitivity), assertthat::is.number(specificity),
+    assertthat::is.number(prior),
+    all(sensitivity >= 0), all(sensitivity <= 1),
+    all(specificity >= 0), all(specificity <= 1),
+    all(prior >= 0), all(prior <= 1),
+    assertthat::is.flag(clamp), assertthat::noNA(clamp))
+  # define local functions, based on case study 1 in
+  # https://doi.org/10.1111/2041-210X.12423
+  update_prior_prob_pres <- function(p, x, s1, s2) {
+    if (x >= 0.5) {
+      o <- (p * s1) / ((p * s1) + ((1 - p) * (1 - s2)))
+    } else {
+      o <- (p * (1 - s1)) / ((p * (1 - s1)) + ((1 - p) * s2))
+    }
+    o
+  }
+  # main calculations
+  obs <- c(rep(1, n_det), rep(0, n_nondet))
+  out <- prior
+  for (i in obs) out <- update_prior_prob_pres(out, i, sensitivity, specificity)
+  # return result
+  if (isTRUE(clamp)) {
+    out[out < 1e-10] <- 1e-10
+    out[out > (1 - 1e-10)] <- (1 - 1e-10)
+  }
+  out
 }

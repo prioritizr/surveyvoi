@@ -1,3 +1,4 @@
+#pragma once
 #ifndef HEURISTIC_PRIORITIZATION_H
 #define HEURISTIC_PRIORITIZATION_H
 

@@ -1,9 +1,9 @@
 #include "rcpp_xgboost.h"
 
 void fit_xgboost_models_and_assess_performance(
-  Eigen::MatrixXd &rij,
-  Eigen::MatrixXd &wij,
   std::vector<std::size_t> &survey_features_idx,
+  Eigen::VectorXd &survey_sensitivity,
+  Eigen::VectorXd &survey_specificity,
   std::vector<mpz_class> &feature_outcome_idx,
   std::vector<std::string> &xgb_parameter_names,
   MatrixXs &xgb_parameter_values,
@@ -22,7 +22,6 @@ void fit_xgboost_models_and_assess_performance(
   Eigen::VectorXd &output_model_specificity) {
 
   // initialization
-  const std::size_t n_pu = rij.cols();
   const std::size_t n_f = survey_features_idx.size();
   const std::size_t n_xgb_parameters = xgb_parameter_names.size();
   const std::size_t n_tuning_parameter_combs = xgb_parameter_values.rows();
@@ -101,7 +100,9 @@ void fit_xgboost_models_and_assess_performance(
           XGBoosterUpdateOneIter(models(t, k), iter, train_x_handle[0]);
           // calculate performance of model
           curr_score = xgboost_model_tss(
-            test_y[i][k], test_w[i][k], test_x_handle[0], 0, models(t, k));
+            test_y[i][k], test_w[i][k], test_x_handle[0], 0, models(t, k),
+            survey_sensitivity[survey_features_idx[i]],
+            survey_specificity[survey_features_idx[i]]);
           // check if the updated model has not improved
           if (curr_score <= best_score) {
             ++curr_no_improvement_iterations;
@@ -143,7 +144,10 @@ void fit_xgboost_models_and_assess_performance(
         test_y[i][k], test_w[i][k], best_test_x_handle[0],
         best_ntree_limit(curr_best_parameter_comb, k),
         models(curr_best_parameter_comb, k),
-        fold_sensitivity[k], fold_specificity[k]);
+        survey_sensitivity[survey_features_idx[i]],
+        survey_specificity[survey_features_idx[i]],
+        fold_sensitivity[k],
+        fold_specificity[k]);
       XGDMatrixFree(best_test_x_handle[0]);
     }
     // calculate average model performance across the different folds
@@ -202,79 +206,39 @@ void predict_xgboost_model(
 
 double xgboost_model_tss(
   Eigen::VectorXf &y, Eigen::VectorXf &w, DMatrixHandle &x_handle,
-  int ntree_limit, BoosterHandle &model) {
+  int ntree_limit, BoosterHandle &model, double data_sens, double data_spec) {
   // initialization
-  Eigen::VectorXf yhat(y.size());
   double sens, spec;
-
   // calculate model sensitivity and specificty
   xgboost_model_sensitivity_and_specificity(
-    y, w, x_handle, ntree_limit, model, sens, spec);
-
+    y, w, x_handle, ntree_limit, model, data_sens, data_spec, sens, spec);
   // return result
   return sens + spec - 1.0;
 }
 
 void xgboost_model_sensitivity_and_specificity(
   Eigen::VectorXf &y, Eigen::VectorXf &w, DMatrixHandle &x_handle,
-  int ntree_limit, BoosterHandle &model, double &sens, double &spec) {
+  int ntree_limit, BoosterHandle &model,
+  double data_sens, double data_spec,
+  double &model_sens, double &model_spec) {
   // initialization
   Eigen::VectorXf yhat(y.size());
-
   // generate model predictions
   predict_xgboost_model(ntree_limit, model, x_handle, yhat);
-
-  // generate confusion table
-  double total_positive = static_cast<double>((y.array() * w.array()).sum());
-  double total_negative = static_cast<double>(w.sum()) - total_positive;
-  double true_positive = static_cast<double>(
-    (w.array() *
-    ((yhat.array() >= 0.5) && (y.array() >= 0.5)).cast<float>()).sum()
-  );
-  double true_negative = static_cast<double>(
-    (w.array() *
-     ((yhat.array() < 0.5) && (y.array() < 0.5)).cast<float>()).sum()
-  );
-
-  // calculate model sensitivity
-  if (std::abs(total_positive) > 1.0e-10) {
-    // if there are actual positives then calculate correctly
-    // sens = true_positive / (true_positive + false_negative);
-    sens = true_positive / total_positive;
-  } else {
-    // otherwise, if there are no positives then report if the predictions
-    // got this right
-    sens = static_cast<double>((yhat.array() >= 0.5).count() == 0);
-  }
-
-  // calculate model specificity
-  if (std::abs(total_negative) > 1.0e-10) {
-    // if there are actual negatives then calculate correctly
-    // spec = true_negative / (true_negative + false_positive);
-    spec = true_negative / total_negative;
-  } else {
-    // otherwise, if there are no negatives then report if the predictions
-    // got this right
-    spec = static_cast<double>((yhat.array() < 0.5).count() == 0);
-  }
-
-  // clamp values to (1e-10) and (1 - 1e-10) to avoid numerical issues
-  // with probabilities that are exactly zero and one
-  spec = std::max(spec, 1.0e-10);
-  sens = std::max(sens, 1.0e-10);
-  spec = std::min(spec, 1.0 - 1.0e-10);
-  sens = std::min(sens, 1.0 - 1.0e-10);
-
-  // return void
-  return;
+  // calculate model sensitivity and specificity
+  model_sensitivity_and_specificity(
+    y, yhat, w, data_sens, data_spec, model_sens, model_spec);
 }
 
 // [[Rcpp::export]]
 Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
-  Eigen::MatrixXd rij,
-  Eigen::MatrixXd wij,
+  Eigen::MatrixXd dij,
+  Eigen::MatrixXd nij,
+  Eigen::MatrixXd pij,
   Eigen::MatrixXf pu_env_data_raw,
   std::vector<bool> survey_features,
+  Eigen::VectorXd survey_sensitivity,
+  Eigen::VectorXd survey_specificity,
   std::vector<std::string> xgb_parameter_names,
   Rcpp::CharacterMatrix xgb_parameter_values,
   std::vector<std::size_t> n_xgb_rounds,
@@ -284,8 +248,7 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
 
   // init
   MatrixXfRM pu_env_data = pu_env_data_raw;
-  const std::size_t n_pu = rij.cols();
-  const std::size_t n_f = rij.rows();
+  const std::size_t n_f = survey_features.size();
   std::vector<std::size_t> survey_features_idx;
   survey_features_idx.reserve(n_f);
   for (std::size_t i = 0; i < n_f; ++i)
@@ -323,27 +286,29 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
   std::vector<std::vector<Eigen::VectorXf>> train_y;
   std::vector<std::vector<Eigen::VectorXf>> train_w;
   std::vector<std::vector<MatrixXfRM>> train_x;
-  extract_k_fold_vector_data_from_indices(
-    rij, xgb_train_folds2, survey_features_idx, train_y);
-  extract_k_fold_vector_data_from_indices(
-    wij, xgb_train_folds2, survey_features_idx, train_w);
-  extract_k_fold_matrix_data_from_indices(
+  extract_k_fold_y_data_from_indices(
+    xgb_train_folds2, survey_features_idx, train_y);
+  extract_k_fold_train_w_data_from_indices(
+    pij, xgb_train_folds2, survey_features_idx, train_w);
+  extract_k_fold_x_data_from_indices(
     pu_env_data, xgb_train_folds2, survey_features_idx, train_x);
 
   // prepare xgboost data structures for model evaluation
   std::vector<std::vector<Eigen::VectorXf>> test_y;
   std::vector<std::vector<Eigen::VectorXf>> test_w;
   std::vector<std::vector<MatrixXfRM>> test_x;
-  extract_k_fold_vector_data_from_indices(
-    rij, xgb_test_folds2, survey_features_idx, test_y);
-  extract_k_fold_vector_data_from_indices(
-    wij, xgb_test_folds2, survey_features_idx, test_w);
-  extract_k_fold_matrix_data_from_indices(
+  extract_k_fold_y_data_from_indices(
+    xgb_test_folds2, survey_features_idx, test_y);
+  extract_k_fold_test_w_data_from_indices(
+    dij, nij, xgb_test_folds2, survey_features_idx, test_w);
+  extract_k_fold_x_data_from_indices(
     pu_env_data, xgb_test_folds2, survey_features_idx, test_x);
 
   // fit models
   fit_xgboost_models_and_assess_performance(
-    rij, wij, survey_features_idx, feature_outcome_idx,
+    survey_features_idx,
+    survey_sensitivity, survey_specificity,
+    feature_outcome_idx,
     xgb_parameter_names, xgb_parameter_values2,
     n_xgb_rounds, n_xgb_early_stopping_rounds,
     train_x, train_y, train_w, test_x, test_y, test_w, pu_predict_env_data,

@@ -1,7 +1,7 @@
 #include "rcpp_posterior_probability_matrix.h"
 
 void posterior_probability_matrix(
-  Eigen::MatrixXd &rij, // original rij data
+  Eigen::MatrixXd &nij, // number of existing survey data
   Eigen::MatrixXd &pij, // prior prob data
   Eigen::MatrixXd &oij, // outcome & modelled prediction data
   std::vector<bool> &pu_survey_solution, // is the planning unit being surveyed?
@@ -18,25 +18,18 @@ void posterior_probability_matrix(
   Eigen::MatrixXd &out) {
 
   // initialization
-  const std::size_t n_pu = rij.cols();
-  const std::size_t n_f = rij.rows();
+  const std::size_t n_pu = nij.cols();
+  const std::size_t n_f = nij.rows();
   std::size_t sub_i;
 
   // calculate the posterior probability for each feature in each planning unit
   for (std::size_t j = 0; j < n_pu; ++j) {
     for (std::size_t i = 0; i < n_f; ++i) {
       /// probability calculation depends on various factors...
-      if (rij(i, j) > -0.5) {
-        /// if the planning unit has already been surveyed,
-        /// then use the prior
-        out(i, j) = pij(i, j);
-      } else if (!survey_features[i]) {
-        /// if the planning unit has not already been surveyed,
-        /// and the feature isn't relevant for future surveys,
-        ///
-        /// then the posterior probability of it occuring in the planning unit
-        /// is simply the prior probability because we aren't learning any
-        /// new information about it
+      if ((nij(i, j) > 0.0) || !survey_features[i]) {
+        /// if the species is not being surveyed,
+        /// or if the planning unit already has been surveyed,
+        /// then use prior data
         out(i, j) = pij(i, j);
       } else if ((pu_survey_solution[j]) && (oij(i, j) >= 0.5)) {
         /// if the planning unit has not already been surveyed,
@@ -107,7 +100,7 @@ void posterior_probability_matrix(
 
 // [[Rcpp::export]]
 Eigen::MatrixXd rcpp_posterior_probability_matrix(
-  Eigen::MatrixXd rij,
+  Eigen::MatrixXd nij,
   Eigen::MatrixXd pij,
   Eigen::MatrixXd oij,
   std::vector<bool> pu_survey_solution,
@@ -118,8 +111,8 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   Eigen::VectorXd model_specificity) {
 
   // initialize variables
-  std::size_t n_f = rij.rows();
-  std::size_t n_pu = rij.cols();
+  std::size_t n_f = nij.rows();
+  std::size_t n_pu = nij.cols();
   std::size_t n_f_survey =
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
 
@@ -184,7 +177,7 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   // calculate posterior matrix
   Eigen::MatrixXd out(n_f, n_pu);
   posterior_probability_matrix(
-    rij, pij, oij,
+    nij, pij, oij,
     pu_survey_solution,
     survey_features, survey_features_rev_idx,
     survey_sensitivity, survey_specificity,

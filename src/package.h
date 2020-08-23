@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
@@ -10,9 +11,6 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <PoissonBinomial.h>
-// GMP library for large numbers
-#include <gmp.h>
-#include <gmpxx.h>
 // R internal functions
 #include <Rinternals.h>
 #include <R_ext/Random.h>
@@ -33,6 +31,11 @@
 #include <sstream>
 #include <stdio.h>
 #include <stdarg.h>
+// GMP library for large integers
+#include <gmp.h>
+#include <gmpxx.h>
+// MPFR library for large and small floats (used in maximum likelihood calc)
+#include <mpfr.h>
 
 /* Import namespaces */
 using namespace Rcpp;

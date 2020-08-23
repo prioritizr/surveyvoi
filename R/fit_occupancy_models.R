@@ -8,13 +8,21 @@ NULL
 #'
 #' @param site_data \code{\link[sf]{sf}} object with site data.
 #'
-#' @param site_occupancy_columns \code{character} names of \code{numeric}
-#'   columns in the
-#'   argument to \code{site_data} that contain presence/absence data.
+#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
+#'
+#' @param site_detection_columns \code{character} names of \code{numeric}
+#'   columns in the argument to \code{site_data} that contain the proportion of
+#'   surveys conducted within each site that detected each feature.
 #'   Each column should correspond to a different feature, and contain
-#'   binary presence/absence data (zeros or ones) indicating if the
-#'   feature was detected in a previous survey or not. If a site has not
-#'   been surveyed before, then missing (\code{NA}) values should be used.
+#'   a proportion value (between zero and one). If a site has
+#'   not previously been surveyed, a value of zero should be used.
+#'
+#' @param site_n_surveys_columns \code{character} names of \code{numeric}
+#'   columns in the argument to \code{site_data} that contain the total
+#'   number of surveys conducted for each each feature within each site.
+#'   Each column should correspond to a different feature, and contain
+#'   a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+#'   not previously been surveyed, a value of zero should be used.
 #'
 #' @param site_env_vars_columns \code{character} names of columns in the
 #'   argument to \code{site_data} that contain environmental information
@@ -22,6 +30,20 @@ NULL
 #'   Each column should correspond to a different environmental variable,
 #'   and contain \code{numeric}, \code{factor}, or \code{character} data.
 #'   No missing (\code{NA}) values are permitted in these columns.
+#'
+#' @param feature_survey_sensitivity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of future surveys correctly detecting a presence of each
+#'   feature in a given site (i.e. the sensitivity of the survey methodology).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
+#'
+#' @param feature_survey_specificity_column \code{character} name of the
+#'   column in the argument to \code{feature_data} that contains
+#'   probability of future surveys correctly detecting an absence of each
+#'   feature in a given site (i.e. the specificity of the survey methodology).
+#'   This column should have \code{numeric} values that are between zero and
+#'   one. No missing (\code{NA}) values are permitted in this column.
 #'
 #' @param xgb_tuning_parameters \code{list} object containing the candidate
 #'  parameter values for fitting models. Valid parameters include:
@@ -41,12 +63,6 @@ NULL
 #' @param xgb_n_folds \code{numeric} number of folds to split the training
 #'   data into when fitting models for each feature.
 #'   Defaults to 5 for each feature.
-#'
-#' @param site_weight_columns \code{character} name of columns in
-#'  \code{site_data} containing weights for model fitting. These columns must
-#'  contain \code{numeric} values. No missing (\code{NA}) values are
-#'  permitted. Defaults to \code{NULL} such that all data are given
-#'  equal weight when fitting models.
 #'
 #' @param n_threads \code{integer} number of threads to use for parameter
 #'   tuning. Defaults to 1.
@@ -194,74 +210,76 @@ NULL
 #'
 #' @export
 fit_occupancy_models <- function(
-  site_data, site_occupancy_columns, site_env_vars_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns,
+  site_env_vars_columns,
+  feature_survey_sensitivity_column, feature_survey_specificity_column,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
-  site_weight_columns = NULL, n_threads = 1, seed = 500, verbose = FALSE) {
+  xgb_early_stopping_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_rounds = rep(1000, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
+  n_threads = 1, seed = 500, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
+    ## site data
     inherits(site_data, "sf"), nrow(site_data) > 0, ncol(site_data) > 0,
-    is.character(site_occupancy_columns),
-    length(site_occupancy_columns) > 0,
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
+    ## feature data
+    inherits(feature_data, "data.frame"), nrow(feature_data) > 0,
+    ncol(feature_data) > 0,
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
+    ## site_env_vars_columns
     is.character(site_env_vars_columns),
     assertthat::noNA(site_env_vars_columns),
     all(assertthat::has_name(site_data, site_env_vars_columns)),
-    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_occupancy_columns),
-    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_occupancy_columns),
+    ## feature_survey_sensitivity_column
+    assertthat::is.string(feature_survey_sensitivity_column),
+    assertthat::noNA(feature_survey_sensitivity_column),
+    all(assertthat::has_name(feature_data, feature_survey_sensitivity_column)),
+    is.numeric(feature_data[[feature_survey_sensitivity_column]]),
+    ## feature_survey_specificity_column
+    assertthat::is.string(feature_survey_specificity_column),
+    assertthat::noNA(feature_survey_specificity_column),
+    all(assertthat::has_name(feature_data, feature_survey_specificity_column)),
+    is.numeric(feature_data[[feature_survey_specificity_column]]),
+    ## xgb_tuning_parameters
+    is.list(xgb_tuning_parameters),
+    ## xgb_n_folds
+    is.numeric(xgb_n_folds),
+    assertthat::noNA(xgb_n_folds),
     all(xgb_n_rounds > 0),
+    length(xgb_n_folds) == nrow(feature_data),
+    ## xgb_n_rounds
+    is.numeric(xgb_n_rounds),
+    assertthat::noNA(xgb_n_rounds),
+    length(xgb_n_rounds) == nrow(feature_data),
+    all(xgb_n_rounds > 0),
+    ## xgb_early_stopping_rounds
     is.numeric(xgb_early_stopping_rounds),
     assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
     all(xgb_early_stopping_rounds > 0),
+    length(xgb_early_stopping_rounds) == nrow(feature_data),
+    ## seed
     assertthat::is.count(seed),
     assertthat::noNA(seed),
-    assertthat::is.count(n_threads), assertthat::noNA(n_threads),
-    is.list(xgb_tuning_parameters))
-  if (!is.null(site_weight_columns)) {
-    assertthat::assert_that(
-      is.character(site_weight_columns),
-      identical(length(site_weight_columns), length(site_occupancy_columns)),
-      all(assertthat::has_name(site_data, site_weight_columns)),
-      assertthat::noNA(site_weight_columns))
-    assertthat::assert_that(
-      all(sapply(site_weight_columns,
-                 function(x) is.numeric(site_data[[x]]))),
-      msg = "site_data values in site_weight_columns must be numeric")
-    assertthat::assert_that(
-      all(sapply(site_weight_columns,
-                 function(x) all(is.finite(site_data[[x]])))),
-      msg = "site_data values in site_weight_columns must not be NA")
-  }
-  ## validate rij values
-  assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) is.numeric(site_data[[x]]))),
-    msg = "site_data values in site_occupancy_columns must be numeric")
-  assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) max(site_data[[x]], na.rm = TRUE) <= 1)),
-    msg = "site_data values in site_occupancy_columns must be <= 1")
-  assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) min(site_data[[x]], na.rm = TRUE) >= 0)),
-    msg = "site_data values in site_occupancy_columns must be >= 0")
-  ## validate environmental values
-  assertthat::assert_that(
-    all(sapply(site_env_vars_columns,
-               function(x) is.numeric(site_data[[x]]))),
-    msg = "site_data values in site_env_vars_columns must be numeric")
-  assertthat::assert_that(
-    all(sapply(site_env_vars_columns,
-               function(x) assertthat::noNA(site_data[[x]]))),
-    msg = "site_data values in site_env_vars_columns must not be NA")
+    ## n_threads
+    assertthat::is.count(n_threads), assertthat::noNA(n_threads))
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
   ## validate tuning parameters
   validate_xgboost_tuning_parameters(xgb_tuning_parameters)
+
   # drop geometry
   site_data <- sf::st_drop_geometry(site_data)
 
@@ -270,80 +288,117 @@ fit_occupancy_models <- function(
     as.matrix(stats::model.matrix(~ . - 1,
                                   data = site_data[, site_env_vars_columns]))
 
-  # convert weight data to matrix format
-  if (!is.null(site_weight_columns)) {
-    site_weight_data <- as.matrix(site_data[, site_weight_columns])
-  } else {
-    site_weight_data <- matrix(1, ncol = length(site_occupancy_columns),
-                               nrow = nrow(site_data))
-  }
-
-  # prepare data
-  d <- lapply(seq_along(site_occupancy_columns), function(i) {
-    # extract data
-    y <- site_data[[site_occupancy_columns[i]]]
-    x <- site_env_data
-    w <- site_weight_data[, i]
-    # exclude NA data
-    train_idx <- which(!is.na(y))
-    assertthat::assert_that(length(train_idx) > 0,
-      msg = "a species is missing data for all planning units")
-    # subset values
-    y <- y[train_idx]
-    x <- x[train_idx, , drop = FALSE]
-    w <- w[train_idx]
-    # return data
-    list(y = y, x = x, w = w)
+  # prepare folds
+  f <- lapply(seq_len(nrow(feature_data)), function(i) {
+    withr::with_seed(seed, {
+      n_surveys <- site_data[[site_n_surveys_columns[i]]]
+      idx <- seq_along(n_surveys)
+      create_site_folds(
+        prop_detected = site_data[[site_detection_columns[i]]][n_surveys > 0],
+        n_total = n_surveys[n_surveys > 0],
+        n = xgb_n_folds[i], idx[n_surveys > 0])
+    })
   })
 
-  # prepare folds
-  f <- lapply(seq_along(site_occupancy_columns), function(i) {
-    withr::with_seed(seed, {
-      create_folds(d[[i]]$y, n = xgb_n_folds[i])
+  # prepare data
+  d <- lapply(seq_len(nrow(feature_data)), function(i) {
+    lapply(seq_len(xgb_n_folds[i]), function(k) {
+      # extract data
+      sens <- feature_data[[feature_survey_sensitivity_column]][i]
+      spec <- feature_data[[feature_survey_specificity_column]][i]
+      n_surveys <- site_data[[site_n_surveys_columns[i]]]
+      n_det <- round(site_data[[site_detection_columns[i]]] * n_surveys)
+      n_nondet <-
+        round((1 - site_data[[site_detection_columns[i]]]) * n_surveys)
+      site_data <- tibble::tibble(n_det = n_det, n_nondet = n_nondet,
+                                  n_surveys = n_surveys, idx = seq_along(n_det))
+      # prepare training fold data
+      ## here we will prepare the data for model fitting by following the
+      ## direct method described in: https://doi.org/10.1214/15-AOAS812
+      ## note that this paper reports pretty poor performance for this
+      ## method, but that is because they do not have observation-level
+      ## training data (unlike here, where we have data for each site).
+      ## This method is also conceptually similar to the EM algorithm outlined
+      ## by Magder and Hughes
+      ## (https://doi.org/10.1093/oxfordjournals.aje.a009251)
+      ## except that it involves a single iteration, as opposed to iterating
+      ## until parameter convergence.
+      ## essentially, this approach involves using weights to account for
+      ## imperfect detection during model fitting
+      ## (similar in spirit to: https://doi.org/10.1002/env.2446)
+      train_data <- site_data[f[[i]]$train[[k]], , drop = FALSE]
+      prior_prob_pres <- vapply(
+        seq_len(nrow(train_data)), FUN.VALUE = numeric(1), function(j) {
+        prior_probability_of_occupancy_given_survey_data(
+          train_data$n_det[j], train_data$n_nondet[j], sens, spec, 0.5)
+      })
+      y_train <- c(rep(1, nrow(train_data)), rep(0, nrow(train_data)))
+      x_train <- site_env_data[c(train_data$idx, train_data$idx), ,
+                               drop = FALSE]
+      w_train <- c(prior_prob_pres, 1 - prior_prob_pres)
+      # prepare test fold data
+      test_data <- site_data[f[[i]]$test[[k]], , drop = FALSE]
+      y_test <- c(rep(1, nrow(test_data)), rep(0, nrow(test_data)))
+      x_test <- site_env_data[c(test_data$idx, test_data$idx), ,
+                               drop = FALSE]
+      w_test <- c(test_data$n_det / test_data$n_surveys,
+                  test_data$n_nondet / test_data$n_surveys)
+      # return data
+      list(train = list(y = y_train, x = x_train, w = w_train),
+           test = list(y = y_test, x = x_test, w = w_test))
     })
   })
 
   # tune and fit models
-  m <- lapply(seq_along(site_occupancy_columns), function(i) {
+  m <- lapply(seq_len(nrow(feature_data)), function(i) {
     withr::with_seed(seed, {
-      tune_model(data = d[[i]],
-                 folds = f[[i]],
-                 parameters = xgb_tuning_parameters,
-                 early_stopping_rounds = xgb_early_stopping_rounds[i],
-                 n_rounds = xgb_n_rounds[i],
-                 n_folds = xgb_n_folds[i],
-                 n_threads = n_threads,
-                 verbose = verbose)
+      tune_model(
+        data = d[[i]], folds = f[[i]],
+        survey_sensitivity =
+          feature_data[[feature_survey_sensitivity_column]][i],
+        survey_specificity =
+          feature_data[[feature_survey_specificity_column]][i],
+        parameters = xgb_tuning_parameters,
+        early_stopping_rounds = xgb_early_stopping_rounds[i],
+        n_rounds = xgb_n_rounds[i], n_folds = xgb_n_folds[i],
+        n_threads = n_threads, verbose = verbose)
     })
   })
 
   # assess models
-  perf <- plyr::ldply(seq_along(site_occupancy_columns), function(i) {
+  perf <- plyr::ldply(seq_len(nrow(feature_data)), function(i) {
     out <- plyr::ldply(seq_len(xgb_n_folds[i]), function(k) {
-      # extract fold training and test data
+      ## extract fold training and test data
       m_k <- m[[i]]$models[[k]]
-      nround_k <- m[[i]]$parameters$nrounds
-      x_train_k <- d[[i]]$x[f[[i]]$train[[k]], , drop = FALSE]
-      x_test_k <- d[[i]]$x[f[[i]]$test[[k]], , drop = FALSE]
-      y_train_k <- d[[i]]$y[f[[i]]$train[[k]]]
-      y_test_k <- d[[i]]$y[f[[i]]$test[[k]]]
-      w_train_k <- d[[i]]$w[f[[i]]$train[[k]]]
-      w_test_k <-d[[i]]$w[f[[i]]$test[[k]]]
-      # make predictions
+      nround_k <- m[[i]]$models[[k]]$best_iteration
+      x_train_k <- d[[i]][[k]]$train$x
+      x_test_k <- d[[i]][[k]]$test$x
+      y_train_k <- d[[i]][[k]]$train$y
+      y_test_k <- d[[i]][[k]]$test$y
+      w_train_k <- d[[i]][[k]]$train$w
+      w_test_k <- d[[i]][[k]]$test$w
+      survey_sens <- feature_data[[feature_survey_sensitivity_column]][[i]]
+      survey_spec <- feature_data[[feature_survey_specificity_column]][[i]]
+      ## make predictions
       p_train_k <- c(withr::with_package("xgboost",
         stats::predict(m_k, x_train_k, ntreelimit = nround_k)))
       p_test_k <- c(withr::with_package("xgboost",
         stats::predict(m_k, x_test_k, ntreelimit = nround_k)))
       ## calculate performance
+      perf_train_k <- rcpp_model_performance(
+        y_train_k, p_train_k, w_train_k, survey_sens, survey_spec)
+      perf_test_k <- rcpp_model_performance(
+        y_test_k, p_test_k, w_test_k, survey_sens, survey_spec)
+      ## calculate performance
       data.frame(
-        train_tss = weighted_tss(y_train_k, p_train_k, w_train_k),
-        train_sensitivity = sensitivity(y_train_k, p_train_k, w_train_k),
-        train_specificity = specificity(y_train_k, p_train_k, w_train_k),
-        test_tss = weighted_tss(y_test_k, p_test_k, w_test_k),
-        test_sensitivity = sensitivity(y_test_k, p_test_k, w_test_k),
-        test_specificity = specificity(y_test_k, p_test_k, w_test_k))
+        train_tss = perf_train_k[[1]],
+        train_sensitivity = perf_train_k[[2]],
+        train_specificity = perf_train_k[[3]],
+        test_tss = perf_test_k[[1]],
+        test_sensitivity = perf_test_k[[2]],
+        test_specificity = perf_test_k[[3]])
     })
-    data.frame(feature = site_occupancy_columns[i],
+    data.frame(feature = site_detection_columns[i],
                train_tss_mean = mean(out$train_tss),
                train_tss_std = stats::sd(out$train_tss),
                train_sensitivity_mean = mean(out$train_sensitivity),
@@ -361,17 +416,17 @@ fit_occupancy_models <- function(
   perf <- tibble::as_tibble(perf)
 
   # make model predictions
-  pred <- vapply(seq_along(site_occupancy_columns),
+  pred <- vapply(seq_len(nrow(feature_data)),
                  FUN.VALUE = numeric(nrow(site_env_data)), function(i) {
     nr <- m[[i]]$parameters$nround
     rowMeans(
       vapply(m[[i]]$models, FUN.VALUE = numeric(nrow(site_env_data)),
              function(x) {
-      c(withr::with_package("xgboost", stats::predict(x, site_env_data,
-                                                      ntreelimit = nr)))
+      c(withr::with_package("xgboost", stats::predict(
+        x, site_env_data, ntreelimit = x$best_iteration)))
     }))
   })
-  colnames(pred) <- site_occupancy_columns
+  colnames(pred) <- site_detection_columns
   pred <- tibble::as_tibble(pred)
 
   # return results
@@ -380,13 +435,15 @@ fit_occupancy_models <- function(
 }
 
 #' @noRd
-tune_model <- function(data, folds, parameters, early_stopping_rounds,
-  n_rounds, n_folds, n_threads, verbose) {
+tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
+  parameters, early_stopping_rounds, n_rounds, n_folds, n_threads, verbose) {
   # assert arguments are valid
   assertthat::assert_that(
     isTRUE(n_folds == length(folds$train)),
     isTRUE(n_folds == length(folds$test)),
     assertthat::is.count(n_folds), assertthat::noNA(n_folds),
+    assertthat::is.number(survey_sensitivity),
+    assertthat::is.number(survey_specificity),
     assertthat::is.count(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
     assertthat::is.count(n_threads),
@@ -398,6 +455,14 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   ## generate all combinations
   full_parameters <- do.call(expand.grid, parameters)
   attr(full_parameters, "out.attrs") <- NULL
+  full_parameters <- lapply(full_parameters, function(x) {
+    if (is.factor(x)) {
+      return(as.character(x))
+    }
+    x
+  })
+  full_parameters <- data.frame(full_parameters, stringsAsFactors = FALSE)
+
   ## add objective if missing
   if (is.null(full_parameters$objective)) {
     full_parameters$objective <- "binary:logistic"
@@ -409,10 +474,10 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   }
 
   # calculate scale_pos_weight
-  spw <- mean(vapply(seq_len(n_folds), FUN.VALUE = numeric(1), function(k) {
-    y <- data$y[folds$train[[k]]]
-    sum(y < 0.5) / sum(y > 0.5)
-  }))
+  spw <- vapply(seq_len(n_folds), FUN.VALUE = numeric(1), function(k) {
+    sum(data[[k]]$train$y < 0.5) / sum(data[[k]]$train$y > 0.5)
+  })
+  assertthat::assert_that(all(is.finite(spw)))
 
   # find best tuning parameters using k-fold cross validation
   ## fit models using all parameters combinations
@@ -425,23 +490,45 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
                     function(i)  {
     ## extract tuning parameters
     p <- as.list(full_parameters[i, , drop = FALSE])
-    p$verbose <- 0
-    p$nthread <- 1
     ## run cross-validation
-    cv <- xgboost::xgb.cv(
-      params = p,
-      data = xgboost::xgb.DMatrix(data$x, label = data$y, weight = data$w),
-      folds = folds$test, train_folds = folds$train,
-      nrounds = n_rounds, early_stopping_rounds = early_stopping_rounds,
-      feval = feval_tss, maximize = TRUE,
-      scale_pos_weight = spw, prediction = FALSE, showsd = TRUE,
-      verbose = verbose,
-      callback = list(xgboost::cb.cv.predict(save_models = TRUE)))
+    cv <- lapply(seq_len(n_folds), function(k) {
+      ### prepare data for xgboost
+      dtrain <- xgboost::xgb.DMatrix(
+        data[[k]]$train$x, label = data[[k]]$train$y,
+        weight = data[[k]]$train$w)
+      dtest <- xgboost::xgb.DMatrix(
+        data[[k]]$test$x, label = data[[k]]$test$y,
+        weight = data[[k]]$test$w)
+      ### prepare evaluation function
+      curr_feval_tss <- feval_tss
+      environment(curr_feval_tss)$sens <- survey_sensitivity
+      environment(curr_feval_tss)$spec <- survey_specificity
+      ### prepare arguments for xgboost call
+      args <- list(data = dtrain, verbose = FALSE, scale_pos_weight = spw[k],
+                   watchlist = list(test = dtest), eval_metric = curr_feval_tss,
+                   maximize = TRUE, nrounds = n_rounds, nthread = 1,
+                   early_stopping_rounds = early_stopping_rounds)
+      args <- append(args, p)
+      ### fit model
+      withr::with_seed(seed, {
+        model <- do.call(what = xgboost::xgb.train, args)
+      })
+      ### evaluate model
+      yhat_test <- c(withr::with_package("xgboost",
+          stats::predict(
+            model, data[[k]]$test$x, ntreelimit = model$best_iteration)))
+      perf <- rcpp_model_performance(
+        data[[k]]$test$y, yhat_test, data[[k]]$test$w,
+        survey_sensitivity, survey_specificity)[[1]]
+      ## check that model evaluations are consistent
+      assertthat::assert_that(abs(perf - model$best_score) < 1e-5)
+      ### return result
+      list(eval = perf, model = model)
+    })
     ## store the model performance
     tibble::tibble(
-      eval = cv$evaluation_log$test_tss_mean[cv$best_ntreelimit],
-      nrounds = cv$best_ntreelimit,
-      models = list(cv$models))
+      eval = mean(vapply(cv, `[[`, numeric(1), "eval")),
+      models = list(lapply(cv, `[[`, "model")))
   })
   if (is_parallel) {
     cl <- parallel::stopCluster(cl)
@@ -449,57 +536,12 @@ tune_model <- function(data, folds, parameters, early_stopping_rounds,
   }
   ## determine best parameters for i'th species
   cv <- tibble::as_tibble(cv)
-  k <- which.max(cv$eval)
+  j <- which.max(cv$eval)
   # return best parameters and models
-  best_params <- as.list(full_parameters[k, , drop = FALSE])
-  best_params$nrounds <- cv$nrounds[k]
-  best_params$scale_pos_weight <- spw
+  best_params <- as.list(full_parameters[j, , drop = FALSE])
+  best_params$scale_pos_weight <- list(spw)
   best_params$objective <- as.character(best_params$objective)
-  list(parameters = best_params, models = cv$models[[k]])
-}
-
-#' @noRd
-sensitivity <- function(actual, predicted, weights = rep(1, length(actual))) {
-  assertthat::assert_that(
-    is.numeric(actual), assertthat::noNA(actual),
-    is.numeric(predicted), assertthat::noNA(predicted),
-    is.numeric(weights), assertthat::noNA(weights),
-    identical(length(actual), length(predicted)),
-    identical(length(actual), length(weights)))
-  # if there are no positives, then return if the predictions were all correct
-  if (sum(actual > 0.5) == 0)
-    return(as.numeric(all(round(actual) == round(predicted))))
-  # calculate weighted sensitivity
-  sum(weights * ((predicted >= 0.5) & (actual >= 0.5))) /
-  sum(weights * (actual >= 0.5))
-}
-
-#' @noRd
-specificity <- function(actual, predicted, weights = rep(1, length(actual))) {
-  assertthat::assert_that(
-    is.numeric(actual), assertthat::noNA(actual),
-    is.numeric(predicted), assertthat::noNA(predicted),
-    is.numeric(weights), assertthat::noNA(weights),
-    identical(length(actual), length(predicted)),
-    identical(length(actual), length(weights)))
-  # if there are no negatives, then return if the predictions were all correct
-  if (sum(actual < 0.5) == 0)
-    return(as.numeric(all(round(actual) == round(predicted))))
-  # calculate weighted specificity
-  sum(weights * ((predicted < 0.5) & (actual < 0.5))) /
-  sum(weights * (actual < 0.5))
-}
-
-#' @noRd
-weighted_tss <- function(actual, predicted, weights = rep(1, length(actual))) {
-  assertthat::assert_that(
-    is.numeric(actual), assertthat::noNA(actual),
-    is.numeric(predicted), assertthat::noNA(predicted),
-    is.numeric(weights), assertthat::noNA(weights),
-    identical(length(actual), length(predicted)),
-    identical(length(actual), length(weights)))
-  specificity(actual, predicted, weights) +
-  sensitivity(actual, predicted, weights) - 1
+  list(parameters = best_params, models = cv$models[[j]])
 }
 
 #' @noRd
@@ -508,6 +550,8 @@ feval_tss <- function(preds, dtrain) {
   wts <- xgboost::getinfo(dtrain, "weight")
   if (packageVersion("xgboost") > "1.1")
     preds <- stats::plogis(preds)
-  value <- weighted_tss(labels, preds, wts)
+  assertthat::assert_that(
+    any(labels >= 0.5), any(labels < 0.5))
+  value <- rcpp_model_performance(labels, preds, wts, sens, spec)[[1]]
   list(metric = "tss", value = value)
 }

@@ -1,13 +1,15 @@
+#pragma once
 #ifndef XGBOOST_MODEL_H
 #define XGBOOST_MODEL_H
 
 #include "package.h"
+#include "rcpp_model_performance.h"
 #include "functions.h"
 
 void fit_xgboost_models_and_assess_performance(
-  Eigen::MatrixXd&,
-  Eigen::MatrixXd&,
   std::vector<std::size_t>&,
+  Eigen::VectorXd&,
+  Eigen::VectorXd&,
   std::vector<mpz_class>&,
   std::vector<std::string>&,
   MatrixXs&,
@@ -30,7 +32,9 @@ double xgboost_model_tss(
   Eigen::VectorXf&,
   DMatrixHandle&,
   int,
-  BoosterHandle&);
+  BoosterHandle&,
+  double,
+  double);
 
 void predict_xgboost_model(
   int,
@@ -44,6 +48,8 @@ void xgboost_model_sensitivity_and_specificity(
   DMatrixHandle&,
   int,
   BoosterHandle&,
+  double,
+  double,
   double&,
   double&);
 

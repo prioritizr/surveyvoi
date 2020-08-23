@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SAMPLE_STATES_H
 #define SAMPLE_STATES_H
 
