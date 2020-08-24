@@ -1,5 +1,5 @@
 r_approx_expected_value_of_decision_given_survey_scheme <- function(
-    rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
+    dij, nij, pij, survey_features, survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_model_prediction,
     pu_survey_costs, pu_purchase_costs,
     pu_purchase_locked_in, pu_purchase_locked_out,
@@ -18,10 +18,11 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
       seed + i - 1)
   })
   set.seed(seed)
+
   # run calculations
   value <- sapply(seq_len(n_approx_replicates), function(i) {
     r_approx_expected_value_of_decision_given_survey_scheme_fixed_states(
-      rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
+      dij, nij, pij, survey_features, survey_sensitivity, survey_specificity,
       pu_survey_solution, pu_model_prediction,
       pu_survey_costs, pu_purchase_costs,
       pu_purchase_locked_in, pu_purchase_locked_out,
@@ -36,7 +37,7 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
 
 r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
   function(
-    rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
+    dij, nij, pij, survey_features, survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_model_prediction,
     pu_survey_costs, pu_purchase_costs,
     pu_purchase_locked_in, pu_purchase_locked_out,
@@ -47,8 +48,8 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     obj_fun_target, total_budget, outcomes) {
   # init
   ## constants
-  n_pu <- ncol(rij)
-  n_f <- nrow(rij)
+  n_pu <- ncol(dij)
+  n_f <- nrow(dij)
   n_f_survey <- sum(survey_features)
   # preliminary processing
   ## calculate remaining budget
@@ -78,13 +79,8 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     total_probability_of_survey_negative
   total_probability_of_survey_negative_log[] <-
     log(total_probability_of_survey_negative)
-  ## overwrite missing data with prior data for features we are not interested
-  ## in surveying
-  oij <- rij
-  for (i in which(!survey_features)) {
-    oij[i, pu_survey_solution_idx] <- pij[i, pu_survey_solution_idx]
-    oij[i, pu_model_prediction[[i]]] <- pij[i, pu_model_prediction[[i]]]
-  }
+  ## prepare data for analysis
+  oij <- pij
   ## find indices for cells corresponding to planning units and features that
   ## that are specified to be surveyed
   rij_outcome_idx <- c()
@@ -96,14 +92,13 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
       counter <- counter + 1
     }
   }
-  ## update model weights
+  ## prepare updated number of surveys
   m <- as.matrix(expand.grid(
     row = which(survey_features),
     col = which(pu_survey_solution)))
-  wij[m] <- wij[m] + 1
+  curr_nij <- nij
+  curr_nij[m] <- nij[m] + 1
   rm(m)
-  ## create dummy matrix
-  dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
   # main processing
   outcome_probs <- numeric(length(outcomes))
   outcome_values <- numeric(length(outcomes))
@@ -112,31 +107,46 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
     i <- outcomes[ii]
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
 
+    ## update prior data with new survey outcome
+    curr_pij <- rcpp_initialize_posterior_probability_matrix(
+      nij, pij, curr_oij,
+      pu_survey_solution, survey_features,
+      survey_sensitivity, survey_specificity)
+
+    ## update survey data with outcome
+    curr_dij <- dij
+    for (i in (rij_outcome_idx + 1)) {
+      curr_dij[i] <-
+        ((dij[i] * nij[i]) + curr_oij[i]) / curr_nij[i]
+    }
+
     ## fit distribution models to make predictions
     curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
-      curr_oij, wij, pu_env_data, as.logical(survey_features),
+      curr_dij, curr_nij, curr_pij, pu_env_data,
+      as.logical(survey_features), survey_sensitivity, survey_specificity,
       xgb_parameter_names, xgb_parameter_values,
       n_xgb_rounds, n_xgb_early_stopping_rounds,
       xgb_train_folds, xgb_test_folds)
 
     ## generate model predictions for unsurveyed planning units
-    curr_oij2 <- r_predict_missing_rij_data(
-      curr_oij, wij, pu_env_data, survey_features,
-      xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds,
+    curr_oij2 <- rcpp_predict_missing_rij_data(
+      curr_dij, curr_nij, curr_pij, pu_env_data,
+      survey_features, survey_sensitivity, survey_specificity,
+      xgb_parameter_names, xgb_parameter_values,
+      n_xgb_rounds, n_xgb_early_stopping_rounds,
       xgb_train_folds, xgb_test_folds, pu_model_prediction)
 
-    ## generate posterior matrix
+    ## extract model sensitivity and specificity data
     curr_models_sens <- rep(NA, n_f)
     curr_models_spec <- rep(NA, n_f)
-    curr_models_sens[survey_features_idx] <-
-      curr_models$sens * survey_sensitivity[survey_features_idx]
-    curr_models_spec[survey_features_idx] <-
-      curr_models$spec * survey_specificity[survey_features_idx]
-    curr_postij <- r_posterior_probability_matrix(
-      rij, pij, curr_oij2,
+    curr_models_sens[survey_features_idx] <- curr_models$sens
+    curr_models_spec[survey_features_idx] <- curr_models$spec
+
+    ## update posterior probabilities with model predictions
+    curr_postij <- rcpp_update_model_posterior_probabilities(
+      nij, pij, curr_oij2,
       pu_survey_solution, survey_features,
-      survey_sensitivity, survey_specificity,
-      curr_models_sens, curr_models_spec)
+      curr_models_sens, curr_models_spec, curr_pij)
 
     ## generate prioritisation
     curr_solution <- r_greedy_heuristic_prioritization(
@@ -150,7 +160,7 @@ r_approx_expected_value_of_decision_given_survey_scheme_fixed_states <-
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(
-      curr_oij2, total_probability_of_survey_positive_log,
+      curr_oij, total_probability_of_survey_positive_log,
       total_probability_of_survey_negative_log, rij_outcome_idx + 1);
 
     ## store values

@@ -16,6 +16,7 @@ extern SEXP _surveyvoi_rcpp_feasible_actions_ilp_matrix(SEXP);
 extern SEXP _surveyvoi_rcpp_fit_xgboost_models_and_assess_performance(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_formula_sensitivity_and_specificity(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_greedy_heuristic_prioritization(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_initialize_posterior_probability_matrix(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_log_sum(SEXP);
 extern SEXP _surveyvoi_rcpp_maxlik_sensitivity_and_specificity(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_model_performance(SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -36,6 +37,7 @@ extern SEXP _surveyvoi_rcpp_total_probability_of_negative_model_result(SEXP, SEX
 extern SEXP _surveyvoi_rcpp_total_probability_of_negative_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_positive_model_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_positive_result(SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_update_model_posterior_probabilities(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_which_state(SEXP);
 extern SEXP _surveyvoi_rcpp_which_state_sparse(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_xgboost(SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -49,6 +51,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_fit_xgboost_models_and_assess_performance",             (DL_FUNC) &_surveyvoi_rcpp_fit_xgboost_models_and_assess_performance,             13},
     {"_surveyvoi_rcpp_formula_sensitivity_and_specificity",                   (DL_FUNC) &_surveyvoi_rcpp_formula_sensitivity_and_specificity,                    3},
     {"_surveyvoi_rcpp_greedy_heuristic_prioritization",                       (DL_FUNC) &_surveyvoi_rcpp_greedy_heuristic_prioritization,                        6},
+    {"_surveyvoi_rcpp_initialize_posterior_probability_matrix",               (DL_FUNC) &_surveyvoi_rcpp_initialize_posterior_probability_matrix,                7},
     {"_surveyvoi_rcpp_log_sum",                                               (DL_FUNC) &_surveyvoi_rcpp_log_sum,                                                1},
     {"_surveyvoi_rcpp_maxlik_sensitivity_and_specificity",                    (DL_FUNC) &_surveyvoi_rcpp_maxlik_sensitivity_and_specificity,                     3},
     {"_surveyvoi_rcpp_model_performance",                                     (DL_FUNC) &_surveyvoi_rcpp_model_performance,                                      5},
@@ -69,6 +72,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_total_probability_of_negative_result",                  (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_negative_result,                   3},
     {"_surveyvoi_rcpp_total_probability_of_positive_model_result",            (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_positive_model_result,             3},
     {"_surveyvoi_rcpp_total_probability_of_positive_result",                  (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_positive_result,                   3},
+    {"_surveyvoi_rcpp_update_model_posterior_probabilities",                  (DL_FUNC) &_surveyvoi_rcpp_update_model_posterior_probabilities,                   8},
     {"_surveyvoi_rcpp_which_state",                                           (DL_FUNC) &_surveyvoi_rcpp_which_state,                                            1},
     {"_surveyvoi_rcpp_which_state_sparse",                                    (DL_FUNC) &_surveyvoi_rcpp_which_state_sparse,                                     2},
     {"_surveyvoi_rcpp_xgboost",                                               (DL_FUNC) &_surveyvoi_rcpp_xgboost,                                                5},
