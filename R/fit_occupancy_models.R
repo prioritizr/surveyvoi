@@ -54,11 +54,11 @@ NULL
 #'
 #' @param xgb_early_stopping_rounds \code{numeric} model rounds for parameter
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 100 for each feature.
+#'   Defaults to 10 for each feature.
 #'
 #' @param xgb_n_rounds \code{numeric} model rounds for model fitting
 #'   See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 1000 for each feature.
+#'   Defaults to 100 for each feature.
 #'
 #' @param xgb_n_folds \code{numeric} number of folds to split the training
 #'   data into when fitting models for each feature.
@@ -215,8 +215,8 @@ fit_occupancy_models <- function(
   site_env_vars_columns,
   feature_survey_sensitivity_column, feature_survey_specificity_column,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_detection_columns)),
-  xgb_n_rounds = rep(1000, length(site_detection_columns)),
+  xgb_early_stopping_rounds = rep(20, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
   xgb_n_folds = rep(5, length(site_detection_columns)),
   n_threads = 1, seed = 500, verbose = FALSE) {
   # assert that arguments are valid
@@ -335,7 +335,8 @@ fit_occupancy_models <- function(
       y_train <- c(rep(1, nrow(train_data)), rep(0, nrow(train_data)))
       x_train <- site_env_data[c(train_data$idx, train_data$idx), ,
                                drop = FALSE]
-      w_train <- c(prior_prob_pres, 1 - prior_prob_pres)
+      ## note: multiply training weights by 100 to avoid floating point issues
+      w_train <- c(prior_prob_pres, 1 - prior_prob_pres) * 100
       # prepare test fold data
       test_data <- site_data[f[[i]]$test[[k]], , drop = FALSE]
       y_test <- c(rep(1, nrow(test_data)), rep(0, nrow(test_data)))
@@ -545,13 +546,14 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
 }
 
 #' @noRd
-feval_tss <- function(preds, dtrain) {
-  labels <- xgboost::getinfo(dtrain, "label")
-  wts <- xgboost::getinfo(dtrain, "weight")
-  if (packageVersion("xgboost") > "1.1")
-    preds <- stats::plogis(preds)
+feval_tss <- function(preds, dtest) {
+  labels <- xgboost::getinfo(dtest, "label")
+  wts <- xgboost::getinfo(dtest, "weight")
   assertthat::assert_that(
-    any(labels >= 0.5), any(labels < 0.5))
-  value <- rcpp_model_performance(labels, preds, wts, sens, spec)[[1]]
-  list(metric = "tss", value = value)
+    any(labels >= 0.5), any(labels < 0.5),
+    msg = "test labels need at least one presence and one absence")
+  assertthat::assert_that(all(preds >= 0), all(preds <= 1),
+    msg = "xgboost predictions are not between zero and one")
+  value <- rcpp_model_performance(labels, preds, wts, sens, spec)
+  list(metric = "tss", value = value[[1]])
 }

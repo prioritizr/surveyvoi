@@ -67,11 +67,7 @@ NULL
 #'
 #' \item If all of the new candidate survey schemes are associated with
 #' missing \code{NA} values -- because they all exceed the survey budget -- then
-#' go to step 13.
-#'
-#' \item If all of the new candidate survey schemes are associated with
-#' lower approximate expected values than the \emph{current survey solution}
-#' then go to step 13.
+#' go to step 12.
 #'
 #' \item Calculate the cost effectiveness of each new candidate survey
 #' scheme. This calculated as the difference between the approximate expected
@@ -88,7 +84,7 @@ NULL
 #' \emph{list of survey scheme solutions} and store its approximate expected
 #' value in the \emph{list of approximate expected values}.
 #'
-#' \item Go to step 13.
+#' \item Go to step 12.
 #'
 #' \item Find the solution in the \emph{list of survey scheme solutions} that
 #' has the highest expected value in the
@@ -147,10 +143,8 @@ NULL
 #'
 #' @export
 approx_near_optimal_survey_scheme <- function(
-  site_data,
-  feature_data,
-  site_occupancy_columns,
-  site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns, site_probability_columns,
   site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
@@ -163,14 +157,13 @@ approx_near_optimal_survey_scheme <- function(
   total_budget,
   survey_budget,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
+  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  site_weight_columns = NULL,
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
   method_approx_outcomes = "weighted_without_replacement",
@@ -185,11 +178,18 @@ approx_near_optimal_survey_scheme <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
     ## site_probability_columns
     is.character(site_probability_columns),
     identical(nrow(feature_data), length(site_probability_columns)),
@@ -261,14 +261,14 @@ approx_near_optimal_survey_scheme <- function(
     is.list(xgb_tuning_parameters),
     ## xgb_n_folds
     is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_occupancy_columns),
+    length(xgb_n_folds) == length(site_detection_columns),
     is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_occupancy_columns),
+    length(xgb_n_rounds) == length(site_detection_columns),
     all(xgb_n_rounds > 0),
     ## xgb_early_stopping_rounds
     is.numeric(xgb_early_stopping_rounds),
     assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    length(xgb_early_stopping_rounds) == length(site_detection_columns),
     all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
@@ -339,14 +339,11 @@ approx_near_optimal_survey_scheme <- function(
            n_states(nrow(site_data), nrow(feature_data))))
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
-  ## validate rij values
-  validate_site_occupancy_data(site_data, site_occupancy_columns)
-  ## validate pij values
-  validate_site_prior_data(site_data, site_probability_columns)
-  ## validate wij values
-  if (!is.null(site_weight_columns))
-    validate_site_weight_data(site_data, site_occupancy_columns,
-      site_weight_columns)
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+  ## validate model probability values
+  validate_site_probability_data(site_data, site_probability_columns)
   ## validate xgboost tuning parameters
   validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
@@ -365,7 +362,8 @@ approx_near_optimal_survey_scheme <- function(
   ## calculate prior matrix
   if (is.null(prior_matrix)) {
     pij <- prior_probability_matrix(
-      site_data, feature_data, site_occupancy_columns, site_probability_columns,
+      site_data, feature_data, site_detection_columns,
+      site_n_surveys_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
       feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
@@ -410,23 +408,12 @@ approx_near_optimal_survey_scheme <- function(
     sum(sorted_costs) <= total_budget,
     msg = paste("targets cannot be achieved given budget and locked out",
                 "planning units"))
-  ## extract site occupancy data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns]))
+  ## extract site data
+  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
+  nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
+  ejx <- as.matrix(site_data[, site_env_vars_columns, drop = FALSE])
   ## identify planning units that have been surveyed for all species
-  site_survey_status <- colSums(is.na(rij)) == 0
-  ## extract environmental data
-  ejx <- as.matrix(site_data[, site_env_vars_columns])
-
-  # prepare model weights
-  ## initialize weights
-  if (!is.null(site_weight_columns)) {
-    ## extract user-specified weights
-    wij <- t(as.matrix(site_data[, site_weight_columns]))
-  } else {
-    ## set weights based on if data are missing or not
-    wij <- t(as.matrix(site_data[, site_occupancy_columns]))
-    wij[] <- as.numeric(!is.na(wij))
-  }
+  site_survey_status <- colSums(nij < 0.5) == 0
 
   # calculate expected value of decision given scheme that does not survey sites
   evd_current <- withr::with_seed(seed, {
@@ -442,8 +429,8 @@ approx_near_optimal_survey_scheme <- function(
   # initialize looping variables
   candidate_sites <- !(site_survey_status | site_survey_locked_out)
   n_candidate_sites <- sum(candidate_sites)
-  survey_solution_matrix <- matrix(FALSE, ncol = nrow(site_data),
-                                   nrow = n_candidate_sites + 1)
+  survey_solution_matrix <-
+    matrix(FALSE, ncol = nrow(site_data), nrow = n_candidate_sites + 1)
   survey_solution_values <- numeric(n_candidate_sites + 1)
   survey_solution_values[1] <- mean(evd_current)
 
@@ -487,24 +474,19 @@ approx_near_optimal_survey_scheme <- function(
       if (curr_total_cost > total_budget) return(NA_real_)
       ## identify sites that need model predictions for each feature
       pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-        which(!curr_candidate_solution & is.na(rij[i, ]))
+        which(!curr_candidate_solution & (nij[i, ] < 0.5))
       })
       ## folds for training and testing models
-      xgb_folds <- lapply(seq_len(nrow(feature_data)),
-        function(i) {
-          pu_train_idx <- which(curr_candidate_solution | !is.na(rij[i, ]))
-          withr::with_seed(seed, {
-            create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
-                         index = pu_train_idx,
-                         na.fail = FALSE, seed = seed)
-          })
+      xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
+        has_data_idx <- which((nij[i, ] > 0.5) | curr_candidate_solution)
+        create_site_folds(
+          dij[i, has_data_idx], nij[i, has_data_idx],
+          xgb_n_folds[i], index = has_data_idx, seed = seed)
       })
-      ## prepare rij matrix for Rcpp
-      rij[is.na(rij)] <- -1
       ## calculate expected value of decision given survey scheme
       out <- withr::with_seed(seed, {
         rcpp_approx_expected_value_of_decision_given_survey_scheme(
-          rij = rij, pij = pij, wij = wij,
+          dij = dij, nij = nij, pij = pij,
           survey_features = feature_data[[feature_survey_column]],
           survey_sensitivity =
             feature_data[[feature_survey_sensitivity_column]],
@@ -569,6 +551,7 @@ approx_near_optimal_survey_scheme <- function(
   # find optimal solution(s)
   best_idx <- abs(max(survey_solution_values) - survey_solution_values) < 1e-10
   out <- survey_solution_matrix[best_idx,  , drop = FALSE]
+  attr(out, "ev") <- survey_solution_values[best_idx]
 
   # return result
   out

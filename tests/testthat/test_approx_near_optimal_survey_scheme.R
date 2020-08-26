@@ -1,15 +1,83 @@
 context("approx_near_optimal_survey_scheme")
 
-test_that("expected results", {
+test_that("single species", {
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
       x = seq_len(6),
       y = x,
-      f1 = c(0, 1, 1, 0, NA, 1),
-      f2 = c(0, 1, 0, 1, NA, 0),
-      f3 = c(1, 0, 1, 0, NA, 1),
+      f1 = c(0, 1, 0, 1, 0, 1),
+      n1 = c(1, 1, 1, 1, 0, 1),
+      p1 = c(0.51, 0.99, 0.01, 0.99, 0.5, 0.99),
+      e1 = runif(6),
+      e2 = runif(6),
+      survey_cost = c(1, 1, 1, 1, 5, 100000),
+      management_cost = c(10, 10, 10, 10, 10, 10),
+      locked_in = FALSE),
+    coords = c("x", "y"))
+  feature_data <- tibble::tibble(
+    name = letters[1:1],
+    survey = rep(TRUE, 1),
+    survey_sensitivity = rep(0.99, 1),
+    survey_specificity = rep(0.99, 1),
+    model_sensitivity = rep(0.5, 1),
+    model_specificity = rep(0.5, 1),
+    target = 3)
+  pm <- matrix(NA, ncol = nrow(site_data), nrow = nrow(feature_data))
+  pm[1, ] <- site_data$p1
+  xgb_parameters <-
+    list(eta = c(0.1, 0.3, 0.5),
+         lambda = c(0.01, 0.1, 0.5),
+         objective = "binary:logistic")
+  # generate prioritisation
+  r <- approx_near_optimal_survey_scheme(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_detection_columns = c("f1"),
+    site_n_surveys_columns = c("n1"),
+    site_probability_columns = c("p1"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_target_column = "target",
+    total_budget = 46,
+    survey_budget = 10,
+    xgb_tuning_parameters = xgb_parameters,
+    xgb_early_stopping_rounds = rep(5, 1),
+    xgb_n_rounds = rep(10, 1),
+    xgb_n_folds = rep(2, 1),
+    site_management_locked_in_column = "locked_in",
+    prior_matrix = pm,
+    n_approx_replicates = 1,
+    n_approx_outcomes_per_replicate = 2,
+    method_approx_outcomes = "uniform_without_replacement")
+  # tests
+  expect_is(r, "matrix")
+  expect_equal(nrow(r), 1)
+  expect_equal(ncol(r), nrow(site_data))
+  expect_is(r[1], "logical")
+  expect_equal(c(r[1, ]), c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE))
+})
+
+test_that("multiple species", {
+  # data
+  set.seed(500)
+  site_data <- sf::st_as_sf(
+    tibble::tibble(
+      x = seq_len(6),
+      y = x,
+      f1 = c(0, 1, 1, 0, 0, 1),
+      f2 = c(0, 1, 0, 1, 0, 0),
+      f3 = c(1, 0, 1, 0, 0, 1),
+      n1 = c(1, 1, 1, 1, 0, 1),
+      n2 = c(1, 1, 1, 1, 0, 1),
+      n3 = c(1, 1, 1, 1, 0, 1),
       p1 = c(0.51, 0.99, 0.99, 0.05, 0.5, 0.99),
       p2 = c(0.51, 0.99, 0.05, 0.99, 0.5, 0.05),
       p3 = c(0.51, 0.05, 0.99, 0.99, 0.5, 0.99),
@@ -22,8 +90,8 @@ test_that("expected results", {
   feature_data <- tibble::tibble(
     name = letters[1:3],
     survey = rep(TRUE, 3),
-    survey_sensitivity = rep(0.95, 3),
-    survey_specificity = rep(0.9, 3),
+    survey_sensitivity = rep(0.99, 3),
+    survey_specificity = rep(0.99, 3),
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
     target = c(3, 3, 3))
@@ -31,11 +99,15 @@ test_that("expected results", {
     list(eta = c(0.1, 0.3, 0.5),
          lambda = c(0.01, 0.1, 0.5),
          objective = "binary:logistic")
+  pij <-
+    t(as.matrix(sf::st_drop_geometry(site_data)[, c("p1", "p2", "p3"),
+                                                drop = FALSE]))
   # generate prioritisation
   r <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
-    site_occupancy_columns = c("f1", "f2", "f3"),
+    site_detection_columns = c("f1", "f2", "f3"),
+    site_n_surveys_columns = c("n1", "n2", "n3"),
     site_probability_columns = c("p1", "p2", "p3"),
     site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
@@ -46,16 +118,89 @@ test_that("expected results", {
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
-    total_budget = 57,
+    total_budget = 56,
     survey_budget = 10,
     xgb_tuning_parameters = xgb_parameters,
     xgb_early_stopping_rounds = rep(5, 3),
     xgb_n_rounds = rep(10, 3),
     xgb_n_folds = rep(2, 3),
     site_management_locked_in_column = "locked_in",
+    prior_matrix = pij,
     n_approx_replicates = 1,
     n_approx_outcomes_per_replicate = 100,
-    method_approx_outcomes = "weighted_without_replacement")
+    method_approx_outcomes = "uniform_without_replacement")
+  # tests
+  expect_is(r, "matrix")
+  expect_equal(nrow(r), 1)
+  expect_equal(ncol(r), nrow(site_data))
+  expect_is(r[1], "logical")
+  expect_equal(c(r[1, ]), c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE))
+})
+
+test_that("multiple species (sparse)", {
+  # data
+  set.seed(500)
+  site_data <- sf::st_as_sf(
+    tibble::tibble(
+      x = seq_len(6),
+      y = x,
+      f1 = c(0, 1, 1, 0, 0, 0),
+      f2 = c(0, 1, 0, 1, 0, 0),
+      f3 = c(1, 0, 1, 0, 0, 1),
+      n1 = c(1, 1, 1, 1, 0, 0),
+      n2 = c(1, 1, 1, 1, 0, 1),
+      n3 = c(1, 1, 1, 1, 0, 1),
+      p1 = c(0.51, 0.99, 0.99, 0.05, 0.5, 1e-10),
+      p2 = c(0.51, 0.99, 0.05, 0.99, 0.5, 0.05),
+      p3 = c(0.51, 0.05, 0.99, 0.99, 0.5, 0.99),
+      e1 = runif(6),
+      e2 = runif(6),
+      survey_cost = c(1, 1, 1, 1, 5, 100000),
+      management_cost = c(10, 10, 10, 10, 10, 10),
+      locked_in = FALSE),
+    coords = c("x", "y"))
+  feature_data <- tibble::tibble(
+    name = letters[1:3],
+    survey = rep(TRUE, 3),
+    survey_sensitivity = rep(0.99, 3),
+    survey_specificity = rep(0.99, 3),
+    model_sensitivity = rep(0.8, 3),
+    model_specificity = rep(0.85, 3),
+    target = c(3, 3, 3))
+  xgb_parameters <-
+    list(eta = c(0.1, 0.3, 0.5),
+         lambda = c(0.01, 0.1, 0.5),
+         objective = "binary:logistic")
+  pij <-
+    t(as.matrix(sf::st_drop_geometry(site_data)[, c("p1", "p2", "p3"),
+                                                drop = FALSE]))
+  # generate prioritisation
+  r <- approx_near_optimal_survey_scheme(
+    site_data = site_data,
+    feature_data = feature_data,
+    site_detection_columns = c("f1", "f2", "f3"),
+    site_n_surveys_columns = c("n1", "n2", "n3"),
+    site_probability_columns = c("p1", "p2", "p3"),
+    site_env_vars_columns = c("e1", "e2"),
+    site_management_cost_column = "management_cost",
+    site_survey_cost_column = "survey_cost",
+    feature_survey_column = "survey",
+    feature_survey_sensitivity_column = "survey_sensitivity",
+    feature_survey_specificity_column = "survey_specificity",
+    feature_model_sensitivity_column = "model_sensitivity",
+    feature_model_specificity_column = "model_specificity",
+    feature_target_column = "target",
+    total_budget = 56,
+    survey_budget = 10,
+    xgb_tuning_parameters = xgb_parameters,
+    xgb_early_stopping_rounds = rep(5, 3),
+    xgb_n_rounds = rep(10, 3),
+    xgb_n_folds = rep(2, 3),
+    site_management_locked_in_column = "locked_in",
+    prior_matrix = pij,
+    n_approx_replicates = 1,
+    n_approx_outcomes_per_replicate = 100,
+    method_approx_outcomes = "uniform_without_replacement")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -81,7 +226,9 @@ test_that("consistent results", {
          lambda = c(0.01),
          objective = "binary:logistic")
   xgb_model <- fit_occupancy_models(
-    site_data, "f1", c("e1", "e2"), xgb_tuning_parameters = xgb_parameters,
+    site_data, feature_data, "f1", "n1", c("e1", "e2"),
+    "survey_sensitivity", "survey_specificity",
+    xgb_tuning_parameters = xgb_parameters,
     xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
@@ -89,7 +236,8 @@ test_that("consistent results", {
     approx_near_optimal_survey_scheme(
         site_data = site_data,
         feature_data = feature_data,
-        site_occupancy_columns = "f1",
+        site_detection_columns = "f1",
+        site_n_surveys_columns = "n1",
         site_probability_columns = "p1",
         site_env_vars_columns = c("e1", "e2"),
         site_survey_cost_column = "survey_cost",
@@ -102,11 +250,11 @@ test_that("consistent results", {
         feature_target_column = "target",
         survey_budget = survey_budget,
         total_budget = total_budget,
-        xgb_tuning_parameters = xgb_model$parameters,
+        xgb_tuning_parameters = xgb_parameters,
         xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2,
-        n_approx_replicates = 2,
-        n_approx_outcomes_per_replicate = 4,
-        method_approx_outcomes = "weighted_without_replacement")
+        n_approx_replicates = 1,
+        n_approx_outcomes_per_replicate = 100,
+        method_approx_outcomes = "uniform_without_replacement")
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
@@ -130,7 +278,9 @@ test_that("consistent results (multiple threads)", {
          lambda = c(0.01),
          objective = "binary:logistic")
   xgb_model <- fit_occupancy_models(
-    site_data, "f1", c("e1", "e2"), xgb_tuning_parameters = xgb_parameters,
+    site_data, feature_data, "f1", "n1", c("e1", "e2"),
+    "survey_sensitivity", "survey_specificity",
+    xgb_tuning_parameters = xgb_parameters,
     xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
@@ -139,7 +289,8 @@ test_that("consistent results (multiple threads)", {
       approx_near_optimal_survey_scheme(
           site_data = site_data,
           feature_data = feature_data,
-          site_occupancy_columns = "f1",
+          site_detection_columns = "f1",
+          site_n_surveys_columns = "n1",
           site_probability_columns = "p1",
           site_env_vars_columns = c("e1", "e2"),
           site_survey_cost_column = "survey_cost",
@@ -152,79 +303,15 @@ test_that("consistent results (multiple threads)", {
           feature_target_column = "target",
           survey_budget = survey_budget,
           total_budget = total_budget,
-          xgb_tuning_parameters = xgb_model$parameters,
+          xgb_tuning_parameters = xgb_parameters,
           xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2,
-          n_approx_replicates = 2,
-          n_approx_outcomes_per_replicate = 4,
-          method_approx_outcomes = "weighted_without_replacement",
+          n_approx_replicates = 1,
+          n_approx_outcomes_per_replicate = 100,
+          method_approx_outcomes = "uniform_without_replacement",
           n_threads = 2)
     })
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
     expect_identical(r[[1]], r[[i]])
-})
-
-test_that("expected results (sparse)", {
-  # data
-  set.seed(500)
-  site_data <- sf::st_as_sf(
-    tibble::tibble(
-      x = seq_len(6),
-      y = x,
-      f1 = c(0, 1, 1, 0, 0, NA),
-      f2 = c(0, 1, 0, 1, NA, 0),
-      f3 = c(1, 0, 1, 0, NA, 1),
-      p1 = c(0.51, 0.99, 0.99, 0.05, 0.5, 0.99),
-      p2 = c(0.51, 0.99, 0.05, 0.99, 0.5, 0.05),
-      p3 = c(0.51, 0.05, 0.99, 0.99, 0.5, 0.99),
-      e1 = runif(6),
-      e2 = runif(6),
-      survey_cost = c(1, 1, 1, 1, 5, 100000),
-      management_cost = c(10, 10, 10, 10, 10, 10),
-      locked_in = FALSE),
-    coords = c("x", "y"))
-  feature_data <- tibble::tibble(
-    name = letters[1:3],
-    survey = rep(TRUE, 3),
-    survey_sensitivity = rep(0.95, 3),
-    survey_specificity = rep(0.9, 3),
-    model_sensitivity = rep(0.8, 3),
-    model_specificity = rep(0.85, 3),
-    target = c(3, 3, 3))
-  xgb_parameters <-
-    list(eta = c(0.1, 0.3, 0.5),
-         lambda = c(0.01, 0.1, 0.5),
-         objective = "binary:logistic")
-  # generate prioritisation
-  r <- approx_near_optimal_survey_scheme(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_occupancy_columns = c("f1", "f2", "f3"),
-    site_probability_columns = c("p1", "p2", "p3"),
-    site_env_vars_columns = c("e1", "e2"),
-    site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",
-    feature_survey_column = "survey",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_target_column = "target",
-    total_budget = 57,
-    survey_budget = 10,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = rep(5, 3),
-    xgb_n_rounds = rep(10, 3),
-    xgb_n_folds = rep(2, 3),
-    site_management_locked_in_column = "locked_in",
-    n_approx_replicates = 1,
-    n_approx_outcomes_per_replicate = 100,
-    method_approx_outcomes = "weighted_without_replacement")
-  # tests
-  expect_is(r, "matrix")
-  expect_equal(nrow(r), 1)
-  expect_equal(ncol(r), nrow(site_data))
-  expect_is(r[1], "logical")
-  expect_equal(c(r[1, ]), c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE))
 })

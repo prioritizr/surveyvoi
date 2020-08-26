@@ -7,7 +7,8 @@
 prior_probability_matrix(
   site_data,
   feature_data,
-  site_occupancy_columns,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_probability_columns,
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
@@ -20,15 +21,19 @@ prior_probability_matrix(
 
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain detections
-and non-detections of features at each site.
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (\code{NA}) value should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled
@@ -74,44 +79,6 @@ This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 }
 \description{
 Create prior probability matrix for the value of information analysis.
-}
-\details{
-The prior matrix is constructed using a combination of previous
-  survey results and modelled predictions for sites that have not been
-  surveyed. Let \eqn{I} denote the set of features (indexed by \eqn{i}) and
-  let \eqn{J} denote the set of sites (indexed by \eqn{j}).
-  Let \eqn{D_j} indicate which sites have already been surveyed (using zeros
-  and ones).
-  Let \eqn{S_i} and \eqn{N_i} denote sensitivity and specificity
-  of the survey method for features \eqn{i \in I} (respectively).
-  Also let \eqn{H_{ij}} denote the presence or absence of each feature
-  in each site if they have been surveyed (using zeros or ones),
-  with unsurveyed sites denoted with -1 values
-  Let \eqn{{H'}_{ij}} indicate the modelled probability of each feature
-  occupying each site.
-  Finally, let \eqn{{S'}_i} and \eqn{{N'}_i} denote
-  sensitivity and specificity of the model for feature \eqn{i \in I}
-  (respectively).
-  Given such data, the (\eqn{P_{ij}}) prior probability of feature \eqn{i}
-  occupying site \eqn{j} is:
-
-\deqn{
-P_{ij} = \\
-S_i, \text{ if } D_j = 1, H_{ij} = 1 \space (i \text{ detected in } j) \\
-1 - N_i, \text{ else if } D_j = 1, H_{ij} = 0 \space (i \text{ not detected in } j) \\
-{S'}_i \times S_i, \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted present in } j \text{)} \\
-1 - ({N'}_i \times N_i), \text{ else if } D_j = 0, {H'}_{ij} \geq 0.5 \space (j \text{ not surveyed and } i \text{ predicted absent in } j \text{)} \\
-}
-
-Note that the prior probability calculations account for the fact that the
-species distribution models were evaluated using the survey data. Since
-the species distribution models were evaluated using survey data, this
-means that sensitivity and specificity values of the models are
-conditional on uncertainty present in the survey methodology. To
-account for this, the prior probability of species \eqn{i} occurring within
-planning unit \eqn{j} when relying on the species distribution model
-predictions depends on the sensitivity and specificity of both the
-species distribution models and the survey methodology.
 }
 \examples{
 # set seeds for reproducibility

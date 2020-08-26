@@ -69,12 +69,11 @@ test_that("single species", {
   expect_lte(max(r2$spec), 1)
   expect_gte(min(r1$sens), 0)
   expect_gte(min(r2$spec), 0)
-  expect_lte(max(abs(r1$sens - r2$sens)), 1e-7)
-  expect_lte(max(abs(r1$spec - r2$spec)), 1e-7)
+  expect_lte(max(abs(r1$sens - r2$sens)), 1e-6)
+  expect_lte(max(abs(r1$spec - r2$spec)), 1e-6)
 })
 
 test_that("multiple species", {
-  # data
   ## set seeds
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -87,7 +86,8 @@ test_that("multiple species", {
   x <- simulate_site_data(n_pu, n_f, 0.2, n_env_vars = n_vars)
   x <- sf::st_drop_geometry(x)
   y <- simulate_feature_data(n_f)
-  y$survey[1] <- FALSE
+  y$survey <- FALSE
+  y$survey[c(1, 3)] <- TRUE
   survey_features <- y$survey
   survey_sensitivity <- y$survey_sensitivity
   survey_specificity <- y$survey_specificity
@@ -111,13 +111,16 @@ test_that("multiple species", {
   xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
   xgb_nrounds <- rep(10, n_f)
-  xgb_early_stopping_rounds <- rep(5, n_f)
+  xgb_early_stopping_rounds <- rep(10, n_f)
   tuning_parameters <-
-    expand.grid(eta = c(0.1, 0.5, 1.0),
-                lambda = c(0.001, 0.01, 0.05),
+    expand.grid(eta = c(0.01),
+                lambda = c(0.001),
                 objective = "binary:logistic",
                 seed = "123")
   tuning_parameters <- as.matrix(tuning_parameters)
+  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
+    which(nij[i, ] < 0.5)
+  })
   # run calculations
   r1 <- rcpp_fit_xgboost_models_and_assess_performance(
     dij, nij, pij, pu_env_data,
@@ -130,15 +133,6 @@ test_that("multiple species", {
     survey_features, survey_sensitivity, survey_specificity,
     tuning_parameters, xgb_nrounds, xgb_early_stopping_rounds,
     xgb_train_folds, xgb_test_folds)
-  # tests
-  expect_length(r1$sens, sum(survey_features))
-  expect_length(r1$spec, sum(survey_features))
-  expect_length(r2$sens, sum(survey_features))
-  expect_length(r2$spec, sum(survey_features))
-  expect_lte(max(r1$sens), 1)
-  expect_lte(max(r2$spec), 1)
-  expect_gte(min(r1$sens), 0)
-  expect_gte(min(r2$spec), 0)
-  expect_lte(max(abs(r1$sens - r2$sens)), 1e-7)
-  expect_lte(max(abs(r1$spec - r2$spec)), 1e-7)
+  expect_lte(max(abs(r1$sens - r2$sens)), 1e-6)
+  expect_lte(max(abs(r1$spec - r2$spec)), 1e-6)
 })

@@ -4,7 +4,6 @@ void model_sensitivity_and_specificity(
   Eigen::VectorXf &y, Eigen::VectorXf &yhat, Eigen::VectorXf &w,
   double data_sens, double data_spec,
   double &model_sens, double &model_spec) {
-
   // check if preds contains at least one predicted absence and presence,
   // if not return very poor performance
   double max_wt_yhat_pres =
@@ -14,8 +13,8 @@ void model_sensitivity_and_specificity(
     static_cast<double>((w.array() *
                          (yhat.array() < 0.5).cast<float>()).maxCoeff());
   if ((max_wt_yhat_pres < 1.0e-5) || (max_wt_yhat_abs < 1.0e-5)) {
-    model_sens = 0.0;
-    model_spec = 0.0;
+    model_sens = 0.5;
+    model_spec = 0.5;
     return;
   }
 
@@ -24,11 +23,11 @@ void model_sensitivity_and_specificity(
   double total_negative = static_cast<double>(w.sum()) - total_positive;
   double true_positive = static_cast<double>(
     (w.array() *
-    ((yhat.array() >= 0.5) && (y.array() >= 0.5)).cast<float>()).sum()
+    ((yhat.array() >= 0.5f) * (y.array() >= 0.5f)).cast<float>()).sum()
   );
   double true_negative = static_cast<double>(
     (w.array() *
-     ((yhat.array() < 0.5) && (y.array() < 0.5)).cast<float>()).sum()
+     ((yhat.array() < 0.5f) * (y.array() < 0.5f)).cast<float>()).sum()
   );
   double false_negative = total_positive - true_positive;
   double false_positive = total_negative - true_negative;
@@ -53,7 +52,6 @@ void model_sensitivity_and_specificity(
   model_sens = std::min(model_sens, 1.0 - 1.0e-10);
   model_spec = std::max(model_spec, 1.0e-10);
   model_spec = std::min(model_spec, 1.0 - 1.0e-10);
-
   // return void
   return;
 }

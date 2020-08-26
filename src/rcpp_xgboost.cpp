@@ -74,8 +74,7 @@ void fit_xgboost_models_and_assess_performance(
         train_y[i][k], train_w[i][k], train_x[i][k], train_x_handle[0]);
       // prepare testing data for booster
       DMatrixHandle test_x_handle[1];
-      initialize_DMatrixHandle(
-        test_x[i][k], test_x_handle[0]);
+      initialize_DMatrixHandle(test_w[i][k], test_x[i][k], test_x_handle[0]);
       // calculate spw for the k'th fold
       curr_det = train_y[i][k].sum();
       spw = (static_cast<double>(train_y[i][k].size()) - curr_det) / curr_det;
@@ -103,9 +102,13 @@ void fit_xgboost_models_and_assess_performance(
             test_y[i][k], test_w[i][k], test_x_handle[0], 0, models(t, k),
             survey_sensitivity[survey_features_idx[i]],
             survey_specificity[survey_features_idx[i]]);
-          // check if the updated model has not improved
+          // check if the updated model has not improved,
+          // and only incremement the nonas non-improvement if the model
+          // performs better than random
           if (curr_score <= best_score) {
-            ++curr_no_improvement_iterations;
+             // increment counter for early stopping if the model performs
+             // better than random
+             if (curr_score >= 1.0e-10) ++curr_no_improvement_iterations;
           } else {
             best_ntree_limit(t, k) = iter;
             best_score = curr_score;
@@ -311,10 +314,10 @@ Rcpp::List rcpp_fit_xgboost_models_and_assess_performance(
     feature_outcome_idx,
     xgb_parameter_names, xgb_parameter_values2,
     n_xgb_rounds, n_xgb_early_stopping_rounds,
-    train_x, train_y, train_w, test_x, test_y, test_w, pu_predict_env_data,
+    train_x, train_y, train_w, test_x, test_y, test_w,
+    pu_predict_env_data,
     model_yhat, model_performance,
     curr_sensitivity, curr_specificity);
-
   // exports
    return Rcpp::List::create(
      Rcpp::Named("sens") = Rcpp::wrap(curr_sensitivity),

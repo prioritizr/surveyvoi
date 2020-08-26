@@ -134,7 +134,8 @@ Eigen::MatrixXd rcpp_predict_missing_rij_data(
     feature_outcome_idx,
     xgb_parameter_names, xgb_parameter_values2,
     n_xgb_rounds, n_xgb_early_stopping_rounds,
-    train_x, train_y, train_w, test_x, test_y, test_w, pu_predict_env_data,
+    train_x, train_y, train_w, test_x, test_y, test_w,
+    pu_predict_env_data,
     model_yhat, model_performance,
     curr_sensitivity, curr_specificity);
 

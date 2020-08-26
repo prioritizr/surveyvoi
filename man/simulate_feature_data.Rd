@@ -4,14 +4,14 @@
 \alias{simulate_feature_data}
 \title{Simulate feature data}
 \usage{
-simulate_feature_data(n_features, proportion_of_survey_features)
+simulate_feature_data(n_features, proportion_of_survey_features = 1)
 }
 \arguments{
 \item{n_features}{\code{integer} number of features.}
 
 \item{proportion_of_survey_features}{\code{numeric} proportion of features
 that will be examined in the new surveys. Values must be between
-zero and one.}
+zero and one. Defaults to 1 such that all features should be surveyed.}
 }
 \value{
 \code{\link[tibble]{tibble}} object. It contains the following

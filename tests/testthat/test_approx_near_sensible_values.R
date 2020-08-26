@@ -1,86 +1,5 @@
 context("approx sensible values")
 
-test_that("lower voi when most of budget spent on surveys", {
-  # initialize rng
-  set.seed(501)
-  RandomFields::RFoptions(seed = 501)
-  # data
-  n_f <- 2
-  site_data <- simulate_site_data(n_sites = 15, n_features = n_f, 0.1)
-  feature_data <- simulate_feature_data(n_features = n_f, 0.5)
-  feature_data$target <- c(2, 2)
-  total_budget <- 5
-  # manually define costs
-  site_data$management_cost <- 0.1
-  site_data$survey_cost <- c(4.8, rep(0.01, nrow(site_data) - 1))
-  # create surveys
-  site_data$survey1 <- FALSE
-  site_data$survey1[1] <- TRUE
-  site_data$survey2 <- FALSE
-  site_data$survey2[c(3, 6)] <- TRUE
-  # prepare data
-  site_det_columns <- c("f1", "f2")
-  site_n_columns <- c("n1", "n2")
-  site_prb_columns <- c("p1", "p2")
-  site_env_columns <- c("e1", "e2", "e3")
-  # prepare xgboost inputs
-  xgb_tuning_parameters <-
-    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
-  # calculations
-  r1 <- approx_evdsi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_detection_columns = site_det_columns,
-    site_n_surveys_columns = site_n_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_survey_scheme_column = "survey1",
-    site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",
-    feature_survey_column = "survey",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_target_column = "target",
-    total_budget = total_budget,
-    xgb_tuning_parameters = xgb_tuning_parameters,
-    xgb_n_folds = rep(2, n_f),
-    n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
-    seed = 1)
-  r2 <- approx_evdsi(
-    site_data = site_data,
-    feature_data = feature_data,
-    site_detection_columns = site_det_columns,
-    site_n_surveys_columns = site_n_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_survey_scheme_column = "survey2",
-    site_management_cost_column = "management_cost",
-    site_survey_cost_column = "survey_cost",
-    feature_survey_column = "survey",
-    feature_survey_sensitivity_column = "survey_sensitivity",
-    feature_survey_specificity_column = "survey_specificity",
-    feature_model_sensitivity_column = "model_sensitivity",
-    feature_model_specificity_column = "model_specificity",
-    feature_target_column = "target",
-    total_budget = total_budget,
-    xgb_tuning_parameters = xgb_tuning_parameters,
-    n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
-    xgb_n_folds = rep(2, n_f),
-    seed = 1)
-  # tests
-  expect_true(is.finite(r1))
-  expect_true(is.finite(r2))
-  expect_gt(r1, 0)
-  expect_gt(r2, 0)
-  expect_lte(r1, 1)
-  expect_lte(r2, 1)
-  expect_gt(r2, r1)
-})
-
 test_that("current == optimal info, when all pu selected", {
   set.seed(500)
   site_data <- sf::st_as_sf(
@@ -131,7 +50,7 @@ test_that("current == optimal info, when all pu selected", {
     total_budget = 100,
     site_management_locked_in_column = "locked_in",
     prior_matrix = pm)
-  evd_ss <- approx_optimal_survey_scheme(
+  evd_ss <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = site_det_columns,
@@ -216,7 +135,7 @@ test_that("current < optimal info, some pu selected", {
     total_budget = total_budget,
     site_management_locked_in_column = "locked_in",
     prior_matrix = pm)
-  evd_ss <- approx_optimal_survey_scheme(
+  evd_ss <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = site_det_columns,
@@ -288,7 +207,7 @@ test_that("locking out planning units lowers voi", {
   pm <- t(as.matrix(sf::st_drop_geometry(site_data)[, site_prb_columns]))
   # calculate expected values
   ## approx_evdsi
-  evd_opt1 <- approx_optimal_survey_scheme(
+  evd_opt1 <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = site_det_columns,
@@ -311,7 +230,7 @@ test_that("locking out planning units lowers voi", {
     n_approx_replicates = 1,
     method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
-  evd_opt2 <- approx_optimal_survey_scheme(
+  evd_opt2 <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = site_det_columns,
@@ -391,7 +310,7 @@ test_that("approx_evdsi >= evdci when solution is fixed", {
     site_management_locked_in_column = "locked_in",
     site_management_locked_out_column = "locked_out",
     prior_matrix = pm)
-  evd_ss <- approx_optimal_survey_scheme(
+  evd_ss <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = site_det_columns,

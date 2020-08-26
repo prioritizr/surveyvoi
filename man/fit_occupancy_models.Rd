@@ -6,13 +6,16 @@
 \usage{
 fit_occupancy_models(
   site_data,
-  site_occupancy_columns,
+  feature_data,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_env_vars_columns,
+  feature_survey_sensitivity_column,
+  feature_survey_specificity_column,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
-  site_weight_columns = NULL,
+  xgb_early_stopping_rounds = rep(20, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
   n_threads = 1,
   seed = 500,
   verbose = FALSE
@@ -21,13 +24,21 @@ fit_occupancy_models(
 \arguments{
 \item{site_data}{\code{\link[sf]{sf}} object with site data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the
-argument to \code{site_data} that contain presence/absence data.
+\item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
+
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary presence/absence data (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_env_vars_columns}{\code{character} names of columns in the
 argument to \code{site_data} that contain environmental information
@@ -35,6 +46,20 @@ for fitting updated occupancy models based on possible survey outcomes.
 Each column should correspond to a different environmental variable,
 and contain \code{numeric}, \code{factor}, or \code{character} data.
 No missing (\code{NA}) values are permitted in these columns.}
+
+\item{feature_survey_sensitivity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of future surveys correctly detecting a presence of each
+feature in a given site (i.e. the sensitivity of the survey methodology).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.}
+
+\item{feature_survey_specificity_column}{\code{character} name of the
+column in the argument to \code{feature_data} that contains
+probability of future surveys correctly detecting an absence of each
+feature in a given site (i.e. the specificity of the survey methodology).
+This column should have \code{numeric} values that are between zero and
+one. No missing (\code{NA}) values are permitted in this column.}
 
 \item{xgb_tuning_parameters}{\code{list} object containing the candidate
 parameter values for fitting models. Valid parameters include:
@@ -45,21 +70,15 @@ parameter values for fitting models. Valid parameters include:
 
 \item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
 tuning. See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 100 for each feature.}
+Defaults to 10 for each feature.}
 
 \item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
 See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 1000 for each feature.}
+Defaults to 100 for each feature.}
 
 \item{xgb_n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
 Defaults to 5 for each feature.}
-
-\item{site_weight_columns}{\code{character} name of columns in
-\code{site_data} containing weights for model fitting. These columns must
-contain \code{numeric} values. No missing (\code{NA}) values are
-permitted. Defaults to \code{NULL} such that all data are given
-equal weight when fitting models.}
 
 \item{n_threads}{\code{integer} number of threads to use for parameter
 tuning. Defaults to 1.}

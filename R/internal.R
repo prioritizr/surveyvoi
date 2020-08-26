@@ -254,14 +254,16 @@ create_site_folds <- function(
   obs_y <- c(rep(rep(1, length(n_det)), n_det),
              rep(rep(0, length(n_nondet)), n_nondet))
   obs_index <- c(rep(index, n_det), rep(index, n_nondet))
-  obs_data <- tibble::tibble(y = obs_y, idx = obs_index,
+  obs_data <- tibble::tibble(y = obs_y, y2 = obs_y, idx = obs_index,
                              idf = factor(as.character(obs_index)))
+  obs_data$y2[obs_data$y < 0.5] <- -1
 
   # organize site data with observations into folds
   withr::with_seed(seed, {
     # create folds
-    obs_data2 <- groupdata2::fold(
-      obs_data, num_col = "y", id_col = "idf", k = n, num_fold_cols = 5)
+    obs_data2 <- groupdata2::partition(
+      obs_data, p = rep(1 / n, n - 1), num_col = "y2", id_col = "idf",
+      list_out = FALSE)
   })
 
   # find valid fold
@@ -300,8 +302,10 @@ create_site_folds <- function(
   # (because they have no previous detections or non-detections)
   na_pos <- is.na(site_data$fold)
   if (any(na_pos)) {
-    site_data$fold[na_pos] <-
-      sample(seq_len(n), sum(na_pos), replace = sum(na_pos) > n)
+    withr::with_seed(seed, {
+      site_data$fold[na_pos] <-
+        sample(seq_len(n), sum(na_pos), replace = sum(na_pos) > n)
+    })
   }
 
   # extract indices for folds

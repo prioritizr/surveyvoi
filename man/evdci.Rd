@@ -7,7 +7,8 @@
 evdci(
   site_data,
   feature_data,
-  site_occupancy_columns,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_probability_columns,
   site_management_cost_column,
   feature_survey_sensitivity_column,
@@ -26,15 +27,19 @@ evdci(
 
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain detections
-and non-detections of features at each site.
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (\code{NA}) value should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled

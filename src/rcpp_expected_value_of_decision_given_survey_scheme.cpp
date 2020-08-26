@@ -275,6 +275,12 @@ double expected_value_of_decision_given_survey_scheme(
     assert_valid_probability_data(curr_total_probability_of_model_negative,
                                   "issue calculating total model negatives");
 
+
+    print(wrap("new outcome"));
+    
+    print(wrap("curr_oij"));
+    print(wrap(curr_oij));
+
     /// add updated model results to posterior matrix
     update_model_posterior_probabilities(
       nij, pij, curr_oij,
@@ -292,6 +298,9 @@ double expected_value_of_decision_given_survey_scheme(
       curr_pij, pu_purchase_costs, pu_purchase_locked_in,
       pu_purchase_locked_out, obj_fun_target, remaining_budget, curr_solution);
 
+    print(wrap("curr_pij"));
+    print(wrap(curr_pij));
+
     /// calculate expected value of the prioritisation
     curr_expected_value_of_action_given_outcome =
       std::log(expected_value_of_action(
@@ -301,6 +310,8 @@ double expected_value_of_decision_given_survey_scheme(
     curr_probability_of_outcome = log_probability_of_outcome(
       curr_oij, total_probability_of_survey_positive_log,
       total_probability_of_survey_negative_log, rij_outcome_idx);
+
+    Rcout << "(value, prob) = " << std::exp(curr_expected_value_of_action_given_outcome) << " " << std::exp(curr_probability_of_outcome) << std::endl;
 
     /// calculate expected value of action
     if (std::isinf(curr_expected_value_of_decision)) {

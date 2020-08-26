@@ -62,7 +62,8 @@ test_that("single species", {
     xgb_train_folds, xgb_test_folds, pu_model_prediction_idx)
   ## tests
   ## expect rcpp and r implementations to give same result
-  expect_equal(r1, r2)
+  ## (given precision of C++ float variables)
+  expect_lte(max(abs(r1 - r2)), 1e-6)
   ## expect values for pu's that shouldn't be updated to remain the same
   for (i in seq_len(n_f)) {
     expect_equal(
@@ -86,7 +87,6 @@ test_that("single species", {
 })
 
 test_that("multiple species", {
-  # data
   ## set seeds
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -99,7 +99,9 @@ test_that("multiple species", {
   x <- simulate_site_data(n_pu, n_f, 0.2, n_env_vars = n_vars)
   x <- sf::st_drop_geometry(x)
   y <- simulate_feature_data(n_f)
-  y$survey[2] <- FALSE
+  # y$survey[1:2] <- FALSE
+  y$survey <- FALSE
+  y$survey[c(1, 3)] <- TRUE
   survey_features <- y$survey
   survey_sensitivity <- y$survey_sensitivity
   survey_specificity <- y$survey_specificity
@@ -112,10 +114,6 @@ test_that("multiple species", {
     "model_sensitivity", "model_specificity")
   ## specify environmental data
   pu_env_data <- as.matrix(x[, paste0("e", seq_len(n_vars))])
-  ## specify planning units for predictions
-  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
-    which(nij[i, ] < 0.5)
-  })
   ## model fitting parameters
   xgb_folds <- lapply(seq_len(n_f), function(f) {
     fn <- paste0("f", f)
@@ -126,15 +124,18 @@ test_that("multiple species", {
   })
   xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
-  xgb_nrounds <- rep(10, n_f)
-  xgb_early_stopping_rounds <- rep(10, n_f)
+  xgb_nrounds <- rep(1, n_f)
+  xgb_early_stopping_rounds <- rep(1, n_f)
   tuning_parameters <-
-    expand.grid(eta = c(0.1),
+    expand.grid(eta = c(0.00001),
                 lambda = c(0.001),
                 objective = "binary:logistic",
                 seed = "123")
   tuning_parameters <- as.matrix(tuning_parameters)
-  # results
+  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
+    which(nij[i, ] < 0.5)
+  })
+  # run calculations
   r1 <- rcpp_predict_missing_rij_data(
     dij, nij, pij, pu_env_data,
     survey_features, survey_sensitivity, survey_specificity,
@@ -146,9 +147,7 @@ test_that("multiple species", {
     survey_features, survey_sensitivity, survey_specificity,
     tuning_parameters, xgb_nrounds, xgb_early_stopping_rounds,
     xgb_train_folds, xgb_test_folds, pu_model_prediction_idx)
-  ## tests
-  ## expect rcpp and r implementations to give same result
-  expect_lte(abs(max(r1 - r2)), 1e-7)
+  expect_lte(max(abs(r1 - r2)), 1e-6)
   ## expect values for pu's that shouldn't be updated to remain the same
   for (i in seq_len(n_f)) {
     expect_equal(

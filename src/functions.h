@@ -55,6 +55,9 @@ void initialize_DMatrixHandle(
   Eigen::VectorXf&, Eigen::VectorXf&, MatrixXfRM&, DMatrixHandle&);
 
 void initialize_DMatrixHandle(
+  Eigen::VectorXf&, MatrixXfRM&, DMatrixHandle&);
+
+void initialize_DMatrixHandle(
   MatrixXfRM&, DMatrixHandle&);
 
 template<typename T>

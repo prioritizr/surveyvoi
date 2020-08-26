@@ -7,7 +7,8 @@
 evdsi(
   site_data,
   feature_data,
-  site_occupancy_columns,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_probability_columns,
   site_env_vars_columns,
   site_management_cost_column,
@@ -21,13 +22,12 @@ evdsi(
   feature_target_column,
   total_budget,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
+  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   prior_matrix = NULL,
-  site_weight_columns = NULL,
   seed = 500
 )
 }
@@ -36,15 +36,19 @@ evdsi(
 
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain detections
-and non-detections of features at each site.
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (\code{NA}) value should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled
@@ -54,7 +58,7 @@ probability data (values between zero and one). No missing (\code{NA})
 values are permitted in these columns.}
 
 \item{site_env_vars_columns}{\code{character} names of columns in the
-argument to  \code{site_data} that contain environmental information
+argument to \code{site_data} that contain environmental information
 for fitting updated occupancy models based on possible survey outcomes.
 Each column should correspond to a different environmental variable,
 and contain \code{numeric}, \code{factor}, or \code{character} data.
@@ -71,7 +75,7 @@ permitted in this column.}
 that indicates which sites are selected in the scheme or not.
 No missing \code{NA} values are permitted. Additionally, only sites
 that are missing data can be selected or surveying (as per the
-argument to \code{site_occupancy_columns}).}
+argument to \code{site_detection_columns}).}
 
 \item{site_survey_cost_column}{\code{character} name of column in the
 argument to  \code{site_data} that contains costs for surveying each
@@ -137,11 +141,11 @@ parameter values for fitting models. Valid parameters include:
 
 \item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
 tuning. See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 100 for each feature.}
+Defaults to 10 for each feature.}
 
 \item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
 See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 1000 for each feature.}
+Defaults to 100 for each feature.}
 
 \item{xgb_n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
@@ -170,13 +174,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{site_weight_columns}{\code{character} name of columns in
-\code{site_data} containing weights for model fitting for each
-feature. These columns must contain \code{numeric} values greater
-than or equal to zero. No missing (\code{NA}) values are
-permitted. Defaults to \code{NULL} such that all data are given
-equal weight when fitting models.}
 
 \item{seed}{\code{integer} state of the random number generator for
 partitioning data into folds cross-validation and fitting \pkg{xgboost}

@@ -44,8 +44,6 @@ test_that("single species", {
   })
   xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
-  xgb_nrounds <- rep(10, n_f)
-  xgb_early_stopping_rounds <- rep(5, n_f)
   tuning_parameters <- expand.grid(
     eta = c(0.1), lambda = c(0.001), objective = "binary:logistic",
     seed = "123")
@@ -139,8 +137,6 @@ test_that("multiple species", {
   })
   xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
   xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
-  xgb_nrounds <- rep(10, n_f)
-  xgb_early_stopping_rounds <- rep(5, n_f)
   tuning_parameters <- expand.grid(
     eta = c(0.1), lambda = c(0.001), objective = "binary:logistic",
     seed = "123")
@@ -160,8 +156,8 @@ test_that("multiple species", {
     pu_env_data = pu_env_data,
     xgb_parameter_names = colnames(tuning_parameters),
     xgb_parameter_values = tuning_parameters,
-    n_xgb_rounds = rep(10, n_f),
-    n_xgb_early_stopping_rounds = rep(5, n_f),
+    n_xgb_rounds = rep(2, n_f),
+    n_xgb_early_stopping_rounds = rep(1, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
@@ -180,8 +176,8 @@ test_that("multiple species", {
     pu_env_data = pu_env_data,
     xgb_parameter_names = colnames(tuning_parameters),
     xgb_parameter_values = tuning_parameters,
-    n_xgb_rounds = rep(10, n_f),
-    n_xgb_early_stopping_rounds = rep(5, n_f),
+    n_xgb_rounds = rep(2, n_f),
+    n_xgb_early_stopping_rounds = rep(1, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,

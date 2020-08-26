@@ -84,10 +84,8 @@ NULL
 #'
 #' @export
 optimal_survey_scheme <- function(
-  site_data,
-  feature_data,
-  site_occupancy_columns,
-  site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns, site_probability_columns,
   site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
@@ -100,14 +98,13 @@ optimal_survey_scheme <- function(
   total_budget,
   survey_budget,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
+  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  site_weight_columns = NULL,
   seed = 500,
   n_threads = 1) {
   # assert arguments are valid
@@ -118,11 +115,18 @@ optimal_survey_scheme <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
     ## site_probability_columns
     is.character(site_probability_columns),
     identical(nrow(feature_data), length(site_probability_columns)),
@@ -194,14 +198,14 @@ optimal_survey_scheme <- function(
     is.list(xgb_tuning_parameters),
     ## xgb_n_folds
     is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_occupancy_columns),
+    length(xgb_n_folds) == length(site_detection_columns),
     is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_occupancy_columns),
+    length(xgb_n_rounds) == length(site_detection_columns),
     all(xgb_n_rounds > 0),
     ## xgb_early_stopping_rounds
     is.numeric(xgb_early_stopping_rounds),
     assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    length(xgb_early_stopping_rounds) == length(site_detection_columns),
     all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
@@ -252,14 +256,11 @@ optimal_survey_scheme <- function(
   }
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
-  ## validate rij values
-  validate_site_occupancy_data(site_data, site_occupancy_columns)
-  ## validate pij values
-  validate_site_prior_data(site_data, site_probability_columns)
-  ## validate wij values
-  if (!is.null(site_weight_columns))
-    validate_site_weight_data(site_data, site_occupancy_columns,
-      site_weight_columns)
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+  ## validate model probability values
+  validate_site_probability_data(site_data, site_probability_columns)
   ## validate xgboost tuning parameters
   validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
@@ -278,7 +279,8 @@ optimal_survey_scheme <- function(
   ## calculate prior matrix
   if (is.null(prior_matrix)) {
     pij <- prior_probability_matrix(
-      site_data, feature_data, site_occupancy_columns, site_probability_columns,
+      site_data, feature_data, site_detection_columns,
+      site_n_surveys_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
       feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
@@ -323,23 +325,12 @@ optimal_survey_scheme <- function(
     warning(paste("no objective specified for model fitting,",
                   "assuming binary:logistic"))
   }
-  ## extract site occupancy data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns]))
+  ## extract site data
+  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
+  nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
+  ejx <- as.matrix(site_data[, site_env_vars_columns, drop = FALSE])
   ## identify planning units that have been surveyed for all species
-  site_survey_status <- colSums(is.na(rij)) == 0
-  ## extract environmental data
-  ejx <- as.matrix(site_data[, site_env_vars_columns])
-
-  # prepare model weights
-  ## initialize weights
-  if (!is.null(site_weight_columns)) {
-    ## extract user-specified weights
-    wij <- t(as.matrix(site_data[, site_weight_columns]))
-  } else {
-    ## set weights based on if data are missing or not
-    wij <- t(as.matrix(site_data[, site_occupancy_columns]))
-    wij[] <- as.numeric(!is.na(wij))
-  }
+  site_survey_status <- colSums(nij < 0.5) == 0
 
   # generate survey schemes
   all_feasible_schemes <- feasible_survey_schemes(
@@ -347,12 +338,12 @@ optimal_survey_scheme <- function(
                out = site_survey_status | site_survey_locked_out),
     "x", survey_budget, NULL, "out", verbose = FALSE)
 
-  # subset for debugging
+  # identify which schemes involve collecting new data vs. using existing data
   new_info_idx <- which(rowSums(all_feasible_schemes) > 0.5)
   current_idx <- which(rowSums(all_feasible_schemes) < 0.5)
 
   # calculate expected value of decision given scheme that does not survey sites
-  evd_current <-
+  evd_current <- withr::with_seed(seed, {
     rcpp_expected_value_of_decision_given_current_info(
       pij = pij,
       pu_costs = site_data[[site_management_cost_column]],
@@ -360,6 +351,7 @@ optimal_survey_scheme <- function(
       pu_locked_out = site_management_locked_out,
       target = round(feature_data[[feature_target_column]]),
       budget = total_budget)
+  })
 
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -375,24 +367,19 @@ optimal_survey_scheme <- function(
     site_survey_scheme <- all_feasible_schemes[new_info_idx[i], , drop = TRUE]
     ## identify sites that need model predictions for each feature
     pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-      which(!site_survey_scheme & is.na(rij[i, ]))
+      which(!site_survey_scheme & (nij[i, ] < 0.5))
     })
     ## folds for training and testing models
-    xgb_folds <- lapply(seq_len(nrow(feature_data)),
-      function(i) {
-        pu_train_idx <- which(site_survey_scheme | !is.na(rij[i, ]))
-        withr::with_seed(seed, {
-          create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
-                       index = pu_train_idx,
-                       na.fail = FALSE, seed = seed)
-        })
+    xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
+      has_data_idx <- which((nij[i, ] > 0.5) | site_survey_scheme)
+      create_site_folds(
+        dij[i, has_data_idx], nij[i, has_data_idx],
+        xgb_n_folds[i], index = has_data_idx, seed = seed)
     })
-    ## prepare rij matrix for Rcpp
-    rij[is.na(rij)] <- -1
     ## calculate expected value of decision given survey scheme
     withr::with_seed(seed, {
       rcpp_expected_value_of_decision_given_survey_scheme(
-        rij = rij, pij = pij, wij = wij,
+        dij = dij, nij = nij, pij = pij,
         survey_features = feature_data[[feature_survey_column]],
         survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
         survey_specificity = feature_data[[feature_survey_specificity_column]],

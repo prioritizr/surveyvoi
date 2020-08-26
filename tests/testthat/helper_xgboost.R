@@ -5,14 +5,22 @@ r_xgboost <- function(
   # calculate parameters for model fitting
   spw <- round(sum(y_train < 0.5) / sum(y_train > 0.5), 6)
   seed <- as.numeric(xgb_parameters$seed)
+  # round data to account for different precision between floats and doubles
+  # y_train <- round(y_train, 5)
+  # x_train <- round(x_train, 5)
+  # w_train <- round(w_train * 100, 5)
+  w_train <- w_train * 100
+  # y_test <- round(y_test, 5)
+  # x_test <- round(x_test, 5)
+  # w_test <- round(w_test, 5)
   # prepare data for model fitting
   dtrain <- xgboost::xgb.DMatrix(
     x_train, missing = NA,
-    info = list(label = y_train, weight =round(w_train, 6)))
+    info = list(label = y_train, weight = w_train))
   # prepare data for model evaluation
   dtest <- xgboost::xgb.DMatrix(
     x_test, missing = NA,
-    info = list(label = y_test, weight = round(w_test, 6)))
+    info = list(label = y_test, weight = w_test))
   # prepare evaluation function
   curr_feval_tss <- feval_tss
   environment(curr_feval_tss)$sens <- survey_sensitivity
@@ -21,7 +29,7 @@ r_xgboost <- function(
   args <- list(data = dtrain, verbose = FALSE, scale_pos_weight = spw,
                watchlist = list(test = dtest), eval_metric = curr_feval_tss,
                maximize = TRUE, nrounds = xgb_nrounds,
-               early_stopping_rounds = xgb_early_nrounds)
+               early_stopping_rounds = xgb_early_nrounds, nthread = 1)
   args <- append(args, xgb_parameters)
   args$seed <- NULL
   # fit model
@@ -29,8 +37,9 @@ r_xgboost <- function(
     model <- do.call(what = xgboost::xgb.train, args)
   })
   # generate predictions
-  yhat_test <- predict(model, x_test, ntreelimit = model$best_ntreelimit)
-  yhat_predict <- predict(model, x_predict, ntreelimit = model$best_ntreelimit)
+  yhat_train <- predict(model, x_train, ntreelimit = model$best_iteration)
+  yhat_test <- predict(model, x_test, ntreelimit = model$best_iteration)
+  yhat_predict <- predict(model, x_predict, ntreelimit = model$best_iteration)
   # calculate performance statistics
   perf <- rcpp_model_performance(
     y_test, yhat_test, w_test, survey_sensitivity, survey_specificity)
@@ -55,10 +64,8 @@ r_fit_xgboost_models_and_assess_performance <- function(
                               drop = FALSE],
         y_test = c(rep(1, length(xgb_test_folds[[i]][[k]])),
                       rep(0, length(xgb_test_folds[[i]][[k]]))),
-        w_test = c(dij[i, xgb_test_folds[[i]][[k]]] /
-                   nij[i, xgb_test_folds[[i]][[k]]],
-                   1 - (dij[i, xgb_test_folds[[i]][[k]]] /
-                        nij[i, xgb_test_folds[[i]][[k]]])),
+        w_test = c(dij[i, xgb_test_folds[[i]][[k]]],
+                   1 - dij[i, xgb_test_folds[[i]][[k]]]),
         x_test = pu_env_data[rep(xgb_test_folds[[i]][[k]], 2), ,
                               drop = FALSE])
     })

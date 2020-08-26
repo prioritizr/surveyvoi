@@ -155,7 +155,7 @@ evdci <- function(
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
   ## validate pij values
-  validate_site_prior_data(site_data, site_probability_columns)
+  validate_site_probability_data(site_data, site_probability_columns)
   ## verify targets
   assertthat::assert_that(
     all(feature_data[[feature_target_column]] <= nrow(site_data)))

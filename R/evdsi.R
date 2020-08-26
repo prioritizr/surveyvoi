@@ -5,19 +5,7 @@
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
-#' @param site_data \code{\link[sf]{sf}} object with site data.
-#'
-#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
-#'
-#' @param site_occupancy_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain detections
-#'   and non-detections of features at each site.
-#'   Each column should correspond to a different feature, and contain
-#'   binary detection/non-detection value (zeros or ones) indicating if the
-#'   feature was detected in a previous survey or not. If a site has not
-#'   been surveyed before, then missing (\code{NA}) values should be used.
-#'   Additionally, if a feature was not looked for when surveying a specific
-#'   site, then missing (\code{NA}) value should be used.
+#' @inheritParams fit_occupancy_models
 #'
 #' @param site_probability_columns \code{character} names of \code{numeric}
 #'   columns in the argument to \code{site_data} that contain modelled
@@ -31,7 +19,7 @@
 #'  that indicates which sites are selected in the scheme or not.
 #'  No missing \code{NA} values are permitted. Additionally, only sites
 #'  that are missing data can be selected or surveying (as per the
-#'  argument to \code{site_occupancy_columns}).
+#'  argument to \code{site_detection_columns}).
 #'
 #' @param feature_survey_column \code{character} name of the column in the
 #'   argument to \code{feature_data} that contains \code{logical} (\code{TRUE} /
@@ -47,39 +35,11 @@
 #'   or greater than zero. No missing (\code{NA}) values are permitted in this
 #'   column.
 #'
-#' @param site_env_vars_columns \code{character} names of columns in the
-#'   argument to  \code{site_data} that contain environmental information
-#'   for fitting updated occupancy models based on possible survey outcomes.
-#'   Each column should correspond to a different environmental variable,
-#'   and contain \code{numeric}, \code{factor}, or \code{character} data.
-#'   No missing (\code{NA}) values are permitted in these columns.
-#'
-#' @param site_weight_columns \code{character} name of columns in
-#'  \code{site_data} containing weights for model fitting for each
-#'  feature. These columns must contain \code{numeric} values greater
-#'  than or equal to zero. No missing (\code{NA}) values are
-#'  permitted. Defaults to \code{NULL} such that all data are given
-#'  equal weight when fitting models.
-#'
 #' @param site_management_cost_column \code{character} name of column in the
 #'   argument to \code{site_data} that contains costs for managing each
 #'   site for conservation. This column should have \code{numeric} values that
 #'   are equal to or greater than zero. No missing (\code{NA}) values are
 #'   permitted in this column.
-#'
-#' @param feature_survey_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting a presence of each
-#'   feature in a given site (i.e. the sensitivity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
-#'
-#' @param feature_survey_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
-#'   probability of future surveys correctly detecting an absence of each
-#'   feature in a given site (i.e. the specificity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
 #'
 #' @param feature_model_sensitivity_column \code{character} name of the
 #'   column in the argument to \code{feature_data} that contains
@@ -190,10 +150,8 @@
 #'
 #' @export
 evdsi <- function(
-  site_data,
-  feature_data,
-  site_occupancy_columns,
-  site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns, site_probability_columns,
   site_env_vars_columns,
   site_management_cost_column,
   site_survey_scheme_column,
@@ -206,13 +164,12 @@ evdsi <- function(
   feature_target_column,
   total_budget,
   xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(100, length(site_occupancy_columns)),
-  xgb_n_rounds = rep(1000, length(site_occupancy_columns)),
-  xgb_n_folds = rep(5, length(site_occupancy_columns)),
+  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
+  xgb_n_rounds = rep(100, length(site_detection_columns)),
+  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   prior_matrix = NULL,
-  site_weight_columns = NULL,
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -222,11 +179,18 @@ evdsi <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
     ## site_probability_columns
     is.character(site_probability_columns),
     identical(nrow(feature_data), length(site_probability_columns)),
@@ -300,14 +264,14 @@ evdsi <- function(
     is.list(xgb_tuning_parameters),
     ## xgb_n_folds
     is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_occupancy_columns),
+    length(xgb_n_folds) == length(site_detection_columns),
     is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_occupancy_columns),
+    length(xgb_n_rounds) == length(site_detection_columns),
     all(xgb_n_rounds > 0),
     ## xgb_early_stopping_rounds
     is.numeric(xgb_early_stopping_rounds),
     assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_occupancy_columns),
+    length(xgb_early_stopping_rounds) == length(site_detection_columns),
     all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
@@ -346,14 +310,11 @@ evdsi <- function(
   }
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
-  ## validate rij values
-  validate_site_occupancy_data(site_data, site_occupancy_columns)
-  ## validate pij values
-  validate_site_prior_data(site_data, site_probability_columns)
-  ## validate wij values
-  if (!is.null(site_weight_columns))
-    validate_site_weight_data(site_data, site_occupancy_columns,
-      site_weight_columns)
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+  ## validate model probability values
+  validate_site_probability_data(site_data, site_probability_columns)
   ## validate xgboost tuning parameters
   validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
@@ -372,7 +333,8 @@ evdsi <- function(
   ## calculate prior matrix
   if (is.null(prior_matrix)) {
     pij <- prior_probability_matrix(
-      site_data, feature_data, site_occupancy_columns, site_probability_columns,
+      site_data, feature_data, site_detection_columns,
+      site_n_surveys_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
       feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
@@ -411,44 +373,26 @@ evdsi <- function(
     warning(paste("no objective specified for model fitting,",
                   "assuming binary:logistic"))
   }
-  ## extract site occupancy data
-  rij <- t(as.matrix(site_data[, site_occupancy_columns, drop = FALSE]))
+  ## extract site data
+  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
+  nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
+  ejx <- as.matrix(site_data[, site_env_vars_columns])
   ## identify sites that need model predictions for each feature
   pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-    which(!site_data[[site_survey_scheme_column]] & is.na(rij[i, ]))
+    which(!site_data[[site_survey_scheme_column]] & (nij[i, ] < 0.5))
   })
   ## folds for training and testing models
-  xgb_folds <- lapply(seq_len(nrow(feature_data)),
-    function(i) {
-      pu_train_idx <-
-        which(site_data[[site_survey_scheme_column]] | !is.na(rij[i, ]))
-      withr::with_seed(seed, {
-        create_folds(unname(rij[i, pu_train_idx]),
-                     n = xgb_n_folds[i],
-                     index = pu_train_idx,
-                     na.fail = FALSE, seed = seed)
-      })
+  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
+    has_data_idx <- which(
+      (nij[i, ] > 0.5) | site_data[[site_survey_scheme_column]])
+    create_site_folds(
+      dij[i, has_data_idx], nij[i, has_data_idx],
+      index = has_data_idx, xgb_n_folds[i], seed = seed)
   })
-  ## extract environmental data
-  ejx <- as.matrix(site_data[, site_env_vars_columns])
-  ## prepare rij matrix for Rcpp
-  rij[is.na(rij)] <- -1
-
-  # prepare model weights
-  ## initialize weights
-  if (!is.null(site_weight_columns)) {
-    ## extract user-specified weights
-    wij <- t(as.matrix(site_data[, site_weight_columns]))
-  } else {
-    ## set weights based on if data are missing or not
-    wij <- t(as.matrix(site_data[, site_occupancy_columns]))
-    wij[] <- as.numeric(!is.na(wij))
-  }
-
   # main calculation
   withr::with_seed(seed, {
     out <- rcpp_expected_value_of_decision_given_survey_scheme(
-      rij = rij, pij = pij, wij = wij,
+      dij = dij, nij = nij, pij = pij,
       survey_features = feature_data[[feature_survey_column]],
       survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
       survey_specificity = feature_data[[feature_survey_specificity_column]],

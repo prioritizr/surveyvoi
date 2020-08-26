@@ -217,9 +217,13 @@ void extract_k_fold_train_w_data_from_indices(
       n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
       for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
         out[i][j][k] = static_cast<float>(
-          x(survey_features_idx[i], idx[survey_features_idx[i]][j][k]));
-        out[i][j][k + n_pu_in_species_fold] = 1.0f - out[i][j][k];
+          100.0 * x(survey_features_idx[i], idx[survey_features_idx[i]][j][k]));
+        out[i][j][k + n_pu_in_species_fold] = static_cast<float>(
+          100.0 * (1.0 - x(survey_features_idx[i],
+                           idx[survey_features_idx[i]][j][k])));
+
       }
+
     }
   }
   // return void
@@ -234,8 +238,6 @@ void extract_k_fold_test_w_data_from_indices(
   std::vector<std::vector<Eigen::VectorXf>> &out) {
   // preallocate output
   std::size_t n_pu_in_species_fold;
-  double curr_det;
-  double curr_total;
   out.resize(survey_features_idx.size());
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
     out[i].resize(idx[survey_features_idx[i]].size());
@@ -247,13 +249,12 @@ void extract_k_fold_test_w_data_from_indices(
   for (std::size_t i = 0; i < survey_features_idx.size(); ++i) {
     for (std::size_t j = 0; j < idx[survey_features_idx[i]].size(); ++j) {
       n_pu_in_species_fold = idx[survey_features_idx[i]][j].size();
+      // copy data
       for (std::size_t k = 0; k < n_pu_in_species_fold; ++k) {
-        curr_det =
-          dij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]);
-        curr_total =
-          nij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]);
-        out[i][j][k] = static_cast<float>(curr_det / curr_total);
-        out[i][j][k + n_pu_in_species_fold] = 1.0f - out[i][j][k];
+        out[i][j][k] = static_cast<float>(
+          dij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]));
+        out[i][j][k + n_pu_in_species_fold] = static_cast<float>(
+          1.0 - dij(survey_features_idx[i], idx[survey_features_idx[i]][j][k]));
       }
     }
   }
@@ -292,15 +293,22 @@ void extract_k_fold_x_data_from_indices(
 
 void initialize_DMatrixHandle(
   Eigen::VectorXf &y, Eigen::VectorXf &w, MatrixXfRM &x, DMatrixHandle &h) {
-  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -1.0f, &h);
+  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -99999.0f, &h);
   XGDMatrixSetFloatInfo(h, "label", y.data(), y.size());
   XGDMatrixSetFloatInfo(h, "weight", w.data(), w.size());
- return;
+  return;
+}
+
+void initialize_DMatrixHandle(
+  Eigen::VectorXf &w, MatrixXfRM &x, DMatrixHandle &h) {
+  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -99999.0f, &h);
+  XGDMatrixSetFloatInfo(h, "weight", w.data(), w.size());
+  return;
 }
 
 void initialize_DMatrixHandle(
   MatrixXfRM &x, DMatrixHandle &h) {
-  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -1.0f, &h);
+  XGDMatrixCreateFromMat((float *) x.data(), x.rows(), x.cols(), -99999.0f, &h);
  return;
 }
 

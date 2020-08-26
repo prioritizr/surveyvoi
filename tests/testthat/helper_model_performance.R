@@ -106,6 +106,9 @@ r_model_performance <- function(
       sum(wts[(actual < 0.5) & (predicted >= 0.5)]),
       sum(wts[(actual < 0.5) & (predicted < 0.5)])),
     nrow = 2, ncol = 2)
+  # if no predicted presences or absences then report random performance
+  if ((cmx[1, 1] < 1e-3) || (cmx[2, 2] < 1e-3))
+    return(c(tss = 0, sensitivity = 0.5, specificity = 0.5))
   # calculate parameter estimates
   if (method %in% c("formula", "auto")) {
     est <- r_formula_sensitivity_and_specificity(

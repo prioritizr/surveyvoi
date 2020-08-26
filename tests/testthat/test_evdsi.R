@@ -1,60 +1,64 @@
 context("evdsi")
 
-test_that("equal weights", {
+test_that("single species", {
   # data
-  RandomFields::RFoptions(seed = 501)
-  set.seed(500)
-  n_f <- 2
-  n_sites <- 30
-  site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(15, 15)
-  total_budget <- sum(site_data$management_cost * 0.9)
+  ## set seeds
+  set.seed(123)
+  RandomFields::RFoptions(seed = 123)
+  ## set constants
+  n_f <- 1
+  n_sites <- 20
+  n_folds <- 2
+  n_vars <- 3
+  seed <- 123
+  ## simulate data
+  site_data <- simulate_site_data(n_sites, n_f, 0.5, n_vars)
+  feature_data <- simulate_feature_data(n_f)
+  feature_data$target <- rep(11, n_f)
+  total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
-  site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  site_data$w1 <- 1
-  site_data$w2 <- 1
-  xgb_n_folds <- rep(5, n_f)
-  # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
-  site_env_columns <- c("e1", "e2", "e3")
-  site_wgt_columns <- c("w1", "w2")
-  rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
+  site_data$survey[which(site_data$f1 < 0.5)[1:2]] <- TRUE
+  ## create matrices for data
+  site_data2 <- sf::st_drop_geometry(site_data)
+  dij <- t(as.matrix(site_data2[, paste0("f", seq_len(n_f))], ncol = n_f))
+  nij <- t(as.matrix(site_data2[, paste0("n", seq_len(n_f))], ncol = n_f))
   pij <- prior_probability_matrix(
-    site_data, feature_data, site_occ_columns, site_prb_columns,
+    site_data, feature_data,
+    paste0("f", seq_len(n_f)),
+    paste0("n", seq_len(n_f)), paste0("p", seq_len(n_f)),
     "survey_sensitivity", "survey_specificity",
     "model_sensitivity", "model_specificity")
-  wij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_wgt_columns])))
-  ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
-  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-    which(!site_data$survey & is.na(rij[i, ]))
+  ## specify environmental data
+  pu_env_data <- as.matrix(site_data2[, paste0("e", seq_len(n_vars))])
+  ## specify planning units for predictions
+  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
+    which((nij[i, ]) < 0.5 & (!site_data$survey))
   })
-  # prepare xgboost inputs
-  xgb_tuning_parameters <-
-    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
-  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
-  attr(xgb_full_parameters, "out.attrs") <- NULL
-  xgb_full_parameters$seed <- as.character(1) # set seed
-  ## folds for training and testing models
-  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
-    pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
-    withr::with_seed(seed,
-      create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
-                   index = pu_train_idx,
-                   na.fail = FALSE,
-                   seed = 1))
+  ## model fitting parameters
+  xgb_folds <- lapply(seq_len(n_f), function(f) {
+    fn <- paste0("f", f)
+    nn <- paste0("n", f)
+    has_data_idx <- which((site_data[[nn]] > 0.5) | site_data$survey)
+    create_site_folds(
+      site_data[[fn]][has_data_idx], site_data[[nn]][has_data_idx],
+      index = has_data_idx, n_folds, seed = seed)
   })
-  ## set NA rij values to -1
-  rij[is.na(rij)] <- -1
+  xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
+  xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
+  xgb_nrounds <- rep(10, n_f)
+  xgb_early_stopping_rounds <- rep(5, n_f)
+  xgb_tuning_parameters <- list(
+    eta = c(0.1), lambda = c(0.001), objective = "binary:logistic")
+  tuning_parameters <- as.matrix(do.call(expand.grid, xgb_tuning_parameters))
+  tuning_parameters <- cbind(tuning_parameters, c("seed" = as.character(seed)))
   # calculations
   r1 <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
-    site_occupancy_columns = site_occ_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_weight_columns = site_wgt_columns,
+    site_detection_columns = paste0("f", seq_len(n_f)),
+    site_n_surveys_columns = paste0("n", seq_len(n_f)),
+    site_probability_columns = paste0("p", seq_len(n_f)),
+    site_env_vars_columns = paste0("e", seq_len(n_vars)),
     site_survey_scheme_column = "survey",
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
@@ -66,26 +70,26 @@ test_that("equal weights", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_tuning_parameters = xgb_tuning_parameters,
-    xgb_early_stopping_rounds = rep(5, n_f),
-    xgb_n_rounds = rep(10, n_f),
-    xgb_n_folds = xgb_n_folds,
-    seed = 1)
+    xgb_n_rounds = rep(2, n_f),
+    xgb_early_stopping_rounds = rep(1, n_f),
+    xgb_n_folds = rep(n_folds, n_f),
+    seed = seed)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
-    rij = rij, pij = pij, wij = wij,
+    dij = dij, nij = nij, pij = pij,
     survey_features = feature_data$survey,
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_model_prediction = pu_model_prediction,
-    pu_survey_costs = site_data$survey_cost,
+    pu_model_prediction = pu_model_prediction_idx,
+    pu_survey_costs  = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
-    pu_env_data = ejx,
-    xgb_parameter_names = names(xgb_full_parameters),
-    xgb_parameter_values = as.matrix(xgb_full_parameters),
-    n_xgb_rounds = rep(10, n_f),
-    n_xgb_early_stopping_rounds = rep(5, n_f),
+    pu_env_data = pu_env_data,
+    xgb_parameter_names = colnames(tuning_parameters),
+    xgb_parameter_values = tuning_parameters,
+    n_xgb_rounds = rep(2, n_f),
+    n_xgb_early_stopping_rounds = rep(1, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
@@ -94,61 +98,63 @@ test_that("equal weights", {
   expect_equal(r1, r2)
 })
 
-test_that("variable weights", {
+test_that("multiple species", {
   # data
-  RandomFields::RFoptions(seed = 501)
-  set.seed(500)
-  n_f <- 2
-  n_sites <- 30
-  site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(15, 15)
-  total_budget <- sum(site_data$management_cost * 0.9)
+  ## set seeds
+  set.seed(123)
+  RandomFields::RFoptions(seed = 123)
+  ## set constants
+  n_f <- 4
+  n_sites <- 20
+  n_folds <- 2
+  n_vars <- 3
+  seed <- 123
+  ## simulate data
+  site_data <- simulate_site_data(n_sites, n_f, 0.5, n_vars)
+  feature_data <- simulate_feature_data(n_f)
+  feature_data$target <- rep(4, n_f)
+  total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
-  site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  site_data$w1 <- runif(nrow(site_data)) + 1
-  site_data$w2 <- runif(nrow(site_data)) + 1
-  xgb_n_folds <- rep(5, n_f)
-  # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
-  site_env_columns <- c("e1", "e2", "e3")
-  site_wgt_columns <- c("w1", "w2")
-  rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
+  site_data$survey[which(site_data$f1 < 0.5)[1:2]] <- TRUE
+  ## create matrices for data
+  site_data2 <- sf::st_drop_geometry(site_data)
+  dij <- t(as.matrix(site_data2[, paste0("f", seq_len(n_f))], ncol = n_f))
+  nij <- t(as.matrix(site_data2[, paste0("n", seq_len(n_f))], ncol = n_f))
   pij <- prior_probability_matrix(
-    site_data, feature_data, site_occ_columns, site_prb_columns,
+    site_data, feature_data,
+    paste0("f", seq_len(n_f)),
+    paste0("n", seq_len(n_f)), paste0("p", seq_len(n_f)),
     "survey_sensitivity", "survey_specificity",
     "model_sensitivity", "model_specificity")
-  wij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_wgt_columns])))
-  ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
-  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-    which(!site_data$survey & is.na(rij[i, ]))
+  ## specify environmental data
+  pu_env_data <- as.matrix(site_data2[, paste0("e", seq_len(n_vars))])
+  ## specify planning units for predictions
+  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
+    which((nij[i, ]) < 0.5 & (!site_data$survey))
   })
-  # prepare xgboost inputs
-  xgb_tuning_parameters <-
-    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
-  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
-  attr(xgb_full_parameters, "out.attrs") <- NULL
-  xgb_full_parameters$seed <- as.character(1) # set seed
-  ## folds for training and testing models
-  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
-    pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
-    withr::with_seed(seed,
-      create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
-                   index = pu_train_idx,
-                   na.fail = FALSE,
-                   seed = 1))
+  ## model fitting parameters
+  xgb_folds <- lapply(seq_len(n_f), function(f) {
+    fn <- paste0("f", f)
+    nn <- paste0("n", f)
+    has_data_idx <- which((site_data[[nn]] > 0.5) | site_data$survey)
+    create_site_folds(
+      site_data[[fn]][has_data_idx], site_data[[nn]][has_data_idx],
+      index = has_data_idx, n_folds, seed = seed)
   })
-  ## set NA rij values to -1
-  rij[is.na(rij)] <- -1
+  xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
+  xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
+  xgb_tuning_parameters <- list(
+    eta = c(0.1), lambda = c(0.001), objective = "binary:logistic")
+  tuning_parameters <- as.matrix(do.call(expand.grid, xgb_tuning_parameters))
+  tuning_parameters <- cbind(tuning_parameters, c("seed" = as.character(seed)))
   # calculations
   r1 <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
-    site_occupancy_columns = site_occ_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_weight_columns = site_wgt_columns,
+    site_detection_columns = paste0("f", seq_len(n_f)),
+    site_n_surveys_columns = paste0("n", seq_len(n_f)),
+    site_probability_columns = paste0("p", seq_len(n_f)),
+    site_env_vars_columns = paste0("e", seq_len(n_vars)),
     site_survey_scheme_column = "survey",
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
@@ -160,26 +166,26 @@ test_that("variable weights", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_tuning_parameters = xgb_tuning_parameters,
-    xgb_early_stopping_rounds = rep(5, n_f),
-    xgb_n_rounds = rep(10, n_f),
-    xgb_n_folds = xgb_n_folds,
-    seed = 1)
+    xgb_n_rounds = rep(2, n_f),
+    xgb_early_stopping_rounds = rep(1, n_f),
+    xgb_n_folds = rep(n_folds, n_f),
+    seed = seed)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
-    rij = rij, pij = pij, wij = wij,
+    dij = dij, nij = nij, pij = pij,
     survey_features = feature_data$survey,
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_model_prediction = pu_model_prediction,
-    pu_survey_costs = site_data$survey_cost,
+    pu_model_prediction = pu_model_prediction_idx,
+    pu_survey_costs  = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
-    pu_env_data = ejx,
-    xgb_parameter_names = names(xgb_full_parameters),
-    xgb_parameter_values = as.matrix(xgb_full_parameters),
-    n_xgb_rounds = rep(10, n_f),
-    n_xgb_early_stopping_rounds = rep(5, n_f),
+    pu_env_data = pu_env_data,
+    xgb_parameter_names = colnames(tuning_parameters),
+    xgb_parameter_values = tuning_parameters,
+    n_xgb_rounds = rep(2, n_f),
+    n_xgb_early_stopping_rounds = rep(1, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,
@@ -188,67 +194,73 @@ test_that("variable weights", {
   expect_equal(r1, r2)
 })
 
-test_that("sparse", {
+test_that("multiple species (sparse)", {
   # data
-  RandomFields::RFoptions(seed = 501)
-  set.seed(500)
-  n_f <- 2
-  n_sites <- 30
-  site_data <- simulate_site_data(n_sites, n_f, 0.5)
-  feature_data <- simulate_feature_data(n_f, 0.5)
-  feature_data$target <- c(15, 15)
-  total_budget <- sum(site_data$management_cost * 0.9)
+  ## set seeds
+  set.seed(123)
+  RandomFields::RFoptions(seed = 123)
+  ## set constants
+  n_f <- 4
+  n_sites <- 20
+  n_folds <- 2
+  n_vars <- 3
+  seed <- 123
+  ## simulate data
+  site_data <- simulate_site_data(n_sites, n_f, 0.5, n_vars)
+  feature_data <- simulate_feature_data(n_f)
+  feature_data$target <- rep(4, n_f)
+  total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
-  site_data$survey[which(is.na(site_data$f1))[1:2]] <- TRUE
-  site_data$w1 <- runif(nrow(site_data)) + 1
-  site_data$w2 <- runif(nrow(site_data)) + 1
-  xgb_n_folds <- rep(5, n_f)
-  # randomly add sparsity to survey data
-  for (i in paste0("f", seq_len(n_f))) {
-    na_idx <- which(is.na(site_data[[i]]))
-    idx <- sample(na_idx, ceiling(length(na_idx) * 0.5))
-    site_data[[i]][idx] <- round(runif(length(idx)))
+  site_data$survey[which(site_data$f1 < 0.5)[1:2]] <- TRUE
+  # randomly set sites to hvae 0 surveys for certain species
+  for (i in seq_len(n_f)) {
+    fn <- paste0("f", i)
+    nn <- paste0("n", i)
+    non_zero <- which(site_data[[fn]] > 0)
+    idx <- sample(non_zero, ceiling(length(non_zero) * 0.25))
+    site_data[[fn]][idx] <- 0
+    site_data[[nn]][idx] <- 0
+    expect_gt(sum(site_data[[fn]]), 0)
   }
-  # prepare data
-  site_occ_columns <- c("f1", "f2")
-  site_prb_columns <- c("p1", "p2")
-  site_env_columns <- c("e1", "e2", "e3")
-  site_wgt_columns <- c("w1", "w2")
-  rij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_occ_columns])))
+  ## create matrices for data
+  site_data2 <- sf::st_drop_geometry(site_data)
+  dij <- t(as.matrix(site_data2[, paste0("f", seq_len(n_f))], ncol = n_f))
+  nij <- t(as.matrix(site_data2[, paste0("n", seq_len(n_f))], ncol = n_f))
   pij <- prior_probability_matrix(
-    site_data, feature_data, site_occ_columns, site_prb_columns,
+    site_data, feature_data,
+    paste0("f", seq_len(n_f)),
+    paste0("n", seq_len(n_f)), paste0("p", seq_len(n_f)),
     "survey_sensitivity", "survey_specificity",
     "model_sensitivity", "model_specificity")
-  wij <- t(as.matrix(sf::st_drop_geometry(site_data[, site_wgt_columns])))
-  ejx <- as.matrix(sf::st_drop_geometry(site_data[, site_env_columns]))
-  pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-    which(!site_data$survey & is.na(rij[i, ]))
+  ## specify environmental data
+  pu_env_data <- as.matrix(site_data2[, paste0("e", seq_len(n_vars))])
+  ## specify planning units for predictions
+  pu_model_prediction_idx <- lapply(seq_len(n_f), function(i) {
+    which((nij[i, ]) < 0.5 & (!site_data$survey))
   })
-  # prepare xgboost inputs
-  xgb_tuning_parameters <-
-    list(objective = "binary:logistic", lambda = c(0.01, 0.1, 0.5))
-  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
-  attr(xgb_full_parameters, "out.attrs") <- NULL
-  xgb_full_parameters$seed <- as.character(1) # set seed
-  ## folds for training and testing models
-  xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
-    pu_train_idx <- which(site_data$survey | !is.na(rij[i, ]))
-    withr::with_seed(seed,
-      create_folds(unname(rij[i, pu_train_idx]), xgb_n_folds[i],
-                   index = pu_train_idx,
-                   na.fail = FALSE,
-                   seed = 1))
+  ## model fitting parameters
+  xgb_folds <- lapply(seq_len(n_f), function(f) {
+    fn <- paste0("f", f)
+    nn <- paste0("n", f)
+    has_data_idx <- which((site_data[[nn]] > 0.5) | site_data$survey)
+    create_site_folds(
+      site_data[[fn]][has_data_idx], site_data[[nn]][has_data_idx],
+      index = has_data_idx, n_folds, seed = seed)
   })
-  ## set NA rij values to -1
-  rij[is.na(rij)] <- -1
+  xgb_train_folds <- lapply(xgb_folds, `[[`, "train")
+  xgb_test_folds <- lapply(xgb_folds, `[[`, "test")
+  xgb_tuning_parameters <- list(
+    eta = c(0.1), lambda = c(0.001), objective = "binary:logistic")
+  tuning_parameters <- as.matrix(do.call(expand.grid, xgb_tuning_parameters))
+  tuning_parameters <- cbind(tuning_parameters, c("seed" = as.character(seed)))
   # calculations
   r1 <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
-    site_occupancy_columns = site_occ_columns,
-    site_probability_columns = site_prb_columns,
-    site_env_vars_columns = site_env_columns,
-    site_weight_columns = site_wgt_columns,
+    site_detection_columns = paste0("f", seq_len(n_f)),
+    site_n_surveys_columns = paste0("n", seq_len(n_f)),
+    site_probability_columns = paste0("p", seq_len(n_f)),
+    site_env_vars_columns = paste0("e", seq_len(n_vars)),
     site_survey_scheme_column = "survey",
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
@@ -260,26 +272,26 @@ test_that("sparse", {
     feature_target_column = "target",
     total_budget = total_budget,
     xgb_tuning_parameters = xgb_tuning_parameters,
-    xgb_early_stopping_rounds = rep(5, n_f),
-    xgb_n_rounds = rep(10, n_f),
-    xgb_n_folds = xgb_n_folds,
-    seed = 1)
+    xgb_n_rounds = rep(2, n_f),
+    xgb_early_stopping_rounds = rep(1, n_f),
+    xgb_n_folds = rep(n_folds, n_f),
+    seed = seed)
   r2 <- r_expected_value_of_decision_given_survey_scheme(
-    rij = rij, pij = pij, wij = wij,
+    dij = dij, nij = nij, pij = pij,
     survey_features = feature_data$survey,
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_model_prediction = pu_model_prediction,
-    pu_survey_costs = site_data$survey_cost,
+    pu_model_prediction = pu_model_prediction_idx,
+    pu_survey_costs  = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
-    pu_env_data = ejx,
-    xgb_parameter_names = names(xgb_full_parameters),
-    xgb_parameter_values = as.matrix(xgb_full_parameters),
-    n_xgb_rounds = rep(10, n_f),
-    n_xgb_early_stopping_rounds = rep(5, n_f),
+    pu_env_data = pu_env_data,
+    xgb_parameter_names = colnames(tuning_parameters),
+    xgb_parameter_values = tuning_parameters,
+    n_xgb_rounds = rep(2, n_f),
+    n_xgb_early_stopping_rounds = rep(1, n_f),
     xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
     xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
     obj_fun_target = feature_data$target,

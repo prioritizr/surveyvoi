@@ -60,7 +60,8 @@ validate_site_n_surveys_data <- function(site_data, column_names) {
   invisible(TRUE)
 }
 
-validate_site_prior_data <- function(site_data, site_probability_columns) {
+validate_site_probability_data <- function(
+  site_data, site_probability_columns) {
   assertthat::assert_that(
     all(sapply(site_probability_columns,
                function(x) is.numeric(site_data[[x]]))),
@@ -80,7 +81,7 @@ validate_site_prior_data <- function(site_data, site_probability_columns) {
 
 validate_prior_data <- function(prior_matrix, n_sites, n_features) {
   assertthat::assert_that(
-    is.matrix(prior_matrix), is.numeric(prior_matrix),
+    is.matrix(prior_matrix), is.numeric(c(prior_matrix)),
     all(is.finite(c(prior_matrix)),
     all(prior_matrix > 0), all(prior_matrix < 1)),
     identical(ncol(prior_matrix), n_sites),

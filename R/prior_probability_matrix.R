@@ -117,10 +117,10 @@ prior_probability_matrix <- function(
           prior = 0.5, clamp = FALSE)
       } else if (pij[i, j] >= 0.5) {
         ### calculate values if no data available, and model predicts presence
-        prior[i, j] <- feature_data[[feature_survey_sensitivity_column]][i]
+        prior[i, j] <- feature_data[[feature_model_sensitivity_column]][i]
       } else {
         ### calculate values if no data available, and model predicts absence
-        prior[i, j] <- 1 - feature_data[[feature_survey_specificity_column]][i]
+        prior[i, j] <- 1 - feature_data[[feature_model_specificity_column]][i]
       }
     }
   }
