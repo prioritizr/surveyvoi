@@ -132,9 +132,55 @@ r_expected_value_of_decision_given_survey_scheme <- function(
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
       obj_fun_target, remaining_budget)$x
 
-    ## calculate expected value of the prioritisation
-    curr_value <- log(r_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_target))
+    ## iterate over each combination of different species,
+    ## and calculate the probability that different models are correct
+    curr_value <- Inf
+    n_spp_states <- n_states(n_f_survey, 1) -1
+    ss <- matrix(0, ncol = 1, nrow = n_f_survey)
+    ss_idx <- seq_along(c(ss))
+    print("new outcome")
+    for (s in seq(0, n_spp_states)) {
+      ## generate state
+      curr_ss <- rcpp_nth_state_sparse(s, ss_idx, ss)
+      print(" s'th state")
+      print(curr_ss)
+      ## calculate probability of set of models being correct and not correct
+      curr_total_probability_of_model_state <-
+        sum(log(c(curr_models_sens * c(curr_ss >= 0.5)) +
+                c((1 - curr_models_sens) * c(curr_ss < 0.5))))
+      ## identify indices in rij matrix that need to be flipped
+      mij_idx <- c()
+      counter2 <- 0
+      for (j in seq_len(n_pu)) {
+        for (i in seq_len(n_f)) {
+          if ((survey_features[i] > 0.5) &&
+              (pu_survey_solution[j] < 0.5) &&
+              (nij[i, j] < 0.5) &&
+              (curr_ss[i] < 0.5)) {
+            mij_idx <- c(mij_idx, counter2)
+          }
+          counter2 <- counter2 + 1
+        }
+      }
+      ## update probabilities for models which are incorrect
+      curr_postij_spp <- curr_postij
+      curr_postij_spp[mij_idx] <- 1 - curr_postij_spp[mij_idx]
+      print("curr_postij_spp")
+      print(curr_postij_spp)
+      ## calculate expected value of the prioritisation
+      curr_spp_value <- log(r_expected_value_of_action(
+        curr_solution, curr_postij_spp, obj_fun_target))
+      curr_spp_prob <- curr_total_probability_of_model_state
+      ## calculate expected value of the action given model state
+      print(exp(c(curr_spp_value, curr_spp_prob)))
+
+
+      if (!is.finite(curr_value)) {
+        curr_value <- curr_spp_value + curr_spp_prob
+      } else {
+        curr_value <- log_sum(curr_value, curr_spp_value + curr_spp_prob)
+      }
+    }
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(

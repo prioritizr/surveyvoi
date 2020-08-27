@@ -110,8 +110,11 @@ double expected_value_of_decision_given_survey_scheme(
 
   /// declare temporary variables used in the main loop
   std::size_t curr_n_folds;
+  std::size_t curr_idx;
   double curr_expected_value_of_action_given_outcome;
+  double curr_probability_of_model_outcome;
   double curr_probability_of_outcome;
+  double curr_expected_value_of_action_given_model_outcome;
   double curr_expected_value_of_decision =
     std::numeric_limits<double>::infinity();
   Eigen::MatrixXd curr_oij = pij;
@@ -121,6 +124,8 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd curr_nij = nij;
   Eigen::MatrixXd curr_total_probability_of_model_positive(n_f_survey, n_pu);
   Eigen::MatrixXd curr_total_probability_of_model_negative(n_f_survey, n_pu);
+  Eigen::MatrixXd curr_total_probability_of_model_positive_log;
+  Eigen::MatrixXd curr_total_probability_of_model_negative_log;
   std::vector<bool> curr_solution(n_pu);
   std::vector<mpz_class> feature_outcome_idx(n_f_survey);
   model_yhat_map model_yhat;
@@ -128,6 +133,8 @@ double expected_value_of_decision_given_survey_scheme(
   model_performance.reserve(n_f_survey * 1000);
   Eigen::VectorXd curr_model_sensitivity(n_f_survey);
   Eigen::VectorXd curr_model_specificity(n_f_survey);
+  std::vector<std::size_t> curr_model_rij_idx;
+  mpz_class n_model_outcomes;
 
   // preliminary processing
   /// create subset of prior matrix for just the species that need surveys
@@ -209,10 +216,24 @@ double expected_value_of_decision_given_survey_scheme(
 
   // main processing
   mpz_class o = 0;
+  mpz_class oo;
   while (cmp(o, n_outcomes) < 0) {
+
+    print(wrap("new survey outcome"));
+
     /// generate the o'th outcome from surveying the planning units across
     /// all species
     nth_state_sparse(o, rij_outcome_idx, curr_oij);
+
+
+     print(wrap("  curr_oij"));
+     print(wrap(curr_oij));
+
+
+    /// calculate likelihood of outcome
+    curr_probability_of_outcome = log_probability_of_outcome(
+      curr_oij, total_probability_of_survey_positive_log,
+      total_probability_of_survey_negative_log, rij_outcome_idx);
 
     // find out the outcome for each feature seperately
     which_feature_state(curr_oij, survey_features_idx, pu_survey_solution_idx,
@@ -275,17 +296,23 @@ double expected_value_of_decision_given_survey_scheme(
     assert_valid_probability_data(curr_total_probability_of_model_negative,
                                   "issue calculating total model negatives");
 
-
-    print(wrap("new outcome"));
-    
-    print(wrap("curr_oij"));
-    print(wrap(curr_oij));
-
-    /// add updated model results to posterior matrix
-    update_model_posterior_probabilities(
-      nij, pij, curr_oij,
+    /// find idices in the rij matrix that use model esimtates
+    find_rij_idx_based_on_models(
+      nij,
       pu_survey_solution,
       survey_features, survey_features_rev_idx,
+      survey_sensitivity, survey_specificity,
+      curr_model_sensitivity, curr_model_specificity,
+      curr_model_rij_idx);
+
+    print(wrap("curr_model_rij_idx"));
+    print(wrap(curr_model_rij_idx));
+
+    /// create posterior matrix with most likely model outcomes
+    update_model_posterior_probabilities(
+      curr_model_rij_idx,
+      pij, curr_oij,
+      survey_features_rev_idx,
       curr_model_sensitivity, curr_model_specificity,
       curr_total_probability_of_model_positive,
       curr_total_probability_of_model_negative,
@@ -293,25 +320,94 @@ double expected_value_of_decision_given_survey_scheme(
       assert_valid_probability_data(
       curr_pij, "issue calculating posterior probabilities");
 
-    /// generate prioritisation
+    /// generate prioritisation using the most likely model outcomes
     greedy_heuristic_prioritization(
       curr_pij, pu_purchase_costs, pu_purchase_locked_in,
       pu_purchase_locked_out, obj_fun_target, remaining_budget, curr_solution);
 
-    print(wrap("curr_pij"));
-    print(wrap(curr_pij));
+    /// caclualate expected value of prioritisation given survey outcome
+    if (curr_model_rij_idx.size() == 0) {
+      /// if no modelled probabilities are being used in the prioritisation,
+      /// then calculate the expected value using posterior with the
+      /// the given survey outcome
+      curr_expected_value_of_action_given_outcome =
+        std::log(expected_value_of_action(
+          curr_solution, curr_pij,  obj_fun_target));
+    } else {
+      /// calculate total number of possible model outcomes
+      n_states(curr_model_rij_idx.size(), n_model_outcomes);
+      n_model_outcomes = n_model_outcomes + 1; // increment to include final
 
-    /// calculate expected value of the prioritisation
-    curr_expected_value_of_action_given_outcome =
-      std::log(expected_value_of_action(
-        curr_solution, curr_pij,  obj_fun_target));
+      /// calculate log of model total probabilities
+      curr_total_probability_of_model_positive_log =
+        curr_total_probability_of_model_positive;
+      log_matrix(curr_total_probability_of_model_positive_log);
+      curr_total_probability_of_model_negative_log =
+        curr_total_probability_of_model_negative;
+      log_matrix(curr_total_probability_of_model_negative_log);
 
-    /// calculate likelihood of outcome
-    curr_probability_of_outcome = log_probability_of_outcome(
-      curr_oij, total_probability_of_survey_positive_log,
-      total_probability_of_survey_negative_log, rij_outcome_idx);
+      /// iterate over each model outcome
+      oo = 0;
+      curr_expected_value_of_action_given_outcome =
+        std::numeric_limits<double>::infinity();
+      while (cmp(oo, n_model_outcomes) < 0) {
 
-    Rcout << "(value, prob) = " << std::exp(curr_expected_value_of_action_given_outcome) << " " << std::exp(curr_probability_of_outcome) << std::endl;
+        print(wrap("  new model outcome"));
+
+
+        /// generate oo'th model outcome
+        nth_state_sparse(oo, curr_model_rij_idx, curr_pij);
+
+         print(wrap("    curr_pij (model outcome)"));
+         print(wrap(curr_pij));
+
+        /// calculate likelihood of model outcome
+        curr_probability_of_model_outcome =
+          log_probability_of_model_outcome(
+            curr_pij, survey_features_rev_idx,
+            curr_total_probability_of_model_positive_log,
+            curr_total_probability_of_model_negative_log,
+            curr_model_rij_idx);
+
+        print(wrap("exp(curr_probability_of_model_outcome))"));
+        print(wrap(std::exp(curr_probability_of_model_outcome)));
+
+        /// generate posterior probability given model outcome
+        update_model_posterior_probabilities(
+          curr_model_rij_idx,
+          pij, curr_pij,
+          survey_features_rev_idx,
+          curr_model_sensitivity, curr_model_specificity,
+          curr_total_probability_of_model_positive,
+          curr_total_probability_of_model_negative,
+          curr_pij);
+          assert_valid_probability_data(
+          curr_pij, "issue calculating posterior probabilities");
+
+         print(wrap("    curr_pij (updated with posterior)"));
+         print(wrap(curr_pij));
+
+        /// calculate expected value of action given model outcome
+        curr_expected_value_of_action_given_model_outcome =
+          std::log(expected_value_of_action(
+            curr_solution, curr_pij, obj_fun_target));
+
+        /// add conditional value to the runing total across all model outcomes
+        if (std::isinf(curr_expected_value_of_action_given_outcome)) {
+          curr_expected_value_of_action_given_outcome =
+            curr_expected_value_of_action_given_model_outcome +
+            curr_probability_of_model_outcome;
+        } else {
+          curr_expected_value_of_action_given_outcome =
+            log_sum(curr_expected_value_of_action_given_outcome,
+                    curr_expected_value_of_action_given_model_outcome +
+                    curr_probability_of_model_outcome);
+        }
+
+        // increment model outcome counter
+        oo = oo + 1;
+      }
+    }
 
     /// calculate expected value of action
     if (std::isinf(curr_expected_value_of_decision)) {

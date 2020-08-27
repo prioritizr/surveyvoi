@@ -77,6 +77,33 @@ double log_probability_of_outcome(
   return out;
 }
 
+double log_probability_of_model_outcome(
+  Eigen::MatrixXd &oij,
+  std::vector<std::size_t> &survey_features_rev_idx,
+  Eigen::MatrixXd &total_probability_of_model_positive_log,
+  Eigen::MatrixXd &total_probability_of_model_negative_log,
+  std::vector<std::size_t> &idx) {
+  // init
+  double out = 0.0;
+  const std::size_t n_pu = oij.cols();
+  std::size_t i, j, ii, sub_i;
+  // main
+  for (auto itr = idx.cbegin(); itr != idx.cend(); ++itr) {
+    // determine species and planning unit indices from rij index
+    ii = *itr;
+    i = ii / n_pu;
+    j = ii - (i * n_pu);
+    // determine species reverse lookup id from species index
+    sub_i = survey_features_rev_idx[i];
+    // add probabilities
+    out +=
+      (oij(ii) * total_probability_of_model_positive_log(sub_i, j)) +
+      ((1.0 - oij(ii)) * total_probability_of_model_negative_log(sub_i, j));
+  }
+  // return void
+  return out;
+}
+
 double log_probability_of_state(
   Eigen::MatrixXd &sij,
   Eigen::MatrixXd &pij_log,

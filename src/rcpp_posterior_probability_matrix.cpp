@@ -62,12 +62,45 @@ void initialize_posterior_probability_matrix(
   return;
 }
 
-void update_model_posterior_probabilities(
+void find_rij_idx_based_on_models(
   Eigen::MatrixXd &nij, // number of existing survey data
-  Eigen::MatrixXd &pij, // prior prob data
-  Eigen::MatrixXd &oij, // outcome & modelled prediction data
   std::vector<bool> &pu_survey_solution, // is the planning unit being surveyed?
   std::vector<bool> &survey_features, // is the feature being surveyed?
+  std::vector<std::size_t> &survey_features_rev_idx,
+  Eigen::VectorXd &survey_sensitivity,
+  Eigen::VectorXd &survey_specificity,
+  Eigen::VectorXd &model_sensitivity,
+  Eigen::VectorXd &model_specificity,
+  std::vector<std::size_t> &out) {
+  // initialization
+  const std::size_t n_pu = nij.cols();
+  const std::size_t n_f = nij.rows();
+  std::size_t counter = 0;
+  out.clear();
+  out.reserve(
+    std::accumulate(survey_features.begin(), survey_features.end(), 0) * n_pu);
+
+  // determine which planning units will use modelled probabilities
+  for (std::size_t j = 0; j < n_pu; ++j) {
+    for (std::size_t i = 0; i < n_f; ++i) {
+      if ((nij(i, j) < 0.5) &&
+          (survey_features[i]) &&
+          (!pu_survey_solution[j])) {
+        out.push_back(counter);
+      }
+      ++counter;
+    }
+  }
+
+  // return void
+  out.shrink_to_fit();
+  return;
+}
+
+void update_model_posterior_probabilities(
+  std::vector<std::size_t> &rij_idx, // indices for model updates
+  Eigen::MatrixXd &pij, // prior prob data
+  Eigen::MatrixXd &oij, // outcome & modelled prediction data
   std::vector<std::size_t> &survey_features_rev_idx,
   Eigen::VectorXd &model_sensitivity,
   Eigen::VectorXd &model_specificity,
@@ -75,54 +108,76 @@ void update_model_posterior_probabilities(
   Eigen::MatrixXd &total_probability_of_model_negative,
   Eigen::MatrixXd &out) {
   // initialization
-  const std::size_t n_pu = nij.cols();
-  const std::size_t n_f = nij.rows();
-  std::size_t sub_i;
+  const std::size_t n_pu = oij.cols();
+  const std::size_t n_f = oij.rows();
+  std::size_t sub_i, i, j, ii;
   // calculate the posterior probability for each feature in each planning unit
-  for (std::size_t j = 0; j < n_pu; ++j) {
-    for (std::size_t i = 0; i < n_f; ++i) {
-      // if data are lacking and the species is not being surveyed,
-      // then use the models to update the posterior probabilities
-      if ((nij(i, j) < 0.5) &&
-          (survey_features[i]) &&
-          (!pu_survey_solution[j])) {
-        // determine species reverse lookup id
-        sub_i = survey_features_rev_idx[i];
-        if (oij(i, j) >= 0.5) {
-          /// if the model predicts a presence,
-          /// then the posterior probability of the species being present
-          /// is based on the sensitivity of the model, our prior probaiblity,
-          /// and the overall probability of the model predicting a presence
-          /// accounting for false-presences
-          out(i, j) =
-            (model_sensitivity[sub_i] * pij(i, j)) /
-            total_probability_of_model_positive(sub_i, j);
-        } else {
-          /// if the model predicts an absence,
-          /// then the posterior probability of the species being present
-          /// is based on the sensitivity of the model, our prior probaiblity,
-          /// and the overall probability of the model predicting an absence
-          /// accounting for false-absences
-          out(i, j) =
-            ((1.0 - model_specificity[sub_i]) * pij(i, j)) /
-            total_probability_of_model_negative(sub_i, j);
-        }
-        /// clamp probability values to avoid numerical issues with /
-        /// probabilities that are eactly equal to zero or one
-        out(i, j) = std::max(out(i, j), 1.0e-10);
-        out(i, j) = std::min(out(i, j), 1.0 - 1.0e-10);
+  for (auto itr = rij_idx.cbegin(); itr != rij_idx.cend(); ++itr) {
+    // determine species and planning unit id for ii'th index
+    ii = *itr;
+    i = ii / n_pu;
+    j = ii - (i * n_pu);
+    // determine species reverse lookup id
+    sub_i = survey_features_rev_idx[i];
+    if (oij(ii) >= 0.5) {
+      /// if the model predicts a presence,
+      /// then the posterior probability of the species being present
+      /// is based on the sensitivity of the model, our prior probaiblity,
+      /// and the overall probability of the model predicting a presence
+      /// accounting for false-presences
+      out(ii) =
+        (model_sensitivity[sub_i] * pij(ii)) /
+        total_probability_of_model_positive(sub_i, j);
+    } else {
+      /// if the model predicts an absence,
+      /// then the posterior probability of the species being present
+      /// is based on the sensitivity of the model, our prior probaiblity,
+      /// and the overall probability of the model predicting an absence
+      /// accounting for false-absences
 
-        /// if posterior probability is NaN because the total
-        /// probability of a model giving a positive result is zero,
-        /// because it is an exceptionally poor model that cannot
-        /// make any correct presence predictions, then manually set
-        /// the posterior probability to a really small non-zero number
-        /// (since we have to take the log of this number later
-        ///  and log(0) is infinity)
-        if (std::isnan(out(i, j)))
-          out(i, j) = 1.0e-10;
-      }
+      print(wrap("pij"));
+      print(wrap(pij));
+      print(wrap("model_specificity"));
+      print(wrap(model_specificity));
+      print(wrap("model_sensitivity"));
+      print(wrap(model_sensitivity));
+      print(wrap("total_probability_of_model_positive"));
+      print(wrap(total_probability_of_model_positive));
+      print(wrap("total_probability_of_model_negative"));
+      print(wrap(total_probability_of_model_negative));
+
+      print(wrap("ii"));
+      print(wrap(ii));
+      print(wrap("i"));
+      print(wrap(i));
+      print(wrap("j"));
+      print(wrap(j));
+
+
+
+      out(ii) =
+        ((1.0 - model_sensitivity[sub_i]) * pij(ii)) /
+        total_probability_of_model_negative(sub_i, j);
+
+
+      print(wrap("out(ii)"));
+      print(wrap(out(ii)));
+
     }
+    /// clamp probability values to avoid numerical issues with /
+    /// probabilities that are eactly equal to zero or one
+    out(ii) = std::max(out(ii), 1.0e-10);
+    out(ii) = std::min(out(ii), 1.0 - 1.0e-10);
+
+    /// if posterior probability is NaN because the total
+    /// probability of a model giving a positive result is zero,
+    /// because it is an exceptionally poor model that cannot
+    /// make any correct presence predictions, then manually set
+    /// the posterior probability to a really small non-zero number
+    /// (since we have to take the log of this number later
+    ///  and log(0) is infinity)
+    if (std::isnan(out(ii)))
+      out(ii) = 1.0e-10;
   }
 }
 
@@ -212,10 +267,22 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
     total_probability_of_survey_positive,
     total_probability_of_survey_negative,
     out);
-  update_model_posterior_probabilities(
-    nij, pij, oij,
+
+  // find rij indices to update with model estimats
+  std::vector<std::size_t> curr_model_rij_idx;
+  find_rij_idx_based_on_models(
+    nij,
     pu_survey_solution,
     survey_features, survey_features_rev_idx,
+    survey_sensitivity, survey_specificity,
+    model_sensitivity2, model_specificity2,
+    curr_model_rij_idx);
+
+  /// create posterior matrix with most likely model outcomes
+  update_model_posterior_probabilities(
+    curr_model_rij_idx,
+    pij, oij,
+    survey_features_rev_idx,
     model_sensitivity2, model_specificity2,
     total_probability_of_model_positive,
     total_probability_of_model_negative,
@@ -286,6 +353,8 @@ Eigen::MatrixXd rcpp_update_model_posterior_probabilities(
   Eigen::MatrixXd oij,
   std::vector<bool> pu_survey_solution,
   std::vector<bool> survey_features,
+  Eigen::VectorXd survey_sensitivity,
+  Eigen::VectorXd survey_specificity,
   Eigen::VectorXd model_sensitivity,
   Eigen::VectorXd model_specificity,
   Eigen::MatrixXd out) {
@@ -344,11 +413,21 @@ Eigen::MatrixXd rcpp_update_model_posterior_probabilities(
     pij_survey_species_subset, model_sensitivity2, model_specificity2,
     total_probability_of_model_negative);
 
-  // update posterior matrix
-  update_model_posterior_probabilities(
-    nij, pij, oij,
+  // find rij indices to update with model estimats
+  std::vector<std::size_t> curr_model_rij_idx;
+  find_rij_idx_based_on_models(
+    nij,
     pu_survey_solution,
     survey_features, survey_features_rev_idx,
+    survey_sensitivity, survey_specificity,
+    model_sensitivity2, model_specificity2,
+    curr_model_rij_idx);
+
+  /// create posterior matrix with most likely model outcomes
+  update_model_posterior_probabilities(
+    curr_model_rij_idx,
+    pij, oij,
+    survey_features_rev_idx,
     model_sensitivity2, model_specificity2,
     total_probability_of_model_positive,
     total_probability_of_model_negative,

@@ -240,8 +240,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_update_model_posterior_probabilities
-Eigen::MatrixXd rcpp_update_model_posterior_probabilities(Eigen::MatrixXd nij, Eigen::MatrixXd pij, Eigen::MatrixXd oij, std::vector<bool> pu_survey_solution, std::vector<bool> survey_features, Eigen::VectorXd model_sensitivity, Eigen::VectorXd model_specificity, Eigen::MatrixXd out);
-RcppExport SEXP _surveyvoi_rcpp_update_model_posterior_probabilities(SEXP nijSEXP, SEXP pijSEXP, SEXP oijSEXP, SEXP pu_survey_solutionSEXP, SEXP survey_featuresSEXP, SEXP model_sensitivitySEXP, SEXP model_specificitySEXP, SEXP outSEXP) {
+Eigen::MatrixXd rcpp_update_model_posterior_probabilities(Eigen::MatrixXd nij, Eigen::MatrixXd pij, Eigen::MatrixXd oij, std::vector<bool> pu_survey_solution, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, Eigen::VectorXd model_sensitivity, Eigen::VectorXd model_specificity, Eigen::MatrixXd out);
+RcppExport SEXP _surveyvoi_rcpp_update_model_posterior_probabilities(SEXP nijSEXP, SEXP pijSEXP, SEXP oijSEXP, SEXP pu_survey_solutionSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP model_sensitivitySEXP, SEXP model_specificitySEXP, SEXP outSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -250,10 +250,12 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type oij(oijSEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type pu_survey_solution(pu_survey_solutionSEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type survey_features(survey_featuresSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type survey_sensitivity(survey_sensitivitySEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type survey_specificity(survey_specificitySEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type model_sensitivity(model_sensitivitySEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type model_specificity(model_specificitySEXP);
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type out(outSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_update_model_posterior_probabilities(nij, pij, oij, pu_survey_solution, survey_features, model_sensitivity, model_specificity, out));
+    rcpp_result_gen = Rcpp::wrap(rcpp_update_model_posterior_probabilities(nij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity, model_sensitivity, model_specificity, out));
     return rcpp_result_gen;
 END_RCPP
 }

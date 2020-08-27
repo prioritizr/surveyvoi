@@ -57,8 +57,8 @@ rcpp_initialize_posterior_probability_matrix <- function(nij, pij, oij, pu_surve
     .Call(`_surveyvoi_rcpp_initialize_posterior_probability_matrix`, nij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity)
 }
 
-rcpp_update_model_posterior_probabilities <- function(nij, pij, oij, pu_survey_solution, survey_features, model_sensitivity, model_specificity, out) {
-    .Call(`_surveyvoi_rcpp_update_model_posterior_probabilities`, nij, pij, oij, pu_survey_solution, survey_features, model_sensitivity, model_specificity, out)
+rcpp_update_model_posterior_probabilities <- function(nij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity, model_sensitivity, model_specificity, out) {
+    .Call(`_surveyvoi_rcpp_update_model_posterior_probabilities`, nij, pij, oij, pu_survey_solution, survey_features, survey_sensitivity, survey_specificity, model_sensitivity, model_specificity, out)
 }
 
 rcpp_predict_missing_rij_data <- function(dij, nij, pij, pu_env_data_raw, survey_features, survey_sensitivity, survey_specificity, xgb_parameter_names, xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds, xgb_train_folds, xgb_test_folds, pu_model_prediction) {
