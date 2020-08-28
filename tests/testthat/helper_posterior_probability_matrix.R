@@ -73,3 +73,24 @@ r_posterior_probability_matrix <- function(
   # return result
   out
 }
+
+r_find_rij_idx_based_on_models <- function(
+  nij,
+  pu_survey_solution,
+  survey_features, survey_features_rev_idx,
+  survey_sensitivity, survey_specificity,
+  model_sensitivity, model_specificity) {
+  out <- c()
+  counter <- 1 # base 1 indexing
+  for (j in seq_len(ncol(nij))) {
+    for (i in seq_len(nrow(nij))) {
+      if ((nij[i, j] < 0.5) &&
+          (survey_features[i] > 0.5) &&
+          (pu_survey_solution[j] < 0.5)) {
+        out <- c(out, counter)
+      }
+      counter <- counter + 1
+    }
+  }
+  out
+}

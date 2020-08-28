@@ -37,7 +37,7 @@ extern SEXP _surveyvoi_rcpp_total_probability_of_negative_model_result(SEXP, SEX
 extern SEXP _surveyvoi_rcpp_total_probability_of_negative_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_positive_model_result(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_total_probability_of_positive_result(SEXP, SEXP, SEXP);
-extern SEXP _surveyvoi_rcpp_update_model_posterior_probabilities(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_update_model_posterior_probabilities(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_which_state(SEXP);
 extern SEXP _surveyvoi_rcpp_which_state_sparse(SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_xgboost(SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -72,7 +72,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_surveyvoi_rcpp_total_probability_of_negative_result",                  (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_negative_result,                   3},
     {"_surveyvoi_rcpp_total_probability_of_positive_model_result",            (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_positive_model_result,             3},
     {"_surveyvoi_rcpp_total_probability_of_positive_result",                  (DL_FUNC) &_surveyvoi_rcpp_total_probability_of_positive_result,                   3},
-    {"_surveyvoi_rcpp_update_model_posterior_probabilities",                  (DL_FUNC) &_surveyvoi_rcpp_update_model_posterior_probabilities,                   8},
+    {"_surveyvoi_rcpp_update_model_posterior_probabilities",                  (DL_FUNC) &_surveyvoi_rcpp_update_model_posterior_probabilities,                  10},
     {"_surveyvoi_rcpp_which_state",                                           (DL_FUNC) &_surveyvoi_rcpp_which_state,                                            1},
     {"_surveyvoi_rcpp_which_state_sparse",                                    (DL_FUNC) &_surveyvoi_rcpp_which_state_sparse,                                     2},
     {"_surveyvoi_rcpp_xgboost",                                               (DL_FUNC) &_surveyvoi_rcpp_xgboost,                                                5},

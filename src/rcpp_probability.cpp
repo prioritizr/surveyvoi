@@ -86,13 +86,15 @@ double log_probability_of_model_outcome(
   // init
   double out = 0.0;
   const std::size_t n_pu = oij.cols();
+  const std::size_t n_f = oij.rows();
   std::size_t i, j, ii, sub_i;
   // main
   for (auto itr = idx.cbegin(); itr != idx.cend(); ++itr) {
     // determine species and planning unit indices from rij index
+    // (data are in column major format)
     ii = *itr;
-    i = ii / n_pu;
-    j = ii - (i * n_pu);
+    j = ii / n_f;
+    i = ii - (j * n_f);
     // determine species reverse lookup id from species index
     sub_i = survey_features_rev_idx[i];
     // add probabilities

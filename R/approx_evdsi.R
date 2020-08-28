@@ -258,11 +258,6 @@ approx_evdsi <- function(
           site_data[[site_management_locked_out_column]] <= 1),
       msg = "at least one planning unit is locked in and locked out")
   }
-  ## n_approx_outcomes_per_replicate
-  if ((nrow(site_data) * nrow(feature_data)) < 50)
-    assertthat::assert_that(
-    isTRUE(n_approx_outcomes_per_replicate <=
-           n_states(nrow(site_data), nrow(feature_data))))
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
   ## validate survey data

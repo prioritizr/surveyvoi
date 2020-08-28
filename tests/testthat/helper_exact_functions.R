@@ -85,6 +85,11 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     ## generate state
     curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
 
+    ## calculate likelihood of outcome
+    curr_prob <- probability_of_outcome(
+      curr_oij, total_probability_of_survey_positive_log,
+      total_probability_of_survey_negative_log, rij_outcome_idx + 1);
+
     ## update prior data with new survey outcome
     curr_pij <- rcpp_initialize_posterior_probability_matrix(
       nij, pij, curr_oij,
@@ -120,73 +125,84 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     curr_models_sens[survey_features_idx] <- curr_models$sens
     curr_models_spec[survey_features_idx] <- curr_models$spec
 
-    ## update posterior probabilities with model predictions
+    ## identify cells in rij matrix with model predictions
+    curr_rij_model_idx <-
+      r_find_rij_idx_based_on_models(
+        nij, pu_survey_solution, survey_features, survey_features_rev_idx,
+        survey_sensitivity, survey_specificity,
+        curr_models$sens, curr_models$spec) - 1
+
+    ## generate posterior probabilities for most likely model predictions
     curr_postij <- rcpp_update_model_posterior_probabilities(
       nij, pij, curr_oij2,
       pu_survey_solution, survey_features,
+      survey_sensitivity, survey_specificity,
       curr_models_sens, curr_models_spec, curr_pij)
 
-    ## generate prioritisation
+    ## generate prioritisation using most likely model predictions
     curr_solution <- r_greedy_heuristic_prioritization(
       curr_postij, pu_purchase_costs,
       as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
       obj_fun_target, remaining_budget)$x
 
-    ## iterate over each combination of different species,
-    ## and calculate the probability that different models are correct
-    curr_value <- Inf
-    n_spp_states <- n_states(n_f_survey, 1) -1
-    ss <- matrix(0, ncol = 1, nrow = n_f_survey)
-    ss_idx <- seq_along(c(ss))
-    print("new outcome")
-    for (s in seq(0, n_spp_states)) {
-      ## generate state
-      curr_ss <- rcpp_nth_state_sparse(s, ss_idx, ss)
-      print(" s'th state")
-      print(curr_ss)
-      ## calculate probability of set of models being correct and not correct
-      curr_total_probability_of_model_state <-
-        sum(log(c(curr_models_sens * c(curr_ss >= 0.5)) +
-                c((1 - curr_models_sens) * c(curr_ss < 0.5))))
-      ## identify indices in rij matrix that need to be flipped
-      mij_idx <- c()
-      counter2 <- 0
-      for (j in seq_len(n_pu)) {
-        for (i in seq_len(n_f)) {
-          if ((survey_features[i] > 0.5) &&
-              (pu_survey_solution[j] < 0.5) &&
-              (nij[i, j] < 0.5) &&
-              (curr_ss[i] < 0.5)) {
-            mij_idx <- c(mij_idx, counter2)
-          }
-          counter2 <- counter2 + 1
+    ## calculate expected value of decision
+    if (length(curr_rij_model_idx) == 0) {
+      ### if modelled probabilities were not used to generate the rij matrix,
+      ### then we don't have to worry about accounting for them
+      curr_value <- log(r_expected_value_of_action(
+        curr_solution, curr_postij, obj_fun_target))
+    } else {
+      ### if modelled probabilities were used to generate the rij matrix,
+      ### then we need to account for them
+      #### generate model outcome
+      n_model_outcomes <- n_states(length(curr_rij_model_idx), 1) - 1
+      #### calculate log probabilities of model returning positive or negative
+      curr_total_probability_of_model_positive_log <-
+        log(total_probability_of_positive_result(
+          pij, curr_models_sens, curr_models_spec))
+      curr_total_probability_of_model_negative_log <-
+        log(total_probability_of_negative_result(
+          pij, curr_models_sens, curr_models_spec))
+      #### initialize looping variables
+      curr_expected_value_of_action_given_outcome <- Inf
+      #### iterate over each model outcome
+      for (ii in seq(0, n_model_outcomes)) {
+        ##### generate model state
+        curr_postij2 <- rcpp_nth_state_sparse(
+          ii, curr_rij_model_idx + 1, curr_postij)
+        ##### calculate probability of model state
+        curr_probability_of_model_outcome <-
+          probability_of_outcome(
+            curr_postij2,
+            curr_total_probability_of_model_positive_log,
+            curr_total_probability_of_model_negative_log,
+            curr_rij_model_idx + 1)
+        ##### generate posterior probability given outcome
+        curr_postij2 <- rcpp_update_model_posterior_probabilities(
+          nij, pij, curr_postij2,
+          pu_survey_solution, survey_features,
+          survey_sensitivity, survey_specificity,
+          curr_models_sens, curr_models_spec, curr_postij2)
+        ##### calculate expected value of action given model outcome
+        curr_expected_value_of_action_given_model_outcome <-
+          log(r_expected_value_of_action(
+            curr_solution, curr_postij2, obj_fun_target))
+        #### add conditional value to running total across all models states
+        if (!is.finite(curr_expected_value_of_action_given_outcome)) {
+          curr_expected_value_of_action_given_outcome <-
+            curr_expected_value_of_action_given_model_outcome +
+            curr_probability_of_model_outcome
+        } else {
+          curr_expected_value_of_action_given_outcome <-
+            log_sum(curr_expected_value_of_action_given_outcome,
+                    curr_expected_value_of_action_given_model_outcome +
+                    curr_probability_of_model_outcome)
         }
       }
-      ## update probabilities for models which are incorrect
-      curr_postij_spp <- curr_postij
-      curr_postij_spp[mij_idx] <- 1 - curr_postij_spp[mij_idx]
-      print("curr_postij_spp")
-      print(curr_postij_spp)
-      ## calculate expected value of the prioritisation
-      curr_spp_value <- log(r_expected_value_of_action(
-        curr_solution, curr_postij_spp, obj_fun_target))
-      curr_spp_prob <- curr_total_probability_of_model_state
-      ## calculate expected value of the action given model state
-      print(exp(c(curr_spp_value, curr_spp_prob)))
-
-
-      if (!is.finite(curr_value)) {
-        curr_value <- curr_spp_value + curr_spp_prob
-      } else {
-        curr_value <- log_sum(curr_value, curr_spp_value + curr_spp_prob)
-      }
+      ### store expected value of action given outcome, accounting
+      ### for uncertainty due to model predictions
+      curr_value <- curr_expected_value_of_action_given_outcome
     }
-
-    ## calculate likelihood of outcome
-    curr_prob <- probability_of_outcome(
-      curr_oij, total_probability_of_survey_positive_log,
-      total_probability_of_survey_negative_log, rij_outcome_idx + 1);
-
     ## calculate expected value of the action
     if (!is.finite(out)) {
       out <- curr_value + curr_prob

@@ -114,9 +114,10 @@ void update_model_posterior_probabilities(
   // calculate the posterior probability for each feature in each planning unit
   for (auto itr = rij_idx.cbegin(); itr != rij_idx.cend(); ++itr) {
     // determine species and planning unit id for ii'th index
+    // (data are in column major format)
     ii = *itr;
-    i = ii / n_pu;
-    j = ii - (i * n_pu);
+    j = ii / n_f;
+    i = ii - (j * n_f);
     // determine species reverse lookup id
     sub_i = survey_features_rev_idx[i];
     if (oij(ii) >= 0.5) {
@@ -134,35 +135,9 @@ void update_model_posterior_probabilities(
       /// is based on the sensitivity of the model, our prior probaiblity,
       /// and the overall probability of the model predicting an absence
       /// accounting for false-absences
-
-      print(wrap("pij"));
-      print(wrap(pij));
-      print(wrap("model_specificity"));
-      print(wrap(model_specificity));
-      print(wrap("model_sensitivity"));
-      print(wrap(model_sensitivity));
-      print(wrap("total_probability_of_model_positive"));
-      print(wrap(total_probability_of_model_positive));
-      print(wrap("total_probability_of_model_negative"));
-      print(wrap(total_probability_of_model_negative));
-
-      print(wrap("ii"));
-      print(wrap(ii));
-      print(wrap("i"));
-      print(wrap(i));
-      print(wrap("j"));
-      print(wrap(j));
-
-
-
       out(ii) =
         ((1.0 - model_sensitivity[sub_i]) * pij(ii)) /
         total_probability_of_model_negative(sub_i, j);
-
-
-      print(wrap("out(ii)"));
-      print(wrap(out(ii)));
-
     }
     /// clamp probability values to avoid numerical issues with /
     /// probabilities that are eactly equal to zero or one

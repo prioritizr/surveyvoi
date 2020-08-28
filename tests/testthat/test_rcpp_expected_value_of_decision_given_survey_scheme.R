@@ -104,7 +104,7 @@ test_that("multiple species", {
   n_folds <- 2
   n_vars <- 3
   ## simulate data
-  site_data <- simulate_site_data(n_sites, n_f, 0.5, n_vars)
+  site_data <- simulate_site_data(n_sites, n_f, 0.1, n_vars)
   feature_data <- simulate_feature_data(n_f)
   feature_data$target <- rep(6, n_f)
   total_budget <- sum(site_data$management_cost * 0.8)

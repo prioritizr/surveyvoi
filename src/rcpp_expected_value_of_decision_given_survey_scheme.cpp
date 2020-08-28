@@ -218,17 +218,9 @@ double expected_value_of_decision_given_survey_scheme(
   mpz_class o = 0;
   mpz_class oo;
   while (cmp(o, n_outcomes) < 0) {
-
-    print(wrap("new survey outcome"));
-
     /// generate the o'th outcome from surveying the planning units across
     /// all species
     nth_state_sparse(o, rij_outcome_idx, curr_oij);
-
-
-     print(wrap("  curr_oij"));
-     print(wrap(curr_oij));
-
 
     /// calculate likelihood of outcome
     curr_probability_of_outcome = log_probability_of_outcome(
@@ -305,9 +297,6 @@ double expected_value_of_decision_given_survey_scheme(
       curr_model_sensitivity, curr_model_specificity,
       curr_model_rij_idx);
 
-    print(wrap("curr_model_rij_idx"));
-    print(wrap(curr_model_rij_idx));
-
     /// create posterior matrix with most likely model outcomes
     update_model_posterior_probabilities(
       curr_model_rij_idx,
@@ -332,7 +321,7 @@ double expected_value_of_decision_given_survey_scheme(
       /// the given survey outcome
       curr_expected_value_of_action_given_outcome =
         std::log(expected_value_of_action(
-          curr_solution, curr_pij,  obj_fun_target));
+          curr_solution, curr_pij, obj_fun_target));
     } else {
       /// calculate total number of possible model outcomes
       n_states(curr_model_rij_idx.size(), n_model_outcomes);
@@ -351,15 +340,8 @@ double expected_value_of_decision_given_survey_scheme(
       curr_expected_value_of_action_given_outcome =
         std::numeric_limits<double>::infinity();
       while (cmp(oo, n_model_outcomes) < 0) {
-
-        print(wrap("  new model outcome"));
-
-
         /// generate oo'th model outcome
         nth_state_sparse(oo, curr_model_rij_idx, curr_pij);
-
-         print(wrap("    curr_pij (model outcome)"));
-         print(wrap(curr_pij));
 
         /// calculate likelihood of model outcome
         curr_probability_of_model_outcome =
@@ -368,9 +350,6 @@ double expected_value_of_decision_given_survey_scheme(
             curr_total_probability_of_model_positive_log,
             curr_total_probability_of_model_negative_log,
             curr_model_rij_idx);
-
-        print(wrap("exp(curr_probability_of_model_outcome))"));
-        print(wrap(std::exp(curr_probability_of_model_outcome)));
 
         /// generate posterior probability given model outcome
         update_model_posterior_probabilities(
@@ -382,10 +361,7 @@ double expected_value_of_decision_given_survey_scheme(
           curr_total_probability_of_model_negative,
           curr_pij);
           assert_valid_probability_data(
-          curr_pij, "issue calculating posterior probabilities");
-
-         print(wrap("    curr_pij (updated with posterior)"));
-         print(wrap(curr_pij));
+            curr_pij, "issue calculating model posterior probabilities");
 
         /// calculate expected value of action given model outcome
         curr_expected_value_of_action_given_model_outcome =
