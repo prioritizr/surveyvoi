@@ -73,7 +73,7 @@ NULL
 #' plot(d[, c("e1", "e2", "e3")], axes = TRUE, pch = 16, cex = 2)
 #'
 #' # plot feature detection data
-#' plot(d[, c("f1", "f2", "f3", "d4")], axes = TRUE, pch = 16, cex = 2)
+#' plot(d[, c("f1", "f2", "f3", "f4")], axes = TRUE, pch = 16, cex = 2)
 #'
 #' # plot feature survey effort
 #' plot(d[, c("n1", "n2", "n3", "n4")], axes = TRUE, pch = 16, cex = 2)

@@ -87,8 +87,7 @@ set.seed(123)
 RFoptions(seed = 123)
 
 # simulate data
-site_data <- simulate_site_data(n_sites = 5, n_features = 2,
-                                prop = 0.5)
+site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 
 # preview simulated data
@@ -97,9 +96,10 @@ print(feature_data)
 
 # calculate prior probability matrix
 prior_matrix <- prior_probability_matrix(
-  site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
-  "survey_sensitivity", "survey_specificity", "model_sensitivity",
-  "model_specificity")
+  site_data, feature_data,
+  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
+  "survey_sensitivity", "survey_specificity",
+  "model_sensitivity", "model_specificity")
 
 # preview prior probability matrix
 print(prior_matrix)

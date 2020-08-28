@@ -31,7 +31,7 @@
 #' # calculate expected value of management decision given current information
 #' # using exact method
 #' ev_current <- evdci(
-#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   site_data, feature_data, c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
 #'   "management_cost", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
 #'   "target", total_budget)

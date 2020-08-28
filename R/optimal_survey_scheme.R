@@ -51,7 +51,7 @@ NULL
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
-#' feature_data$target <- c(15, 15)
+#' feature_data$target <- c(10, 10)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -73,7 +73,7 @@ NULL
 #' # find optimal survey scheme using exact method
 #' opt_survey <- optimal_survey_scheme(
 #'   site_data, feature_data,
-#'   c("f1", "f2"), c("p1", "p2"), c("e1", "e2", "e3"),
+#'   c("f1", "f2"), c("n1", "n2"), c("p1", "p2"), c("e1", "e2", "e3"),
 #'   "management_cost", "survey_cost",
 #'   "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
