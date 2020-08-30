@@ -8,6 +8,7 @@ doc
 # temporary files
 approximation.R
 simulation.R
+vignettes/simulation_files/figure-html/*png
 
 # R profile files
 *.Rproj.user
