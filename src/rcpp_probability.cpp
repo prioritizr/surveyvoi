@@ -64,6 +64,22 @@ void total_probability_of_negative_model_result(
 
 double log_probability_of_outcome(
   Eigen::MatrixXd &oij,
+  Eigen::MatrixXd &probability_of_positive_log,
+  Eigen::MatrixXd &probability_of_negative_log) {
+  // init
+  double out = 0.0;
+  const std::size_t n = oij.size();
+  // main
+  for (std::size_t i = 0; i < n; ++i)
+    out += (oij(i) * probability_of_positive_log(i)) +
+           ((1.0 - oij(i)) * probability_of_negative_log(i));
+  // return void
+  return out;
+}
+
+
+double log_probability_of_outcome(
+  Eigen::MatrixXd &oij,
   Eigen::MatrixXd &total_probability_of_survey_positive_log,
   Eigen::MatrixXd &total_probability_of_survey_negative_log,
   std::vector<std::size_t> &idx) {

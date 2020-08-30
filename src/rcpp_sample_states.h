@@ -4,6 +4,7 @@
 
 #include "package.h"
 #include "rcpp_states.h"
+#include "rcpp_probability.h"
 #include "functions.h"
 
 void sample_n_states(

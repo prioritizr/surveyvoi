@@ -7,6 +7,7 @@
 #include "rcpp_posterior_probability_matrix.h"
 #include "rcpp_predict_missing_rij_data.h"
 #include "rcpp_expected_value_of_action.h"
+#include "expected_value_given_survey_outcome.h"
 
 Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd &dij, // proportion of detections matrix
@@ -55,7 +56,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   mpz_class n_outcomes;
   mpz_class n_approx_outcomes_per_replicate2 =
     n_approx_survey_outcomes_per_replicate;
-  if ((n_pu_surveyed_in_scheme * n_f_survey) < 30) {
+  if ((n_pu_surveyed_in_scheme * n_f_survey) < 20) {
     n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
     n_outcomes = n_outcomes + 1; // increment to include final outcome
     if (cmp(n_approx_outcomes_per_replicate2, n_outcomes) > 0)
@@ -118,15 +119,10 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   /// declare temporary variables used in the main loop
   std::size_t curr_n_approx_model_outcomes_per_replicate;
   Eigen::VectorXd out(n_approx_replicates);
-  Eigen::VectorXd outcome_probabilities(n_approx_survey_outcomes_per_replicate);
-  Eigen::VectorXd outcome_values(n_approx_survey_outcomes_per_replicate);
+  Eigen::VectorXd outcome_probabilities;
+  Eigen::VectorXd outcome_values;
   std::size_t curr_n_folds;
   double curr_expected_value_of_action_given_outcome;
-  Eigen::VectorXd
-    curr_probability_of_model_outcome(n_approx_survey_outcomes_per_replicate);
-  Eigen::VectorXd
-    curr_expected_value_of_action_given_model_outcome(
-      n_approx_survey_outcomes_per_replicate);
   double curr_probability_of_outcome;
   Eigen::MatrixXd curr_dij = dij;
   Eigen::MatrixXd curr_nij = nij;
@@ -140,7 +136,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd curr_modelled_probabilities;
   std::vector<bool> curr_solution(n_pu);
   std::vector<mpz_class> feature_outcome_idx(n_f_survey);
-  std::vector<mpz_class> outcomes(n_approx_survey_outcomes_per_replicate);
+  std::vector<mpz_class> outcomes;
   std::vector<mpz_class> model_outcomes;
   model_yhat_map model_yhat;
   model_yhat.reserve(n_f_survey * 1000);
@@ -151,6 +147,7 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
   Eigen::VectorXd curr_model_sensitivity(n_f_survey);
   Eigen::VectorXd curr_model_specificity(n_f_survey);
   std::vector<std::size_t> curr_model_rij_idx;
+  std::size_t curr_n_survey_outcomes;
 
   // preliminary processing
   /// create subset of prior matrix for just the species that need surveys
@@ -244,9 +241,12 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
       n_approx_survey_outcomes_per_replicate, survey_pij,
       method_approx_outcomes, seed + static_cast<double>(r), outcomes);
     set_seed(seed);
+    curr_n_survey_outcomes = outcomes.size();
+    outcome_probabilities.resize(curr_n_survey_outcomes);
+    outcome_values.resize(curr_n_survey_outcomes);
 
     // calculate values based outcomes
-    for (std::size_t o = 0; o < n_approx_survey_outcomes_per_replicate; ++o) {
+    for (std::size_t o = 0; o < curr_n_survey_outcomes; ++o) {
       /// generate the o'th outcome from surveying the planning units across
       /// all species
       nth_state_sparse(outcomes[o], rij_outcome_idx, curr_oij);
@@ -353,95 +353,41 @@ Rcpp::NumericVector approx_expected_value_of_decision_given_survey_scheme(
         curr_expected_value_of_action_given_outcome =
           std::log(expected_value_of_action(curr_solution, curr_pij,
             obj_fun_target));
-      } else {
-        /// prepare probabilities for generating the model outcomes
-        curr_modelled_probabilities.resize(curr_model_rij_idx.size(), 1);
-        for (std::size_t ii = 0; ii < curr_model_rij_idx.size(); ++ii)
-          curr_modelled_probabilities(ii) = curr_pij(curr_model_rij_idx[ii]);
-
-        /// determine number of model outcomes
-        curr_n_approx_model_outcomes_per_replicate =
-          n_approx_outcomes_per_replicate;
-        n_approx_outcomes_per_replicate2 = n_approx_outcomes_per_replicate;
-        if (curr_model_rij_idx.size() < 30) {
-          n_states(curr_model_rij_idx.size(), n_outcomes);
-          n_outcomes = n_outcomes + 1; // increment to include final outcome
-          if (cmp(n_approx_outcomes_per_replicate2, n_outcomes) > 0)
-            curr_n_approx_model_outcomes_per_replicate = n_outcomes.get_ui();
-        }
-
-        /// resize data structures for number of model outcomes
-        model_outcomes.resize(curr_n_approx_model_outcomes_per_replicate);
-        curr_probability_of_model_outcome.resize(
-          curr_n_approx_model_outcomes_per_replicate);
-        curr_expected_value_of_action_given_model_outcome.resize(
-          curr_n_approx_model_outcomes_per_replicate);
-
-        /// generate a set of model outcomes
-        /// manually adjust seed to ensure different samples per replicate
-        sample_n_states(
-          curr_n_approx_model_outcomes_per_replicate,
-          curr_modelled_probabilities, method_approx_outcomes,
-          seed + static_cast<double>(r + o), model_outcomes);
-        set_seed(seed);
-
-        /// calculate log of model total probabilities
-        curr_total_probability_of_model_positive_log =
-          curr_total_probability_of_model_positive;
-        log_matrix(curr_total_probability_of_model_positive_log);
-        curr_total_probability_of_model_negative_log =
-          curr_total_probability_of_model_negative;
-        log_matrix(curr_total_probability_of_model_negative_log);
-
-        /// iterate over each model outcome and calculate the
-        /// probability of the outcome occurring and the expected value
-        /// of the prioritisation given the model outcome
-        for (std::size_t oo = 0;
-             oo < curr_n_approx_model_outcomes_per_replicate; ++oo) {
-
-          /// generate oo'th model outcome
-          nth_state_sparse(model_outcomes[oo], curr_model_rij_idx, curr_pij);
-
-          /// calculate likelihood of model outcome
-          curr_probability_of_model_outcome[oo] =
-            log_probability_of_model_outcome(
-              curr_pij, survey_features_rev_idx,
-              curr_total_probability_of_model_positive_log,
-              curr_total_probability_of_model_negative_log,
-              curr_model_rij_idx);
-
-          /// generate posterior probability given model outcome
-          update_model_posterior_probabilities(
-            curr_model_rij_idx,
-            pij, curr_pij,
+      } else if (curr_model_rij_idx.size() <= 5) {
+        curr_expected_value_of_action_given_outcome =
+          exact_expected_value_given_survey_outcome_with_model_estimates(
+            pij,
+            curr_pij,
+            curr_solution,
             survey_features_rev_idx,
-            curr_model_sensitivity, curr_model_specificity,
+            curr_model_rij_idx,
+            curr_model_sensitivity,
+            curr_model_specificity,
             curr_total_probability_of_model_positive,
             curr_total_probability_of_model_negative,
-            curr_pij);
-            assert_valid_probability_data(
-              curr_pij, "issue calculating model posterior probabilities");
-
-          /// calculate expected value of action given model outcome
-          curr_expected_value_of_action_given_model_outcome[oo] =
-            expected_value_of_action(
-              curr_solution, curr_pij, obj_fun_target);
-        }
-
-        /// store value of decision for the o'th survey outcome
-        /// given uncertainty in the model outcomes
-        curr_probability_of_model_outcome.array() -=
-          log_sum(curr_probability_of_model_outcome);
-        curr_probability_of_model_outcome.array() +=
-          curr_expected_value_of_action_given_model_outcome.array().log();
+            obj_fun_target);
+      } else {
         curr_expected_value_of_action_given_outcome =
-          log_sum(curr_probability_of_model_outcome);
+          approx_expected_value_given_survey_outcome_with_model_estimates(
+            pij,
+            curr_pij,
+            curr_solution,
+            survey_features_rev_idx,
+            curr_model_rij_idx,
+            curr_model_sensitivity,
+            curr_model_specificity,
+            curr_total_probability_of_model_positive,
+            curr_total_probability_of_model_negative,
+            obj_fun_target,
+            n_approx_outcomes_per_replicate,
+            method_approx_outcomes,
+            seed + r + o);
+        set_seed(seed);
       }
       /// calculate expected value of decision for the o'th survey outcome
       /// given uncertainty in model predictions
       outcome_values[o] = curr_expected_value_of_action_given_outcome;
       outcome_probabilities[o] = curr_probability_of_outcome;
-
     }
 
     // standardize survye outcome data

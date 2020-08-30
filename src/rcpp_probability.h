@@ -21,6 +21,9 @@ double log_probability_of_outcome(
   Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&,
   std::vector<std::size_t>&);
 
+double log_probability_of_outcome(
+  Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::MatrixXd&);
+
 double log_probability_of_model_outcome(
   Eigen::MatrixXd&,
   std::vector<std::size_t>&,

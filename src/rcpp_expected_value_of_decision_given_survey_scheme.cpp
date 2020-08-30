@@ -1,5 +1,6 @@
 #include "package.h"
 #include "functions.h"
+#include "expected_value_given_survey_outcome.h"
 #include "rcpp_states.h"
 #include "rcpp_probability.h"
 #include "rcpp_heuristic_prioritization.h"
@@ -323,66 +324,18 @@ double expected_value_of_decision_given_survey_scheme(
         std::log(expected_value_of_action(
           curr_solution, curr_pij, obj_fun_target));
     } else {
-      /// calculate total number of possible model outcomes
-      n_states(curr_model_rij_idx.size(), n_model_outcomes);
-      n_model_outcomes = n_model_outcomes + 1; // increment to include final
-
-      /// calculate log of model total probabilities
-      curr_total_probability_of_model_positive_log =
-        curr_total_probability_of_model_positive;
-      log_matrix(curr_total_probability_of_model_positive_log);
-      curr_total_probability_of_model_negative_log =
-        curr_total_probability_of_model_negative;
-      log_matrix(curr_total_probability_of_model_negative_log);
-
-      /// iterate over each model outcome
-      oo = 0;
       curr_expected_value_of_action_given_outcome =
-        std::numeric_limits<double>::infinity();
-      while (cmp(oo, n_model_outcomes) < 0) {
-        /// generate oo'th model outcome
-        nth_state_sparse(oo, curr_model_rij_idx, curr_pij);
-
-        /// calculate likelihood of model outcome
-        curr_probability_of_model_outcome =
-          log_probability_of_model_outcome(
-            curr_pij, survey_features_rev_idx,
-            curr_total_probability_of_model_positive_log,
-            curr_total_probability_of_model_negative_log,
-            curr_model_rij_idx);
-
-        /// generate posterior probability given model outcome
-        update_model_posterior_probabilities(
-          curr_model_rij_idx,
-          pij, curr_pij,
+        exact_expected_value_given_survey_outcome_with_model_estimates(
+          pij,
+          curr_pij,
+          curr_solution,
           survey_features_rev_idx,
-          curr_model_sensitivity, curr_model_specificity,
+          curr_model_rij_idx,
+          curr_model_sensitivity,
+          curr_model_specificity,
           curr_total_probability_of_model_positive,
           curr_total_probability_of_model_negative,
-          curr_pij);
-          assert_valid_probability_data(
-            curr_pij, "issue calculating model posterior probabilities");
-
-        /// calculate expected value of action given model outcome
-        curr_expected_value_of_action_given_model_outcome =
-          std::log(expected_value_of_action(
-            curr_solution, curr_pij, obj_fun_target));
-
-        /// add conditional value to the runing total across all model outcomes
-        if (std::isinf(curr_expected_value_of_action_given_outcome)) {
-          curr_expected_value_of_action_given_outcome =
-            curr_expected_value_of_action_given_model_outcome +
-            curr_probability_of_model_outcome;
-        } else {
-          curr_expected_value_of_action_given_outcome =
-            log_sum(curr_expected_value_of_action_given_outcome,
-                    curr_expected_value_of_action_given_model_outcome +
-                    curr_probability_of_model_outcome);
-        }
-
-        // increment model outcome counter
-        oo = oo + 1;
-      }
+          obj_fun_target);
     }
 
     /// calculate expected value of action

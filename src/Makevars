@@ -40,6 +40,7 @@ PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) -pthread\
 OBJECTS =\
   $(PKGROOT)/init.o\
   $(PKGROOT)/functions.o\
+  $(PKGROOT)/expected_value_given_survey_outcome.o\
   $(PKGROOT)/rcpp_model_performance.o\
   $(PKGROOT)/rcpp_xgboost.o\
   $(PKGROOT)/rcpp_sample_states.o\

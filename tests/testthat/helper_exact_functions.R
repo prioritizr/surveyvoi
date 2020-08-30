@@ -152,56 +152,17 @@ r_expected_value_of_decision_given_survey_scheme <- function(
       curr_value <- log(r_expected_value_of_action(
         curr_solution, curr_postij, obj_fun_target))
     } else {
-      ### if modelled probabilities were used to generate the rij matrix,
-      ### then we need to account for them
-      #### generate model outcome
-      n_model_outcomes <- n_states(length(curr_rij_model_idx), 1) - 1
-      #### calculate log probabilities of model returning positive or negative
-      curr_total_probability_of_model_positive_log <-
-        log(total_probability_of_positive_result(
-          pij, curr_models_sens, curr_models_spec))
-      curr_total_probability_of_model_negative_log <-
-        log(total_probability_of_negative_result(
-          pij, curr_models_sens, curr_models_spec))
-      #### initialize looping variables
-      curr_expected_value_of_action_given_outcome <- Inf
-      #### iterate over each model outcome
-      for (ii in seq(0, n_model_outcomes)) {
-        ##### generate model state
-        curr_postij2 <- rcpp_nth_state_sparse(
-          ii, curr_rij_model_idx + 1, curr_postij)
-        ##### calculate probability of model state
-        curr_probability_of_model_outcome <-
-          probability_of_outcome(
-            curr_postij2,
-            curr_total_probability_of_model_positive_log,
-            curr_total_probability_of_model_negative_log,
-            curr_rij_model_idx + 1)
-        ##### generate posterior probability given outcome
-        curr_postij2 <- rcpp_update_model_posterior_probabilities(
-          nij, pij, curr_postij2,
-          pu_survey_solution, survey_features,
-          survey_sensitivity, survey_specificity,
-          curr_models_sens, curr_models_spec, curr_postij2)
-        ##### calculate expected value of action given model outcome
-        curr_expected_value_of_action_given_model_outcome <-
-          log(r_expected_value_of_action(
-            curr_solution, curr_postij2, obj_fun_target))
-        #### add conditional value to running total across all models states
-        if (!is.finite(curr_expected_value_of_action_given_outcome)) {
-          curr_expected_value_of_action_given_outcome <-
-            curr_expected_value_of_action_given_model_outcome +
-            curr_probability_of_model_outcome
-        } else {
-          curr_expected_value_of_action_given_outcome <-
-            log_sum(curr_expected_value_of_action_given_outcome,
-                    curr_expected_value_of_action_given_model_outcome +
-                    curr_probability_of_model_outcome)
-        }
-      }
-      ### store expected value of action given outcome, accounting
-      ### for uncertainty due to model predictions
-      curr_value <- curr_expected_value_of_action_given_outcome
+      curr_value <- exact_expected_value_given_survey_outcome(
+        nij,
+        pij,
+        curr_postij,
+        curr_solution,
+        pu_survey_solution,
+        survey_features,
+        curr_rij_model_idx,
+        survey_sensitivity, survey_specificity,
+        curr_models_sens, curr_models_spec,
+        obj_fun_target)
     }
     ## calculate expected value of the action
     if (!is.finite(out)) {

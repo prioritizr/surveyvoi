@@ -47,7 +47,9 @@ test_that("rcpp_sample_n_uniform_states_without_replacement (k < n_states)", {
 })
 
 test_that("rcpp_sample_n_uniform_states_without_replacement (k = n_states)", {
-  p <- matrix(runif(6), nrow = 3, ncol = 2)
+  # note, probabilities are constrained such that early stopping criteria
+  # will not be triggered
+  p <- matrix(runif(6, min = 0.45, max = 0.55), nrow = 3, ncol = 2)
   k <- rcpp_n_states(length(p))
   s <- character(20)
   o <- rcpp_sample_n_uniform_states_without_replacement(k + 1, p, 500)
@@ -73,7 +75,9 @@ test_that("rcpp_sample_n_weighted_states_without_replacement (k < n_states)", {
 })
 
 test_that("rcpp_sample_n_weighted_states_without_replacement (k = n_states)", {
-  p <- matrix(runif(6, min = 0.3, max = 0.6), nrow = 3, ncol = 2)
+  # note, probabilities are constrained such that early stopping criteria
+  # will not be triggered
+  p <- matrix(runif(6, min = 0.48, max = 0.52), nrow = 3, ncol = 2)
   k <- rcpp_n_states(length(p))
   o <- rcpp_sample_n_weighted_states_without_replacement(k + 1, p, 500)
   expect_is(o, "numeric")
