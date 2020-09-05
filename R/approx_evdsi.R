@@ -292,6 +292,12 @@ approx_evdsi <- function(
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix
   }
+  ## calculate prior matrix for re-fitting species distribution models
+  pijm <- internal_prior_probability_matrix(
+    site_data, feature_data, site_detection_columns,
+    site_n_surveys_columns, site_probability_columns,
+    feature_survey_sensitivity_column, feature_survey_specificity_column,
+    feature_model_sensitivity_column, feature_model_specificity_column, TRUE)
   ## prepare locked in data
   if (!is.null(site_management_locked_in_column)) {
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
@@ -344,7 +350,7 @@ approx_evdsi <- function(
   # main calculation
   withr::with_seed(seed, {
     out <- rcpp_approx_expected_value_of_decision_given_survey_scheme(
-      dij = dij, nij = nij, pij = pij,
+      dij = dij, nij = nij, pij = pij, pijm = pijm,
       survey_features = feature_data[[feature_survey_column]],
       survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
       survey_specificity = feature_data[[feature_survey_specificity_column]],

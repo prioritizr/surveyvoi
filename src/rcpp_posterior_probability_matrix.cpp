@@ -1,7 +1,6 @@
 #include "rcpp_posterior_probability_matrix.h"
 
 void initialize_posterior_probability_matrix(
-  Eigen::MatrixXd &nij, // number of existing survey data
   Eigen::MatrixXd &pij, // prior prob data
   Eigen::MatrixXd &oij, // outcome & modelled prediction data
   std::vector<bool> &pu_survey_solution, // is the planning unit being surveyed?
@@ -13,8 +12,8 @@ void initialize_posterior_probability_matrix(
   Eigen::MatrixXd &total_probability_of_survey_negative,
   Eigen::MatrixXd &out) {
   // initialization
-  const std::size_t n_pu = nij.cols();
-  const std::size_t n_f = nij.rows();
+  const std::size_t n_pu = pij.cols();
+  const std::size_t n_f = pij.rows();
 
   // calculate the posterior probability for each feature in each planning unit
   for (std::size_t j = 0; j < n_pu; ++j) {
@@ -26,8 +25,7 @@ void initialize_posterior_probability_matrix(
         /// then use prior data
         out(i, j) = pij(i, j);
       } else if (pu_survey_solution[j] && (oij(i, j) >= 0.5)) {
-        /// if the planning unit has not already been surveyed,
-        /// and is selected for surveying,
+        /// if the planning unit is selected for surveying,
         /// and we're simulating what would happen if we detected the feature,
         ///
         /// then the posterior probability of it occuring in the planning unit
@@ -38,8 +36,7 @@ void initialize_posterior_probability_matrix(
           (survey_sensitivity(i) * pij(i, j)) /
           total_probability_of_survey_positive(i, j);
       } else if (pu_survey_solution[j]) {
-        /// if the planning unit has not already been surveyed,
-        /// and is selected for surveying,
+        /// if the planning unit is selected for surveying,
         /// and we're simulating what would happen if we didn't detect the
         //  feature,
         //
@@ -63,32 +60,53 @@ void initialize_posterior_probability_matrix(
 }
 
 void find_rij_idx_based_on_models(
-  Eigen::MatrixXd &nij, // number of existing survey data
-  std::vector<bool> &pu_survey_solution, // is the planning unit being surveyed?
+  MatrixXd &model_pij, // model predictions and priors
+  std::vector<std::vector<std::size_t>> &pu_model_prediction_idx,
   std::vector<bool> &survey_features, // is the feature being surveyed?
-  std::vector<std::size_t> &survey_features_rev_idx,
-  Eigen::VectorXd &survey_sensitivity,
-  Eigen::VectorXd &survey_specificity,
-  Eigen::VectorXd &model_sensitivity,
-  Eigen::VectorXd &model_specificity,
+  std::vector<std::size_t> &survey_features_rev_idx, // reverse ids
+  Eigen::MatrixXd &survey_tss, // TSS of survey scheme
+  Eigen::VectorXd &model_sensitivity, // models sensitivity
+  Eigen::VectorXd &model_specificity, // models specificity
   std::vector<std::size_t> &out) {
   // initialization
-  const std::size_t n_pu = nij.cols();
-  const std::size_t n_f = nij.rows();
-  std::size_t counter = 0;
+  const std::size_t n_pu = model_pij.cols();
+  const std::size_t n_f = model_pij.rows();
+  const std::size_t n_f_survey = survey_features_rev_idx.size();
+
+  // declare looping variables
+  std::size_t sub_i;
+
+  // prepare output
   out.clear();
-  out.reserve(
-    std::accumulate(survey_features.begin(), survey_features.end(), 0) * n_pu);
+  out.reserve(n_f_survey * n_pu);
+
+  // calculate model tss
+  Eigen::VectorXd model_tss =
+    model_sensitivity.array() + model_specificity.array();
+  model_tss.array() -= 1.0;
 
   // determine which planning units will use modelled probabilities
-  for (std::size_t j = 0; j < n_pu; ++j) {
-    for (std::size_t i = 0; i < n_f; ++i) {
-      if ((nij(i, j) < 0.5) &&
-          (survey_features[i]) &&
-          (!pu_survey_solution[j])) {
-        out.push_back(counter);
+  for (std::size_t i = 0; i < n_f_survey; ++i) {
+    // extract feature idx
+    sub_i = survey_features_rev_idx[i];
+    for (auto itr = pu_model_prediction_idx.cbegin();
+         itr != pu_model_prediction_idx.cend(); ++itr) {
+      // extract planning unit idx
+      j = *itr;
+      if (pu_survey_solution[*itr]) {
+        // if the planning unit is seleceted for additional surveys,
+        // then we would only use the model predictions if they outperform
+        // the survey methodology
+        if (model_tss[i] >= survey_tss(i, j)) {
+          curr_idx = (j * n_f) + sub_i;
+        }
+      } else {
+        // if the planning unit is not selected for additional surveys,
+        // then we must use the model predictions because no existing survey
+        // data are available
+        curr_idx = (j * n_f) + sub_i;
+        out.push_back(curr_idx)
       }
-      ++counter;
     }
   }
 
@@ -210,18 +228,6 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
     pij, survey_sensitivity, survey_specificity,
     total_probability_of_survey_negative);
 
-  // prepare feature ids
-  std::vector<std::size_t> survey_features_rev_idx(n_f, 0);
-  {
-    std::size_t k = 0;
-    for (std::size_t i = 0; i < n_f; ++i) {
-      if (survey_features[i]) {
-        survey_features_rev_idx[i] = k;
-        ++k;
-      }
-    }
-  }
-
   // calculate total model probabilities
   Eigen::MatrixXd total_probability_of_model_positive(n_f_survey, n_pu);
   Eigen::MatrixXd total_probability_of_model_negative(n_f_survey, n_pu);
@@ -232,10 +238,35 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
     pij_survey_species_subset, model_sensitivity2, model_specificity2,
     total_probability_of_model_negative);
 
+  // create default pu_model_prediction variable
+  std::vector<bool> pu_model_prediction(n_pu);
+  for (std::size_t i = 0; i < n_pu; ++i)
+    pu_model_prediction[i] = !pu_survey_solution[i];
+
+  // store indices of features that need surveying
+  std::vector<std::size_t> survey_features_idx;
+  survey_features_idx.reserve(n_f);
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (survey_features[i])
+      survey_features_idx.push_back(i);
+  survey_features_idx.shrink_to_fit();
+
+  // indices for features in sparse format for reverse lookup
+  std::vector<std::size_t> survey_features_rev_idx(n_f, 1e5);
+  create_reverse_lookup_id(survey_features, survey_features_rev_idx);
+
+  // calculate TSS for survey data including new surveys
+  Eigen::MatrixXd curr_survey_tss(n_f_survey, n_pu);
+  calculate_survey_tss(
+    nij,
+    survey_features_idx,
+    survey_sensitivity, survey_specificity,
+    curr_survey_tss);
+
   // calculate posterior matrix
   Eigen::MatrixXd out(n_f, n_pu);
   initialize_posterior_probability_matrix(
-    nij, pij, oij,
+    pij, oij,
     pu_survey_solution,
     survey_features, survey_features_rev_idx,
     survey_sensitivity, survey_specificity,
@@ -247,9 +278,9 @@ Eigen::MatrixXd rcpp_posterior_probability_matrix(
   std::vector<std::size_t> curr_model_rij_idx;
   find_rij_idx_based_on_models(
     nij,
-    pu_survey_solution,
     survey_features, survey_features_rev_idx,
-    survey_sensitivity, survey_specificity,
+    pu_model_prediction,
+    curr_survey_tss,
     model_sensitivity2, model_specificity2,
     curr_model_rij_idx);
 
@@ -294,22 +325,22 @@ Eigen::MatrixXd rcpp_initialize_posterior_probability_matrix(
     pij, survey_sensitivity, survey_specificity,
     total_probability_of_survey_negative);
 
-  // prepare feature ids
-  std::vector<std::size_t> survey_features_rev_idx(n_f, 0);
-  {
-    std::size_t k = 0;
-    for (std::size_t i = 0; i < n_f; ++i) {
-      if (survey_features[i]) {
-        survey_features_rev_idx[i] = k;
-        ++k;
-      }
-    }
-  }
+  // store indices of features that need surveying
+  std::vector<std::size_t> survey_features_idx;
+  survey_features_idx.reserve(n_f);
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (survey_features[i])
+      survey_features_idx.push_back(i);
+  survey_features_idx.shrink_to_fit();
+
+  // indices for features in sparse format for reverse lookup
+  std::vector<std::size_t> survey_features_rev_idx(n_f, 1e5);
+  create_reverse_lookup_id(survey_features, survey_features_rev_idx);
 
   // calculate posterior matrix
   Eigen::MatrixXd out(n_f, n_pu);
   initialize_posterior_probability_matrix(
-    nij, pij, oij,
+    pij, oij,
     pu_survey_solution,
     survey_features, survey_features_rev_idx,
     survey_sensitivity, survey_specificity,
@@ -366,17 +397,17 @@ Eigen::MatrixXd rcpp_update_model_posterior_probabilities(
     }
   }
 
-  // prepare feature ids
-  std::vector<std::size_t> survey_features_rev_idx(n_f, 0);
-  {
-    std::size_t k = 0;
-    for (std::size_t i = 0; i < n_f; ++i) {
-      if (survey_features[i]) {
-        survey_features_rev_idx[i] = k;
-        ++k;
-      }
-    }
-  }
+  // store indices of features that need surveying
+  std::vector<std::size_t> survey_features_idx;
+  survey_features_idx.reserve(n_f);
+  for (std::size_t i = 0; i < n_f; ++i)
+    if (survey_features[i])
+      survey_features_idx.push_back(i);
+  survey_features_idx.shrink_to_fit();
+
+  // indices for features in sparse format for reverse lookup
+  std::vector<std::size_t> survey_features_rev_idx(n_f, 1e5);
+  create_reverse_lookup_id(survey_features, survey_features_rev_idx);
 
   // calculate total model probabilities
   Eigen::MatrixXd total_probability_of_model_positive(n_f_survey, n_pu);
@@ -388,13 +419,27 @@ Eigen::MatrixXd rcpp_update_model_posterior_probabilities(
     pij_survey_species_subset, model_sensitivity2, model_specificity2,
     total_probability_of_model_negative);
 
+  // calculate TSS for survey data including new surveys
+  Eigen::MatrixXd curr_survey_tss(n_f_survey, n_pu);
+  calculate_survey_tss(
+    nij,
+    survey_features_idx,
+    survey_sensitivity, survey_specificity,
+    curr_survey_tss);
+
+  // create default pu_model_prediction variable
+  std::vector<bool> pu_model_prediction(n_pu);
+  for (std::size_t i = 0; i < n_pu; ++i)
+    pu_model_prediction[i] = !pu_survey_solution[i];
+
   // find rij indices to update with model estimats
   std::vector<std::size_t> curr_model_rij_idx;
   find_rij_idx_based_on_models(
     nij,
-    pu_survey_solution,
-    survey_features, survey_features_rev_idx,
-    survey_sensitivity, survey_specificity,
+    survey_features,
+    survey_features_rev_idx,
+    pu_model_prediction,
+    curr_survey_tss,
     model_sensitivity2, model_specificity2,
     curr_model_rij_idx);
 

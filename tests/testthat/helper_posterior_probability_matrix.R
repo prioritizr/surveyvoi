@@ -36,36 +36,51 @@ r_posterior_probability_matrix <- function(
   out <- matrix(NA, ncol = n_pu, nrow = n_f)
   for (j in seq_len(n_pu)) {
     for (i in seq_len(n_f)) {
-      if (!survey_features[i] || (nij[i, j] > 0)) {
+      if (!survey_features[i]) {
         # if the species is not being surveyed, then use prior data
-        # or, if the planning unit already has survey data then use prior data
         out[i, j] <- pij[i, j]
-      } else if ((pu_survey_solution[j] > 0.5) && (oij[i, j] >= 0.5)) {
-        # if there is survey data for i'th pu and j'th species,
-        # and the species was detected
-        out[i, j] <-
-          (survey_sensitivity[i] * pij[i, j]) /
-           total_probability_of_survey_positive[i, j]
-      } else if ((pu_survey_solution[j] > 0.5) && (oij[i, j] < 0.5)) {
-        # if there is survey data for i'th pu and j'th species,
-        # and the species was not detected
-        out[i, j] <-
-          ((1 - survey_sensitivity[i]) * pij[i, j]) /
-           total_probability_of_survey_negative[i, j]
       } else {
-        # if there is no survey data for i'th pu and j'th species,
-        # then use model predictions
+        # calculate indices
         sub_i <- survey_features_rev_idx[i]
-        if (oij[i, j] >= 0.5) {
-          # if the model predicts a presence
-          out[i, j] <-
-            (model_sensitivity2[sub_i] * pij[i, j]) /
-             total_probability_of_model_positive[sub_i, j]
+        has_no_survey_data <- (nij[i, j] < 0.5) && !pu_survey_solution[j]
+        # calculate model TSS
+        curr_model_tss <-
+          model_sensitivity2[sub_i] + model_specificity2[sub_i] - 1
+        # calculate survey methodology TSS (account for multiple surveys)
+        curr_survey_sens <-
+          1 - (prod(1 - rep(survey_sensitivity[i], nij[i, j])))
+        curr_survey_spec <-
+          1 - (prod(1 - rep(survey_specificity[i], nij[i, j])))
+        curr_survey_tss <- curr_survey_sens + curr_survey_spec - 1
+        is_model_better_than_survey <- curr_model_tss > curr_survey_tss
+        # generate posterior
+        if (has_no_survey_data || is_model_better_than_survey) {
+          ## use model for posterior if there is no survey data or
+          ## the models are better
+          if (oij[i, j] >= 0.5) {
+            ## if model predicts presence
+            out[i, j] <-
+              (model_sensitivity2[sub_i] * pij[i, j]) /
+               total_probability_of_model_positive[sub_i, j]
+          } else {
+            ## if model predicts absence
+            out[i, j] <-
+              ((1.0 - model_sensitivity2[sub_i]) * pij[i, j]) /
+               total_probability_of_model_negative[sub_i, j]
+          }
         } else {
-          # if the model predicts an absence
-          out[i, j] <-
-            ((1.0 - model_sensitivity2[sub_i]) * pij[i, j]) /
-             total_probability_of_model_negative[sub_i, j]
+          ## use survey data
+          if (oij[i, j] >= 0.5) {
+            ## if survey gives detection
+            out[i, j] <-
+              (survey_sensitivity[i] * pij[i, j]) /
+               total_probability_of_survey_positive[i, j]
+          } else {
+            ## if survey gives non-detection
+            out[i, j] <-
+              ((1 - survey_sensitivity[i]) * pij[i, j]) /
+               total_probability_of_survey_negative[i, j]
+          }
         }
       }
     }

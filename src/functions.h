@@ -5,6 +5,13 @@
 
 void factorial(std::size_t, mpz_t);
 
+void create_reverse_lookup_id(
+  std::vector<bool>&, std::vector<std::size_t>&);
+
+void calculate_survey_tss(
+  Eigen::MatrixXd&, std::vector<std::size_t>&,
+  Eigen::VectorXd&, Eigen::VectorXd&, Eigen::MatrixXd&);
+
 void set_seed(double);
 
 void log_matrix(Eigen::MatrixXd&);

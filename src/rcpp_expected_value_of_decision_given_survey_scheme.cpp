@@ -12,6 +12,10 @@ double expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd &dij, // proportion of detections matrix
   Eigen::MatrixXd &nij, // number of surveys matrix
   Eigen::MatrixXd &pij, // prior matrix
+                        // has model predictions in cases where it is better
+                        // to rely on models instead of survey data
+  Eigen::MatrixXd &pijm, // prior matrix for model fitting
+                         // has model predictions only in sites with no surveys
   std::vector<bool> &survey_features, // features that we want to survey, 0/1
   Eigen::VectorXd &survey_sensitivity,
   Eigen::VectorXd &survey_specificity,
@@ -41,9 +45,6 @@ double expected_value_of_decision_given_survey_scheme(
     std::accumulate(survey_features.begin(), survey_features.end(), 0);
   const std::size_t n_pu_surveyed_in_scheme =
     std::accumulate(pu_survey_solution.begin(), pu_survey_solution.end(), 0);
-   std::vector<std::size_t> n_pu_model_prediction(n_f);
-   for (std::size_t i = 0; i < n_f; ++i)
-    n_pu_model_prediction[i] = pu_model_prediction_idx[i].size();
 
   /// integer over-flow checks, highest std::size_t value is 1e+18
   if (n_pu_surveyed_in_scheme > 20)
@@ -92,22 +93,9 @@ double expected_value_of_decision_given_survey_scheme(
       survey_features_idx.push_back(i);
   survey_features_idx.shrink_to_fit();
 
-  /// store indices for features in sparse format for reverse lookup
-  /// e.g. if survey_features = [0, 1, 0, 1]
-  ///         survey_features_idx = [1, 3]
-  ///         survey_features_rev_idx = [?, 0, ?, 1], note ? = 0 as a default
-  ///                                                 but could be anything
-  ///                                                 since it is not used
-  std::vector<std::size_t> survey_features_rev_idx(n_f, 0);
-  {
-    std::size_t counter = 0;
-    for (std::size_t i = 0; i < n_f; ++i) {
-      if (survey_features[i]) {
-        survey_features_rev_idx[i] = counter;
-        ++counter;
-      }
-    }
-  }
+  /// indices for features in sparse format for reverse lookup
+  std::vector<std::size_t> survey_features_rev_idx(n_f, 1e5);
+  create_reverse_lookup_id(survey_features, survey_features_rev_idx);
 
   /// declare temporary variables used in the main loop
   std::size_t curr_n_folds;
@@ -119,6 +107,7 @@ double expected_value_of_decision_given_survey_scheme(
   double curr_expected_value_of_decision =
     std::numeric_limits<double>::infinity();
   Eigen::MatrixXd curr_oij = pij;
+  Eigen::MatrixXd curr_model_pij = pijm;
   Eigen::MatrixXd curr_pij(n_f, n_pu);
   curr_pij.setConstant(-100.0);
   Eigen::MatrixXd curr_dij = dij;
@@ -148,7 +137,7 @@ double expected_value_of_decision_given_survey_scheme(
   std::size_t curr_n;
   for (std::size_t i = 0; i < n_f_survey; ++i) {
     /// prepare matrix
-    curr_n = n_pu_model_prediction[survey_features_idx[i]];
+    curr_n = pu_model_prediction_idx[i].size();
     pu_predict_env_data[i].resize(curr_n, n_vars);
     /// store environmental values for species needing predictions
     for (std::size_t j = 0; j < curr_n; ++j)
@@ -215,6 +204,14 @@ double expected_value_of_decision_given_survey_scheme(
     ++curr_nij(*itr);
   }
 
+  // calculate TSS for survey data including new surveys
+  Eigen::MatrixXd curr_survey_tss(n_f_survey, n_pu);
+  calculate_survey_tss(
+    curr_nij,
+    survey_features_idx,
+    survey_sensitivity, survey_specificity,
+    curr_survey_tss);
+
   // main processing
   mpz_class o = 0;
   mpz_class oo;
@@ -240,9 +237,23 @@ double expected_value_of_decision_given_survey_scheme(
     }
 
     /// initialize posterior probability matrix with new survey results
-    /// and the prior data for cells that don't need
+    /// for fitting species distribution models,
+    /// thus cells are based on survey data when survey data are available even
+    /// if the species distribution models are better
     initialize_posterior_probability_matrix(
-      nij, pij, curr_oij,
+      pijm, curr_oij,
+      pu_survey_solution,
+      survey_features, survey_features_rev_idx,
+      survey_sensitivity, survey_specificity,
+      total_probability_of_survey_positive,
+      total_probability_of_survey_negative,
+      curr_model_pij);
+
+    /// initialize posterior probability matrix with new survey results
+    /// for generating prioritisations,
+    /// thus cells are based on the best available information
+    initialize_posterior_probability_matrix(
+      pij, curr_oij,
       pu_survey_solution,
       survey_features, survey_features_rev_idx,
       survey_sensitivity, survey_specificity,
@@ -252,7 +263,7 @@ double expected_value_of_decision_given_survey_scheme(
 
     // prepare weight data for modelling
     extract_k_fold_train_w_data_from_indices(
-      curr_pij, xgb_train_folds, survey_features_idx, train_w);
+      curr_model_pij, xgb_train_folds, survey_features_idx, train_w);
     extract_k_fold_test_w_data_from_indices(
       curr_dij, curr_nij, xgb_test_folds, survey_features_idx, test_w);
 
@@ -269,9 +280,22 @@ double expected_value_of_decision_given_survey_scheme(
 
     /// generate modelled predictions for species we are interested in surveying
     predict_missing_rij_data(
-      curr_oij, survey_features_idx, feature_outcome_idx,
+      curr_model_pij, survey_features_idx, feature_outcome_idx,
       pu_model_prediction_idx, model_yhat);
     assert_valid_probability_data(curr_oij, "issue predicting missing data");
+
+    /// find indices in the rij matrix that should be updated with results
+    /// from the species distribution models
+    /// because either
+    /// (i) the model performs better than the survey data or
+    /// (ii) there are no survey data available
+    find_rij_idx_based_on_models(
+      curr_model_pij,
+      pu_model_prediction_idx,
+      survey_features, survey_features_rev_idx,
+      curr_survey_tss,
+      curr_model_sensitivity, curr_model_specificity,
+      curr_model_rij_idx);
 
     /// calculate total probability of models' positive results
     total_probability_of_positive_model_result(
@@ -289,16 +313,7 @@ double expected_value_of_decision_given_survey_scheme(
     assert_valid_probability_data(curr_total_probability_of_model_negative,
                                   "issue calculating total model negatives");
 
-    /// find idices in the rij matrix that use model esimtates
-    find_rij_idx_based_on_models(
-      nij,
-      pu_survey_solution,
-      survey_features, survey_features_rev_idx,
-      survey_sensitivity, survey_specificity,
-      curr_model_sensitivity, curr_model_specificity,
-      curr_model_rij_idx);
-
-    /// create posterior matrix with most likely model outcomes
+    /// update posterior matrix with model predictions
     update_model_posterior_probabilities(
       curr_model_rij_idx,
       pij, curr_oij,
@@ -363,11 +378,11 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   Eigen::MatrixXd dij,
   Eigen::MatrixXd nij,
   Eigen::MatrixXd pij,
+  Eigen::MatrixXd pijm,
   std::vector<bool> survey_features,
   Eigen::VectorXd survey_sensitivity,
   Eigen::VectorXd survey_specificity,
   std::vector<bool> pu_survey_solution,
-  Rcpp::List pu_model_prediction,
   Eigen::VectorXd pu_survey_costs,
   Eigen::VectorXd pu_purchase_costs,
   Eigen::VectorXd pu_purchase_locked_in,
@@ -391,6 +406,7 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
     if (survey_features[i])
       survey_features_idx.push_back(i);
   survey_features_idx.shrink_to_fit();
+  const std::size_t n_pu = survey_features_idx.size();
   const std::size_t n_f_survey = survey_features_idx.size();
   const std::size_t n_f_outcomes = 1;
   std::vector<mpz_class> feature_outcome_idx(n_f_survey, 0);
@@ -408,12 +424,20 @@ double rcpp_expected_value_of_decision_given_survey_scheme(
   extract_k_fold_indices(xgb_test_folds, xgb_test_folds2);
 
   // format pu model prediction indices
-  std::vector<std::vector<std::size_t>> pu_model_prediction_idx;
-  extract_list_of_list_of_indices(pu_model_prediction, pu_model_prediction_idx);
+  std::vector<std::vector<std::size_t>> pu_model_prediction_idx(n_f_survey);
+  for (std::size_t i = 0; i < n_f_survey; ++i) {
+    pu_model_prediction_idx.reserve(n_pu);
+    for (std::size_t j = 0; j < n_pu; ++j) {
+      if ((nij(survey_features_idx[i], j) < 0.5) || pu_survey_solution[j]) {
+        pu_model_prediction_idx.push_back(j);
+      }
+    }
+    pu_model_prediction_idx.shrink_to_fit();
+  }
 
   // calculate value of information
   return expected_value_of_decision_given_survey_scheme(
-    dij, nij, pij,
+    dij, nij, pij, pijm,
     survey_features,
     survey_sensitivity, survey_specificity,
     pu_survey_solution, pu_model_prediction_idx,

@@ -93,19 +93,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_expected_value_of_decision_given_survey_scheme
-double rcpp_expected_value_of_decision_given_survey_scheme(Eigen::MatrixXd dij, Eigen::MatrixXd nij, Eigen::MatrixXd pij, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<bool> pu_survey_solution, Rcpp::List pu_model_prediction, Eigen::VectorXd pu_survey_costs, Eigen::VectorXd pu_purchase_costs, Eigen::VectorXd pu_purchase_locked_in, Eigen::VectorXd pu_purchase_locked_out, Eigen::MatrixXf pu_env_data_raw, std::vector<std::string> xgb_parameter_names, Rcpp::CharacterMatrix xgb_parameter_values, std::vector<std::size_t> n_xgb_rounds, std::vector<std::size_t> n_xgb_early_stopping_rounds, Rcpp::List xgb_train_folds, Rcpp::List xgb_test_folds, Eigen::VectorXi obj_fun_target, double total_budget);
-RcppExport SEXP _surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme(SEXP dijSEXP, SEXP nijSEXP, SEXP pijSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP pu_survey_solutionSEXP, SEXP pu_model_predictionSEXP, SEXP pu_survey_costsSEXP, SEXP pu_purchase_costsSEXP, SEXP pu_purchase_locked_inSEXP, SEXP pu_purchase_locked_outSEXP, SEXP pu_env_data_rawSEXP, SEXP xgb_parameter_namesSEXP, SEXP xgb_parameter_valuesSEXP, SEXP n_xgb_roundsSEXP, SEXP n_xgb_early_stopping_roundsSEXP, SEXP xgb_train_foldsSEXP, SEXP xgb_test_foldsSEXP, SEXP obj_fun_targetSEXP, SEXP total_budgetSEXP) {
+double rcpp_expected_value_of_decision_given_survey_scheme(Eigen::MatrixXd dij, Eigen::MatrixXd nij, Eigen::MatrixXd pij, Eigen::MatrixXd pijm, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<bool> pu_survey_solution, Eigen::VectorXd pu_survey_costs, Eigen::VectorXd pu_purchase_costs, Eigen::VectorXd pu_purchase_locked_in, Eigen::VectorXd pu_purchase_locked_out, Eigen::MatrixXf pu_env_data_raw, std::vector<std::string> xgb_parameter_names, Rcpp::CharacterMatrix xgb_parameter_values, std::vector<std::size_t> n_xgb_rounds, std::vector<std::size_t> n_xgb_early_stopping_rounds, Rcpp::List xgb_train_folds, Rcpp::List xgb_test_folds, Eigen::VectorXi obj_fun_target, double total_budget);
+RcppExport SEXP _surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme(SEXP dijSEXP, SEXP nijSEXP, SEXP pijSEXP, SEXP pijmSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP pu_survey_solutionSEXP, SEXP pu_survey_costsSEXP, SEXP pu_purchase_costsSEXP, SEXP pu_purchase_locked_inSEXP, SEXP pu_purchase_locked_outSEXP, SEXP pu_env_data_rawSEXP, SEXP xgb_parameter_namesSEXP, SEXP xgb_parameter_valuesSEXP, SEXP n_xgb_roundsSEXP, SEXP n_xgb_early_stopping_roundsSEXP, SEXP xgb_train_foldsSEXP, SEXP xgb_test_foldsSEXP, SEXP obj_fun_targetSEXP, SEXP total_budgetSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type dij(dijSEXP);
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type nij(nijSEXP);
     Rcpp::traits::input_parameter< Eigen::MatrixXd >::type pij(pijSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type pijm(pijmSEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type survey_features(survey_featuresSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type survey_sensitivity(survey_sensitivitySEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type survey_specificity(survey_specificitySEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type pu_survey_solution(pu_survey_solutionSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type pu_model_prediction(pu_model_predictionSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type pu_survey_costs(pu_survey_costsSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type pu_purchase_costs(pu_purchase_costsSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXd >::type pu_purchase_locked_in(pu_purchase_locked_inSEXP);
@@ -119,7 +119,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type xgb_test_folds(xgb_test_foldsSEXP);
     Rcpp::traits::input_parameter< Eigen::VectorXi >::type obj_fun_target(obj_fun_targetSEXP);
     Rcpp::traits::input_parameter< double >::type total_budget(total_budgetSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_decision_given_survey_scheme(dij, nij, pij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_model_prediction, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data_raw, xgb_parameter_names, xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds, xgb_train_folds, xgb_test_folds, obj_fun_target, total_budget));
+    rcpp_result_gen = Rcpp::wrap(rcpp_expected_value_of_decision_given_survey_scheme(dij, nij, pij, pijm, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data_raw, xgb_parameter_names, xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds, xgb_train_folds, xgb_test_folds, obj_fun_target, total_budget));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -260,7 +260,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_predict_missing_rij_data
-Eigen::MatrixXd rcpp_predict_missing_rij_data(Eigen::MatrixXd dij, Eigen::MatrixXd nij, Eigen::MatrixXd pij, Eigen::MatrixXf pu_env_data_raw, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<std::string> xgb_parameter_names, Rcpp::CharacterMatrix xgb_parameter_values, std::vector<std::size_t> n_xgb_rounds, std::vector<std::size_t> n_xgb_early_stopping_rounds, Rcpp::List xgb_train_folds, Rcpp::List xgb_test_folds, Rcpp::List pu_model_prediction);
+Eigen::MatrixXd rcpp_predict_missing_rij_data(Eigen::MatrixXd dij, Eigen::MatrixXd nij, Eigen::MatrixXd pij, Eigen::MatrixXf pu_env_data_raw, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<std::string> xgb_parameter_names, Rcpp::CharacterMatrix xgb_parameter_values, std::vector<std::size_t> n_xgb_rounds, std::vector<std::size_t> n_xgb_early_stopping_rounds, Rcpp::List xgb_train_folds, Rcpp::List xgb_test_folds, std::vector<bool> pu_model_prediction);
 RcppExport SEXP _surveyvoi_rcpp_predict_missing_rij_data(SEXP dijSEXP, SEXP nijSEXP, SEXP pijSEXP, SEXP pu_env_data_rawSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP xgb_parameter_namesSEXP, SEXP xgb_parameter_valuesSEXP, SEXP n_xgb_roundsSEXP, SEXP n_xgb_early_stopping_roundsSEXP, SEXP xgb_train_foldsSEXP, SEXP xgb_test_foldsSEXP, SEXP pu_model_predictionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -278,7 +278,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<std::size_t> >::type n_xgb_early_stopping_rounds(n_xgb_early_stopping_roundsSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type xgb_train_folds(xgb_train_foldsSEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type xgb_test_folds(xgb_test_foldsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type pu_model_prediction(pu_model_predictionSEXP);
+    Rcpp::traits::input_parameter< std::vector<bool> >::type pu_model_prediction(pu_model_predictionSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_predict_missing_rij_data(dij, nij, pij, pu_env_data_raw, survey_features, survey_sensitivity, survey_specificity, xgb_parameter_names, xgb_parameter_values, n_xgb_rounds, n_xgb_early_stopping_rounds, xgb_train_folds, xgb_test_folds, pu_model_prediction));
     return rcpp_result_gen;
 END_RCPP

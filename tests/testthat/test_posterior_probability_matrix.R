@@ -23,8 +23,8 @@ test_that("correct result", {
   feature_data <- tibble::tibble(
     name = letters[1:3],
     survey = c(TRUE, FALSE, TRUE),
-    sensitivity = c(0.9, 0.96, 0.9),
-    specificity = c(0.95, 0.92, 0.95),
+    sensitivity = c(0.9, 0.96, 0.52),
+    specificity = c(0.95, 0.92, 0.51),
     model_sensitivity = c(0.8, 0.7, 0.657),
     model_specificity = c(0.92, 0.9, 0.65))
   site_n_columns <- c("n1", "n2", "n3")
@@ -50,6 +50,8 @@ test_that("correct result", {
   dimnames(r1) <- dimnames(pij)
   dimnames(r2) <- dimnames(pij)
   # tests
+  ## equal results for r and rcpp implementations
+  expect_equal(r1, r2)
   ## expect prior probs in places with existing data
   expect_equivalent(r2[1, 1:3], site_data$p1[1:3])
   expect_equivalent(r2[2, ], site_data$p2)
@@ -62,6 +64,4 @@ test_that("correct result", {
   expect_gt(r2[1, 5], max(r2[1, 6]))
   ## expect low probs in places with modelled presence
   expect_lt(r2[3, 6], max(r2[3, 5]))
-  ## equal results for r and rcpp implementations
-  expect_equal(r1, r2)
 })
