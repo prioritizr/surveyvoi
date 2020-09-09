@@ -143,7 +143,7 @@ internal_prior_probability_matrix <- function(
   model_specificity <- feature_data[[feature_model_specificity_column]]
   # initialize matrix
   prior <- matrix(0, ncol = ncol(dij), nrow = nrow(dij))
-  # determine each site ha survey data for each feature
+  # determine if each site has survey data for each feature
   is_site_have_survey_data <- nij > 0.5
   # calculate model performance
   perf_model_tss <- model_sensitivity + model_specificity - 1
@@ -170,20 +170,26 @@ internal_prior_probability_matrix <- function(
       is_survey_data_better_than_model <-
         perf_survey_tss[i, j] >= perf_model_tss[i]
       ## now calculate the posterior probabilities...
-      if (is_site_have_survey_data &&
+      if (is_site_have_survey_data[i, j] &&
           (is_survey_data_better_than_model || prefer_survey_data)) {
         ## calculate values if has survey data
         prior[i, j] <-
-          prior_probability_of_occupancy_given_survey_data(
+          prior_probability_of_occupancy(
             round(dij[i, j] * nij[i, j]), round((1 - dij[i, j]) * nij[i, j]),
             survey_sensitivity[i], survey_specificity[i],
             prior = 0.5, clamp = FALSE)
       } else if (pij[i, j] >= 0.5) {
         ## calculate values if no data available, and model predicts presence
-        prior[i, j] <- model_sensitivity[i]
+        prior[i, j] <-
+          prior_probability_of_occupancy(
+            1, 0, model_sensitivity[i], model_specificity[i],
+            prior = 0.5, clamp = FALSE)
       } else {
         ## calculate values if no data available, and model predicts absence
-        prior[i, j] <- 1 - model_specificity[i]
+        prior[i, j] <-
+          prior_probability_of_occupancy(
+            0, 1, model_sensitivity[i], model_specificity[i],
+            prior = 0.5, clamp = FALSE)
       }
     }
   }
@@ -196,7 +202,7 @@ internal_prior_probability_matrix <- function(
   prior
 }
 
-#' Prior probability of occupancy given survey data
+#' Prior probability of occupancy
 #'
 #' Calculate the prior probability of a species occupying a site
 #' given that a series of surveys which protected a number of
@@ -220,7 +226,7 @@ internal_prior_probability_matrix <- function(
 #' @return \code{numeric} probability value.
 #'
 #' @noRd
-prior_probability_of_occupancy_given_survey_data <- function(
+prior_probability_of_occupancy <- function(
   n_det, n_nondet, sensitivity, specificity, prior = 0.5, clamp = TRUE) {
   # assert that arguments are valid
   assertthat::assert_that(

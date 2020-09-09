@@ -192,6 +192,7 @@ NULL
 #'                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
 #'                    objective = "binary:logistic")
 #'
+#' \dontrun{
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
 #' # finishes quickly, you would probably want something like 1000+
@@ -210,7 +211,7 @@ NULL
 #'
 #' # print model performance
 #' print(results$performance)
-#'
+#' }
 #' @export
 fit_occupancy_models <- function(
   site_data, feature_data,
@@ -293,14 +294,12 @@ fit_occupancy_models <- function(
 
   # prepare folds
   f <- lapply(seq_len(nrow(feature_data)), function(i) {
-    withr::with_seed(seed, {
-      n_surveys <- site_data[[site_n_surveys_columns[i]]]
-      idx <- seq_along(n_surveys)
-      create_site_folds(
-        prop_detected = site_data[[site_detection_columns[i]]][n_surveys > 0],
-        n_total = n_surveys[n_surveys > 0],
-        n = xgb_n_folds[i], idx[n_surveys > 0])
-    })
+    n_surveys <- site_data[[site_n_surveys_columns[i]]]
+    idx <- seq_along(n_surveys)
+    create_site_folds(
+      prop_detected = site_data[[site_detection_columns[i]]][n_surveys > 0],
+      n_total = n_surveys[n_surveys > 0],
+      n = xgb_n_folds[i], idx[n_surveys > 0], seed = seed)
   })
 
   # prepare data
@@ -332,7 +331,7 @@ fit_occupancy_models <- function(
       train_data <- site_data[f[[i]]$train[[k]], , drop = FALSE]
       prior_prob_pres <- vapply(
         seq_len(nrow(train_data)), FUN.VALUE = numeric(1), function(j) {
-        prior_probability_of_occupancy_given_survey_data(
+        prior_probability_of_occupancy(
           train_data$n_det[j], train_data$n_nondet[j], sens, spec, 0.5)
       })
       y_train <- c(rep(1, nrow(train_data)), rep(0, nrow(train_data)))
@@ -355,18 +354,16 @@ fit_occupancy_models <- function(
 
   # tune and fit models
   m <- lapply(seq_len(nrow(feature_data)), function(i) {
-    withr::with_seed(seed, {
-      tune_model(
-        data = d[[i]], folds = f[[i]],
-        survey_sensitivity =
-          feature_data[[feature_survey_sensitivity_column]][i],
-        survey_specificity =
-          feature_data[[feature_survey_specificity_column]][i],
-        parameters = xgb_tuning_parameters,
-        early_stopping_rounds = xgb_early_stopping_rounds[i],
-        n_rounds = xgb_n_rounds[i], n_folds = xgb_n_folds[i],
-        n_threads = n_threads, verbose = verbose)
-    })
+    tune_model(
+      data = d[[i]], folds = f[[i]],
+      survey_sensitivity =
+        feature_data[[feature_survey_sensitivity_column]][i],
+      survey_specificity =
+        feature_data[[feature_survey_specificity_column]][i],
+      parameters = xgb_tuning_parameters,
+      early_stopping_rounds = xgb_early_stopping_rounds[i],
+      n_rounds = xgb_n_rounds[i], n_folds = xgb_n_folds[i],
+      n_threads = n_threads, verbose = verbose, seed = seed)
   })
 
   # assess models
@@ -440,7 +437,8 @@ fit_occupancy_models <- function(
 
 #' @noRd
 tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
-  parameters, early_stopping_rounds, n_rounds, n_folds, n_threads, verbose) {
+  parameters, early_stopping_rounds, n_rounds, n_folds, n_threads, verbose,
+  seed) {
   # assert arguments are valid
   assertthat::assert_that(
     isTRUE(n_folds == length(folds$train)),
@@ -451,6 +449,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
     assertthat::is.count(early_stopping_rounds),
     assertthat::noNA(early_stopping_rounds),
     assertthat::is.count(n_threads),
+    assertthat::is.count(seed),
     assertthat::noNA(n_threads),
     is.list(parameters),
     assertthat::is.flag(verbose), assertthat::noNA(verbose))
@@ -504,9 +503,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
         data[[k]]$test$x, label = data[[k]]$test$y,
         weight = data[[k]]$test$w)
       ### prepare evaluation function
-      curr_feval_tss <- feval_tss
-      environment(curr_feval_tss)$sens <- survey_sensitivity
-      environment(curr_feval_tss)$spec <- survey_specificity
+      curr_feval_tss <- make_feval_tss(survey_sensitivity, survey_specificity)
       ### prepare arguments for xgboost call
       args <- list(data = dtrain, verbose = FALSE, scale_pos_weight = spw[k],
                    watchlist = list(test = dtest), eval_metric = curr_feval_tss,
@@ -549,14 +546,16 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
 }
 
 #' @noRd
-feval_tss <- function(preds, dtest) {
-  labels <- xgboost::getinfo(dtest, "label")
-  wts <- xgboost::getinfo(dtest, "weight")
-  assertthat::assert_that(
-    any(labels >= 0.5), any(labels < 0.5),
-    msg = "test labels need at least one presence and one absence")
-  assertthat::assert_that(all(preds >= 0), all(preds <= 1),
-    msg = "xgboost predictions are not between zero and one")
-  value <- rcpp_model_performance(labels, preds, wts, sens, spec)
-  list(metric = "tss", value = value[[1]])
+make_feval_tss <- function(sens, spec) {
+  function(preds, dtest) {
+    labels <- xgboost::getinfo(dtest, "label")
+    wts <- xgboost::getinfo(dtest, "weight")
+    assertthat::assert_that(
+      any(labels >= 0.5), any(labels < 0.5),
+      msg = "test labels need at least one presence and one absence")
+    assertthat::assert_that(all(preds >= 0), all(preds <= 1),
+      msg = "xgboost predictions are not between zero and one")
+    value <- rcpp_model_performance(labels, preds, wts, sens, spec)
+    list(metric = "tss", value = value[[1]])
+  }
 }

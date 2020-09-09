@@ -26,7 +26,7 @@ NULL
 #'   Defaults to \code{NULL} such that no sites are locked out.
 #'
 #' @param verbose \code{logical} indicating if information should be
-#'   printed while generating the survey scheme(s). Defaults to \code{FALSE}.
+#'   printed during processing. Defaults to \code{FALSE}.
 #'
 #' @details
 #' Ideally, the brute-force algorithm would be used to identify the optimal
@@ -122,21 +122,15 @@ NULL
 #' # (i.e. 10% of the cost of managing all sites)
 #' survey_budget <- sum(site_data$survey_cost) * 0.1
 #'
-#' # define xgboost tuning parameters
-#' xgb_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
-#'                        lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
-#'                        objective = "binary:logistic")
-#'
 #' # find survey scheme using approximate method and greedy heuristic algorithm
 #' # (using 10 replicates so that this example completes relatively quickly)
 #' approx_near_optimal_survey <- approx_near_optimal_survey_scheme(
 #'   site_data, feature_data,
 #'   c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
-#'   c("e1", "e2", "e3"), "management_cost", "survey_cost",
+#'   "management_cost", "survey_cost",
 #'   "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "target", total_budget, survey_budget, xgb_parameters,
-#'   n_approx_replicates = 10)
+#'   "target", total_budget, survey_budget)
 #'
 #' # print result
 #' print(approx_near_optimal_survey)
@@ -145,7 +139,6 @@ NULL
 approx_near_optimal_survey_scheme <- function(
   site_data, feature_data,
   site_detection_columns, site_n_surveys_columns, site_probability_columns,
-  site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
   feature_survey_column,
@@ -156,10 +149,6 @@ approx_near_optimal_survey_scheme <- function(
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
-  xgb_n_rounds = rep(100, length(site_detection_columns)),
-  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
@@ -195,10 +184,6 @@ approx_near_optimal_survey_scheme <- function(
     identical(nrow(feature_data), length(site_probability_columns)),
     assertthat::noNA(site_probability_columns),
     all(assertthat::has_name(site_data, site_probability_columns)),
-    ## site_env_vars_columns
-    is.character(site_env_vars_columns),
-    assertthat::noNA(site_env_vars_columns),
-    all(assertthat::has_name(site_data, site_env_vars_columns)),
     ## site_management_cost_column
     assertthat::is.string(site_management_cost_column),
     all(assertthat::has_name(site_data, site_management_cost_column)),
@@ -257,19 +242,6 @@ approx_near_optimal_survey_scheme <- function(
     assertthat::is.number(survey_budget), assertthat::noNA(survey_budget),
     isTRUE(survey_budget > 0), isTRUE(survey_budget <= total_budget),
     isTRUE(survey_budget >= min(site_data[[site_survey_cost_column]])),
-    ## xgb_parameters
-    is.list(xgb_tuning_parameters),
-    ## xgb_n_folds
-    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_detection_columns),
-    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_detection_columns),
-    all(xgb_n_rounds > 0),
-    ## xgb_early_stopping_rounds
-    is.numeric(xgb_early_stopping_rounds),
-    assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_detection_columns),
-    all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
     ## n_threads
@@ -332,11 +304,6 @@ approx_near_optimal_survey_scheme <- function(
       assertthat::noNA(site_data[[site_survey_locked_out_column]]),
       !all(site_data[[site_survey_locked_out_column]]))
   }
-  ## n_approx_outcomes_per_replicate
-  if ((nrow(site_data) * nrow(feature_data)) < 50)
-    assertthat::assert_that(
-    isTRUE(n_approx_outcomes_per_replicate <=
-           n_states(nrow(site_data), nrow(feature_data))))
   ## validate targets
   validate_target_data(feature_data, feature_target_column)
   ## validate survey data
@@ -344,8 +311,6 @@ approx_near_optimal_survey_scheme <- function(
   validate_site_n_surveys_data(site_data, site_n_surveys_columns)
   ## validate model probability values
   validate_site_probability_data(site_data, site_probability_columns)
-  ## validate xgboost tuning parameters
-  validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
   assertthat::assert_that(
     all(feature_data[[feature_target_column]] <= nrow(site_data)))
@@ -370,12 +335,6 @@ approx_near_optimal_survey_scheme <- function(
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix
   }
-  ## calculate prior matrix for re-fitting species distribution models
-  pijm <- internal_prior_probability_matrix(
-    site_data, feature_data, site_detection_columns,
-    site_n_surveys_columns, site_probability_columns,
-    feature_survey_sensitivity_column, feature_survey_specificity_column,
-    feature_model_sensitivity_column, feature_model_specificity_column, TRUE)
   ## prepare site management locked in data
   if (!is.null(site_management_locked_in_column)) {
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
@@ -394,17 +353,6 @@ approx_near_optimal_survey_scheme <- function(
   } else {
     site_survey_locked_out <- rep(FALSE, nrow(site_data))
   }
-  ## prepare parameter combinations for model tuning
-  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
-  attr(xgb_full_parameters, "out.attrs") <- NULL
-  xgb_full_parameters$nthread <- "1" # force single thread for reproducibility
-  xgb_full_parameters$verbose <- "0" # force quiet
-  xgb_full_parameters$seed <- as.character(seed) # set seed
-  if (is.null(xgb_full_parameters$objective)) {
-    xgb_full_parameters$objective <- "binary:logistic"
-    warning(paste("no objective specified for model fitting,",
-                  "assuming binary:logistic"))
-  }
   ## validate that targets are feasible given budget and locked out units
   sorted_costs <- sort(
     site_data[[site_management_cost_column]][!site_management_locked_out])
@@ -415,9 +363,7 @@ approx_near_optimal_survey_scheme <- function(
     msg = paste("targets cannot be achieved given budget and locked out",
                 "planning units"))
   ## extract site data
-  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
   nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
-  ejx <- as.matrix(site_data[, site_env_vars_columns, drop = FALSE])
   ## identify planning units that have been surveyed for all species
   site_survey_status <- colSums(nij < 0.5) == 0
 
@@ -478,39 +424,20 @@ approx_near_optimal_survey_scheme <- function(
         sum(site_data[[site_management_cost_column]] *
             site_management_locked_in)
       if (curr_total_cost > total_budget) return(NA_real_)
-      ## identify sites that need model predictions for each feature
-      pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-        which(!curr_candidate_solution & (nij[i, ] < 0.5))
-      })
-      ## folds for training and testing models
-      xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
-        has_data_idx <- which((nij[i, ] > 0.5) | curr_candidate_solution)
-        create_site_folds(
-          dij[i, has_data_idx], nij[i, has_data_idx],
-          xgb_n_folds[i], index = has_data_idx, seed = seed)
-      })
       ## calculate expected value of decision given survey scheme
       out <- withr::with_seed(seed, {
         rcpp_approx_expected_value_of_decision_given_survey_scheme(
-          dij = dij, nij = nij, pij = pij, pijm = pijm,
+          pij = pij,
           survey_features = feature_data[[feature_survey_column]],
           survey_sensitivity =
             feature_data[[feature_survey_sensitivity_column]],
           survey_specificity =
             feature_data[[feature_survey_specificity_column]],
           pu_survey_solution = curr_candidate_solution,
-          pu_model_prediction = pu_model_prediction,
           pu_survey_costs = site_data[[site_survey_cost_column]],
           pu_purchase_costs = site_data[[site_management_cost_column]],
           pu_purchase_locked_in = site_management_locked_in,
           pu_purchase_locked_out = site_management_locked_out,
-          pu_env_data = ejx,
-          xgb_parameter_names = names(xgb_full_parameters),
-          xgb_parameter_values = as.matrix(xgb_full_parameters),
-          n_xgb_rounds = xgb_n_rounds,
-          n_xgb_early_stopping_rounds = xgb_early_stopping_rounds,
-          xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
-          xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
           obj_fun_target = round(feature_data[[feature_target_column]]),
           n_approx_replicates = n_approx_replicates,
           total_budget = total_budget,
@@ -555,7 +482,7 @@ approx_near_optimal_survey_scheme <- function(
   }
 
   # find optimal solution(s)
-  best_idx <- abs(max(survey_solution_values) - survey_solution_values) < 1e-10
+  best_idx <- abs(max(survey_solution_values) - survey_solution_values) < 1e-15
   out <- survey_solution_matrix[best_idx,  , drop = FALSE]
   attr(out, "ev") <- survey_solution_values[best_idx]
 

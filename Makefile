@@ -58,6 +58,7 @@ install:
 	R --slave -e "devtools::install_local('../surveyroi', force = TRUE, upgrade = 'never')"
 
 examples:
+	rm -f examples.log
 	R --slave -e "devtools::run_examples(test = TRUE);warnings()"  >> examples.log
 	rm -f Rplots.pdf
 

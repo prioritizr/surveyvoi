@@ -73,7 +73,7 @@ planning units." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -139,13 +139,16 @@ planning units.</p>
 
     <pre class="usage"><span class='fu'>fit_occupancy_models</span>(
   <span class='no'>site_data</span>,
-  <span class='no'>site_occupancy_columns</span>,
+  <span class='no'>feature_data</span>,
+  <span class='no'>site_detection_columns</span>,
+  <span class='no'>site_n_surveys_columns</span>,
   <span class='no'>site_env_vars_columns</span>,
+  <span class='no'>feature_survey_sensitivity_column</span>,
+  <span class='no'>feature_survey_specificity_column</span>,
   <span class='no'>xgb_tuning_parameters</span>,
-  <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
-  <span class='kw'>xgb_n_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
-  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
-  <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
+  <span class='kw'>xgb_n_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
+  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -159,14 +162,26 @@ planning units.</p>
       <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
     </tr>
     <tr>
-      <th>site_occupancy_columns</th>
+      <th>feature_data</th>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+    </tr>
+    <tr>
+      <th>site_detection_columns</th>
       <td><p><code>character</code> names of <code>numeric</code>
-columns in the
-argument to <code>site_data</code> that contain presence/absence data.
+columns in the argument to <code>site_data</code> that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary presence/absence data (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (<code>NA</code>) values should be used.</p></td>
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
+    </tr>
+    <tr>
+      <th>site_n_surveys_columns</th>
+      <td><p><code>character</code> names of <code>numeric</code>
+columns in the argument to <code>site_data</code> that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
     </tr>
     <tr>
       <th>site_env_vars_columns</th>
@@ -176,6 +191,24 @@ for fitting updated occupancy models based on possible survey outcomes.
 Each column should correspond to a different environmental variable,
 and contain <code>numeric</code>, <code>factor</code>, or <code>character</code> data.
 No missing (<code>NA</code>) values are permitted in these columns.</p></td>
+    </tr>
+    <tr>
+      <th>feature_survey_sensitivity_column</th>
+      <td><p><code>character</code> name of the
+column in the argument to <code>feature_data</code> that contains
+probability of future surveys correctly detecting a presence of each
+feature in a given site (i.e. the sensitivity of the survey methodology).
+This column should have <code>numeric</code> values that are between zero and
+one. No missing (<code>NA</code>) values are permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_survey_specificity_column</th>
+      <td><p><code>character</code> name of the
+column in the argument to <code>feature_data</code> that contains
+probability of future surveys correctly detecting an absence of each
+feature in a given site (i.e. the specificity of the survey methodology).
+This column should have <code>numeric</code> values that are between zero and
+one. No missing (<code>NA</code>) values are permitted in this column.</p></td>
     </tr>
     <tr>
       <th>xgb_tuning_parameters</th>
@@ -190,27 +223,19 @@ parameter values for fitting models. Valid parameters include:
       <th>xgb_early_stopping_rounds</th>
       <td><p><code>numeric</code> model rounds for parameter
 tuning. See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> for more information.
-Defaults to 100 for each feature.</p></td>
+Defaults to 10 for each feature.</p></td>
     </tr>
     <tr>
       <th>xgb_n_rounds</th>
       <td><p><code>numeric</code> model rounds for model fitting
 See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> for more information.
-Defaults to 1000 for each feature.</p></td>
+Defaults to 100 for each feature.</p></td>
     </tr>
     <tr>
       <th>xgb_n_folds</th>
       <td><p><code>numeric</code> number of folds to split the training
 data into when fitting models for each feature.
 Defaults to 5 for each feature.</p></td>
-    </tr>
-    <tr>
-      <th>site_weight_columns</th>
-      <td><p><code>character</code> name of columns in
-<code>site_data</code> containing weights for model fitting. These columns must
-contain <code>numeric</code> values. No missing (<code>NA</code>) values are
-permitted. Defaults to <code>NULL</code> such that all data are given
-equal weight when fitting models.</p></td>
     </tr>
     <tr>
       <th>n_threads</th>
@@ -323,24 +348,28 @@ tuning parameters for each feature.</p></dd>
 <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
- <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='fl'>200</span>, <span class='fl'>2</span>, <span class='fl'>0.5</span>, <span class='kw'>n_env_vars</span> <span class='kw'>=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt; ...</div><div class='input'>
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+
 <span class='co'># create list of possible tuning parameters for modelling</span>
 <span class='no'>parameters</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>eta</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>3</span>),
                    <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>10</span> ^ <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1.0</span>, <span class='fl'>0.0</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>3</span>),
                    <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>)
 
+<span class='co'># \dontrun{</span>
 <span class='co'># fit models</span>
 <span class='co'># note that we use 10 random search iterations here so that the example</span>
 <span class='co'># finishes quickly, you would probably want something like 1000+</span>
 <span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(
-   <span class='no'>x</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"f"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_len</a></span>(<span class='fl'>2</span>)), <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"e"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_len</a></span>(<span class='fl'>3</span>)),
+   <span class='no'>site_data</span>, <span class='no'>feature_data</span>,
+   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
+   <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
    <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>2</span>),
    <span class='kw'>xgb_tuning_parameters</span> <span class='kw'>=</span> <span class='no'>parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># print best found model parameters</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>parameters</span>)</div><div class='output co'>#&gt; [[1]]
 #&gt; [[1]]$eta
-#&gt; [1] 0.5
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[1]]$lambda
 #&gt; [1] 0.1
@@ -348,11 +377,10 @@ tuning parameters for each feature.</p></dd>
 #&gt; [[1]]$objective
 #&gt; [1] "binary:logistic"
 #&gt; 
-#&gt; [[1]]$nrounds
-#&gt; [1] 15
-#&gt; 
 #&gt; [[1]]$scale_pos_weight
-#&gt; [1] 1.040897
+#&gt; [[1]]$scale_pos_weight[[1]]
+#&gt; [1] 1 1 1 1 1
+#&gt; 
 #&gt; 
 #&gt; 
 #&gt; [[2]]
@@ -360,43 +388,42 @@ tuning parameters for each feature.</p></dd>
 #&gt; [1] 0.1
 #&gt; 
 #&gt; [[2]]$lambda
-#&gt; [1] 1
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[2]]$objective
 #&gt; [1] "binary:logistic"
 #&gt; 
-#&gt; [[2]]$nrounds
-#&gt; [1] 31
-#&gt; 
 #&gt; [[2]]$scale_pos_weight
-#&gt; [1] 1.083536
+#&gt; [[2]]$scale_pos_weight[[1]]
+#&gt; [1] 1 1 1 1 1
+#&gt; 
 #&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># print model predictions</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 200 x 2</span><span>
-#&gt;         f1     f2
-#&gt;      </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.987   0.773 
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.020</span><span style='text-decoration: underline;'>2</span><span>  0.600 
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.050</span><span style='text-decoration: underline;'>6</span><span>  0.787 
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.006</span><span style='text-decoration: underline;'>66</span><span> 0.047</span><span style='text-decoration: underline;'>3</span><span>
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.044</span><span style='text-decoration: underline;'>2</span><span>  0.048</span><span style='text-decoration: underline;'>8</span><span>
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.706   0.899 
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.048</span><span style='text-decoration: underline;'>7</span><span>  0.228 
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.133   0.072</span><span style='text-decoration: underline;'>4</span><span>
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.799   0.050</span><span style='text-decoration: underline;'>1</span><span>
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.925   0.165 
-#&gt; </span><span style='color: #555555;'># ... with 190 more rows</span><span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
+#&gt;       f1    f2
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.529 0.719
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.451 0.719
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.549 0.593
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.451 0.713
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.550 0.700
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.450 0.279
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.549 0.546
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.466 0.626
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.540 0.656
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.549 0.377
+#&gt; </span><span style='color: #555555;'># ... with 20 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 13</span><span>
 #&gt;   feature train_tss_mean train_tss_std train_sensitivi~ train_sensitivi~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.960        0.028</span><span style='text-decoration: underline;'>6</span><span>            0.980           0.011</span><span style='text-decoration: underline;'>4</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.931        0.027</span><span style='text-decoration: underline;'>8</span><span>            0.974           0.025</span><span style='text-decoration: underline;'>6</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.981        0.017</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
+#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.940        0.037</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
 #&gt; </span><span style='color: #555555;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
 #&gt; </span><span style='color: #555555;'>#   train_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
 #&gt; </span><span style='color: #555555;'>#   test_sensitivity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_sensitivity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   test_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'>#   test_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'># }
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

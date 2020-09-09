@@ -10,8 +10,6 @@ test_that("single species", {
       f1 = c(0, 1, 0, 1, 0, 1),
       n1 = c(1, 1, 1, 1, 0, 1),
       p1 = c(0.51, 0.99, 0.01, 0.99, 0.5, 0.99),
-      e1 = runif(6),
-      e2 = runif(6),
       survey_cost = c(1, 1, 1, 1, 5, 100000),
       management_cost = c(10, 10, 10, 10, 10, 10),
       locked_in = FALSE),
@@ -26,10 +24,6 @@ test_that("single species", {
     target = 3)
   pm <- matrix(NA, ncol = nrow(site_data), nrow = nrow(feature_data))
   pm[1, ] <- site_data$p1
-  xgb_parameters <-
-    list(eta = c(0.1, 0.3, 0.5),
-         lambda = c(0.01, 0.1, 0.5),
-         objective = "binary:logistic")
   # generate prioritisation
   r <- approx_near_optimal_survey_scheme(
     site_data = site_data,
@@ -37,7 +31,6 @@ test_that("single species", {
     site_detection_columns = c("f1"),
     site_n_surveys_columns = c("n1"),
     site_probability_columns = c("p1"),
-    site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
@@ -48,15 +41,8 @@ test_that("single species", {
     feature_target_column = "target",
     total_budget = 46,
     survey_budget = 10,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = rep(5, 1),
-    xgb_n_rounds = rep(10, 1),
-    xgb_n_folds = rep(2, 1),
     site_management_locked_in_column = "locked_in",
-    prior_matrix = pm,
-    n_approx_replicates = 1,
-    n_approx_outcomes_per_replicate = 2,
-    method_approx_outcomes = "uniform_without_replacement")
+    prior_matrix = pm)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -81,8 +67,6 @@ test_that("multiple species", {
       p1 = c(0.51, 0.99, 0.99, 0.05, 0.5, 0.99),
       p2 = c(0.51, 0.99, 0.05, 0.99, 0.5, 0.05),
       p3 = c(0.51, 0.05, 0.99, 0.99, 0.5, 0.99),
-      e1 = runif(6),
-      e2 = runif(6),
       survey_cost = c(1, 1, 1, 1, 5, 100000),
       management_cost = c(10, 10, 10, 10, 10, 10),
       locked_in = FALSE),
@@ -95,10 +79,6 @@ test_that("multiple species", {
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
     target = c(3, 3, 3))
-  xgb_parameters <-
-    list(eta = c(0.1, 0.3, 0.5),
-         lambda = c(0.01, 0.1, 0.5),
-         objective = "binary:logistic")
   pij <-
     t(as.matrix(sf::st_drop_geometry(site_data)[, c("p1", "p2", "p3"),
                                                 drop = FALSE]))
@@ -109,7 +89,6 @@ test_that("multiple species", {
     site_detection_columns = c("f1", "f2", "f3"),
     site_n_surveys_columns = c("n1", "n2", "n3"),
     site_probability_columns = c("p1", "p2", "p3"),
-    site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
@@ -120,15 +99,8 @@ test_that("multiple species", {
     feature_target_column = "target",
     total_budget = 56,
     survey_budget = 10,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = rep(5, 3),
-    xgb_n_rounds = rep(10, 3),
-    xgb_n_folds = rep(2, 3),
     site_management_locked_in_column = "locked_in",
-    prior_matrix = pij,
-    n_approx_replicates = 1,
-    n_approx_outcomes_per_replicate = 100,
-    method_approx_outcomes = "uniform_without_replacement")
+    prior_matrix = pij)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -153,8 +125,6 @@ test_that("multiple species (sparse)", {
       p1 = c(0.51, 0.99, 0.99, 0.05, 0.5, 1e-10),
       p2 = c(0.51, 0.99, 0.05, 0.99, 0.5, 0.05),
       p3 = c(0.51, 0.05, 0.99, 0.99, 0.5, 0.99),
-      e1 = runif(6),
-      e2 = runif(6),
       survey_cost = c(1, 1, 1, 1, 5, 100000),
       management_cost = c(10, 10, 10, 10, 10, 10),
       locked_in = FALSE),
@@ -167,10 +137,6 @@ test_that("multiple species (sparse)", {
     model_sensitivity = rep(0.8, 3),
     model_specificity = rep(0.85, 3),
     target = c(3, 3, 3))
-  xgb_parameters <-
-    list(eta = c(0.1, 0.3, 0.5),
-         lambda = c(0.01, 0.1, 0.5),
-         objective = "binary:logistic")
   pij <-
     t(as.matrix(sf::st_drop_geometry(site_data)[, c("p1", "p2", "p3"),
                                                 drop = FALSE]))
@@ -181,7 +147,6 @@ test_that("multiple species (sparse)", {
     site_detection_columns = c("f1", "f2", "f3"),
     site_n_surveys_columns = c("n1", "n2", "n3"),
     site_probability_columns = c("p1", "p2", "p3"),
-    site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
@@ -192,15 +157,8 @@ test_that("multiple species (sparse)", {
     feature_target_column = "target",
     total_budget = 56,
     survey_budget = 10,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = rep(5, 3),
-    xgb_n_rounds = rep(10, 3),
-    xgb_n_folds = rep(2, 3),
     site_management_locked_in_column = "locked_in",
-    prior_matrix = pij,
-    n_approx_replicates = 1,
-    n_approx_outcomes_per_replicate = 100,
-    method_approx_outcomes = "uniform_without_replacement")
+    prior_matrix = pij)
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -239,7 +197,6 @@ test_that("consistent results", {
         site_detection_columns = "f1",
         site_n_surveys_columns = "n1",
         site_probability_columns = "p1",
-        site_env_vars_columns = c("e1", "e2"),
         site_survey_cost_column = "survey_cost",
         site_management_cost_column = "management_cost",
         feature_survey_column = "survey",
@@ -249,12 +206,7 @@ test_that("consistent results", {
         feature_model_specificity_column = "model_specificity",
         feature_target_column = "target",
         survey_budget = survey_budget,
-        total_budget = total_budget,
-        xgb_tuning_parameters = xgb_parameters,
-        xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2,
-        n_approx_replicates = 1,
-        n_approx_outcomes_per_replicate = 100,
-        method_approx_outcomes = "uniform_without_replacement")
+        total_budget = total_budget)
   })
   # verify that all repeat calculations are identical
   for (i in seq_along(r))
@@ -292,7 +244,6 @@ test_that("consistent results (multiple threads)", {
           site_detection_columns = "f1",
           site_n_surveys_columns = "n1",
           site_probability_columns = "p1",
-          site_env_vars_columns = c("e1", "e2"),
           site_survey_cost_column = "survey_cost",
           site_management_cost_column = "management_cost",
           feature_survey_column = "survey",
@@ -303,11 +254,6 @@ test_that("consistent results (multiple threads)", {
           feature_target_column = "target",
           survey_budget = survey_budget,
           total_budget = total_budget,
-          xgb_tuning_parameters = xgb_parameters,
-          xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2,
-          n_approx_replicates = 1,
-          n_approx_outcomes_per_replicate = 100,
-          method_approx_outcomes = "uniform_without_replacement",
           n_threads = 2)
     })
   })

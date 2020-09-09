@@ -213,6 +213,7 @@ parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
                    objective = "binary:logistic")
 
+\dontrun{
 # fit models
 # note that we use 10 random search iterations here so that the example
 # finishes quickly, you would probably want something like 1000+
@@ -231,5 +232,5 @@ print(results$predictions)
 
 # print model performance
 print(results$performance)
-
+}
 }

@@ -26,8 +26,7 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 devtools::load_all()
 ```
 
-
-Here we will examine the approximation method for value of information analyses. To achieve this, we will compare estimates from the approximation method against the correct values from the exact methods. A crucial part of the approximation method involves generating a subset of outcomes to _approximate_ the full set of outcomes, and so we will investigate several different methods for generating outcomes. We will also examine how the number of approximation outcomes affects the quality of the estimate.
+Here we will examine the approximation method for conducting the value of information analyses. To achieve this, we will compare estimates from the approximation method against correct values derived from the exact method. A crucial part of the approximation method involves generating a subset of outcomes to _approximate_ the full set of outcomes, and so we will investigate several different methods for generating outcomes. We will also examine how the number of outcomes used in the approximation calculations affects the accuracy of the estimates.
 
 ## Setup
 
@@ -71,7 +70,7 @@ ggplot(site_data) +
   ggtitle("sites")
 ```
 
-The `site_data` object is a spatially explicit dataset (i.e. `sf`) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `n1` column contains the number of previous surveys conducted within each site. The `p1` column contains modelled probability of occupancy predictions from environmental niche models. The `e1`, `e2`, and `e3` columns contain environmental variables for each site. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. Although the `site_data` object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let's create some visualizations.
+The `site_data` object is a spatially explicit dataset (i.e. `sf`) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the  results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site only has a single previous survey at most, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The `n1` column contains the number of previous surveys conducted within each site. Thus sites with zeros in this column have not previously been surveyed. The `p1` column contains modelled probability of occupancy predictions from environmental niche models. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. Although the `site_data` object contains additional columns, they are not relevant here and so we will not bother with them. To help understand the simulated data, let's create some visualizations.
 
 ```{r, fig.height = h, fig.width = w * 2.0}
 # map of site occupancy data from previous surveys
@@ -145,13 +144,6 @@ print(feature_data)
 
 The `feature_data` object is a table (i.e. `tibble`) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `target` column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `model_sensitivity` and `model_specificity` columns denote the sensitivity and specificity of the model used to predict the occupancy probabilities in the `site_data` object (i.e. values in the `p1` column).
 
-Furthermore, our calculations will involve fitting new species distribution models and so we will define some parameters for model fitting. Generally, these parameters would be obtained using the `fit_occupancy_models` function, but here we will define them manually to keep things simple.
-
-```{r}
-# define parameters
-xgb_parameters <- list(eta = 0.1, lambda = 0.1, objective = "binary:logistic")
-```
-
 ## Benchmark analysis
 
 After simulating the data, we can conduct our benchmark analysis. Our simulated data contains one feature and ten planning units in total. This means that there is a total of `r n_states(1, 5)` outcomes. Since we are interested in understanding how the number outcomes in the approximation method affects its accuracy, we will create a set of containing different numbers of outcomes (i.e. `n_approx_outcomes`).
@@ -175,7 +167,6 @@ ev_survey <- evdsi(
   site_detection_columns = "f1",
   site_n_surveys_columns = "n1",
   site_probability_columns = "p1",
-  site_env_vars_columns = c("e1", "e2", "e3"),
   site_survey_scheme_column = "survey_scheme",
   site_survey_cost_column = "survey_cost",
   site_management_cost_column = "management_cost",
@@ -185,8 +176,7 @@ ev_survey <- evdsi(
   feature_model_sensitivity_column = "model_sensitivity",
   feature_model_specificity_column = "model_specificity",
   feature_target_column = "target",
-  total_budget = total_budget,
-  xgb_tuning_parameters = xgb_parameters, xgb_n_folds = 2)
+  total_budget = total_budget)
 
 # print value
 print(ev_survey)
@@ -215,7 +205,6 @@ ev_prime_survey <-
         site_detection_columns = "f1",
         site_n_surveys_columns = "n1",
         site_probability_columns = "p1",
-        site_env_vars_columns = c("e1", "e2", "e3"),
         site_survey_scheme_column = "survey_scheme",
         site_survey_cost_column = "survey_cost",
         site_management_cost_column = "management_cost",
@@ -228,9 +217,7 @@ ev_prime_survey <-
         total_budget = total_budget,
         n_approx_replicates = 25,
         n_approx_outcomes_per_replicate = x$n,
-        method_approx_outcomes = as.character(x$method),
-        xgb_tuning_parameters = xgb_parameters,
-        xgb_n_folds = 2)
+        method_approx_outcomes = as.character(x$method))
     data.frame(n = x, mean = mean(result), se = se(result))
   }) %>%
   as_tibble() %>%

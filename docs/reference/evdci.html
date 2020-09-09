@@ -75,7 +75,7 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -144,7 +144,8 @@ existing biodiversity data (i.e. survey data and environmental niche models).</p
     <pre class="usage"><span class='fu'>evdci</span>(
   <span class='no'>site_data</span>,
   <span class='no'>feature_data</span>,
-  <span class='no'>site_occupancy_columns</span>,
+  <span class='no'>site_detection_columns</span>,
+  <span class='no'>site_n_surveys_columns</span>,
   <span class='no'>site_probability_columns</span>,
   <span class='no'>site_management_cost_column</span>,
   <span class='no'>feature_survey_sensitivity_column</span>,
@@ -170,16 +171,22 @@ existing biodiversity data (i.e. survey data and environmental niche models).</p
       <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
     </tr>
     <tr>
-      <th>site_occupancy_columns</th>
+      <th>site_detection_columns</th>
       <td><p><code>character</code> names of <code>numeric</code>
-columns in the argument to <code>site_data</code> that contain detections
-and non-detections of features at each site.
+columns in the argument to <code>site_data</code> that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (<code>NA</code>) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (<code>NA</code>) value should be used.</p></td>
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
+    </tr>
+    <tr>
+      <th>site_n_surveys_columns</th>
+      <td><p><code>character</code> names of <code>numeric</code>
+columns in the argument to <code>site_data</code> that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
     </tr>
     <tr>
       <th>site_probability_columns</th>
@@ -306,24 +313,24 @@ using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a>
 <span class='no'>feature_data</span>$<span class='no'>target</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>)
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 9 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 11 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
 #&gt; CRS:            NA
-#&gt; <span style='color: #555555;'># A tibble: 5 x 10</span><span>
-#&gt;   survey_cost management_cost     e1     e2     e3    f1    f2     p1      p2
-#&gt;         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>        8.13            73.9 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08      1     1 0.991  0.988  
-#&gt; </span><span style='color: #555555;'>2</span><span>        6.07            69.7 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span>     0     0 0.126  0.287  
-#&gt; </span><span style='color: #555555;'>3</span><span>        3.74            62.0  1.77   1.42   1.11     </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.892  0.002</span><span style='text-decoration: underline;'>44</span><span>
-#&gt; </span><span style='color: #555555;'>4</span><span>        6.82            71.8 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span>    </span><span style='color: #BB0000;'>NA</span><span>    </span><span style='color: #BB0000;'>NA</span><span> 0.063</span><span style='text-decoration: underline;'>8</span><span> 0.583  
-#&gt; </span><span style='color: #555555;'>5</span><span>        5.22            70.7 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span>     1     1 0.099</span><span style='text-decoration: underline;'>1</span><span> 0.900  
-#&gt; </span><span style='color: #555555;'># ... with 1 more variable: geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
+#&gt; <span style='color: #555555;'># A tibble: 5 x 12</span><span>
+#&gt;   survey_cost management_cost    f1    f2    n1    n2     e1     e2     e3    p1
+#&gt;         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>        8.13            73.9   1       1     5     5 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08  0.991
+#&gt; </span><span style='color: #555555;'>2</span><span>        6.07            69.7   0.2     0     5     5 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span> 0.126
+#&gt; </span><span style='color: #555555;'>3</span><span>        3.74            62.0   0       0     0     0  1.77   1.42   1.11  0.892
+#&gt; </span><span style='color: #555555;'>4</span><span>        6.82            71.8   0       0     2     2 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span> 0.064
+#&gt; </span><span style='color: #555555;'>5</span><span>        5.22            70.7   0       0     0     0 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span> 0.099
+#&gt; </span><span style='color: #555555;'># ... with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
 #&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.955            0.822            0.775
-#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.961            0.829            0.723
+#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.965            0.821            0.701
+#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.960            0.814            0.701
 #&gt; </span><span style='color: #555555;'># ... with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
@@ -331,13 +338,13 @@ using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a>
 <span class='co'># calculate expected value of management decision given current information</span>
 <span class='co'># using exact method</span>
 <span class='no'>ev_current</span> <span class='kw'>&lt;-</span> <span class='fu'>evdci</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
   <span class='st'>"target"</span>, <span class='no'>total_budget</span>)
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 0.9605585</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 0.9997575</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

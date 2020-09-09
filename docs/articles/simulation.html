@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -99,16 +99,16 @@
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations—this is not a trivial task.</p>
-<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management <em>decision</em>). Methods are provided to calculate the <em>expected value of the decision given current information</em> (<code>evdci</code> function), and the <em>expected value of the decision given a survey scheme</em> (<code>evdsi</code> function). Furthermore, by examining survey schemes, optimal survey schemes can be identified (<code>optimal_survey_scheme</code> function). In this vignette, we will use a simulated dataset to explore these methods.</p>
+<p>The <em>surveyvoi</em> package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management <em>decision</em>). Methods are provided to calculate the <em>expected value of the decision given current information</em>, and the <em>expected value of the decision given a survey scheme</em> (using exact methods for small problems, and approximation methods for large problems). Furthermore, by examining survey schemes, optimal survey schemes can be identified. In this vignette, we will use a simulated dataset to explore these methods.</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h2>
 <p>Let’s start by setting up our R session. Here we will load some R packages and pre-set the random number generators for reproducibility.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># load packages</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">surveyvoi</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">surveyvoi</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gridExtra</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">viridis</span>)
@@ -116,8 +116,9 @@
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">RandomFields</span>)
 
 <span class="co"># set RNG seeds for reproducibility</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">505</span>)
-<span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html">RFoptions</a></span>(<span class="kw">seed</span> <span class="kw">=</span> <span class="fl">505</span>)
+<span class="no">seed</span> <span class="kw">&lt;-</span> <span class="fl">715</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="no">seed</span>)
+<span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html">RFoptions</a></span>(<span class="kw">seed</span> <span class="kw">=</span> <span class="no">seed</span>)
 
 <span class="co"># set default table printing options</span>
 <span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">pillar.sigfig</span> <span class="kw">=</span> <span class="fl">6</span>)</pre></body></html></div>
@@ -125,48 +126,56 @@
 <div id="simulate-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#simulate-data" class="anchor"></a>Simulate data</h2>
-<p>Let’s simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 20 sites—meaning that 10 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. <code>simulate_site_data</code>) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.</p>
+<p>Let’s simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 18 sites—meaning that 12 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. <code>simulate_site_data</code>) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># simulate site data</span>
 <span class="no">site_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simulate_site_data.html">simulate_site_data</a></span>(
-  <span class="kw">n_sites</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_sites_missing_data</span> <span class="kw">=</span> <span class="fl">10</span> / <span class="fl">30</span>,
-  <span class="kw">n_env_vars</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">output_probabilities</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
-<pre><code>## ..</code></pre>
+  <span class="kw">n_sites</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_sites_missing_data</span> <span class="kw">=</span> <span class="fl">12</span> / <span class="fl">30</span>,
+  <span class="kw">n_env_vars</span> <span class="kw">=</span> <span class="fl">3</span>, <span class="kw">max_number_surveys_per_site</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">output_probabilities</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
+<pre><code>## ...</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print site data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">site_data</span>)</pre></body></html></div>
-<pre><code>## Simple feature collection with 30 features and 5 fields
+<pre><code>## Simple feature collection with 30 features and 7 fields
 ## geometry type:  POINT
 ## dimension:      XY
-## bbox:           xmin: 0.01366063 ymin: 0.01929364 xmax: 0.9272025 ymax: 0.9946761
+## bbox:           xmin: 0.04928101 ymin: 0.02242576 xmax: 0.9836789 ymax: 0.9957509
 ## CRS:            NA
-## # A tibble: 30 x 6
-##    survey_cost management_cost          e1        e2    f1             geometry
-##          &lt;dbl&gt;           &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;              &lt;POINT&gt;
-##  1     7.07047         69.9782  0.539321   -0.895568     1  (0.131104 0.639454)
-##  2     5.43637         69.0084 -0.862086    0.135739    NA  (0.503956 0.326207)
-##  3     7.02416         66.8320  0.557181   -0.974966     1 (0.0999113 0.667734)
-##  4     7.11699         68.7759 -0.00550767 -1.14857      1 (0.0907369 0.425329)
-##  5     6.13178         64.6530  0.590071   -0.841855    NA (0.0207079 0.913594)
-##  6     4.31864         67.0997  1.44469     1.86069      0  (0.785583 0.976051)
-##  7     5.46042         63.6544  0.786510   -0.619393     1  (0.174191 0.795111)
-##  8     8.88090         69.5445 -0.794324   -1.09249      1  (0.127675 0.195547)
-##  9     6.39256         72.6893 -1.00987    -0.651723     1  (0.304969 0.200439)
-## 10     7.20251         72.0285 -1.14882    -0.707694     1   (0.30489 0.164804)
-## # … with 20 more rows</code></pre>
+## # A tibble: 30 x 8
+##    survey_cost management_cost    f1    n1        e1         e2        e3
+##          &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+##  1     5.37503         71.4770     1     1 -1.16175  -0.820554   0.444516
+##  2     4.40311         63.7324     0     0  1.05826  -1.28770    0.139157
+##  3     7.83981         73.0621     1     1 -0.736609  0.733109   1.03653 
+##  4    11.4662          66.1679     0     0  1.77391   1.20038   -2.27371 
+##  5     5.50316         67.9276     0     0 -1.67395  -0.408138   0.376850
+##  6     8.67965         74.8280     0     1 -0.905815  0.978526   0.759205
+##  7     7.24226         69.5557     1     1  0.384206 -0.158379   0.515493
+##  8    11.7712          68.0428     0     1  0.728228  0.671176  -0.964622
+##  9    10.5117          64.9664     0     0  1.29645   0.0114602 -0.746961
+## 10     6.05228         72.7030     1     1 -1.13688   0.919918   1.70807 
+## # … with 20 more rows, and 1 more variable: geometry &lt;POINT&gt;</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># plot the spatial location of the sites</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">site_data</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"sites"</span>)</pre></body></html></div>
 <p><img src="simulation_files/figure-html/unnamed-chunk-5-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (<code>NA</code>) values mean that a site has not yet been surveyed. The <code>survey_cost</code> column contains the cost for surveying each site, and the <code>management_cost</code> column contains the cost for managing each site for conservation. The <code>e1</code> and <code>e2</code> columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let’s create some visualizations.</p>
+<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The <code>f1</code> column contains the results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site only has a single previous survey at most, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The <code>n1</code> column contains the number of previous surveys conducted within each site. Thus sites with zeros in this column have not previously been surveyed. The <code>e1</code>, <code>e2</code>, and <code>e3</code> columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The <code>survey_cost</code> column contains the cost for surveying each site, and the <code>management_cost</code> column contains the cost for managing each site for conservation.</p>
+<p>To help understand the simulated data, let’s create some visualizations.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># plot site occupancy data from previous surveys</span>
 <span class="no">site_data</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">f1</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">f1</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">f1</span>)) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"1"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"0"</span> <span class="kw">=</span> <span class="st">"black"</span>),
-                       <span class="kw">na.value</span> <span class="kw">=</span> <span class="st">"blue"</span>) +
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"presence/absence data"</span>)</pre></body></html></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"1"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"0"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"detection/non-detection data"</span>)</pre></body></html></div>
 <p><img src="simulation_files/figure-html/unnamed-chunk-6-1.png" width="336" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><html><body><pre class="r"><span class="co"># plot number of previous surveys within each site</span>
+<span class="no">site_data</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">n1</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">n1</span>)) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">n1</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"1"</span> <span class="kw">=</span> <span class="st">"blue"</span>, <span class="st">"0"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"number of previous surveys data"</span>)</pre></body></html></div>
+<p><img src="simulation_files/figure-html/unnamed-chunk-7-1.png" width="336" style="display: block; margin: auto;"></p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># plot site cost data</span>
 <span class="co"># note that survey and management costs are on different scales</span>
 <span class="no">p1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">site_data</span>) +
@@ -180,31 +189,31 @@
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"management cost"</span>) +
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.title</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>())
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-7-1.png" width="604.8" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-8-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># plot site environmental data</span>
 <span class="no">site_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">starts_with</a></span>(<span class="st">"e"</span>)) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://tidyr.tidyverse.org/reference/reexports.html">starts_with</a></span>(<span class="st">"e"</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">var</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">var</span>) +
     <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span>() +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"environmental conditions"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-8-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-9-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>After simulating data for the sites, we will simulate data for the conservation feature.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># simulate feature data</span>
 <span class="no">feature_data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/simulate_feature_data.html">simulate_feature_data</a></span>(
   <span class="kw">n_features</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">proportion_of_survey_features</span> <span class="kw">=</span> <span class="fl">1</span>)
 
 <span class="co"># manually set target</span>
-<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">10</span>
+<span class="no">feature_data</span>$<span class="no">target</span> <span class="kw">&lt;-</span> <span class="fl">15</span>
 
 <span class="co"># print feature data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">feature_data</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 1 x 7
 ##   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 ##   &lt;chr&gt; &lt;lgl&gt;             &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1 f1    TRUE           0.952171         0.815544         0.731463
+## 1 f1    TRUE           0.965532         0.861344         0.776341
 ## # … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</code></pre>
 <p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>target</code> column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. Finally, the <code>sensitivity</code> and <code>specificity</code> columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.</p>
 </div>
@@ -213,15 +222,16 @@
 <a href="#modelling-probability-of-occupancy" class="anchor"></a>Modelling probability of occupancy</h2>
 <p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a> – using functions contained in this package. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># create list of candidate parameter value for calibration procedure</span>
-<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">eta</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.3</span>, <span class="fl">1</span>), <span class="kw">lambda</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>, <span class="fl">0.5</span>),
-                       <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>)
+<span class="no">xgb_parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">eta</span> <span class="kw">=</span> <span class="fl">0.1</span>, <span class="kw">lambda</span> <span class="kw">=</span> <span class="fl">0.1</span>, <span class="kw">objective</span> <span class="kw">=</span> <span class="st">"binary:logistic"</span>)
 
 <span class="co"># identify suitable parameters for model fitting</span>
 <span class="co"># ideally, we would try a larger range of values,</span>
 <span class="co"># but we will keep it low to reduce processing time for this example</span>
 <span class="no">xgb_results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_occupancy_models.html">fit_occupancy_models</a></span>(
-  <span class="no">site_data</span>, <span class="st">"f1"</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>), <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)</pre></body></html></div>
+  <span class="no">site_data</span>, <span class="no">feature_data</span>,
+  <span class="st">"f1"</span>, <span class="st">"n1"</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span>),
+  <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,
+  <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)</pre></body></html></div>
 <p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print best parameters</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">xgb_results</span>$<span class="no">parameters</span>)</pre></body></html></div>
@@ -230,27 +240,25 @@
 ## [1] 0.1
 ## 
 ## [[1]]$lambda
-## [1] 0.01
+## [1] 0.1
 ## 
 ## [[1]]$objective
 ## [1] "binary:logistic"
 ## 
-## [[1]]$nrounds
-## [1] 1
-## 
 ## [[1]]$scale_pos_weight
-## [1] 0.8166667</code></pre>
+## [[1]]$scale_pos_weight[[1]]
+## [1] 1 1</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print model performance (TSS value)</span>
 <span class="no">xgb_performance</span> <span class="kw">&lt;-</span> <span class="no">xgb_results</span>$<span class="no">performance</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">xgb_performance</span>))</pre></body></html></div>
 <pre><code>##   feature train_tss_mean train_tss_std train_sensitivity_mean
-## 1      f1              1             0                      1
+## 1      f1      0.8491889    0.04208485                      1
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
-## 1                     0                      1                     0
+## 1                     0              0.8491889            0.04208485
 ##   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
-## 1     0.7916667   0.05892557             0.9166667            0.1178511
+## 1     0.8788582    0.1713204                     1                    0
 ##   test_specificity_mean test_specificity_std
-## 1                 0.875            0.1767767</code></pre>
+## 1             0.8788582            0.1713204</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># store the model sensitivities and specificities in the feature_data object</span>
 <span class="no">feature_data</span>$<span class="no">model_sensitivity</span> <span class="kw">&lt;-</span> <span class="no">xgb_performance</span>$<span class="no">test_sensitivity_mean</span>
 <span class="no">feature_data</span>$<span class="no">model_specificity</span> <span class="kw">&lt;-</span> <span class="no">xgb_performance</span>$<span class="no">test_specificity_mean</span>
@@ -261,16 +269,16 @@
 <pre><code>## # A tibble: 30 x 1
 ##          f1
 ##       &lt;dbl&gt;
-##  1 0.549393
-##  2 0.500045
-##  3 0.549393
-##  4 0.549393
-##  5 0.549393
-##  6 0.450608
-##  7 0.549393
-##  8 0.549393
-##  9 0.549393
-## 10 0.549393
+##  1 0.688959
+##  2 0.617087
+##  3 0.603602
+##  4 0.339257
+##  5 0.647904
+##  6 0.380529
+##  7 0.647904
+##  8 0.268054
+##  9 0.506680
+## 10 0.688901
 ## # … with 20 more rows</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="no">site_data</span>$<span class="no">p1</span> <span class="kw">&lt;-</span> <span class="no">xgb_predictions</span>$<span class="no">f1</span>
 
@@ -279,7 +287,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">p1</span>)) +
   <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">title</span> <span class="kw">=</span> <span class="st">"modelled probabilities"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-11-1.png" width="700" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-12-1.png" width="700" style="display: block; margin: auto;"></p>
 </div>
 <div id="expected-value-given-current-information" class="section level2">
 <h2 class="hasAnchor">
@@ -290,13 +298,14 @@
 
 <span class="co"># print total budget</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">total_budget</span>)</pre></body></html></div>
-<pre><code>## [1] 1600.412</code></pre>
+<pre><code>## [1] 1651.593</code></pre>
 <p>Given the total budget, we can now calculate the <em>expected value of the decision given current information</em>.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># expected value of the decision given current information</span>
 <span class="no">evd_current</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evdci.html">evdci</a></span>(
   <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
   <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,
-  <span class="kw">site_occupancy_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+  <span class="kw">site_detection_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+  <span class="kw">site_n_surveys_columns</span> <span class="kw">=</span> <span class="st">"n1"</span>,
   <span class="kw">site_probability_columns</span> <span class="kw">=</span> <span class="st">"p1"</span>,
   <span class="kw">site_management_cost_column</span> <span class="kw">=</span> <span class="st">"management_cost"</span>,
   <span class="kw">feature_survey_sensitivity_column</span> <span class="kw">=</span> <span class="st">"survey_sensitivity"</span>,
@@ -308,7 +317,7 @@
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_current</span>)</pre></body></html></div>
-<pre><code>## [1] 0.9992836</code></pre>
+<pre><code>## [1] 0.7236256</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -317,7 +326,7 @@
 <p>Now we will generate some candidate survey schemes to see if we can improve the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. <code>survey_budget</code>) will be set as 40% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># calculate budget for surveying sites</span>
 <span class="co">#   add column to site_data indicating if the sites already have data or not</span>
-<span class="no">site_data</span>$<span class="no">surveyed</span> <span class="kw">&lt;-</span> !<span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span>(<span class="no">site_data</span>$<span class="no">f1</span>)
+<span class="no">site_data</span>$<span class="no">surveyed</span> <span class="kw">&lt;-</span> <span class="no">site_data</span>$<span class="no">n1</span> <span class="kw">&gt;</span> <span class="fl">0.5</span>
 
 <span class="co">#   add column to site_data containing the additional survey costs,</span>
 <span class="co">#   i.e. sites that already have data have a zero cost, and</span>
@@ -335,46 +344,51 @@
 
 <span class="co"># print budgets</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">survey_budget</span>)</pre></body></html></div>
-<pre><code>## [1] 21.15986</code></pre>
+<pre><code>## [1] 34.13683</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">total_budget</span>)</pre></body></html></div>
-<pre><code>## [1] 1600.412</code></pre>
+<pre><code>## [1] 1651.593</code></pre>
 <p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites <span class="citation">(i.e. environmental diversity; Faith &amp; Walker 1996)</span>, (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># (i) generate survey scheme to increase geographic coverage</span>
-<span class="no">geo_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/geo_cov_survey_scheme.html">geo_cov_survey_scheme</a></span>(<span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>,
-                                    <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
+<span class="no">geo_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="../reference/geo_cov_survey_scheme.html">geo_cov_survey_scheme</a></span>(
+    <span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>, <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
 
 <span class="co"># (ii) generate survey scheme to increase environmental diversity,</span>
 <span class="co"># environmental distances are calculated using Euclidean distances here,</span>
 <span class="co"># though we might consider something like Mahalanobis distances for a</span>
 <span class="co"># real dataset to account for correlations among environmental variables)</span>
-<span class="no">env_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/env_div_survey_scheme.html">env_div_survey_scheme</a></span>(<span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>,
-                                    <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>), <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>,
-                                    <span class="kw">method</span> <span class="kw">=</span> <span class="st">"euclidean"</span>)
+<span class="no">env_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="../reference/env_div_survey_scheme.html">env_div_survey_scheme</a></span>(
+    <span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span>),
+    <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>, <span class="kw">method</span> <span class="kw">=</span> <span class="st">"euclidean"</span>)
 
 <span class="co"># (iii) generate survey scheme using site uncertainty scores</span>
 <span class="co"># calculate site uncertainty scores</span>
 <span class="no">site_data</span>$<span class="no">uncertainty_score</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/relative_site_uncertainty_scores.html">relative_site_uncertainty_scores</a></span>(<span class="no">site_data</span>, <span class="st">"p1"</span>)
 
 <span class="co"># generate survey scheme</span>
-<span class="no">unc_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(<span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>,
-                                     <span class="no">survey_budget</span>, <span class="st">"uncertainty_score"</span>,
-                                     <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
+<span class="no">unc_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(
+    <span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>, <span class="st">"uncertainty_score"</span>,
+    <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
 
 <span class="co"># (iv) generate survey scheme using site management cheapness</span>
 <span class="co"># (i.e. inverse management cost)</span>
 <span class="no">site_data</span>$<span class="no">inv_management_cost</span> <span class="kw">&lt;-</span> <span class="fl">1</span> / <span class="no">site_data</span>$<span class="no">management_cost</span>
-<span class="no">cheap_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(<span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>,
-                                       <span class="no">survey_budget</span>, <span class="st">"inv_management_cost"</span>,
-                                       <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
+<span class="no">cheap_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(
+    <span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>, <span class="st">"inv_management_cost"</span>,
+    <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)
 
 <span class="co"># (v) generate survey scheme using site richness scores</span>
 <span class="co"># calculate site richness scores</span>
 <span class="no">site_data</span>$<span class="no">richness_score</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/relative_site_richness_scores.html">relative_site_richness_scores</a></span>(<span class="no">site_data</span>, <span class="st">"p1"</span>)
 
 <span class="co"># generate survey scheme</span>
-<span class="no">rich_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(<span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>,
-                                      <span class="no">survey_budget</span>, <span class="st">"richness_score"</span>,
-                                      <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)</pre></body></html></div>
+<span class="no">rich_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="../reference/weighted_survey_scheme.html">weighted_survey_scheme</a></span>(
+    <span class="no">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="no">survey_budget</span>, <span class="st">"richness_score"</span>,
+    <span class="kw">locked_out</span> <span class="kw">=</span> <span class="st">"surveyed"</span>)</pre></body></html></div>
 <p>Let’s visualize the different survey schemes.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># add schemes to site_data</span>
 <span class="no">site_data</span>$<span class="no">geo_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="no">geo_scheme</span>)
@@ -385,7 +399,7 @@
 
 <span class="co"># plot the schemes</span>
 <span class="no">site_data</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">contains</a></span>(<span class="st">"scheme"</span>)) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="fu"><a href="https://tidyr.tidyverse.org/reference/reexports.html">contains</a></span>(<span class="st">"scheme"</span>)) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">name</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html">mutate_if</a></span>(<span class="no">is.logical</span>, <span class="no">as.character</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">name</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="no">name</span>))) <span class="kw">%&gt;%</span>
@@ -393,7 +407,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-19-1.png" width="604.8" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-20-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <p>We can see that different approaches yield different survey schemes – but which survey scheme is the best?</p>
 </div>
 <div id="expected-value-of-the-decision-given-the-candidate-survey-schemes" class="section level2">
@@ -402,7 +416,7 @@
 <p>Now that we’ve generated the survey schemes, let’s calculate the <em>expected value of the decision of each survey scheme</em>.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># create table to store results</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
                   <span class="st">"rich_scheme"</span>))
 
 <span class="co"># expected value of the decision given each survey scheme</span>
@@ -411,9 +425,9 @@
     <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span>(
       <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
       <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,
-      <span class="kw">site_occupancy_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+      <span class="kw">site_detection_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+      <span class="kw">site_n_surveys_columns</span> <span class="kw">=</span> <span class="st">"n1"</span>,
       <span class="kw">site_probability_columns</span> <span class="kw">=</span> <span class="st">"p1"</span>,
-      <span class="kw">site_env_vars_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
       <span class="kw">site_survey_scheme_column</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">x</span>),
       <span class="kw">site_management_cost_column</span> <span class="kw">=</span> <span class="st">"management_cost"</span>,
       <span class="kw">site_survey_cost_column</span> <span class="kw">=</span> <span class="st">"survey_cost"</span>,
@@ -423,9 +437,7 @@
       <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
       <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
       <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
-      <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-      <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
-      <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)
+      <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>)
 })
 
 <span class="co"># print values</span>
@@ -433,11 +445,11 @@
 <pre><code>## # A tibble: 5 x 2
 ##   name            value
 ##   &lt;chr&gt;           &lt;dbl&gt;
-## 1 geo_scheme   0.999015
-## 2 env_scheme   0.998694
-## 3 unc_scheme   0.999015
-## 4 cheap_scheme 0.999015
-## 5 rich_scheme  0.997666</code></pre>
+## 1 geo_scheme   0.723626
+## 2 env_scheme   0.723626
+## 3 unc_scheme   0.723626
+## 4 cheap_scheme 0.723626
+## 5 rich_scheme  0.723626</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># estimate the return on investment for each survey scheme</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">roi</span> <span class="kw">&lt;-</span>
@@ -448,11 +460,11 @@
 <pre><code>## # A tibble: 5 x 3
 ##   name            value          roi
 ##   &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;
-## 1 geo_scheme   0.999015 -0.000268822
-## 2 env_scheme   0.998694 -0.000589986
-## 3 unc_scheme   0.999015 -0.000268822
-## 4 cheap_scheme 0.999015 -0.000268822
-## 5 rich_scheme  0.997666 -0.00161718</code></pre>
+## 1 geo_scheme   0.723626 -5.46341e-12
+## 2 env_scheme   0.723626 -1.96900e-11
+## 3 unc_scheme   0.723626 -1.96897e-11
+## 4 cheap_scheme 0.723626 -1.96897e-11
+## 5 rich_scheme  0.723626 -1.96897e-11</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize the return on investment for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -466,20 +478,21 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-21-1.png" width="700" style="display: block; margin: auto;"></p>
-<p>In this particular simulation, we can see that conducting additional surveys can improve our ability to decide which sites we should manage for conservation. This is evidenced by the fact that some of the survey schemes (i.e. <code>env_scheme</code>) have positive return on investment values—meaning that the <em>expected value of the management decision</em> is greater when we conduct these surveys (even when accounting for survey costs). We can also see that surveying additional sites may not necessarily improve our conservation decisions, since some of the survey schemes (e.g. <code>rich_scheme</code>) have negative values. But what is the best possible – the optimal – survey scheme?</p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-22-1.png" width="700" style="display: block; margin: auto;"></p>
+<p>In this particular simulation, we can see that all of the survey schemes have a very low return on investment (i.e. most values are very close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent conducting them. So, we would not choose to implement any of these surveys schemes. But what is the best possible – the optimal – survey scheme?</p>
 </div>
 <div id="optimal-survey-scheme" class="section level2">
 <h2 class="hasAnchor">
 <a href="#optimal-survey-scheme" class="anchor"></a>Optimal survey scheme</h2>
 <p>Now let’s identify the optimal survey scheme by directly maximizing the <em>expected value of the decision given a survey scheme</em>.</p>
-<div class="sourceCode"><html><body><pre class="r"><span class="co"># generate optimal survey scheme(s)</span>
+<div class="sourceCode"><html><body><pre class="r"><span class="co"># identify optimal survey scheme(s)</span>
+<span class="co"># (note here we use approximation methods to reduce computational burden)</span>
 <span class="no">opt_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/optimal_survey_scheme.html">optimal_survey_scheme</a></span>(
     <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
     <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,
-    <span class="kw">site_occupancy_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+    <span class="kw">site_detection_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+    <span class="kw">site_n_surveys_columns</span> <span class="kw">=</span> <span class="st">"n1"</span>,
     <span class="kw">site_probability_columns</span> <span class="kw">=</span> <span class="st">"p1"</span>,
-    <span class="kw">site_env_vars_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
     <span class="kw">site_management_cost_column</span> <span class="kw">=</span> <span class="st">"management_cost"</span>,
     <span class="kw">site_survey_cost_column</span> <span class="kw">=</span> <span class="st">"survey_cost"</span>,
     <span class="kw">feature_survey_column</span> <span class="kw">=</span> <span class="st">"survey"</span>,
@@ -489,12 +502,11 @@
     <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
     <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-    <span class="kw">survey_budget</span> <span class="kw">=</span> <span class="no">survey_budget</span>,
-    <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
-    <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
+    <span class="kw">survey_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
+    <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></body></html></div>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print number of optimal survey schemes</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">opt_scheme</span>))</pre></body></html></div>
-<pre><code>## [1] 1</code></pre>
+<pre><code>## [1] 8</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># add optimal scheme to site data</span>
 <span class="no">site_data</span>$<span class="no">opt_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="no">opt_scheme</span>[<span class="fl">1</span>, ])
 
@@ -505,15 +517,15 @@
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">opt_scheme</span>)) +
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~ <span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>))</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes. In particular, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey schemes need to ensure adequate funds remain for actually achieving conservation objectives.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># calculate return on investment of the optimal scheme</span>
 <span class="no">evd_opt</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span>(
     <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
     <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,
-    <span class="kw">site_occupancy_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+    <span class="kw">site_detection_columns</span> <span class="kw">=</span> <span class="st">"f1"</span>,
+    <span class="kw">site_n_surveys_columns</span> <span class="kw">=</span> <span class="st">"n1"</span>,
     <span class="kw">site_probability_columns</span> <span class="kw">=</span> <span class="st">"p1"</span>,
-    <span class="kw">site_env_vars_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>),
     <span class="kw">site_survey_scheme_column</span> <span class="kw">=</span> <span class="st">"opt_scheme"</span>,
     <span class="kw">site_management_cost_column</span> <span class="kw">=</span> <span class="st">"management_cost"</span>,
     <span class="kw">site_survey_cost_column</span> <span class="kw">=</span> <span class="st">"survey_cost"</span>,
@@ -523,29 +535,27 @@
     <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
     <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
     <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
-    <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>,
-    <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>,
-    <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>)
+    <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">total_budget</span>)
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_opt</span>)</pre></body></html></div>
-<pre><code>## [1] 0.9999009</code></pre>
+<pre><code>## [1] 0.7236256</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># append optimal results to results table</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span>(
   <span class="no">evd_survey_schemes</span>,
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">"opt_scheme"</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="no">evd_opt</span>, <span class="kw">roi</span> <span class="kw">=</span> <span class="no">evd_opt</span> - <span class="no">evd_current</span>))
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/reexports.html">tibble</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">"opt_scheme"</span>, <span class="kw">value</span> <span class="kw">=</span> <span class="no">evd_opt</span>, <span class="kw">roi</span> <span class="kw">=</span> <span class="no">evd_opt</span> - <span class="no">evd_current</span>))
 
 <span class="co"># print updated results table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">evd_survey_schemes</span>)</pre></body></html></div>
 <pre><code>## # A tibble: 6 x 3
 ##   name            value          roi
 ##   &lt;chr&gt;           &lt;dbl&gt;        &lt;dbl&gt;
-## 1 geo_scheme   0.999015 -0.000268822
-## 2 env_scheme   0.998694 -0.000589986
-## 3 unc_scheme   0.999015 -0.000268822
-## 4 cheap_scheme 0.999015 -0.000268822
-## 5 rich_scheme  0.997666 -0.00161718 
-## 6 opt_scheme   0.999901  0.000617265</code></pre>
+## 1 geo_scheme   0.723626 -5.46341e-12
+## 2 env_scheme   0.723626 -1.96900e-11
+## 3 unc_scheme   0.723626 -1.96897e-11
+## 4 cheap_scheme 0.723626 -1.96897e-11
+## 5 rich_scheme  0.723626 -1.96897e-11
+## 6 opt_scheme   0.723626  2.84532e-11</code></pre>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># visualize return on investment values</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="no">evd_survey_schemes</span> <span class="kw">%&gt;%</span>
@@ -559,7 +569,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-24-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-26-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme has the highest <em>return on investment</em> of all the candidate survey schemes. To understand how sub-optimal the candidate survey schemes actually are, let’s compute their relative optimality and visualize them.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># express values in terms of optimality</span>
 <span class="no">evd_survey_schemes</span>$<span class="no">optimality</span> <span class="kw">&lt;-</span>
@@ -580,7 +590,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span>(<span class="kw">values</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"TRUE"</span> <span class="kw">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="kw">=</span> <span class="st">"black"</span>)) +
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.65</span>),
           <span class="kw">legend.position</span> <span class="kw">=</span> <span class="st">"none"</span>)</pre></body></html></div>
-<p><img src="simulation_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="simulation_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimal survey scheme performs much better than all the other survey schemes. This result shows that value of information analyses can potentially improve management decisions by strategically allocating funds to surveys and conservation management.</p>
 </div>
 <div id="references" class="section level2 unnumbered">

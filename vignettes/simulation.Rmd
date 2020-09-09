@@ -56,8 +56,9 @@ library(tibble)
 library(RandomFields)
 
 # set RNG seeds for reproducibility
-set.seed(505)
-RFoptions(seed = 505)
+seed <- 715
+set.seed(seed)
+RFoptions(seed = seed)
 
 # set default table printing options
 options(pillar.sigfig = 6)
@@ -65,13 +66,13 @@ options(pillar.sigfig = 6)
 
 ## Simulate data
 
-Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 20 sites---meaning that 10 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
+Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 18 sites---meaning that 12 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
 
 ```{r}
 # simulate site data
 site_data <- simulate_site_data(
-  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 10 / 30,
-  n_env_vars = 2, max_number_surveys_per_site = 1, output_probabilities = FALSE)
+  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 12 / 30,
+  n_env_vars = 3, max_number_surveys_per_site = 1, output_probabilities = FALSE)
 
 # print site data
 print(site_data)
@@ -82,7 +83,9 @@ ggplot(site_data) +
   ggtitle("sites")
 ```
 
-The `site_data` object is a spatially explicit dataset (i.e. `sf` object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the results from previous surveys, where ones indicate that the feature was previously detected at a site, zeros indicate that the feature has not previously been detected at a site, and missing (`NA`) values mean that a site has not yet been surveyed. The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation. The `e1` and `e2` columns contain environmental conditions (e.g. temperature, precipitation). To help understand the simulated data, let's create some visualizations.
+The `site_data` object is a spatially explicit dataset (i.e. `sf` object) that contains information on the site locations and additional information for each site too. Here, each row corresponds to a different site and each column contains different information about the sites. The `f1` column contains the  results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site only has a single previous survey at most, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The `n1` column contains the number of previous surveys conducted within each site. Thus sites with zeros in this column have not previously been surveyed. The `e1`, `e2`, and `e3` columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The `survey_cost` column contains the cost for surveying each site, and the `management_cost` column contains the cost for managing each site for conservation.
+
+To help understand the simulated data, let's create some visualizations.
 
 ```{r, fig.height = h, fig.width = w}
 # plot site occupancy data from previous surveys
@@ -90,9 +93,18 @@ site_data %>%
   mutate(f1 = as.character(f1)) %>%
   ggplot() +
   geom_sf(aes(color = f1)) +
-    scale_color_manual(values = c("1" = "red", "0" = "black"),
-                       na.value = "blue") +
-    labs(title = "presence/absence data")
+    scale_color_manual(values = c("1" = "red", "0" = "black")) +
+    labs(title = "detection/non-detection data")
+```
+
+```{r, fig.height = h, fig.width = w}
+# plot number of previous surveys within each site
+site_data %>%
+  mutate(n1 = as.character(n1)) %>%
+  ggplot() +
+  geom_sf(aes(color = n1)) +
+    scale_color_manual(values = c("1" = "blue", "0" = "black")) +
+    labs(title = "number of previous surveys data")
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.8}
@@ -131,7 +143,7 @@ feature_data <- simulate_feature_data(
   n_features = 1, proportion_of_survey_features = 1)
 
 # manually set target
-feature_data$target <- 10
+feature_data$target <- 15
 
 # print feature data
 print(feature_data)
@@ -152,7 +164,7 @@ xgb_parameters <- list(eta = 0.1, lambda = 0.1, objective = "binary:logistic")
 # but we will keep it low to reduce processing time for this example
 xgb_results <- fit_occupancy_models(
   site_data, feature_data,
-  "f1", "n1", c("e1", "e2"),
+  "f1", "n1", c("e1", "e2", "e3"),
   "survey_sensitivity", "survey_specificity",
   xgb_n_folds = 2, xgb_tuning_parameters = xgb_parameters)
 ```
@@ -232,7 +244,7 @@ Now we will generate some candidate survey schemes to see if we can improve the 
 ```{r}
 # calculate budget for surveying sites
 #   add column to site_data indicating if the sites already have data or not
-site_data$surveyed <- site_data$n1 < 0.5
+site_data$surveyed <- site_data$n1 > 0.5
 
 #   add column to site_data containing the additional survey costs,
 #   i.e. sites that already have data have a zero cost, and
@@ -262,41 +274,46 @@ We will generate survey schemes by selecting unsurveyed sites that (i) increase 
 
 ```{r}
 # (i) generate survey scheme to increase geographic coverage
-geo_scheme <- geo_cov_survey_scheme(site_data, "new_survey_cost", survey_budget,
-                                    locked_out = "surveyed")
+geo_scheme <-
+  geo_cov_survey_scheme(
+    site_data, "new_survey_cost", survey_budget, locked_out = "surveyed")
 
 # (ii) generate survey scheme to increase environmental diversity,
 # environmental distances are calculated using Euclidean distances here,
 # though we might consider something like Mahalanobis distances for a
 # real dataset to account for correlations among environmental variables)
-env_scheme <- env_div_survey_scheme(site_data, "new_survey_cost", survey_budget,
-                                    c("e1", "e2"), locked_out = "surveyed",
-                                    method = "euclidean")
+env_scheme <-
+  env_div_survey_scheme(
+    site_data, "new_survey_cost", survey_budget, c("e1", "e2", "e3"),
+    locked_out = "surveyed", method = "euclidean")
 
 # (iii) generate survey scheme using site uncertainty scores
 # calculate site uncertainty scores
 site_data$uncertainty_score <- relative_site_uncertainty_scores(site_data, "p1")
 
 # generate survey scheme
-unc_scheme <- weighted_survey_scheme(site_data, "new_survey_cost",
-                                     survey_budget, "uncertainty_score",
-                                     locked_out = "surveyed")
+unc_scheme <-
+  weighted_survey_scheme(
+    site_data, "new_survey_cost", survey_budget, "uncertainty_score",
+    locked_out = "surveyed")
 
 # (iv) generate survey scheme using site management cheapness
 # (i.e. inverse management cost)
 site_data$inv_management_cost <- 1 / site_data$management_cost
-cheap_scheme <- weighted_survey_scheme(site_data, "new_survey_cost",
-                                       survey_budget, "inv_management_cost",
-                                       locked_out = "surveyed")
+cheap_scheme <-
+  weighted_survey_scheme(
+    site_data, "new_survey_cost", survey_budget, "inv_management_cost",
+    locked_out = "surveyed")
 
 # (v) generate survey scheme using site richness scores
 # calculate site richness scores
 site_data$richness_score <- relative_site_richness_scores(site_data, "p1")
 
 # generate survey scheme
-rich_scheme <- weighted_survey_scheme(site_data, "new_survey_cost",
-                                      survey_budget, "richness_score",
-                                      locked_out = "surveyed")
+rich_scheme <-
+  weighted_survey_scheme(
+    site_data, "new_survey_cost", survey_budget, "richness_score",
+    locked_out = "surveyed")
 ```
 
 ```{r, include = FALSE}
@@ -346,7 +363,6 @@ evd_survey_schemes$value <- sapply(
       site_detection_columns = "f1",
       site_n_surveys_columns = "n1",
       site_probability_columns = "p1",
-      site_env_vars_columns = c("e1", "e2"),
       site_survey_scheme_column = as.character(x),
       site_management_cost_column = "management_cost",
       site_survey_cost_column = "survey_cost",
@@ -356,9 +372,7 @@ evd_survey_schemes$value <- sapply(
       feature_model_sensitivity_column = "model_sensitivity",
       feature_model_specificity_column = "model_specificity",
       feature_target_column = "target",
-      total_budget = total_budget,
-      xgb_tuning_parameters = xgb_parameters,
-      xgb_n_folds = 2)
+      total_budget = total_budget)
 })
 
 # print values
@@ -390,7 +404,7 @@ evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that none of these survey schemes have a positive return on investment. This means that none of these survey schemes would likely lead to a better conservation outcome when considering the funds spent conducting them. So, we would not choose to implement any of these surveys schemes. But what is the best possible -- the optimal -- survey scheme?
+In this particular simulation, we can see that all of the survey schemes have a very low return on investment (i.e. most values are very close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent conducting them. So, we would not choose to implement any of these surveys schemes. But what is the best possible -- the optimal -- survey scheme?
 
 ## Optimal survey scheme
 
@@ -399,14 +413,12 @@ Now let's identify the optimal survey scheme by directly maximizing the _expecte
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 # identify optimal survey scheme(s)
 # (note here we use approximation methods to reduce computational burden)
-time <- system.time({
-opt_scheme <- approx_near_optimal_survey_scheme(
+opt_scheme <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
     site_detection_columns = "f1",
     site_n_surveys_columns = "n1",
     site_probability_columns = "p1",
-    site_env_vars_columns = c("e1", "e2"),
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
@@ -416,18 +428,11 @@ opt_scheme <- approx_near_optimal_survey_scheme(
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
     total_budget = total_budget,
-    survey_budget = survey_budget,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_n_folds = 2,
-    method_approx_outcomes = "weighted_without_replacement",
-    n_approx_replicates = 1,
-    n_approx_outcomes_per_replicate = 10000,
+    survey_budget = total_budget,
     verbose = TRUE)
-})
 ```
 
 ```{r, fig.height = h, fig.width = w * 1.5}
-print(time)
 # print number of optimal survey schemes
 print(nrow(opt_scheme))
 
@@ -443,6 +448,10 @@ facet_wrap(~ name, nrow = 1) +
 scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"))
 ```
 
+```{r, include = FALSE}
+assertthat::assert_that(sum(site_data$opt_scheme) >= 1)
+```
+
 We can see that the optimal survey scheme (`opt_scheme`) is different to the previous survey schemes. In particular, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey schemes need to ensure adequate funds remain for actually achieving conservation objectives.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
@@ -453,7 +462,6 @@ evd_opt <- evdsi(
     site_detection_columns = "f1",
     site_n_surveys_columns = "n1",
     site_probability_columns = "p1",
-    site_env_vars_columns = c("e1", "e2"),
     site_survey_scheme_column = "opt_scheme",
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
@@ -463,9 +471,7 @@ evd_opt <- evdsi(
     feature_model_sensitivity_column = "model_sensitivity",
     feature_model_specificity_column = "model_specificity",
     feature_target_column = "target",
-    total_budget = total_budget,
-    xgb_tuning_parameters = xgb_parameters,
-    xgb_n_folds = 2)
+    total_budget = total_budget)
 
 # calculate value
 print(evd_opt)

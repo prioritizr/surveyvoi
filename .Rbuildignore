@@ -31,3 +31,5 @@ src/rabit/src/engine_empty.o
 .editorconfig
 .travis.yml
 ^src/dmlc-core/tracker/yarn*
+approximation.R
+simulation.R

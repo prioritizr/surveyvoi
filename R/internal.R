@@ -224,7 +224,7 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
 #'
 #' @noRd
 create_site_folds <- function(
-  prop_detected, n_total, n, index = seq_along(x), seed = 500) {
+  prop_detected, n_total, n, index = seq_along(prop_detected), seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
     is.numeric(prop_detected), length(prop_detected) > 0,
@@ -273,9 +273,10 @@ create_site_folds <- function(
     ## format fold data
     obs_data2$fold <- as.integer(as.character(obs_data2[[f]]))
     ## calculate statistics to determine if folding scheme is valid
-    n_det_per_fold <- aggregate(obs_data2$y, by = list(obs_data2$fold), sum)$x
+    n_det_per_fold <-
+      stats::aggregate(obs_data2$y, by = list(obs_data2$fold), sum)$x
     n_nondet_per_fold <-
-      aggregate(1 - obs_data2$y, by = list(obs_data2$fold), sum)$x
+      stats::aggregate(1 - obs_data2$y, by = list(obs_data2$fold), sum)$x
     ## if folding scheme is valid, then keep it
     if (all(n_det_per_fold > 0) && all(n_nondet_per_fold > 0)) {
       found_valid <- TRUE

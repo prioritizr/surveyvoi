@@ -24,6 +24,9 @@ NULL
 #'   low chance of containing the target species).
 #'   Defaults to \code{NULL} such that no sites are locked out.
 #'
+#' @param verbose \code{logical} indicating if information should be
+#'   printed during processing. Defaults to \code{FALSE}.
+#'
 #' @details
 #' The optimal survey scheme is determined using a brute-force algorithm.
 #' Initially, all feasible (valid) survey schemes are identified given the
@@ -65,19 +68,14 @@ NULL
 #' # (i.e. 10% of the cost of managing all sites)
 #' survey_budget <- sum(site_data$survey_cost) * 0.1
 #'
-#' # define xgboost tuning parameters
-#' xgb_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
-#'                        lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
-#'                        objective = "binary:logistic")
-#'
 #' # find optimal survey scheme using exact method
 #' opt_survey <- optimal_survey_scheme(
 #'   site_data, feature_data,
-#'   c("f1", "f2"), c("n1", "n2"), c("p1", "p2"), c("e1", "e2", "e3"),
+#'   c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
 #'   "management_cost", "survey_cost",
 #'   "survey", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "target", total_budget, survey_budget, xgb_parameters)
+#'   "target", total_budget, survey_budget)
 #'
 #' # print result
 #' print(opt_survey)
@@ -86,7 +84,6 @@ NULL
 optimal_survey_scheme <- function(
   site_data, feature_data,
   site_detection_columns, site_n_surveys_columns, site_probability_columns,
-  site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
   feature_survey_column,
@@ -97,16 +94,12 @@ optimal_survey_scheme <- function(
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
-  xgb_n_rounds = rep(100, length(site_detection_columns)),
-  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  seed = 500,
-  n_threads = 1) {
+  n_threads = 1,
+  verbose = FALSE) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -132,10 +125,6 @@ optimal_survey_scheme <- function(
     identical(nrow(feature_data), length(site_probability_columns)),
     assertthat::noNA(site_probability_columns),
     all(assertthat::has_name(site_data, site_probability_columns)),
-    ## site_env_vars_columns
-    is.character(site_env_vars_columns),
-    assertthat::noNA(site_env_vars_columns),
-    all(assertthat::has_name(site_data, site_env_vars_columns)),
     ## site_management_cost_column
     assertthat::is.string(site_management_cost_column),
     all(assertthat::has_name(site_data, site_management_cost_column)),
@@ -194,26 +183,14 @@ optimal_survey_scheme <- function(
     assertthat::is.number(survey_budget), assertthat::noNA(survey_budget),
     isTRUE(survey_budget > 0), isTRUE(survey_budget <= total_budget),
     isTRUE(survey_budget >= min(site_data[[site_survey_cost_column]])),
-    ## xgb_parameters
-    is.list(xgb_tuning_parameters),
-    ## xgb_n_folds
-    is.numeric(xgb_n_folds), assertthat::noNA(xgb_n_folds),
-    length(xgb_n_folds) == length(site_detection_columns),
-    is.numeric(xgb_n_rounds), assertthat::noNA(xgb_n_rounds),
-    length(xgb_n_rounds) == length(site_detection_columns),
-    all(xgb_n_rounds > 0),
-    ## xgb_early_stopping_rounds
-    is.numeric(xgb_early_stopping_rounds),
-    assertthat::noNA(xgb_early_stopping_rounds),
-    length(xgb_early_stopping_rounds) == length(site_detection_columns),
-    all(xgb_early_stopping_rounds > 0),
     ## prior_matrix
     inherits(prior_matrix, c("matrix", "NULL")),
+    ## verbose
+    assertthat::is.flag(verbose),
+    assertthat::noNA(verbose),
     ## n_threads
     assertthat::is.count(n_threads),
-    assertthat::noNA(n_threads),
-    ## seed
-    assertthat::is.number(seed))
+    assertthat::noNA(n_threads))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -261,8 +238,6 @@ optimal_survey_scheme <- function(
   validate_site_n_surveys_data(site_data, site_n_surveys_columns)
   ## validate model probability values
   validate_site_probability_data(site_data, site_probability_columns)
-  ## validate xgboost tuning parameters
-  validate_xgboost_tuning_parameters(xgb_tuning_parameters)
   ## verify targets
   assertthat::assert_that(
     all(feature_data[[feature_target_column]] <= nrow(site_data)))
@@ -287,12 +262,6 @@ optimal_survey_scheme <- function(
     validate_prior_data(prior_matrix, nrow(site_data), nrow(feature_data))
     pij <- prior_matrix
   }
-  ## calculate prior matrix for re-fitting species distribution models
-  pijm <- internal_prior_probability_matrix(
-    site_data, feature_data, site_detection_columns,
-    site_n_surveys_columns, site_probability_columns,
-    feature_survey_sensitivity_column, feature_survey_specificity_column,
-    feature_model_sensitivity_column, feature_model_specificity_column, TRUE)
   ## prepare site management locked in data
   if (!is.null(site_management_locked_in_column)) {
     site_management_locked_in <- site_data[[site_management_locked_in_column]]
@@ -320,21 +289,8 @@ optimal_survey_scheme <- function(
     sum(sorted_costs) <= total_budget,
     msg = paste("targets cannot be achieved given budget and locked out",
                 "planning units"))
-  ## prepare parameter combinations for model tuning
-  xgb_full_parameters <- do.call(expand.grid, xgb_tuning_parameters)
-  attr(xgb_full_parameters, "out.attrs") <- NULL
-  xgb_full_parameters$nthread <- "1" # force single thread for reproducibility
-  xgb_full_parameters$verbose <- "0" # force quiet
-  xgb_full_parameters$seed <- as.character(seed) # set seed
-  if (is.null(xgb_full_parameters$objective)) {
-    xgb_full_parameters$objective <- "binary:logistic"
-    warning(paste("no objective specified for model fitting,",
-                  "assuming binary:logistic"))
-  }
   ## extract site data
-  dij <- t(as.matrix(site_data[, site_detection_columns, drop = FALSE]))
   nij <- t(as.matrix(site_data[, site_n_surveys_columns, drop = FALSE]))
-  ejx <- as.matrix(site_data[, site_env_vars_columns, drop = FALSE])
   ## identify planning units that have been surveyed for all species
   site_survey_status <- colSums(nij < 0.5) == 0
 
@@ -349,15 +305,13 @@ optimal_survey_scheme <- function(
   current_idx <- which(rowSums(all_feasible_schemes) < 0.5)
 
   # calculate expected value of decision given scheme that does not survey sites
-  evd_current <- withr::with_seed(seed, {
-    rcpp_expected_value_of_decision_given_current_info(
-      pij = pij,
-      pu_costs = site_data[[site_management_cost_column]],
-      pu_locked_in = site_management_locked_in,
-      pu_locked_out = site_management_locked_out,
-      target = round(feature_data[[feature_target_column]]),
-      budget = total_budget)
-  })
+  evd_current <- rcpp_expected_value_of_decision_given_current_info(
+    pij = pij,
+    pu_costs = site_data[[site_management_cost_column]],
+    pu_locked_in = site_management_locked_in,
+    pu_locked_out = site_management_locked_out,
+    target = round(feature_data[[feature_target_column]]),
+    budget = total_budget)
 
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
@@ -368,43 +322,22 @@ optimal_survey_scheme <- function(
   ## run calculations
   evd_new_info <- plyr::laply(
     seq_along(new_info_idx), .parallel = n_threads > 1,
-    .progress = ifelse(n_threads == 1, "text", "none"), function(i) {
+    .progress = ifelse(verbose && n_threads == 1, "text", "none"), function(i) {
     ## extract i'th survey scheme
     site_survey_scheme <- all_feasible_schemes[new_info_idx[i], , drop = TRUE]
-    ## identify sites that need model predictions for each feature
-    pu_model_prediction <- lapply(seq_len(nrow(feature_data)), function(i) {
-      which(!site_survey_scheme & (nij[i, ] < 0.5))
-    })
-    ## folds for training and testing models
-    xgb_folds <- lapply(seq_len(nrow(feature_data)), function(i) {
-      has_data_idx <- which((nij[i, ] > 0.5) | site_survey_scheme)
-      create_site_folds(
-        dij[i, has_data_idx], nij[i, has_data_idx],
-        xgb_n_folds[i], index = has_data_idx, seed = seed)
-    })
     ## calculate expected value of decision given survey scheme
-    withr::with_seed(seed, {
-      rcpp_expected_value_of_decision_given_survey_scheme(
-        dij = dij, nij = nij, pij = pij, pijm = pijm,
-        survey_features = feature_data[[feature_survey_column]],
-        survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
-        survey_specificity = feature_data[[feature_survey_specificity_column]],
-        pu_survey_solution = site_survey_scheme,
-        pu_model_prediction = pu_model_prediction,
-        pu_survey_costs = site_data[[site_survey_cost_column]],
-        pu_purchase_costs = site_data[[site_management_cost_column]],
-        pu_purchase_locked_in = site_management_locked_in,
-        pu_purchase_locked_out = site_management_locked_out,
-        pu_env_data = ejx,
-        xgb_parameter_names = names(xgb_full_parameters),
-        xgb_parameter_values = as.matrix(xgb_full_parameters),
-        n_xgb_rounds = xgb_n_rounds,
-        n_xgb_early_stopping_rounds = xgb_early_stopping_rounds,
-        xgb_train_folds = lapply(xgb_folds, `[[`, "train"),
-        xgb_test_folds = lapply(xgb_folds, `[[`, "test"),
-        obj_fun_target = round(feature_data[[feature_target_column]]),
-        total_budget = total_budget)
-    })
+    rcpp_expected_value_of_decision_given_survey_scheme(
+      pij = pij,
+      survey_features = feature_data[[feature_survey_column]],
+      survey_sensitivity = feature_data[[feature_survey_sensitivity_column]],
+      survey_specificity = feature_data[[feature_survey_specificity_column]],
+      pu_survey_solution = site_survey_scheme,
+      pu_survey_costs = site_data[[site_survey_cost_column]],
+      pu_purchase_costs = site_data[[site_management_cost_column]],
+      pu_purchase_locked_in = site_management_locked_in,
+      pu_purchase_locked_out = site_management_locked_out,
+      obj_fun_target = round(feature_data[[feature_target_column]]),
+      total_budget = total_budget)
   })
   ## kill cluster
   if (n_threads > 1) {
@@ -418,7 +351,7 @@ optimal_survey_scheme <- function(
   evd[current_idx] <- evd_current
 
   # find optimal solution(s)
-  optimal_idx <- abs(max(evd) - evd) < 1e-10
+  optimal_idx <- abs(max(evd) - evd) < 1e-15
   out <- all_feasible_schemes[optimal_idx, , drop = FALSE]
   attr(out, "ev") <- evd[optimal_idx]
 

@@ -10,7 +10,6 @@ optimal_survey_scheme(
   site_detection_columns,
   site_n_surveys_columns,
   site_probability_columns,
-  site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
   feature_survey_column,
@@ -21,16 +20,12 @@ optimal_survey_scheme(
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_tuning_parameters,
-  xgb_early_stopping_rounds = rep(10, length(site_detection_columns)),
-  xgb_n_rounds = rep(100, length(site_detection_columns)),
-  xgb_n_folds = rep(5, length(site_detection_columns)),
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  seed = 500,
-  n_threads = 1
+  n_threads = 1,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -58,13 +53,6 @@ probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (\code{NA})
 values are permitted in these columns.}
-
-\item{site_env_vars_columns}{\code{character} names of columns in the
-argument to \code{site_data} that contain environmental information
-for fitting updated occupancy models based on possible survey outcomes.
-Each column should correspond to a different environmental variable,
-and contain \code{numeric}, \code{factor}, or \code{character} data.
-No missing (\code{NA}) values are permitted in these columns.}
 
 \item{site_management_cost_column}{\code{character} name of column in the
 argument to \code{site_data} that contains costs for managing each
@@ -130,25 +118,6 @@ for conducting surveys and managing sites for conservation.}
 \item{survey_budget}{\code{numeric} maximum expenditure permitted
 for conducting surveys.}
 
-\item{xgb_tuning_parameters}{\code{list} object containing the candidate
-parameter values for fitting models. Valid parameters include:
-\code{"max_depth"}, \code{"eta"}, \code{"lambda"},
-\code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
-\code{"objective"}. See documentation for the \code{params} argument in
-\code{\link[xgboost]{xgb.train}} for more information.}
-
-\item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
-tuning. See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 10 for each feature.}
-
-\item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
-See \code{\link[xgboost]{xgboost}} for more information.
-Defaults to 100 for each feature.}
-
-\item{xgb_n_folds}{\code{numeric} number of folds to split the training
-data into when fitting models for each feature.
-Defaults to 5 for each feature.}
-
 \item{site_management_locked_in_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}
 (\code{TRUE} / \code{FALSE}) values indicating which sites should
@@ -183,12 +152,10 @@ Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
 
-\item{seed}{\code{integer} state of the random number generator for
-partitioning data into folds cross-validation and fitting \pkg{xgboost}
-models. This parameter must remain the same to compare results for
-different survey schemes. Defaults to 500.}
-
 \item{n_threads}{\code{integer} number of threads to use for computation.}
+
+\item{verbose}{\code{logical} indicating if information should be
+printed during processing. Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
@@ -237,19 +204,14 @@ total_budget <- sum(site_data$management_cost) * 0.5
 # (i.e. 10\% of the cost of managing all sites)
 survey_budget <- sum(site_data$survey_cost) * 0.1
 
-# define xgboost tuning parameters
-xgb_parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
-                       lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
-                       objective = "binary:logistic")
-
 # find optimal survey scheme using exact method
 opt_survey <- optimal_survey_scheme(
   site_data, feature_data,
-  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"), c("e1", "e2", "e3"),
+  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
   "management_cost", "survey_cost",
   "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "target", total_budget, survey_budget, xgb_parameters)
+  "target", total_budget, survey_budget)
 
 # print result
 print(opt_survey)

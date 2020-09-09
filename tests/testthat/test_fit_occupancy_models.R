@@ -147,7 +147,7 @@ test_that("multiple species", {
   expect_gte(min(r$performance$test_specificity_std), 0)
 })
 
-test_that("multiple species (sparse)", {
+test_that("multiple species (sparse, multiple threads)", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -177,7 +177,8 @@ test_that("multiple species (sparse)", {
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity",
       xgb_tuning_parameters = tuning_parameters,
-      xgb_early_stopping_rounds = rep(5, n_f))
+      xgb_early_stopping_rounds = rep(5, n_f),
+      n_threads = 2)
   })
   # tests
   expect_is(r, "list")
