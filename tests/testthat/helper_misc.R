@@ -40,7 +40,7 @@ r_conservation_value <- function(pij, target) {
   out <- vapply(seq_along(target), FUN.VALUE = numeric(1), function(i) {
     convolve_binomial(pij[i, ], target[i])
   })
-  prod(out)
+  sum(out)
 }
 
 r_approx_conservation_value <- function(pij, target) {
@@ -49,7 +49,7 @@ r_approx_conservation_value <- function(pij, target) {
     sum(PoissonBinomial::dpbinom(
       seq(target[i], ncol(pij)), pij[i, ], method = "Normal"))
   })
-  prod(out)
+  sum(out)
 }
 
 r_proxy_conservation_value <- function(pij, target) {

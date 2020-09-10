@@ -87,7 +87,7 @@ void greedy_heuristic_prioritization(
           ((curr_min_feasible_pu_cost >= pu_costs[i]) ||
             ((std::abs(pu_costs[i] - costs_rem_pu_sorted[0])) < 1.0e-15)) &&
           ((pu_costs[i] + solution_cost) <= budget)) {
-          // calculate objective with i'th planning unit excluded
+          // calculate objective with i'th planning unit included
           curr_log_1m_rij.col(i) = log_1m_rij.col(i);
           log_obj = log_proxy_expected_value_of_action(curr_log_1m_rij);
           curr_log_1m_rij.col(i).setZero();

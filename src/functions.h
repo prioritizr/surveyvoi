@@ -20,7 +20,7 @@ void log_1m_matrix(Eigen::MatrixXd&);
 
 double log_sum(double, double);
 
-double log_substract(double, double);
+double log_subtract(double, double);
 
 double log_sum(Eigen::VectorXd&);
 

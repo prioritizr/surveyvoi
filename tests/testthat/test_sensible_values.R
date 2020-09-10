@@ -60,8 +60,6 @@ test_that("lower voi when most of budget spent on surveys", {
   expect_true(is.finite(r2))
   expect_gt(r1, 0)
   expect_gt(r2, 0)
-  expect_lte(r1, 1)
-  expect_lte(r2, 1)
   expect_gt(r2, r1)
 })
 

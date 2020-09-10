@@ -36,14 +36,14 @@ double expected_value_of_action(
     spp_prob[i] = Rcpp::sum(curr_density_probs);
   }
 
-  // calculate probability of all species meeting targets
-  return spp_prob.prod();
+  // calculate sum of probabilities of species meeting targets
+  return spp_prob.sum();
 }
 
 double approx_expected_value_of_action(
   Eigen::MatrixXd &pij,
   Rcpp::IntegerVector &target_values) {
-  double out = 1.0;
+  double out = 0.0;
   const std::size_t n_f = pij.rows();
   Rcpp::NumericVector curr_density_probs;
   Rcpp::NumericVector curr_spp_probs;
@@ -51,7 +51,7 @@ double approx_expected_value_of_action(
     curr_spp_probs = wrap(pij.row(i));
     curr_density_probs = PoissonBinomial::dpb_na(
       target_values, curr_spp_probs, false);
-    out *= Rcpp::sum(curr_density_probs);
+    out += Rcpp::sum(curr_density_probs);
   }
   return out;
 }
@@ -59,9 +59,10 @@ double approx_expected_value_of_action(
 double log_proxy_expected_value_of_action(
   Eigen::MatrixXd &log_1m_pij) {
   Eigen::VectorXd out = log_1m_pij.rowwise().sum();
+  // note we that we use log_substract(0, ..) because 0 is log(1.0)
   for (auto itr = out.data(); itr != out.data() + out.size(); ++itr)
-    *itr = log_substract(0.0, *itr);
-  return out.sum();
+    *itr = log_subtract(0.0, *itr);
+  return log_sum(out);
 }
 
 // [[Rcpp::export]]

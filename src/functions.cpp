@@ -86,7 +86,7 @@ double log_sum(double u, double v) {
   return m + std::log(std::exp(u - m) + std::exp(v - m));
 }
 
-double log_substract(double u, double v) {
+double log_subtract(double u, double v) {
  // https://stackoverflow.com/a/778273/3483791
   return u + std::log1p(-std::exp(v - u));
 }
