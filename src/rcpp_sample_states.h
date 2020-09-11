@@ -8,7 +8,7 @@
 #include "functions.h"
 
 void sample_n_states(
-  std::size_t, Eigen::MatrixXd&, std::string&, int, std::vector<mpz_class>&);
+  std::size_t, Eigen::MatrixXd&, int, std::vector<mpz_class>&);
 
 void sample_n_weighted_states_with_replacement(
   std::size_t, Eigen::MatrixXd&, std::vector<mpz_class>&);

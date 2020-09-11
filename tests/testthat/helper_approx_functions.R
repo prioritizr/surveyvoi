@@ -9,7 +9,7 @@ r_approx_expected_value_of_decision_given_survey_scheme <- function(
   # generate outcomes
   outcomes <- lapply(seq_len(n_approx_replicates), function(i) {
     set.seed(seed + i - 1)
-    rcpp_sample_n_weighted_states_without_replacement(
+    rcpp_sample_n_uniform_states_without_replacement(
       n_approx_outcomes_per_replicate,
       pij[survey_features, pu_survey_solution, drop = FALSE],
       seed + i - 1)

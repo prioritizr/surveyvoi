@@ -25,7 +25,6 @@ approx_evdsi(
   prior_matrix = NULL,
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
-  method_approx_outcomes = "weighted_without_replacement",
   seed = 500
 )
 }
@@ -152,16 +151,6 @@ approximating the expected value calculations. Defaults to 100.}
 
 \item{n_approx_outcomes_per_replicate}{\code{integer} number of outcomes to
 use per replicate for approximation calculations. Defaults to 10000.}
-
-\item{method_approx_outcomes}{\code{character} name of method that is
-used to sample outcomes for approximating the expected value
-calculations. Available options are:
-\code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
-\code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
-Uniform sampling methods have an equal chance of returning each
-state, and weighted sampling methods are more likely to return
-outcomes with a higher prior probability of occurring.
-Defaults to \code{"weighted_without_replacement"}.}
 
 \item{seed}{\code{integer} state of the random number generator for
 simulating outcomes when conducting the value of information analyses.

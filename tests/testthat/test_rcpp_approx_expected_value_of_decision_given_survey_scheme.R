@@ -39,7 +39,6 @@ test_that("single species", {
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
     n_approx_replicates = n_reps,
-    method_approx_outcomes = "weighted_without_replacement",
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
     seed = 500)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(
@@ -103,7 +102,6 @@ test_that("multiple species", {
     obj_fun_target = feature_data$target,
     total_budget = total_budget,
     n_approx_replicates = n_reps,
-    method_approx_outcomes = "weighted_without_replacement",
     n_approx_outcomes_per_replicate = n_outcomes_per_rep,
     seed = 500)
   r2 <- r_approx_expected_value_of_decision_given_survey_scheme(

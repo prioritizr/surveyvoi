@@ -29,8 +29,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_approx_expected_value_of_decision_given_survey_scheme
-Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(Eigen::MatrixXd pij, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<bool> pu_survey_solution, Eigen::VectorXd pu_survey_costs, Eigen::VectorXd pu_purchase_costs, Eigen::VectorXd pu_purchase_locked_in, Eigen::VectorXd pu_purchase_locked_out, Eigen::VectorXi obj_fun_target, double total_budget, std::size_t n_approx_replicates, std::size_t n_approx_outcomes_per_replicate, std::string method_approx_outcomes, double seed);
-RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP pijSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP pu_survey_solutionSEXP, SEXP pu_survey_costsSEXP, SEXP pu_purchase_costsSEXP, SEXP pu_purchase_locked_inSEXP, SEXP pu_purchase_locked_outSEXP, SEXP obj_fun_targetSEXP, SEXP total_budgetSEXP, SEXP n_approx_replicatesSEXP, SEXP n_approx_outcomes_per_replicateSEXP, SEXP method_approx_outcomesSEXP, SEXP seedSEXP) {
+Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(Eigen::MatrixXd pij, std::vector<bool> survey_features, Eigen::VectorXd survey_sensitivity, Eigen::VectorXd survey_specificity, std::vector<bool> pu_survey_solution, Eigen::VectorXd pu_survey_costs, Eigen::VectorXd pu_purchase_costs, Eigen::VectorXd pu_purchase_locked_in, Eigen::VectorXd pu_purchase_locked_out, Eigen::VectorXi obj_fun_target, double total_budget, std::size_t n_approx_replicates, std::size_t n_approx_outcomes_per_replicate, double seed);
+RcppExport SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP pijSEXP, SEXP survey_featuresSEXP, SEXP survey_sensitivitySEXP, SEXP survey_specificitySEXP, SEXP pu_survey_solutionSEXP, SEXP pu_survey_costsSEXP, SEXP pu_purchase_costsSEXP, SEXP pu_purchase_locked_inSEXP, SEXP pu_purchase_locked_outSEXP, SEXP obj_fun_targetSEXP, SEXP total_budgetSEXP, SEXP n_approx_replicatesSEXP, SEXP n_approx_outcomes_per_replicateSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -47,9 +47,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type total_budget(total_budgetSEXP);
     Rcpp::traits::input_parameter< std::size_t >::type n_approx_replicates(n_approx_replicatesSEXP);
     Rcpp::traits::input_parameter< std::size_t >::type n_approx_outcomes_per_replicate(n_approx_outcomes_per_replicateSEXP);
-    Rcpp::traits::input_parameter< std::string >::type method_approx_outcomes(method_approx_outcomesSEXP);
     Rcpp::traits::input_parameter< double >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_decision_given_survey_scheme(pij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, obj_fun_target, total_budget, n_approx_replicates, n_approx_outcomes_per_replicate, method_approx_outcomes, seed));
+    rcpp_result_gen = Rcpp::wrap(rcpp_approx_expected_value_of_decision_given_survey_scheme(pij, survey_features, survey_sensitivity, survey_specificity, pu_survey_solution, pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, obj_fun_target, total_budget, n_approx_replicates, n_approx_outcomes_per_replicate, seed));
     return rcpp_result_gen;
 END_RCPP
 }

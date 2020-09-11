@@ -22,7 +22,6 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
   double total_budget, // total budget for surveying + monitor costs
   std::size_t n_approx_replicates,
   std::size_t n_approx_outcomes_per_replicate,
-  std::string method_approx_outcomes,
   double seed) {
   // initialization
   /// constant variables
@@ -144,8 +143,7 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     // manually adjust seed to ensure different samples per replicate
     sample_n_states(
       n_approx_survey_outcomes_per_replicate, survey_pij,
-      method_approx_outcomes, seed + static_cast<double>(r),
-      curr_survey_outcomes);
+      seed + static_cast<double>(r), curr_survey_outcomes);
     set_seed(seed);
 
     /// allocate memory for storing results from each outcome

@@ -13,16 +13,6 @@
 #' @param n_approx_outcomes_per_replicate \code{integer} number of outcomes to
 #'   use per replicate for approximation calculations. Defaults to 10000.
 #'
-#' @param method_approx_outcomes \code{character} name of method that is
-#'   used to sample outcomes for approximating the expected value
-#'   calculations. Available options are:
-#'   \code{"uniform_with_replacement"}, \code{"uniform_without_replacement"},
-#'   \code{"weighted_with_replacement"}, \code{"weighted_without_replacement"}.
-#'   Uniform sampling methods have an equal chance of returning each
-#'   state, and weighted sampling methods are more likely to return
-#'   outcomes with a higher prior probability of occurring.
-#'   Defaults to \code{"weighted_without_replacement"}.
-#'
 #' @param seed \code{integer} state of the random number generator for
 #'  simulating outcomes when conducting the value of information analyses.
 #'  Defaults to 500.
@@ -96,7 +86,6 @@ approx_evdsi <- function(
   prior_matrix = NULL,
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
-  method_approx_outcomes = "weighted_without_replacement",
   seed = 500) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -191,12 +180,6 @@ approx_evdsi <- function(
     ## n_approx_outcomes_per_replicate
     assertthat::is.count(n_approx_outcomes_per_replicate),
     assertthat::noNA(n_approx_outcomes_per_replicate),
-    ## method_approx_outcomes
-    assertthat::is.string(method_approx_outcomes),
-    assertthat::noNA(method_approx_outcomes),
-    isTRUE(method_approx_outcomes %in%
-      c("uniform_with_replacement", "uniform_without_replacement",
-        "weighted_with_replacement", "weighted_without_replacement")),
     ## seed
     assertthat::is.number(seed))
   ## site_management_locked_in_column
@@ -299,7 +282,6 @@ approx_evdsi <- function(
       total_budget = total_budget,
       n_approx_replicates = n_approx_replicates,
       n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-      method_approx_outcomes = method_approx_outcomes,
       seed = seed)
   })
   # return result

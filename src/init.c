@@ -8,7 +8,7 @@
 */
 
 /* .Call calls */
-extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP _surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_action(SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_decision_given_current_info(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP _surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
@@ -36,7 +36,7 @@ extern SEXP _surveyvoi_rcpp_which_state(SEXP);
 extern SEXP _surveyvoi_rcpp_which_state_sparse(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme, 15},
+    {"_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme", (DL_FUNC) &_surveyvoi_rcpp_approx_expected_value_of_decision_given_survey_scheme, 14},
     {"_surveyvoi_rcpp_expected_value_of_action",                              (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_action,                               3},
     {"_surveyvoi_rcpp_expected_value_of_decision_given_current_info",         (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_decision_given_current_info,          6},
     {"_surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme",        (DL_FUNC) &_surveyvoi_rcpp_expected_value_of_decision_given_survey_scheme,        11},

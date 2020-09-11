@@ -63,7 +63,6 @@ test_that("current == optimal info, when all pu selected", {
     survey_budget = 10,
     site_management_locked_in_column = "locked_in",
     n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
   # tests
   expect_equal(evd_current, max(attr(evd_ss, "ev")))
@@ -143,7 +142,6 @@ test_that("current < optimal info, some pu selected", {
     survey_budget = survey_budget,
     site_management_locked_in_column = "locked_in",
     n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
   # tests
   expect_gt(max(attr(evd_ss, "ev")), evd_current)
@@ -209,7 +207,6 @@ test_that("locking out planning units lowers voi", {
     survey_budget = survey_budget,
     site_management_locked_in_column = "locked_in",
     n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
   evd_opt2 <- approx_near_optimal_survey_scheme(
     site_data = site_data,
@@ -230,7 +227,6 @@ test_that("locking out planning units lowers voi", {
     site_management_locked_in_column = "locked_in",
     site_management_locked_out_column = "locked_out",
     n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
   # tests
   expect_lt(max(attr(evd_opt2, "ev")), attr(evd_opt1, "ev"))
@@ -304,7 +300,6 @@ test_that("approx_evdsi >= evdci when solution is fixed", {
     site_management_locked_in_column = "locked_in",
     site_management_locked_out_column = "locked_out",
     n_approx_replicates = 1,
-    method_approx_outcomes = "uniform_without_replacement",
     prior_matrix = pm)
   # tests
   expect_equal(evd_current, max(attr(evd_ss, "ev")))

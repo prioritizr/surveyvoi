@@ -155,7 +155,6 @@ approx_near_optimal_survey_scheme <- function(
   prior_matrix = NULL,
   n_approx_replicates = 100,
   n_approx_outcomes_per_replicate = 10000,
-  method_approx_outcomes = "weighted_without_replacement",
   seed = 500,
   n_threads = 1,
   verbose = FALSE) {
@@ -253,12 +252,6 @@ approx_near_optimal_survey_scheme <- function(
     ## n_approx_outcomes_per_replicate
     assertthat::is.count(n_approx_outcomes_per_replicate),
     assertthat::noNA(n_approx_outcomes_per_replicate),
-    ## method_approx_outcomes
-    assertthat::is.string(method_approx_outcomes),
-    assertthat::noNA(method_approx_outcomes),
-    isTRUE(method_approx_outcomes %in%
-      c("uniform_with_replacement", "uniform_without_replacement",
-        "weighted_with_replacement", "weighted_without_replacement")),
     ## seed
     assertthat::is.number(seed),
     ## verbose
@@ -439,10 +432,9 @@ approx_near_optimal_survey_scheme <- function(
           pu_purchase_locked_in = site_management_locked_in,
           pu_purchase_locked_out = site_management_locked_out,
           obj_fun_target = round(feature_data[[feature_target_column]]),
-          n_approx_replicates = n_approx_replicates,
           total_budget = total_budget,
+          n_approx_replicates = n_approx_replicates,
           n_approx_outcomes_per_replicate = n_approx_outcomes_per_replicate,
-          method_approx_outcomes = method_approx_outcomes,
           seed = seed)
       })
       ## return average expected value

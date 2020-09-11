@@ -11,22 +11,11 @@ template <> struct hash<mpz_class>
 }
 
 void sample_n_states(
-  std::size_t k, Eigen::MatrixXd &pij, std::string &method, int seed,
-  std::vector<mpz_class> &out) {
+  std::size_t k, Eigen::MatrixXd &pij, int seed, std::vector<mpz_class> &out) {
   // set seed
   set_seed(seed);
-  // sample states according to specififed method
-  if (method == "weighted_without_replacement") {
-    sample_n_weighted_states_without_replacement(k, pij, out);
-  } else if (method == "weighted_with_replacement") {
-    sample_n_weighted_states_with_replacement(k, pij, out);
-  } else if (method == "uniform_with_replacement") {
-    sample_n_uniform_states_with_replacement(k, pij, out);
-  } else if (method == "uniform_without_replacement") {
-    sample_n_uniform_states_without_replacement(k, pij, out);
-  } else {
-    Rcpp::stop("method not recognized");
-  }
+  // sample states
+  sample_n_uniform_states_without_replacement(k, pij, out);
   // return void
   return;
 }
