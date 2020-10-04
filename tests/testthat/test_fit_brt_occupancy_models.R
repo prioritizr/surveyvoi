@@ -1,4 +1,4 @@
-context("fit_occupancy_models")
+context("fit_brt_occupancy_models")
 
 test_that("single species", {
   # data
@@ -16,7 +16,7 @@ test_that("single species", {
          objective = "binary:logistic", tree_method = "auto")
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_brt_occupancy_models(
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity",
@@ -88,7 +88,7 @@ test_that("multiple species", {
          objective = "binary:logistic")
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_brt_occupancy_models(
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity",
@@ -172,7 +172,7 @@ test_that("multiple species (sparse, multiple threads)", {
   }
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_brt_occupancy_models(
       x2, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity",

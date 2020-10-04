@@ -183,7 +183,7 @@ test_that("consistent results", {
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),
          objective = "binary:logistic")
-  xgb_model <- fit_occupancy_models(
+  xgb_model <- fit_brt_occupancy_models(
     site_data, feature_data, "f1", "n1", c("e1", "e2"),
     "survey_sensitivity", "survey_specificity",
     xgb_tuning_parameters = xgb_parameters,
@@ -229,7 +229,7 @@ test_that("consistent results (multiple threads)", {
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),
          objective = "binary:logistic")
-  xgb_model <- fit_occupancy_models(
+  xgb_model <- fit_brt_occupancy_models(
     site_data, feature_data, "f1", "n1", c("e1", "e2"),
     "survey_sensitivity", "survey_specificity",
     xgb_tuning_parameters = xgb_parameters,

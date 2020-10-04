@@ -1,6 +1,7 @@
 #' @include internal.R
 NULL
 
+#' @import Rcpp
 #' @import sf
 #' @import Matrix
 NULL

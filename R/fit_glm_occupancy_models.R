@@ -1,10 +1,12 @@
 #' @include internal.R
 NULL
 
-#' Fit models to estimate probability of occupancy
+#' Fit hierarchical generalized linear models to model occupancy
 #'
 #' Estimate probability of occupancy for a set of features in a set of
-#' planning units.
+#' planning units. Models are fit using hierachical generalized linear models
+#' that account for for imperfect detection (following Mc)
+#' \code{\link[xgboost]{xgb.train}}).
 #'
 #' @param site_data \code{\link[sf]{sf}} object with site data.
 #'
@@ -45,22 +47,13 @@ NULL
 #'   This column should have \code{numeric} values that are between zero and
 #'   one. No missing (\code{NA}) values are permitted in this column.
 #'
-#' @param xgb_tuning_parameters \code{list} object containing the candidate
-#'  parameter values for fitting models. Valid parameters include:
-#'  \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
-#'  \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
-#'  \code{"objective"}. See documentation for the \code{params} argument in
-#'  \code{\link[xgboost]{xgb.train}} for more information.
+#' @param stan_n_iter \code{}
 #'
-#' @param xgb_early_stopping_rounds \code{numeric} model rounds for parameter
-#'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 10 for each feature.
+#' @param stan_n_chains
 #'
-#' @param xgb_n_rounds \code{numeric} model rounds for model fitting
-#'   See \code{\link[xgboost]{xgboost}} for more information.
-#'   Defaults to 100 for each feature.
+#' @param stan_n_warmup
 #'
-#' @param xgb_n_folds \code{numeric} number of folds to split the training
+#' @param n_folds \code{numeric} number of folds to split the training
 #'   data into when fitting models for each feature.
 #'   Defaults to 5 for each feature.
 #'
@@ -121,6 +114,11 @@ NULL
 #'  the models' training and evaluation folds.
 #'
 #' }
+#'
+#' @references
+#' MacKenzie DI, Nichols JD, Lachman GB, Droege S, Royle AJ & Langtimm CA
+#' (2002) Estimating site occupancy rates when detection
+#' probabilities are less than one. \emph{Ecology}, \strong{83}, 2248--2255.
 #'
 #' @return \code{list} object containing:
 #' \describe{
@@ -196,7 +194,7 @@ NULL
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
 #' # finishes quickly, you would probably want something like 1000+
-#' results <- fit_occupancy_models(
+#' results <- fit_brt_occupancy_models(
 #'    site_data, feature_data,
 #'    c("f1", "f2"), c("n1", "n2"), c("e1", "e2", "e3"),
 #'    "survey_sensitivity", "survey_specificity",
@@ -213,7 +211,7 @@ NULL
 #' print(results$performance)
 #' }
 #' @export
-fit_occupancy_models <- function(
+fit_brt_occupancy_models <- function(
   site_data, feature_data,
   site_detection_columns, site_n_surveys_columns,
   site_env_vars_columns,
@@ -559,3 +557,4 @@ make_feval_tss <- function(sens, spec) {
     list(metric = "tss", value = value[[1]])
   }
 }
+#'
