@@ -457,9 +457,15 @@ approx_near_optimal_survey_scheme <- function(
     if (all(is.na(curr_sites_approx_evsdi))) break()
 
     # penalise each objective value by the cost of the extra planning unit
-    curr_eval_metrics <-
-      (curr_sites_approx_evsdi - survey_solution_values[s]) /
-      site_data[[site_survey_cost_column]][curr_remaining_sites]
+    if (all(curr_sites_approx_evsdi < survey_solution_values[s])) {
+      curr_eval_metrics <-
+        (1 / (survey_solution_values[s] - curr_sites_approx_evsdi)) /
+        site_data[[site_survey_cost_column]][curr_remaining_sites]
+    } else {
+      curr_eval_metrics <-
+        (curr_sites_approx_evsdi - survey_solution_values[s]) /
+        site_data[[site_survey_cost_column]][curr_remaining_sites]
+    }
 
     # find the best site
     curr_best_idx <- which.max(curr_eval_metrics)
