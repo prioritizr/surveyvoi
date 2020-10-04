@@ -73,7 +73,7 @@ of surveys." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -143,6 +143,7 @@ of surveys.</p>
   <span class='no'>survey_budget</span>,
   <span class='kw'>locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>exclude_locked_out</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
@@ -182,6 +183,12 @@ the argument to <code>site_data</code> that contains <code>logical</code>
 locked out of the survey scheme.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
+    </tr>
+    <tr>
+      <th>exclude_locked_out</th>
+      <td><p><code>logical</code> should locked out planning units
+be entirely excluded from the optimization process?
+Defaults to <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>verbose</th>

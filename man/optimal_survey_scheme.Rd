@@ -7,9 +7,9 @@
 optimal_survey_scheme(
   site_data,
   feature_data,
-  site_occupancy_columns,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_probability_columns,
-  site_env_vars_columns,
   site_management_cost_column,
   site_survey_cost_column,
   feature_survey_column,
@@ -17,21 +17,15 @@ optimal_survey_scheme(
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   survey_budget,
-  xgb_parameters,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
   site_survey_locked_out_column = NULL,
   prior_matrix = NULL,
-  optimality_gap = 0,
-  site_weight_columns = NULL,
-  xgb_n_folds = rep(5, nrow(feature_data)),
-  seed = 500,
-  n_threads = 1
+  n_threads = 1,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -39,15 +33,19 @@ optimal_survey_scheme(
 
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain detections
-and non-detections of features at each site.
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (\code{NA}) value should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled
@@ -55,13 +53,6 @@ probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (\code{NA})
 values are permitted in these columns.}
-
-\item{site_env_vars_columns}{\code{character} names of columns in the
-argument to  \code{site_data} that contain environmental information
-for fitting updated occupancy models based on possible survey outcomes.
-Each column should correspond to a different environmental variable,
-and contain \code{numeric}, \code{factor}, or \code{character} data.
-No missing (\code{NA}) values are permitted in these columns.}
 
 \item{site_management_cost_column}{\code{character} name of column in the
 argument to \code{site_data} that contains costs for managing each
@@ -113,22 +104,6 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_preweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{preweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
-\item{feature_postweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{postweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
 \item{feature_target_column}{\code{character} name of the column in the
 argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
@@ -142,15 +117,6 @@ for conducting surveys and managing sites for conservation.}
 
 \item{survey_budget}{\code{numeric} maximum expenditure permitted
 for conducting surveys.}
-
-\item{xgb_parameters}{\code{list} of \code{list} objects
-containing the parameters for fitting models for each
-feature. See documentation for the \code{params} argument in
-\code{\link[xgboost]{xgb.train}} for available parameters. Ideally,
-these parameters would be determined using the
-\code{\link{fit_occupancy_models}} function. Note that arguments must
-have \code{"nrounds"}, \code{"objective"}, \code{"scale_pos_weight"}
-elements (see example below).}
 
 \item{site_management_locked_in_column}{\code{character} name of the column
 in the argument to \code{site_data} that contains \code{logical}
@@ -186,32 +152,10 @@ Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
 
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
-
-\item{site_weight_columns}{\code{character} name of columns in
-\code{site_data} containing weights for model fitting for each
-feature. These columns must contain \code{numeric} values greater
-than or equal to zero. No missing (\code{NA}) values are
-permitted. Defaults to \code{NULL} such that all data are given
-equal weight when fitting models.}
-
-\item{xgb_n_folds}{\code{integer} vector containing the number of
- k-fold cross-validation folds to use for fitting models and
- assessing model performance for each feature. Ideally, the number of folds
- should be exactly the same as the number used for tuning the
- model parameters (i.e. same parameter to the \code{n_folds}
- argument in \link{fit_occupancy_models} when generating parameters
-for \code{xgb_parameters}).}
-
-\item{seed}{\code{integer} state of the random number generator for
-partitioning data into folds cross-validation and fitting \pkg{xgboost}
-models. This parameter must remain the same to compare results for
-different survey schemes. Defaults to 500.}
-
 \item{n_threads}{\code{integer} number of threads to use for computation.}
+
+\item{verbose}{\code{logical} indicating if information should be
+printed during processing. Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
@@ -244,8 +188,9 @@ set.seed(123)
 RFoptions(seed = 123)
 
 # simulate data
-site_data <- simulate_site_data(n_sites = 15, n_features = 2, prop = 0.5)
+site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+feature_data$target <- c(10, 10)
 
 # preview simulated data
 print(site_data)
@@ -259,20 +204,14 @@ total_budget <- sum(site_data$management_cost) * 0.5
 # (i.e. 10\% of the cost of managing all sites)
 survey_budget <- sum(site_data$survey_cost) * 0.1
 
-# define xgboost tuning parameters
-xgb_parameters <-
- list(list(objective = "binary:logistic", scale_pos_weight = 1,
-      nrounds = 8, eta = 0.1))[rep(1, 2)]
-
 # find optimal survey scheme using exact method
 opt_survey <- optimal_survey_scheme(
   site_data, feature_data,
-  c("f1", "f2"), c("p1", "p2"), c("e1", "e2", "e3"),
+  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
   "management_cost", "survey_cost",
   "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "preweight", "postweight", "target",
-  total_budget, survey_budget, xgb_parameters)
+  "target", total_budget, survey_budget)
 
 # print result
 print(opt_survey)

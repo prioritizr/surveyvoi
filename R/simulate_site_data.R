@@ -29,6 +29,9 @@ NULL
 #' @param management_cost_radius \code{numeric} value corresponding to
 #'   the spatial homogeneity of the survey costs. Defaults to 0.1.
 #'
+#' @param max_number_surveys_per_site \code{integer} maximum number of
+#'   surveys per site in the simulated data. Defaults to 5.
+#'
 #' @param output_probabilities \code{logical} value indicating if
 #'   probability values of occupancy should be output or not. Defaults
 #'   to \code{TRUE}.
@@ -38,13 +41,18 @@ NULL
 #' (\code{\link[RandomFields]{RFsimulate}}) to provide spatially auto-correlated
 #' simulations.
 #'
-#' @return \code{\link[sf]{sf}} object with site data. Columns starting with
-#'  (i) \code{"f"} (e.g. \code{f1}) contain presence/absence data,
-#'  (ii) \code{"p"} (e.g. \code{p1}) contain prior probability data,
-#'  (iii) \code{"e"} (e.g. \code{e1}) contain environmental data. Note
-#'  that presence/absence and probability columns with the same integer suffix
-#'  correspond to the same feature (e.g. \code{f1} and \code{p1} are the
-#'  same feature).
+#' @return \code{\link[sf]{sf}} object with site data. Columns that start with
+#'  (i) \code{"f"} (e.g. \code{"d1"}) contain the proportion of
+#'   times that each feature was detected in each site,
+#'  (ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
+#'   of surveys for each feature within each site,
+#'  (iii) \code{"p"} (e.g. \code{"p1"}) contain prior
+#'  probability data,  and
+#'  (iv) \code{"e"} (e.g. \code{"e1"}) contain environmental
+#'  data. Note that columns that contain the same integer value (excepting
+#'  environmental data columns) correspond to the same feature
+#'  (e.g. \code{"d1"}, \code{"n1"}, \code{"p1"} contain data that correspond
+#'  to the same feature).
 #'
 #' @examples
 #' # set seed for reproducibility
@@ -64,10 +72,13 @@ NULL
 #' # plot environmental data
 #' plot(d[, c("e1", "e2", "e3")], axes = TRUE, pch = 16, cex = 2)
 #'
-#' # plot feature presence/absence data
+#' # plot feature detection data
 #' plot(d[, c("f1", "f2", "f3", "f4")], axes = TRUE, pch = 16, cex = 2)
-#;
-#' # plot feature probability data
+#'
+#' # plot feature survey effort
+#' plot(d[, c("n1", "n2", "n3", "n4")], axes = TRUE, pch = 16, cex = 2)
+#'
+#' # plot feature prior probability data
 #' plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
 #'
 #' @seealso \code{\link{simulate_feature_data}}
@@ -80,6 +91,7 @@ simulate_site_data <- function(n_sites, n_features,
                                survey_cost_radius = 0.5,
                                management_cost_intensity = 100,
                                management_cost_radius = 0.5,
+                               max_number_surveys_per_site = 5,
                                output_probabilities = TRUE) {
   # assert arguments are valid
   assertthat::assert_that(
@@ -110,11 +122,15 @@ simulate_site_data <- function(n_sites, n_features,
     assertthat::is.number(management_cost_radius),
     assertthat::noNA(management_cost_radius),
     all(management_cost_radius >= 0),
+    ## max_number_surveys_per_site
+    assertthat::is.count(max_number_surveys_per_site),
+    assertthat::noNA(max_number_surveys_per_site),
     ## output_probabilities
     assertthat::is.flag(output_probabilities),
     assertthat::noNA(output_probabilities))
   # site locations
-  site_data <- tibble::tibble(x = runif(n_sites), y = runif(n_sites))
+  site_data <- tibble::tibble(x = stats::runif(n_sites),
+                              y = stats::runif(n_sites))
   # cost data
   site_data$survey_cost <- suppressMessages(
     RandomFields::RFsimulate(
@@ -139,32 +155,42 @@ simulate_site_data <- function(n_sites, n_features,
                               n = n_env_vars)@data))
   env_data <- apply(env_data, 2, function(x) scale(x))
   # feature model coefficients
-  feature_coef <- matrix(rnorm(n_features * n_env_vars, sd = 5),
+  feature_coef <- matrix(stats::rnorm(n_features * n_env_vars, sd = 8),
                          ncol = n_env_vars, nrow = n_features)
   # probability data
   pij <- matrix(NA, ncol = n_features, nrow = n_sites)
   for (i in seq_len(n_features))
-    pij[, i] <- plogis(c(env_data  %*% feature_coef[i, ]))
-  # presence/absence data
-  rij <- pij
-  rij[] <- rbinom(n_sites * n_features, 1, c(pij))
+    pij[, i] <- stats::plogis(c(env_data  %*% feature_coef[i, ]))
+  pij[] <- round(pij[], 3)
+  # determine number of surveys per site
+  n_surveys <- sample.int(max_number_surveys_per_site, n_sites, replace = TRUE)
+  # simulate survey detections within each site
+  p_det <- pij
+  for (i in seq_len(n_features)) {
+    for (j in seq_len(n_sites)) {
+      p_det[j, i] <- mean(stats::rbinom(n_surveys[j], 1, pij[j, i]))
+    }
+  }
   # randomly specify sites missing data
   missing_sites <- sample.int(n_sites,
     round(proportion_of_sites_missing_data * n_sites), replace = FALSE)
-  # set missing site data to NA
-  rij[missing_sites, ] <- NA_real_
+  # set missing site data to zeros
+  p_det[missing_sites, ] <- 0
   # compile data
+  ## detection data
+  for (i in seq_len(n_features))
+    site_data[[paste0("f", i)]] <- p_det[, i]
+  ## number of surveys data
+  for (i in seq_len(n_features))
+    site_data[[paste0("n", i)]] <- replace(n_surveys, missing_sites, 0)
   ## env data
-  for (i in seq_len(ncol(env_data)))
+  for (i in seq_len(n_env_vars))
     site_data[[paste0("e", i)]] <- env_data[, i]
-  ## rij data
-  for (i in seq_len(ncol(rij)))
-    site_data[[paste0("f", i)]] <- rij[, i]
   ## pij data
   if (output_probabilities) {
     for (i in seq_len(ncol(pij)))
       site_data[[paste0("p", i)]] <- pij[, i]
   }
   # return result
-  st_as_sf(site_data, coords = c("x", "y"))
+  sf::st_as_sf(site_data, coords = c("x", "y"))
 }

@@ -4,24 +4,26 @@ test_that("single species", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
-  n_pu <- 10000
+  n_pu <- 1000
   n_f <- 1
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  y <- sf::st_drop_geometry(x)
+  f <- simulate_feature_data(n_f = 1)
+  f$survey_sensitivity <- 0.9
+  f$survey_specificity <- 0.999
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         max_depth = c(1, 2, 3),
-         colsample_bytree = c(0.1, 0.8), subsample = c(0.5, 0.8, 0.9),
-         objective = "binary:logistic")
+         objective = "binary:logistic", tree_method = "auto")
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      tree_method = "hist",
-      parameters = tuning_parameters, n_random_search_iterations = 20)
+      x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
+      xgb_tuning_parameters = tuning_parameters)
   })
   # tests
+  y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
   expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
@@ -34,38 +36,38 @@ test_that("single species", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
-  expect_is(r$performance$train_auc_mean, "numeric")
-  expect_is(r$performance$train_auc_std, "numeric")
+  expect_is(r$performance$train_tss_mean, "numeric")
+  expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
   expect_is(r$performance$train_sensitivity_std, "numeric")
   expect_is(r$performance$train_specificity_mean, "numeric")
   expect_is(r$performance$train_specificity_std, "numeric")
-  expect_is(r$performance$test_auc_mean, "numeric")
-  expect_is(r$performance$test_auc_std, "numeric")
+  expect_is(r$performance$test_tss_mean, "numeric")
+  expect_is(r$performance$test_tss_std, "numeric")
   expect_is(r$performance$test_sensitivity_mean, "numeric")
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
-  expect_lte(max(r$performance$train_auc_mean), 1)
-  expect_lte(max(r$performance$train_auc_std), 1)
+  expect_lte(max(r$performance$train_tss_mean), 1)
+  expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)
   expect_lte(max(r$performance$train_sensitivity_std), 1)
   expect_lte(max(r$performance$train_specificity_mean), 1)
   expect_lte(max(r$performance$train_specificity_std), 1)
-  expect_lte(max(r$performance$test_auc_mean), 1)
-  expect_lte(max(r$performance$test_auc_std), 1)
+  expect_lte(max(r$performance$test_tss_mean), 1)
+  expect_lte(max(r$performance$test_tss_std), 1)
   expect_lte(max(r$performance$test_sensitivity_mean), 1)
   expect_lte(max(r$performance$test_sensitivity_std), 1)
   expect_lte(max(r$performance$test_specificity_mean), 1)
   expect_lte(max(r$performance$test_specificity_std), 1)
-  expect_gte(min(r$performance$train_auc_mean), 0)
-  expect_gte(min(r$performance$train_auc_std), 0)
+  expect_gte(min(r$performance$train_tss_mean), 0)
+  expect_gte(min(r$performance$train_tss_std), 0)
   expect_gte(min(r$performance$train_sensitivity_mean), 0)
   expect_gte(min(r$performance$train_sensitivity_std), 0)
   expect_gte(min(r$performance$train_specificity_mean), 0)
   expect_gte(min(r$performance$train_specificity_std), 0)
-  expect_gte(min(r$performance$test_auc_mean), 0)
-  expect_gte(min(r$performance$test_auc_std), 0)
+  expect_gte(min(r$performance$test_tss_mean), 0)
+  expect_gte(min(r$performance$test_tss_std), 0)
   expect_gte(min(r$performance$test_sensitivity_mean), 0)
   expect_gte(min(r$performance$test_sensitivity_std), 0)
   expect_gte(min(r$performance$test_specificity_mean), 0)
@@ -76,24 +78,25 @@ test_that("multiple species", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
-  n_pu <- 2000
-  n_f <- 4
+  n_pu <- 300
+  n_f <- 3
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  y <- sf::st_drop_geometry(x)
+  f <- simulate_feature_data(n_f)
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         max_depth = c(1, 2, 3),
-         colsample_bytree = c(0.1, 0.8), subsample = c(0.5, 0.8, 0.9),
          objective = "binary:logistic")
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      parameters = tuning_parameters, n_random_search_iterations = 5,
-      n_threads = 2)
+      x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
+      xgb_tuning_parameters = tuning_parameters,
+      xgb_early_stopping_rounds = rep(5, n_f))
   })
   # tests
+  y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
   expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
@@ -106,45 +109,45 @@ test_that("multiple species", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
-  expect_is(r$performance$train_auc_mean, "numeric")
-  expect_is(r$performance$train_auc_std, "numeric")
+  expect_is(r$performance$train_tss_mean, "numeric")
+  expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
   expect_is(r$performance$train_sensitivity_std, "numeric")
   expect_is(r$performance$train_specificity_mean, "numeric")
   expect_is(r$performance$train_specificity_std, "numeric")
-  expect_is(r$performance$test_auc_mean, "numeric")
-  expect_is(r$performance$test_auc_std, "numeric")
+  expect_is(r$performance$test_tss_mean, "numeric")
+  expect_is(r$performance$test_tss_std, "numeric")
   expect_is(r$performance$test_sensitivity_mean, "numeric")
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
-  expect_lte(max(r$performance$train_auc_mean), 1)
-  expect_lte(max(r$performance$train_auc_std), 1)
+  expect_lte(max(r$performance$train_tss_mean), 1)
+  expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)
   expect_lte(max(r$performance$train_sensitivity_std), 1)
   expect_lte(max(r$performance$train_specificity_mean), 1)
   expect_lte(max(r$performance$train_specificity_std), 1)
-  expect_lte(max(r$performance$test_auc_mean), 1)
-  expect_lte(max(r$performance$test_auc_std), 1)
+  expect_lte(max(r$performance$test_tss_mean), 1)
+  expect_lte(max(r$performance$test_tss_std), 1)
   expect_lte(max(r$performance$test_sensitivity_mean), 1)
   expect_lte(max(r$performance$test_sensitivity_std), 1)
   expect_lte(max(r$performance$test_specificity_mean), 1)
   expect_lte(max(r$performance$test_specificity_std), 1)
-  expect_gte(min(r$performance$train_auc_mean), 0)
-  expect_gte(min(r$performance$train_auc_std), 0)
+  expect_gte(min(r$performance$train_tss_mean), 0)
+  expect_gte(min(r$performance$train_tss_std), 0)
   expect_gte(min(r$performance$train_sensitivity_mean), 0)
   expect_gte(min(r$performance$train_sensitivity_std), 0)
   expect_gte(min(r$performance$train_specificity_mean), 0)
   expect_gte(min(r$performance$train_specificity_std), 0)
-  expect_gte(min(r$performance$test_auc_mean), 0)
-  expect_gte(min(r$performance$test_auc_std), 0)
+  expect_gte(min(r$performance$test_tss_mean), 0)
+  expect_gte(min(r$performance$test_tss_std), 0)
   expect_gte(min(r$performance$test_sensitivity_mean), 0)
   expect_gte(min(r$performance$test_sensitivity_std), 0)
   expect_gte(min(r$performance$test_specificity_mean), 0)
   expect_gte(min(r$performance$test_specificity_std), 0)
 })
 
-test_that("multiple species (sparse)", {
+test_that("multiple species (sparse, multiple threads)", {
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -152,24 +155,29 @@ test_that("multiple species (sparse)", {
   n_f <- 4
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
-  x2 <- x
+  f <- simulate_feature_data(n_f)
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         max_depth = c(1, 2, 3),
-         colsample_bytree = c(0.1, 0.8), subsample = c(0.5, 0.8, 0.9),
          objective = "binary:logistic")
-  # randomly add a missing values to each species
-  for (i in paste0("f", n_f)) {
-    non_na <- which(!is.na(x[[i]]))
-    idx <- sample(non_na, ceiling(length(non_na) * 0.25))
-    x2[[i]][idx] <- NA_real_
-    expect_gt(sum(is.na(x2[[i]])), sum(is.na(x[[i]])))
+  # randomly set sites to hvae 0 surveys for certain species
+  x2 <- x
+  for (i in seq_len(n_f)) {
+    fn <- paste0("f", i)
+    nn <- paste0("n", i)
+    non_zero <- which(x[[fn]] > 0)
+    idx <- sample(non_zero, ceiling(length(non_zero) * 0.25))
+    x2[[fn]][idx] <- 0
+    x2[[nn]][idx] <- 0
+    expect_gt(sum(x2[[fn]]), 0)
   }
   # fit models
   suppressWarnings({
     r <- fit_occupancy_models(
-      x2, paste0("f", seq_len(n_f)), paste0("e", seq_len(n_vars)),
-      parameters = tuning_parameters, n_random_search_iterations = 5,
+      x2, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
+      paste0("e", seq_len(n_vars)),
+      "survey_sensitivity", "survey_specificity",
+      xgb_tuning_parameters = tuning_parameters,
+      xgb_early_stopping_rounds = rep(5, n_f),
       n_threads = 2)
   })
   # tests
@@ -187,38 +195,38 @@ test_that("multiple species (sparse)", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
-  expect_is(r$performance$train_auc_mean, "numeric")
-  expect_is(r$performance$train_auc_std, "numeric")
+  expect_is(r$performance$train_tss_mean, "numeric")
+  expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
   expect_is(r$performance$train_sensitivity_std, "numeric")
   expect_is(r$performance$train_specificity_mean, "numeric")
   expect_is(r$performance$train_specificity_std, "numeric")
-  expect_is(r$performance$test_auc_mean, "numeric")
-  expect_is(r$performance$test_auc_std, "numeric")
+  expect_is(r$performance$test_tss_mean, "numeric")
+  expect_is(r$performance$test_tss_std, "numeric")
   expect_is(r$performance$test_sensitivity_mean, "numeric")
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
-  expect_lte(max(r$performance$train_auc_mean), 1)
-  expect_lte(max(r$performance$train_auc_std), 1)
+  expect_lte(max(r$performance$train_tss_mean), 1)
+  expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)
   expect_lte(max(r$performance$train_sensitivity_std), 1)
   expect_lte(max(r$performance$train_specificity_mean), 1)
   expect_lte(max(r$performance$train_specificity_std), 1)
-  expect_lte(max(r$performance$test_auc_mean), 1)
-  expect_lte(max(r$performance$test_auc_std), 1)
+  expect_lte(max(r$performance$test_tss_mean), 1)
+  expect_lte(max(r$performance$test_tss_std), 1)
   expect_lte(max(r$performance$test_sensitivity_mean), 1)
   expect_lte(max(r$performance$test_sensitivity_std), 1)
   expect_lte(max(r$performance$test_specificity_mean), 1)
   expect_lte(max(r$performance$test_specificity_std), 1)
-  expect_gte(min(r$performance$train_auc_mean), 0)
-  expect_gte(min(r$performance$train_auc_std), 0)
+  expect_gte(min(r$performance$train_tss_mean), 0)
+  expect_gte(min(r$performance$train_tss_std), 0)
   expect_gte(min(r$performance$train_sensitivity_mean), 0)
   expect_gte(min(r$performance$train_sensitivity_std), 0)
   expect_gte(min(r$performance$train_specificity_mean), 0)
   expect_gte(min(r$performance$train_specificity_std), 0)
-  expect_gte(min(r$performance$test_auc_mean), 0)
-  expect_gte(min(r$performance$test_auc_std), 0)
+  expect_gte(min(r$performance$test_tss_mean), 0)
+  expect_gte(min(r$performance$test_tss_std), 0)
   expect_gte(min(r$performance$test_sensitivity_mean), 0)
   expect_gte(min(r$performance$test_sensitivity_std), 0)
   expect_gte(min(r$performance$test_specificity_mean), 0)

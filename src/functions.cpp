@@ -14,19 +14,69 @@ void factorial(std::size_t x, mpz_t out) {
   }
 }
 
+void create_reverse_lookup_id(
+  std::vector<bool> &in, std::vector<std::size_t> &out) {
+  /// e.g. if in = [0, 1, 0, 1]
+  ///         out = [?, 0, ?, 1]
+  ///  note ? = initial number in out, defaults to 1e-5 to deliberately crash
+  ///           if there are coding errors
+  const std::size_t n = in.size();
+  std::size_t counter = 0;
+  for (std::size_t i = 0; i < n; ++i) {
+    if (in[i]) {
+      out[i] = counter;
+      ++counter;
+    }
+  }
+  return;
+}
+
+void calculate_survey_tss(
+  Eigen::MatrixXd &nij, std::vector<std::size_t> &survey_features_idx,
+  Eigen::VectorXd &survey_sensitivity, Eigen::VectorXd &survey_specificity,
+  Eigen::MatrixXd &out) {
+  // declare constants
+  const std::size_t n_f_survey = survey_features_idx.size();
+  const std::size_t n_pu = nij.cols();
+  // declare temporary loop variables
+  double curr_sens, curr_spec;
+  // calculate TSS for survey data at each planning unit for each
+  // species that we are surveying
+  // note that these TSS account for multiple surveys per site,
+  // assuming that each survey is independent
+  for (std::size_t i = 0; i < n_f_survey; ++i) {
+    for (std::size_t j = 0; j < n_pu; ++j) {
+      // calculate sensitivity
+      curr_sens = 1.0;
+      for (std::size_t r = 0; r < nij(survey_features_idx[i], j); ++r)
+        curr_sens *= (1.0 - survey_sensitivity[survey_features_idx[i]]);
+      curr_sens = 1.0 - curr_sens;
+      // calculate specificity
+      curr_spec = 1.0;
+      for (std::size_t r = 0; r < nij(survey_features_idx[i], j); ++r)
+        curr_spec *= (1.0 - survey_specificity[survey_features_idx[i]]);
+      curr_spec = 1.0 - curr_spec;
+      // calculate TSS
+      out(i, j) = curr_sens + curr_spec - 1.0;
+    }
+  }
+  // return void
+  return;
+}
+
+void set_seed(double seed) {
+  Rcpp::Environment base_env("package:base");
+  Rcpp::Function set_seed_r = base_env["set.seed"];
+  set_seed_r(std::floor(std::fabs(seed)));
+}
+
 void log_matrix(Eigen::MatrixXd &x) {
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wenum-compare"
   x.array() = x.array().log();
-  #pragma GCC diagnostic pop
   return;
 }
 
 void log_1m_matrix(Eigen::MatrixXd &x) {
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wenum-compare"
   x.array() = (1.0 - x.array()).array().log();
-  #pragma GCC diagnostic pop
   return;
 }
 
@@ -34,6 +84,11 @@ double log_sum(double u, double v) {
   // https://statmodeling.stat.columbia.edu/2016/06/11/log-sum-of-exponentials
   const double m = std::max(u, v);
   return m + std::log(std::exp(u - m) + std::exp(v - m));
+}
+
+double log_subtract(double u, double v) {
+ // https://stackoverflow.com/a/778273/3483791
+  return u + std::log1p(-std::exp(v - u));
 }
 
 double log_sum(Eigen::VectorXd &x) {
@@ -76,30 +131,6 @@ void assert_valid_probability_data(double x, std::string msg) {
   return;
 }
 
-void extract_k_fold_indices(Rcpp::List &x,
-  std::vector<std::vector<std::vector<std::size_t>>> &out) {
-  const std::size_t n1 = x.size();
-  std::size_t n2;
-  std::size_t n3;
-  Rcpp::IntegerVector idx;
-  Rcpp::List curr_sub_x;
-  out.resize(n1);
-  for (std::size_t i = 0; i < n1; ++i) {
-    curr_sub_x = Rcpp::as<Rcpp::List>(x[i]);
-    n2 = curr_sub_x.size();
-    out[i].resize(n2);
-    for (std::size_t j = 0; j < n2; ++j) {
-      idx = Rcpp::as<Rcpp::IntegerVector>(curr_sub_x[j]);
-      n3 = idx.size();
-      out[i][j].resize(n3);
-      for (std::size_t k = 0; k < n3; ++k) {
-        out[i][j][k] = idx[k] - 1;
-      }
-    }
-  }
-  return;
-}
-
 void extract_list_of_list_of_indices(
   Rcpp::List &x, std::vector<std::vector<std::size_t>> &out) {
   const std::size_t n1 = x.size();
@@ -116,55 +147,3 @@ void extract_list_of_list_of_indices(
   }
   return;
 }
-
-void extract_xgboost_parameters(Rcpp::List &x,
-  std::vector<std::vector<std::string>> &out_names,
-  std::vector<std::vector<std::string>> &out_values) {
-  const std::size_t n1 = x.size();
-  Rcpp::CharacterVector curr_sub_names;
-  Rcpp::List curr_sub_list;
-  std::size_t n2;
-  out_names.resize(n1);
-  out_values.resize(n1);
-  for (std::size_t i = 0; i < n1; ++i) {
-    curr_sub_list = Rcpp::as<Rcpp::List>(x[i]);
-    n2 = curr_sub_list.size();
-    curr_sub_names = curr_sub_list.names();
-    out_names[i].reserve(n2);
-    out_values[i].reserve(n2);
-    for (std::size_t p = 0; p < n2; ++p) {
-      out_names[i].push_back(Rcpp::as<std::string>(curr_sub_names[p]));
-      out_values[i].push_back(Rcpp::as<std::string>(curr_sub_list[p]));
-    }
-  }
-  return;
-}
-
-/* Copyright (c) 2015 by Xgboost Contributors */
-// This file contains the customization implementations of R module
-// to change behavior of libxgboost
-namespace xgboost {
-namespace common {
-
-// redirect the nath functions.
-bool CheckNAN(double v) {
-  return ISNAN(v);
-}
-#if !defined(XGBOOST_USE_CUDA)
-double LogGamma(double v) {
-  return R::lgammafn(v);
-}
-#endif  // !defined(XGBOOST_USE_CUDA)
-// customize random engine.
-void CustomGlobalRandomEngine::seed(CustomGlobalRandomEngine::result_type val) {
-  // ignore the seed
-}
-
-// use R's PRNG to replace
-CustomGlobalRandomEngine::result_type
-CustomGlobalRandomEngine::operator()() {
-  return static_cast<result_type>(
-      std::floor(unif_rand() * CustomGlobalRandomEngine::max()));
-}
-}  // namespace common
-}  // namespace xgboost

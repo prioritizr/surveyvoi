@@ -13,6 +13,7 @@ simulate_site_data(
   survey_cost_radius = 0.5,
   management_cost_intensity = 100,
   management_cost_radius = 0.5,
+  max_number_surveys_per_site = 5,
   output_probabilities = TRUE
 )
 }
@@ -41,18 +42,26 @@ average cost of managing sites for conservation. Defaults to 100.}
 \item{management_cost_radius}{\code{numeric} value corresponding to
 the spatial homogeneity of the survey costs. Defaults to 0.1.}
 
+\item{max_number_surveys_per_site}{\code{integer} maximum number of
+surveys per site in the simulated data. Defaults to 5.}
+
 \item{output_probabilities}{\code{logical} value indicating if
 probability values of occupancy should be output or not. Defaults
 to \code{TRUE}.}
 }
 \value{
-\code{\link[sf]{sf}} object with site data. Columns starting with
- (i) \code{"f"} (e.g. \code{f1}) contain presence/absence data,
- (ii) \code{"p"} (e.g. \code{p1}) contain prior probability data,
- (iii) \code{"e"} (e.g. \code{e1}) contain environmental data. Note
- that presence/absence and probability columns with the same integer suffix
- correspond to the same feature (e.g. \code{f1} and \code{p1} are the
- same feature).
+\code{\link[sf]{sf}} object with site data. Columns that start with
+ (i) \code{"f"} (e.g. \code{"d1"}) contain the proportion of
+  times that each feature was detected in each site,
+ (ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
+  of surveys for each feature within each site,
+ (iii) \code{"p"} (e.g. \code{"p1"}) contain prior
+ probability data,  and
+ (iv) \code{"e"} (e.g. \code{"e1"}) contain environmental
+ data. Note that columns that contain the same integer value (excepting
+ environmental data columns) correspond to the same feature
+ (e.g. \code{"d1"}, \code{"n1"}, \code{"p1"} contain data that correspond
+ to the same feature).
 }
 \description{
 Simulate site data for developing simulated survey schemes.
@@ -80,9 +89,13 @@ plot(d[, c("survey_cost", "management_cost")], axes = TRUE, pch = 16,
 # plot environmental data
 plot(d[, c("e1", "e2", "e3")], axes = TRUE, pch = 16, cex = 2)
 
-# plot feature presence/absence data
+# plot feature detection data
 plot(d[, c("f1", "f2", "f3", "f4")], axes = TRUE, pch = 16, cex = 2)
-# plot feature probability data
+
+# plot feature survey effort
+plot(d[, c("n1", "n2", "n3", "n4")], axes = TRUE, pch = 16, cex = 2)
+
+# plot feature prior probability data
 plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
 
 }

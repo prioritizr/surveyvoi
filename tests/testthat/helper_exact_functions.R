@@ -1,33 +1,31 @@
 r_expected_value_of_action <- function(
-  solution, prior_data, preweight, postweight, target) {
-    r_conservation_value_state(
-      prior_data[, solution > 0.5, drop = FALSE], preweight, postweight,
-      target, rep(ncol(prior_data), length(preweight)))
+  solution, prior_data, target) {
+    r_conservation_value(prior_data[, solution > 0.5, drop = FALSE], target)
 }
 
 r_expected_value_of_decision_given_current_info <- function(
-  prior_data, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight,
-  target, budget, gap) {
+  prior_data, pu_costs, pu_purchase_locked_in, pu_purchase_locked_out, target, budget) {
   # find optimal solution
-  solution <- rcpp_prioritization(
-    prior_data, pu_costs, pu_locked_in, pu_locked_out, preweight, postweight,
-    target, budget, gap, "")$x
+  solution <- r_greedy_heuristic_prioritization(
+    prior_data, pu_costs, as.numeric(pu_purchase_locked_in),
+    as.numeric(pu_purchase_locked_out), target, budget)$x
   # calculate expected value
   r_expected_value_of_action(
-    solution, prior_data, preweight, postweight, target)
+    solution, prior_data, target)
 }
 
 r_expected_value_of_decision_given_survey_scheme <- function(
-  rij, pij, wij, survey_features, survey_sensitivity, survey_specificity,
-  pu_survey_solution, pu_model_prediction, pu_survey_costs,
-  pu_purchase_costs, pu_purchase_locked_in, pu_purchase_locked_out, pu_env_data,
-  xgb_parameters, xgb_nrounds, xgb_train_folds, xgb_test_folds,
-  obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-  total_budget, optim_gap) {
+  pij,
+  survey_features,
+  survey_sensitivity, survey_specificity,
+  pu_survey_solution,
+  pu_survey_costs, pu_purchase_costs, pu_purchase_locked_in,
+  pu_purchase_locked_out, pu_env_data,
+  obj_fun_target, total_budget) {
   # init
   ## constants
-  n_pu <- ncol(rij)
-  n_f <- nrow(rij)
+  n_pu <- ncol(pij)
+  n_f <- nrow(pij)
   n_f_survey <- sum(survey_features)
   # preliminary processing
   ## calculate remaining budget
@@ -59,13 +57,6 @@ r_expected_value_of_decision_given_survey_scheme <- function(
     total_probability_of_survey_negative
   total_probability_of_survey_negative_log[] <-
     log(total_probability_of_survey_negative)
-  ## overwrite missing data with prior data for features we are not interested
-  ## in surveying
-  oij <- rij
-  for (i in which(!survey_features)) {
-    oij[i, pu_survey_solution_idx] <- pij[i, pu_survey_solution_idx]
-    oij[i, pu_model_prediction[[i]]] <- pij[i, pu_model_prediction[[i]]]
-  }
   ## find indices for cells corresponding to planning units and features that
   ## that are specified to be surveyed
   rij_outcome_idx <- c()
@@ -77,62 +68,36 @@ r_expected_value_of_decision_given_survey_scheme <- function(
       counter <- counter + 1
     }
   }
-  ## update model weights
-  m <- as.matrix(expand.grid(
-    row = which(survey_features),
-    col = which(pu_survey_solution)))
-  wij[m] <- wij[m] + 1
-  rm(m)
-  ## create dummy matrix
-  dummy_matrix <- matrix(-100, ncol = n_pu, nrow = n_f)
+
   # main processing
   out <- Inf
   for (i in seq(0, total_outcomes)) {
     ## generate state
-    curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, oij)
-
-    ## fit distribution models to make predictions
-    curr_models <- rcpp_fit_xgboost_models_and_assess_performance(
-      curr_oij, wij, pu_env_data, as.logical(survey_features), xgb_parameters,
-      xgb_nrounds, xgb_train_folds, xgb_test_folds)
-
-    ## generate model predictions for unsurveyed planning units
-    curr_oij2 <- r_predict_missing_rij_data(
-      curr_oij, wij, pu_env_data, survey_features_idx,
-      pu_model_prediction, xgb_parameters, xgb_nrounds, xgb_train_folds,
-      xgb_test_folds)
-
-    ## generate posterior matrix
-    curr_models_sens <- rep(NA, n_f)
-    curr_models_spec <- rep(NA, n_f)
-    curr_models_sens[survey_features_idx] <-
-      curr_models$sens * survey_sensitivity[survey_features_idx]
-    curr_models_spec[survey_features_idx] <-
-      curr_models$spec * survey_specificity[survey_features_idx]
-    curr_postij <- r_posterior_probability_matrix(
-      rij, pij, curr_oij2,
-      pu_survey_solution, survey_features,
-      survey_sensitivity, survey_specificity,
-      curr_models_sens, curr_models_spec)
-
-    ## generate prioritisation
-    curr_solution <- r_prioritization(
-      curr_postij, pu_purchase_costs,
-      as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
-      obj_fun_preweight, obj_fun_postweight, obj_fun_target,
-      remaining_budget, optim_gap, "")$x
-
-    ## calculate expected value of the prioritisation
-    curr_value <- log(r_expected_value_of_action(
-      curr_solution, curr_postij, obj_fun_preweight, obj_fun_postweight,
-      obj_fun_target))
+    curr_oij <- rcpp_nth_state_sparse(i, rij_outcome_idx + 1, pij)
 
     ## calculate likelihood of outcome
     curr_prob <- probability_of_outcome(
-      curr_oij2, total_probability_of_survey_positive_log,
+      curr_oij, total_probability_of_survey_positive_log,
       total_probability_of_survey_negative_log, rij_outcome_idx + 1);
 
-    ## calculate expected value of the action
+    ## generate posterior probabilities given survey outcomes
+    curr_wij <- r_update_posterior_probability_matrix(
+      pij, curr_oij,
+      survey_features,
+      survey_sensitivity, survey_specificity,
+      pu_survey_solution)
+
+    ## generate prioritisation using updated posterior matrix
+    curr_solution <- r_greedy_heuristic_prioritization(
+      curr_wij, pu_purchase_costs,
+      as.numeric(pu_purchase_locked_in), as.numeric(pu_purchase_locked_out),
+      obj_fun_target, remaining_budget)$x
+
+    ## calculate expected value of action
+    curr_value <- log(r_expected_value_of_action(
+      curr_solution, curr_wij, obj_fun_target))
+
+    ## calculate expected value of the decision
     if (!is.finite(out)) {
       out <- curr_value + curr_prob
     } else {

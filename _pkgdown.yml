@@ -47,4 +47,3 @@ reference:
     contents:
       - n_states
       - fit_occupancy_models
-      - plot_conservation_value

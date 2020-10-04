@@ -7,21 +7,19 @@
 evdci(
   site_data,
   feature_data,
-  site_occupancy_columns,
+  site_detection_columns,
+  site_n_surveys_columns,
   site_probability_columns,
   site_management_cost_column,
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL,
-  optimality_gap = 0
+  prior_matrix = NULL
 )
 }
 \arguments{
@@ -29,15 +27,19 @@ evdci(
 
 \item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
 
-\item{site_occupancy_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain detections
-and non-detections of features at each site.
+\item{site_detection_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary detection/non-detection value (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (\code{NA}) values should be used.
-Additionally, if a feature was not looked for when surveying a specific
-site, then missing (\code{NA}) value should be used.}
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.}
+
+\item{site_n_surveys_columns}{\code{character} names of \code{numeric}
+columns in the argument to \code{site_data} that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled
@@ -82,22 +84,6 @@ This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
 
-\item{feature_preweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{preweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
-\item{feature_postweight_column}{\code{character} name of the column in the
-argument to \code{feature_data} that contains the \eqn{postweight}
-values used to parametrize  the conservation benefit of managing of each
-feature.
-This column should have \code{numeric} values that
-are equal to or greater than zero. No missing (\code{NA}) values are
-permitted in this column.}
-
 \item{feature_target_column}{\code{character} name of the column in the
 argument to \code{feature_data} that contains the \eqn{target}
 values used to parametrize the conservation benefit of managing of each
@@ -132,11 +118,6 @@ the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link{prior_probability_matrix}}.}
-
-\item{optimality_gap}{\code{numeric} relative optimality gap for generating
-conservation prioritizations. A value of zero indicates that
-prioritizations must be solved to optimality. A value of 0.1 indicates
-prioritizations must be within 10\% of optimality. Defaults to 0.}
 }
 \value{
 \code{numeric} value.
@@ -161,6 +142,7 @@ RFoptions(seed = 123)
 # simulate data
 site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+feature_data$target <- c(1, 1)
 
 # preview simulated data
 print(site_data)
@@ -172,10 +154,10 @@ total_budget <- sum(site_data$management_cost) * 0.5
 # calculate expected value of management decision given current information
 # using exact method
 ev_current <- evdci(
-  site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+  site_data, feature_data, c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
   "management_cost", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",
-  "preweight", "postweight", "target", total_budget)
+  "target", total_budget)
 
 # print exact value
 print(ev_current)

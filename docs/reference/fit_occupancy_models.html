@@ -73,7 +73,7 @@ planning units." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -139,14 +139,16 @@ planning units.</p>
 
     <pre class="usage"><span class='fu'>fit_occupancy_models</span>(
   <span class='no'>site_data</span>,
-  <span class='no'>site_occupancy_columns</span>,
+  <span class='no'>feature_data</span>,
+  <span class='no'>site_detection_columns</span>,
+  <span class='no'>site_n_surveys_columns</span>,
   <span class='no'>site_env_vars_columns</span>,
-  <span class='no'>parameters</span>,
-  <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>n_rounds</span> <span class='kw'>=</span> <span class='fl'>1000</span>,
-  <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_occupancy_columns</span>)),
-  <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
-  <span class='kw'>site_weight_columns</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='no'>feature_survey_sensitivity_column</span>,
+  <span class='no'>feature_survey_specificity_column</span>,
+  <span class='no'>xgb_tuning_parameters</span>,
+  <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
+  <span class='kw'>xgb_n_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
+  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -160,14 +162,26 @@ planning units.</p>
       <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
     </tr>
     <tr>
-      <th>site_occupancy_columns</th>
+      <th>feature_data</th>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+    </tr>
+    <tr>
+      <th>site_detection_columns</th>
       <td><p><code>character</code> names of <code>numeric</code>
-columns in the
-argument to <code>site_data</code> that contain presence/absence data.
+columns in the argument to <code>site_data</code> that contain the proportion of
+surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
-binary presence/absence data (zeros or ones) indicating if the
-feature was detected in a previous survey or not. If a site has not
-been surveyed before, then missing (<code>NA</code>) values should be used.</p></td>
+a proportion value (between zero and one). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
+    </tr>
+    <tr>
+      <th>site_n_surveys_columns</th>
+      <td><p><code>character</code> names of <code>numeric</code>
+columns in the argument to <code>site_data</code> that contain the total
+number of surveys conducted for each each feature within each site.
+Each column should correspond to a different feature, and contain
+a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
+not previously been surveyed, a value of zero should be used.</p></td>
     </tr>
     <tr>
       <th>site_env_vars_columns</th>
@@ -179,7 +193,25 @@ and contain <code>numeric</code>, <code>factor</code>, or <code>character</code>
 No missing (<code>NA</code>) values are permitted in these columns.</p></td>
     </tr>
     <tr>
-      <th>parameters</th>
+      <th>feature_survey_sensitivity_column</th>
+      <td><p><code>character</code> name of the
+column in the argument to <code>feature_data</code> that contains
+probability of future surveys correctly detecting a presence of each
+feature in a given site (i.e. the sensitivity of the survey methodology).
+This column should have <code>numeric</code> values that are between zero and
+one. No missing (<code>NA</code>) values are permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>feature_survey_specificity_column</th>
+      <td><p><code>character</code> name of the
+column in the argument to <code>feature_data</code> that contains
+probability of future surveys correctly detecting an absence of each
+feature in a given site (i.e. the specificity of the survey methodology).
+This column should have <code>numeric</code> values that are between zero and
+one. No missing (<code>NA</code>) values are permitted in this column.</p></td>
+    </tr>
+    <tr>
+      <th>xgb_tuning_parameters</th>
       <td><p><code>list</code> object containing the candidate
 parameter values for fitting models. Valid parameters include:
 <code>"max_depth"</code>, <code>"eta"</code>, <code>"lambda"</code>,
@@ -188,39 +220,22 @@ parameter values for fitting models. Valid parameters include:
 <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgb.train</a></code> for more information.</p></td>
     </tr>
     <tr>
-      <th>early_stopping_rounds</th>
+      <th>xgb_early_stopping_rounds</th>
       <td><p><code>numeric</code> model rounds for parameter
 tuning. See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> for more information.
-Defaults to 100.</p></td>
+Defaults to 10 for each feature.</p></td>
     </tr>
     <tr>
-      <th>n_rounds</th>
+      <th>xgb_n_rounds</th>
       <td><p><code>numeric</code> model rounds for model fitting
 See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> for more information.
-Defaults to 1000.</p></td>
+Defaults to 100 for each feature.</p></td>
     </tr>
     <tr>
-      <th>n_folds</th>
+      <th>xgb_n_folds</th>
       <td><p><code>numeric</code> number of folds to split the training
 data into when fitting models for each feature.
-Defaults to 10 if there are more than 1000
-rows in the argument <code>site_data</code>, otherwise defaults to 5.
-Note that if the maximum number of minority cases (e.g. 1 presence and
-1000 absences) is fewer than the number of folds then one minority case
-is sampled per fold.</p></td>
-    </tr>
-    <tr>
-      <th>n_random_search_iterations</th>
-      <td><p><code>numeric</code> number of random search
-iterations to use when tuning model parameters. Defaults to 10000.</p></td>
-    </tr>
-    <tr>
-      <th>site_weight_columns</th>
-      <td><p><code>character</code> name of columns in
-<code>site_data</code> containing weights for model fitting. These columns must
-contain <code>numeric</code> values. No missing (<code>NA</code>) values are
-permitted. Defaults to <code>NULL</code> such that all data are given
-equal weight when fitting models.</p></td>
+Defaults to 5 for each feature.</p></td>
     </tr>
     <tr>
       <th>n_threads</th>
@@ -242,6 +257,7 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>list</code> object containing:</p><dl'>
+
 <dt>parameters</dt><dd><p><code>list</code> of <code>list</code> objects containing the best
 tuning parameters for each feature.</p></dd>
 
@@ -249,7 +265,33 @@ tuning parameters for each feature.</p></dd>
  predictions for each feature.</p></dd>
 
 <dt>performance</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></code> object containing the
- performance of the best cross-validation models for each feature.</p></dd>
+ performance of the best models for each feature. It contains the following
+ columns: <dl'>
+ <dt>feature</dt><dd><p>name of the feature.</p></dd>
+ <dt>train_tss_mean</dt><dd><p>mean TSS statistic for models calculated using training data in
+   cross-validation.</p></dd>
+ <dt>train_tss_std</dt><dd><p>standard deviation in TSS statistics for models calculated using training
+   data in cross-validation.</p></dd>
+ <dt>train_sensitivity_mean</dt><dd><p>mean sensitivity statistic for models calculated using training data in
+   cross-validation.</p></dd>
+ <dt>train_sensitivity_std</dt><dd><p>standard deviation in sensitivity statistics for models calculated using
+   training data in cross-validation.</p></dd>
+ <dt>train_specificity_mean</dt><dd><p>mean specificity statistic for models calculated using training data in
+   cross-validation.</p></dd>
+ <dt>train_specificity_std</dt><dd><p>standard deviation in specificity statistics for models calculated using
+   training data in cross-validation.</p></dd>
+ <dt>test_tss_mean</dt><dd><p>mean TSS statistic for models calculated using test data in
+   cross-validation.</p></dd>
+ <dt>test_tss_std</dt><dd><p>standard deviation in TSS statistics for models calculated using test
+   data in cross-validation.</p></dd>
+ <dt>test_sensitivity_mean</dt><dd><p>mean sensitivity statistic for models calculated using test data in
+   cross-validation.</p></dd>
+ <dt>test_sensitivity_std</dt><dd><p>standard deviation in sensitivity statistics for models calculated using
+   test data in cross-validation.</p></dd>
+ <dt>test_specificity_mean</dt><dd><p>mean specificity statistic for models calculated using test data in
+   cross-validation.</p></dd>
+ <dt>test_specificity_std</dt><dd><p>standard deviation in specificity statistics for models calculated using
+   test data in cross-validation.</p></dd></dl></p></dd>
 
 
 </dl>
@@ -263,28 +305,28 @@ tuning parameters for each feature.</p></dd>
  feature. For a given feature:</p>
 <p></p><ol>
 <li><p>The data are prepared for model fitting by partitioning the data using
- k-fold cross-validation (set via argument to <code>n_folds</code>). The training
- and evaluation folds are constructed
+ k-fold cross-validation (set via argument to <code>xgb_n_folds</code>). The
+ training and evaluation folds are constructed
  in such a manner as to ensure that each training and evaluation
  fold contains at least one presence and one absence observation.</p></li>
-<li><p>A random search method is used to tune the model parameters. The
+<li><p>A grid search method is used to tune the model parameters. The
  candidate values for each parameter (specified via <code>parameters</code>) are
- used to generate a full set of parameter combinations, and then
- a subset of these parameter combinations is randomly selected for
- the tuning procedure (specified via <code>n_random_search_iterations</code>).
+ used to generate a full set of parameter combinations, and these
+ parameter combinations are subsequently used for tuning the models.
  To account for unbalanced datasets, the
  <code>scale_pos_weight</code> <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></code> parameter
  is calculated as the mean value across each of the training folds
  (i.e. number of absence divided by number of presences per feature).
  For a given parameter combination, models are fit using k-fold cross-
  validation (via <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.cv.html'>xgb.cv</a></code>) -- using the previously
- mentioned training and evaluation folds -- and the average area under the
- curve (AUC) statistic calculated using the data held out from each fold is
- used to quantify the performance. These models are also fitted using the
+ mentioned training and evaluation folds -- and the True Skill Statistic
+ (TSS) calculated using the data held out from each fold is
+ used to quantify the performance (i.e. <code>"test_tss_mean"</code> column in
+ output). These models are also fitted using the
  <code>early_stopping_rounds</code> parameter to reduce time-spent
  tuning models. If relevant, they are also fitted using the supplied weights
- (per by the argument to <code>site_weights_data</code>).After exploring the
- subset of parameter combinations, the best parameter combination is
+ (per by the argument to <code>site_weights_data</code>). After exploring the
+ full set of parameter combinations, the best parameter combination is
  identified, and the associated parameter values and models are stored for
  later use.</p></li>
 <li><p>The cross-validation models associated with the best parameter
@@ -292,10 +334,10 @@ tuning parameters for each feature.</p></dd>
   feature occupies each site. These predictions include sites that have
   been surveyed before, and also sites that have not been surveyed before.</p></li>
 <li><p>The performance of the cross-validation models is evaluated.
- Specifically, the AUC, sensitivity, and specificity statistics are
- calculated
- (if relevant, weighted by the argument to <code>site_weights_data</code>).
- These performance values are calculated using the models' evaluation folds.</p></li>
+ Specifically, the TSS, sensitivity, and specificity statistics are
+ calculated (if relevant, weighted by the argument to
+ <code>site_weights_data</code>). These performance values are calculated using
+ the models' training and evaluation folds.</p></li>
 </ol>
 
 
@@ -306,101 +348,82 @@ tuning parameters for each feature.</p></dd>
 <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
- <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='fl'>200</span>, <span class='fl'>2</span>, <span class='fl'>0.5</span>, <span class='kw'>n_env_vars</span> <span class='kw'>=</span> <span class='fl'>3</span>)</div><div class='output co'>#&gt; ...</div><div class='input'>
-<span class='co'># create list of possible tuning parameters for modelling</span>
-<span class='no'>all_parameters</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>max_depth</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1</span>, <span class='fl'>10</span>, <span class='fl'>1</span>),
-                       <span class='kw'>eta</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='fl'>0.1</span>),
-                       <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>10</span> ^ <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1.0</span>, <span class='fl'>0.0</span>, <span class='fl'>0.25</span>),
-                       <span class='kw'>subsample</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.5</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span>),
-                       <span class='kw'>colsample_bytree</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.4</span>, <span class='fl'>1.0</span>, <span class='fl'>0.1</span>),
-                       <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>)
+<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
+<span class='co'># create list of possible tuning parameters for modelling</span>
+<span class='no'>parameters</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>eta</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.5</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>3</span>),
+                   <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fl'>10</span> ^ <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1.0</span>, <span class='fl'>0.0</span>, <span class='kw'>length.out</span> <span class='kw'>=</span> <span class='fl'>3</span>),
+                   <span class='kw'>objective</span> <span class='kw'>=</span> <span class='st'>"binary:logistic"</span>)
+
+<span class='co'># \dontrun{</span>
 <span class='co'># fit models</span>
 <span class='co'># note that we use 10 random search iterations here so that the example</span>
 <span class='co'># finishes quickly, you would probably want something like 1000+</span>
 <span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(
-   <span class='no'>x</span>, <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"f"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_len</a></span>(<span class='fl'>2</span>)), <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='st'>"e"</span>, <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq_len</a></span>(<span class='fl'>3</span>)),
-   <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>n_random_search_iterations</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-   <span class='kw'>early_stopping_rounds</span> <span class='kw'>=</span> <span class='fl'>100</span>, <span class='kw'>parameters</span> <span class='kw'>=</span> <span class='no'>all_parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+   <span class='no'>site_data</span>, <span class='no'>feature_data</span>,
+   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
+   <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
+   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>2</span>),
+   <span class='kw'>xgb_tuning_parameters</span> <span class='kw'>=</span> <span class='no'>parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># print best found model parameters</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>parameters</span>)</div><div class='output co'>#&gt; [[1]]
-#&gt; [[1]]$max_depth
-#&gt; [1] 2
-#&gt; 
 #&gt; [[1]]$eta
-#&gt; [1] 0.2
-#&gt; 
-#&gt; [[1]]$nrounds
-#&gt; [1] 25
-#&gt; 
-#&gt; [[1]]$scale_pos_weight
-#&gt; [1] 1.089492
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[1]]$lambda
-#&gt; [1] 0.3162278
-#&gt; 
-#&gt; [[1]]$subsample
-#&gt; [1] 0.6
-#&gt; 
-#&gt; [[1]]$colsample_bytree
-#&gt; [1] 1
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[1]]$objective
 #&gt; [1] "binary:logistic"
 #&gt; 
+#&gt; [[1]]$scale_pos_weight
+#&gt; [[1]]$scale_pos_weight[[1]]
+#&gt; [1] 1 1 1 1 1
+#&gt; 
+#&gt; 
 #&gt; 
 #&gt; [[2]]
-#&gt; [[2]]$max_depth
-#&gt; [1] 2
-#&gt; 
 #&gt; [[2]]$eta
 #&gt; [1] 0.1
 #&gt; 
-#&gt; [[2]]$nrounds
-#&gt; [1] 19
-#&gt; 
-#&gt; [[2]]$scale_pos_weight
-#&gt; [1] 0.9653068
-#&gt; 
 #&gt; [[2]]$lambda
-#&gt; [1] 0.3162278
-#&gt; 
-#&gt; [[2]]$subsample
-#&gt; [1] 0.7
-#&gt; 
-#&gt; [[2]]$colsample_bytree
-#&gt; [1] 0.5
+#&gt; [1] 0.1
 #&gt; 
 #&gt; [[2]]$objective
 #&gt; [1] "binary:logistic"
 #&gt; 
+#&gt; [[2]]$scale_pos_weight
+#&gt; [[2]]$scale_pos_weight[[1]]
+#&gt; [1] 1 1 1 1 1
+#&gt; 
+#&gt; 
 #&gt; </div><div class='input'>
 <span class='co'># print model predictions</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 200 x 2</span><span>
-#&gt;        f1    f2
-#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.946  0.577
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.141  0.636
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.421  0.697
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.018</span><span style='text-decoration: underline;'>3</span><span> 0.215
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.035</span><span style='text-decoration: underline;'>5</span><span> 0.215
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.679  0.828
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.081</span><span style='text-decoration: underline;'>3</span><span> 0.481
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.132  0.232
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.541  0.304
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.732  0.362
-#&gt; </span><span style='color: #555555;'># ... with 190 more rows</span><span></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
+#&gt;       f1    f2
+#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.529 0.719
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.451 0.719
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.549 0.593
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.451 0.713
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.550 0.700
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.450 0.279
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.549 0.546
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.466 0.626
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.540 0.656
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.549 0.377
+#&gt; </span><span style='color: #555555;'># ... with 20 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 13</span><span>
-#&gt;   feature train_auc_mean train_auc_std train_sensitivi~ train_sensitivi~
+#&gt;   feature train_tss_mean train_tss_std train_sensitivi~ train_sensitivi~
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.977       0.004</span><span style='text-decoration: underline;'>75</span><span>            0.932           0.023</span><span style='text-decoration: underline;'>2</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.961       0.013</span><span style='text-decoration: underline;'>0</span><span>             0.862           0.030</span><span style='text-decoration: underline;'>7</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.981        0.017</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
+#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.940        0.037</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
 #&gt; </span><span style='color: #555555;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   train_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_auc_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_auc_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
+#&gt; </span><span style='color: #555555;'>#   train_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
 #&gt; </span><span style='color: #555555;'>#   test_sensitivity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_sensitivity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   test_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'>#   test_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'># }
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

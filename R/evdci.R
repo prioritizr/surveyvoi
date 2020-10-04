@@ -18,6 +18,7 @@
 #' # simulate data
 #' site_data <- simulate_site_data(n_sites = 5, n_features = 2, prop = 0.5)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
+#' feature_data$target <- c(1, 1)
 #'
 #' # preview simulated data
 #' print(site_data)
@@ -30,33 +31,28 @@
 #' # calculate expected value of management decision given current information
 #' # using exact method
 #' ev_current <- evdci(
-#'   site_data, feature_data, c("f1", "f2"), c("p1", "p2"),
+#'   site_data, feature_data, c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
 #'   "management_cost", "survey_sensitivity", "survey_specificity",
 #'   "model_sensitivity", "model_specificity",
-#'   "preweight", "postweight", "target", total_budget)
+#'   "target", total_budget)
 #'
 #' # print exact value
 #' print(ev_current)
 #'
 #' @export
 evdci <- function(
-  site_data,
-  feature_data,
-  site_occupancy_columns,
-  site_probability_columns,
+  site_data, feature_data,
+  site_detection_columns, site_n_surveys_columns, site_probability_columns,
   site_management_cost_column,
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
   feature_model_sensitivity_column,
   feature_model_specificity_column,
-  feature_preweight_column,
-  feature_postweight_column,
   feature_target_column,
   total_budget,
   site_management_locked_in_column = NULL,
   site_management_locked_out_column = NULL,
-  prior_matrix = NULL,
-  optimality_gap = 0) {
+  prior_matrix = NULL) {
   # assert arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -65,16 +61,18 @@ evdci <- function(
     ## feature_data
     inherits(feature_data, "data.frame"), ncol(feature_data) > 0,
     nrow(feature_data) > 0,
-    ## site_occupancy_columns
-    is.character(site_occupancy_columns),
-    identical(nrow(feature_data), length(site_occupancy_columns)),
-    assertthat::noNA(site_occupancy_columns),
-    all(assertthat::has_name(site_data, site_occupancy_columns)),
-    ## site_probability_columns
-    is.character(site_probability_columns),
-    identical(nrow(feature_data), length(site_probability_columns)),
-    assertthat::noNA(site_probability_columns),
-    all(assertthat::has_name(site_data, site_probability_columns)),
+    ## site_detection_columns
+    is.character(site_detection_columns),
+    length(site_detection_columns) > 0,
+    assertthat::noNA(site_detection_columns),
+    all(assertthat::has_name(site_data, site_detection_columns)),
+    length(site_detection_columns) == nrow(feature_data),
+    ## site_n_surveys_columns
+    is.character(site_n_surveys_columns),
+    length(site_n_surveys_columns) > 0,
+    assertthat::noNA(site_n_surveys_columns),
+    all(assertthat::has_name(site_data, site_n_surveys_columns)),
+    length(site_n_surveys_columns) == nrow(feature_data),
     ## site_management_cost_column
     assertthat::is.string(site_management_cost_column),
     all(assertthat::has_name(site_data, site_management_cost_column)),
@@ -109,18 +107,6 @@ evdci <- function(
     assertthat::noNA(feature_data[[feature_model_specificity_column]]),
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1),
-    ## feature_preweight_column
-    assertthat::is.string(feature_preweight_column),
-    all(assertthat::has_name(feature_data, feature_preweight_column)),
-    is.numeric(feature_data[[feature_preweight_column]]),
-    assertthat::noNA(feature_data[[feature_preweight_column]]),
-    all(feature_data[[feature_preweight_column]] >= 0),
-    ## feature_postweight_column
-    assertthat::is.string(feature_postweight_column),
-    all(assertthat::has_name(feature_data, feature_postweight_column)),
-    is.numeric(feature_data[[feature_postweight_column]]),
-    assertthat::noNA(feature_data[[feature_postweight_column]]),
-    all(feature_data[[feature_postweight_column]] >= 0),
     ## feature_target_column
     assertthat::is.string(feature_target_column),
     all(assertthat::has_name(feature_data, feature_target_column)),
@@ -131,11 +117,7 @@ evdci <- function(
     assertthat::is.number(total_budget), assertthat::noNA(total_budget),
     isTRUE(total_budget > 0),
     ## prior_matrix
-    inherits(prior_matrix, c("matrix", "NULL")),
-    ## optimality_gap
-    assertthat::is.number(optimality_gap),
-    assertthat::noNA(optimality_gap),
-    isTRUE(optimality_gap >= 0))
+    inherits(prior_matrix, c("matrix", "NULL")))
   ## site_management_locked_in_column
   if (!is.null(site_management_locked_in_column)) {
     assertthat::assert_that(
@@ -167,10 +149,21 @@ evdci <- function(
           site_data[[site_management_locked_out_column]] <= 1),
       msg = "at least one planning unit is locked in and locked out")
   }
-  ## validate rij values
-  validate_site_occupancy_data(site_data, site_occupancy_columns)
+  ## validate survey data
+  validate_site_detection_data(site_data, site_detection_columns)
+  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+  ## validate targets
+  validate_target_data(feature_data, feature_target_column)
   ## validate pij values
-  validate_site_prior_data(site_data, site_probability_columns)
+  validate_site_probability_data(site_data, site_probability_columns)
+  ## verify targets
+  assertthat::assert_that(
+    all(feature_data[[feature_target_column]] <= nrow(site_data)))
+  if (!is.null(site_management_locked_out_column)) {
+    assertthat::assert_that(
+      all(feature_data[[feature_target_column]] <=
+          sum(!site_data[[site_management_locked_out_column]])))
+  }
 
   # drop spatial information
   if (inherits(site_data, "sf"))
@@ -179,7 +172,8 @@ evdci <- function(
   # calculate prior matrix
   if (is.null(prior_matrix)) {
     pij <- prior_probability_matrix(
-      site_data, feature_data, site_occupancy_columns, site_probability_columns,
+      site_data, feature_data, site_detection_columns,
+      site_n_surveys_columns, site_probability_columns,
       feature_survey_sensitivity_column, feature_survey_specificity_column,
       feature_model_sensitivity_column, feature_model_specificity_column)
   } else {
@@ -201,17 +195,24 @@ evdci <- function(
     site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
 
+  ## validate that targets are feasible given budget and locked out units
+  sorted_costs <- sort(
+    site_data[[site_management_cost_column]][!site_management_locked_out])
+  sorted_costs <- sorted_costs[
+    seq_len(max(feature_data[[feature_target_column]]))]
+  assertthat::assert_that(
+    sum(sorted_costs) <= total_budget,
+    msg = paste("targets cannot be achieved given budget and locked out",
+                "planning units"))
+
   # main calculation
   out <- rcpp_expected_value_of_decision_given_current_info(
     pij = pij,
     pu_costs = site_data[[site_management_cost_column]],
     pu_locked_in = site_management_locked_in,
     pu_locked_out = site_management_locked_out,
-    preweight = feature_data[[feature_preweight_column]],
-    postweight = feature_data[[feature_postweight_column]],
-    target = feature_data[[feature_target_column]],
-    budget = total_budget,
-    gap = optimality_gap)
+    target = round(feature_data[[feature_target_column]]),
+    budget = total_budget)
 
   # return result
   out

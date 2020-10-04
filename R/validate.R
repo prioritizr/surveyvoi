@@ -1,30 +1,67 @@
-validate_site_occupancy_data <- function(site_data, site_occupancy_columns) {
+validate_site_detection_data <- function(site_data, column_names) {
+  ## check that data are numeric
+  is_valid <- sapply(column_names, function(x) is.numeric(site_data[[x]]))
   assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) is.numeric(site_data[[x]]))),
-    msg = "site_data values in site_occupancy_columns must be numeric")
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+        " columns in site_data are not numeric"))
+  ## check that data have no NA values
+  is_valid <- sapply(column_names, function(x) assertthat::noNA(site_data[[x]]))
   assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) max(site_data[[x]], na.rm = TRUE) <= 1)),
-    msg = "site_data values in site_occupancy_columns must be <= 1")
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data have NA values"))
+  ## check that data have valid proportion values
+  is_valid <- sapply(column_names, function(x) {
+    all(site_data[[x]] >= 0 & site_data[[x]] <= 1)
+  })
   assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) min(site_data[[x]], na.rm = TRUE) >= 0)),
-    msg = "site_data values in site_occupancy_columns must be >= 0")
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data must have values >= 0 and <= 1"))
+  ## check that each species has been detected at least once
+  is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
   assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) any(site_data[[x]] == 0, na.rm = TRUE))),
-    msg = paste("site_data values in site_occupancy_columns require at",
-                "least one absence per feature"))
-  assertthat::assert_that(
-    all(sapply(site_occupancy_columns,
-               function(x) any(site_data[[x]] == 1, na.rm = TRUE))),
-    msg = paste("site_data values in site_occupancy_columns require at",
-                "least one presence per feature"))
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+       " columns in site_data need a maximum value > 0",
+       "(i.e. it needs to be detected at least once)"))
   invisible(TRUE)
 }
 
-validate_site_prior_data <- function(site_data, site_probability_columns) {
+validate_site_n_surveys_data <- function(site_data, column_names) {
+  ## check that data are integer
+  is_valid <- sapply(column_names, function(x) {
+    max(abs(round(site_data[[x]]) - site_data[[x]])) < 1e-10
+  })
+  assertthat::assert_that(
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+        " columns in site_data are not whole numbers"))
+  ## check that data have no NA values
+  is_valid <- sapply(column_names, function(x) assertthat::noNA(site_data[[x]]))
+  assertthat::assert_that(
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data have NA values"))
+  ## check that data have values >= 0
+  is_valid <- sapply(column_names, function(x) all(site_data[[x]] >= 0))
+  assertthat::assert_that(
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data have values < 0"))
+  ## check that each species has been detected at least once
+  is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
+  assertthat::assert_that(
+    all(is_valid),
+    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+       " columns in site_data need a maximum value > 0",
+       "(i.e. it needs to be surveyed at least in one site)"))
+  invisible(TRUE)
+}
+
+validate_site_probability_data <- function(
+  site_data, site_probability_columns) {
   assertthat::assert_that(
     all(sapply(site_probability_columns,
                function(x) is.numeric(site_data[[x]]))),
@@ -44,58 +81,48 @@ validate_site_prior_data <- function(site_data, site_probability_columns) {
 
 validate_prior_data <- function(prior_matrix, n_sites, n_features) {
   assertthat::assert_that(
-    is.matrix(prior_matrix), is.numeric(prior_matrix),
+    is.matrix(prior_matrix), is.numeric(c(prior_matrix)),
     all(is.finite(c(prior_matrix)),
     all(prior_matrix > 0), all(prior_matrix < 1)),
     identical(ncol(prior_matrix), n_sites),
     identical(nrow(prior_matrix), n_features))
 }
 
-validate_site_weight_data <- function(site_data, site_occupancy_columns,
-  site_weight_columns) {
+validate_target_data <- function(feature_data, feature_target_column) {
   assertthat::assert_that(
-    is.character(site_weight_columns),
-    identical(length(site_weight_columns), length(site_occupancy_columns)),
-    all(assertthat::has_name(site_data, site_weight_columns)),
-    assertthat::noNA(site_weight_columns))
+    inherits(feature_data, "data.frame"),
+    assertthat::is.string(feature_target_column),
+    assertthat::has_name(feature_data, feature_target_column))
   assertthat::assert_that(
-    all(sapply(site_weight_columns,
-               function(x) is.numeric(site_data[[x]]))),
-    msg = "site_data values in site_weight_columns must be numeric")
+    all(vapply(feature_data[[feature_target_column]], assertthat::is.count,
+           logical(1))),
+    msg = paste("feature target values must be count values",
+                "(i.e. integer values >= 1"))
   assertthat::assert_that(
-    all(sapply(site_weight_columns,
-               function(x) all(is.finite(site_data[[x]])))),
-    msg = "site_data values in site_weight_columns must not be NA")
+    dplyr::n_distinct(feature_data[[feature_target_column]]) == 1,
+    msg = paste("all features must have exactly the same target value"))
+  invisible(TRUE)
 }
 
-validate_xgboost_parameters <- function(x) {
-  param_names <- c("scale_pos_weight", "max_depth", "eta", "nrounds",
-                   "lambda", "subsample",  "colsample_bytree", "objective",
-                   "tree_method")
-  lapply(x, function(z) {
+validate_xgboost_tuning_parameters <- function(x) {
+  param_names <- c("max_depth", "eta", "lambda", "subsample",
+                   "colsample_bytree", "objective", "tree_method")
+  assertthat::assert_that(
+    all(names(x) %in% param_names),
+    msg = paste("argument to xgb_tuning_parameters has unrecognised elements:",
+               paste(setdiff(names(x), param_names),
+                     collapse = ", ")))
+  if ("tree_method" %in% names(x))
     assertthat::assert_that(
-      assertthat::is.string(z$objective),
-      msg = "a feature is missing the objective parameter in xgb_parameters")
-    assertthat::assert_that(
-      assertthat::is.number(z$scale_pos_weight),
-      msg = paste("a feature is missing the scale_pos_weight parameter",
-                  "in xgb_parameters"))
-    assertthat::assert_that(
-      assertthat::is.number(z$nrounds),
-      msg = paste("a feature is missing the nrounds parameter",
-                  "in xgb_parameters"))
-    if (!is.null(z$tree_method)) {
-    assertthat::assert_that(
-      assertthat::is.string(z$tree_method),
-      z$tree_method %in% c("auto", "exact", "hist", "approx"),
-      msg = paste("invalid tree_method parameter in xgb_parameters"))
-    }
-    extra_names <- names(z)[!names(z) %in% param_names]
-    assertthat::assert_that(
-      length(extra_names) == 0,
-      msg = paste("argument to xgb_parameters has unrecognized parameters:",
-                  paste(extra_names, collapse = ",")))
-    invisible(TRUE)
-  })
+      all(x$tree_method %in% c("auto", "hist", "exact", "approx")),
+      msg = "argument to xgb_tuning_parameters has invalid tree_method value")
   invisible(TRUE)
+}
+
+paste_list <- function(x) {
+  if (length(x) == 1)
+    return(x)
+  if (length(x) == 2)
+    return(paste(x[1], "and", x[2]))
+  paste0(paste(x[-length(x)], collapse = ", "), ", and ", x[length(x)])
 }

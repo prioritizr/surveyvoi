@@ -12,6 +12,8 @@ test_that("correct result", {
       locked_out = c(FALSE, FALSE, FALSE),
       f1 = c(1, 1, 1),
       f2 = c(0, 1, 0),
+      n1 = c(1, 1, 1),
+      n2 = c(1, 1, 1),
       p1 = c(0.99, 0.99, 0.99),
       p2 = c(0.05, 0.99, 0.99)),
     coords = c("x", "y"))
@@ -22,23 +24,21 @@ test_that("correct result", {
     specificity = c(0.34, 0.92),
     model_sensitivity = c(0.8, 0.7),
     model_specificity = c(0.92, 0.9),
-    preweight = runif(2, 100, 200),
-    postweight = runif(2, 5, 20),
     target = c(1, 1))
-  site_occupancy_columns <- c("f1", "f2")
+  site_detection_columns <- c("f1", "f2")
+  site_n_survey_columns <- c("n1", "n2")
   site_probability_columns <-  c("p1", "p2")
   prior_data <- prior_probability_matrix(
-    site_data, feature_data, site_occupancy_columns, site_probability_columns,
-    "sensitivity", "specificity", "model_sensitivity", "model_specificity")
+    site_data, feature_data, site_detection_columns, site_n_survey_columns,
+    site_probability_columns, "sensitivity", "specificity",
+    "model_sensitivity", "model_specificity")
   # calculations
   r1 <- rcpp_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$preweight, feature_data$postweight,
-    feature_data$target, 301, 0)
+    site_data$locked_out, feature_data$target, 301)
   r2 <- r_expected_value_of_decision_given_current_info(
     prior_data, site_data$management_cost, site_data$locked_in,
-    site_data$locked_out, feature_data$preweight, feature_data$postweight,
-    feature_data$target, 301, 0)
+    site_data$locked_out, feature_data$target, 301)
   # tests
   expect_equal(r1, r2)
 })

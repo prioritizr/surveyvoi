@@ -5,11 +5,22 @@
 
 void factorial(std::size_t, mpz_t);
 
+void create_reverse_lookup_id(
+  std::vector<bool>&, std::vector<std::size_t>&);
+
+void calculate_survey_tss(
+  Eigen::MatrixXd&, std::vector<std::size_t>&,
+  Eigen::VectorXd&, Eigen::VectorXd&, Eigen::MatrixXd&);
+
+void set_seed(double);
+
 void log_matrix(Eigen::MatrixXd&);
 
 void log_1m_matrix(Eigen::MatrixXd&);
 
 double log_sum(double, double);
+
+double log_subtract(double, double);
 
 double log_sum(Eigen::VectorXd&);
 
@@ -37,14 +48,7 @@ inline void assert_gt_value(T x, T y, std::string msg) {
   return;
 }
 
-void extract_k_fold_indices(Rcpp::List&,
-  std::vector<std::vector<std::vector<std::size_t>>>&);
-
 void extract_list_of_list_of_indices(
   Rcpp::List&, std::vector<std::vector<std::size_t>>&);
-
-void extract_xgboost_parameters(Rcpp::List&,
-  std::vector<std::vector<std::string>>&,
-  std::vector<std::vector<std::string>>&);
 
 #endif

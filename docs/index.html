@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
       </span>
     </div>
 
@@ -90,54 +90,23 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#survey-value-of-information" class="anchor"></a>Survey Value of Information</h1></div>
 
-<p>TODO OVERVIEW TODO.</p>
+<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve conservation plans for managing biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to identify which sites should be surveyed because doing so would likely lead to superior conservation management plans. It uses value of information analyses to measure return on investment for competing survey schemes. Furthermore, by directly maximizing the expected value of sample information, optimal survey schemes can also be identified.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>The <em>surveyvoi R</em> package has several dependencies that must first be installed before you can install this package. Specifically, you will first need to install the <a href="http://www.gurobi.com/">Gurobi optimization suite</a>, <a href="https://www.gurobi.com/documentation/8.1/refman/r_api_overview.html"><em>gurobi R</em> package</a>, and Intel Math Kernel Library <a href="https://software.intel.com/en-us/mkl">(Intel MKL)</a>. For instructions on installing <em>Gurobi</em> software, please refer to <a href="https://CRAN.R-project.org/package=prioritizr/vignettes/gurobi_installation.html">this installation guide</a>. Please note that package is configured to assume that you have installed <em>Gurobi</em> version 9.0.1. If you have a different version of <em>Gurobi</em>, please edit the <code>gurobi90</code> compilation flag specified in the <code>PKG_LIBS</code> variable within the <code>src/Makevars</code> file. For instructions on installing the Intel Math Kernel Library, please refer to the following bash commands (based on a <a href="http://dirk.eddelbuettel.com/blog/2018/04/15/">blog post by Dirk Eddelbuettel</a>):</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="bu">cd</span> /tmp
-<span class="fu">wget</span> https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-<span class="fu">sudo</span> apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-<span class="fu">sudo</span> sh -c <span class="st">'echo deb https://apt.repos.intel.com/mkl all main &gt; /etc/apt/sources.list.d/intel-mkl.list'</span>
-<span class="fu">sudo</span> apt-get -o Acquire::http::proxy=false update
-<span class="fu">sudo</span> apt-get -o Acquire::http::proxy=false install intel-mkl-64bit-2020.0-088</code></pre></div>
-<p>You will then need to add the following commands to your <code>~./bashrc</code> file:</p>
-<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r">export MKLROOT=<span class="st">"/opt/intel/mkl"</span>
-export LD_LIBRARY_PATH=<span class="st">"${LD_LIBRARY_PATH}:${MKLROOT}/lib/intel64_lin"</span></code></pre></div>
-<p>Finally, after installing the dependencies, you can install the package with the following <em>R</em> commands.</p>
-<div class="sourceCode"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">remotes</span>))
-  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"jeffreyhanson/surveyvoi"</span>)</pre></div>
+<p>The <em>surveyvoi R</em> package is still in an experimental phase of the development cycle and so it is not yet available on <a href="https://cran.r-project.org/">Comprehensive R Archive Network (CRAN)</a>. To install latest developmental version from <a href="https://github.com/jeffreyhanson/surveyvoi">GitHub</a>, please use the following R code. Note that developmental versions may contain coding errors.</p>
+<div class="sourceCode"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">remotes</span>)) <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
+<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span>(<span class="st">"jeffreyhanson/surveyvoi"</span>)</pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>Just don’t - it’s still early in development and isn’t ready yet.</p>
+<p>TODO.</p>
 </div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#citation" class="anchor"></a>Citation</h2>
-<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r">Warning <span class="cf">in</span> <span class="kw">citation</span>(<span class="st">"surveyvoi"</span>)<span class="op">:</span><span class="st"> </span>no date field <span class="cf">in</span> DESCRIPTION file of package
-<span class="st">'surveyvoi'</span>
-
-Warning <span class="cf">in</span> <span class="kw">citation</span>(<span class="st">"surveyvoi"</span>)<span class="op">:</span><span class="st"> </span>could not determine year <span class="cf">for</span> <span class="st">'surveyvoi'</span> from
-package DESCRIPTION file
-
-
-To cite package <span class="st">'surveyvoi'</span> <span class="cf">in</span> publications use<span class="op">:</span>
-
-<span class="st">  </span>Jeffrey O Hanson and Joseph <span class="kw">Bennett</span> (<span class="ot">NA</span>). surveyvoi<span class="op">:</span><span class="st"> </span>Survey Value of
-  Information. R package version <span class="fl">0.0</span>.<span class="dv">5</span>.
-  https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>jeffreyhanson<span class="op">/</span>surveyvoi
-
-A BibTeX entry <span class="cf">for</span> LaTeX users is
-
-  <span class="op">@</span>Manual{,
-    title =<span class="st"> </span>{surveyvoi<span class="op">:</span><span class="st"> </span>Survey Value of Information},
-    author =<span class="st"> </span>{Jeffrey O Hanson and Joseph Bennett},
-    note =<span class="st"> </span>{R package version <span class="fl">0.0</span>.<span class="dv">5</span>},
-    url =<span class="st"> </span>{https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>jeffreyhanson<span class="op">/</span>surveyvoi},
-  }</code></pre></div>
+<p>This package is still early in development and should not be used yet.</p>
 </div>
 </div>
   </div>

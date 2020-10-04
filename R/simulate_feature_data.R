@@ -9,7 +9,7 @@ NULL
 #'
 #' @param proportion_of_survey_features \code{numeric} proportion of features
 #'   that will be examined in the new surveys. Values must be between
-#'   zero and one.
+#'   zero and one. Defaults to 1 such that all features should be surveyed.
 #'
 #' @return \code{\link[tibble]{tibble}} object. It contains the following
 #' data:
@@ -31,12 +31,6 @@ NULL
 #' \item{\code{model_specificity}}{\code{numeric} specificity (true negative
 #'   rate) of the occupancy models for each features.}
 #'
-#' \item{\code{preweight}}{\code{numeric} weight values used to parametrize
-#'   the conservation benefit of managing of each feature.}
-#'
-#' \item{\code{postweight}}{\code{numeric} weight values used to parametrize
-#'   the conservation benefit of managing of each feature.}
-#'
 #' \item{\code{target}}{\code{numeric} target values used to parametrize
 #'   the conservation benefit of managing of each feature.}
 #'
@@ -55,7 +49,8 @@ NULL
 #' print(d)
 #'
 #' @export
-simulate_feature_data <- function(n_features, proportion_of_survey_features) {
+simulate_feature_data <- function(
+  n_features, proportion_of_survey_features = 1) {
   # assert that arguments are valid
   assertthat::assert_that(
     assertthat::is.count(n_features), assertthat::noNA(n_features),
@@ -72,11 +67,9 @@ simulate_feature_data <- function(n_features, proportion_of_survey_features) {
   tibble::tibble(
     name = paste0("f", seq_len(n_features)),
     survey = survey_feature,
-    survey_sensitivity = runif(n_features, 0.95, 0.99),
-    survey_specificity = runif(n_features, 0.8, 0.9),
-    model_sensitivity = runif(n_features, 0.7, 0.8),
-    model_specificity = runif(n_features, 0.8, 0.9),
-    preweight = runif(n_features, 100, 200),
-    postweight = runif(n_features, 5, 30),
-    target = ceiling(runif(n_features, 5, 20)))
+    survey_sensitivity = stats::runif(n_features, 0.95, 0.99),
+    survey_specificity = stats::runif(n_features, 0.8, 0.9),
+    model_sensitivity = stats::runif(n_features, 0.7, 0.8),
+    model_specificity = stats::runif(n_features, 0.8, 0.9),
+    target = 1)
 }

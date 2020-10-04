@@ -24,42 +24,19 @@ void total_probability_of_negative_result(
   return;
 }
 
-void total_probability_of_positive_model_result(
-  Eigen::MatrixXd &prior, // only contains rows for spp that need surveys
-  Eigen::VectorXd &sensitivity, // only elements for spp needing surveys
-  Eigen::VectorXd &specificity, // only elements for spp needing surveys
-  Eigen::MatrixXd &out) {
-  const std::size_t n_pu = prior.cols();
-  const std::size_t n_f = sensitivity.size();
-  for (std::size_t j = 0; j < n_pu; ++j) {
-    for (std::size_t i = 0; i < n_f; ++i) {
-      out(i, j) =
-        (sensitivity[i] * prior(i, j)) +
-        ((1.0 - specificity[i]) * (1.0 - prior(i, j)));
-    }
-  }
-  out = out.cwiseMax(1.0e-10);
-  out = out.cwiseMin(1.0 - 1.0e-10);
-  return;
-}
-
-void total_probability_of_negative_model_result(
-  Eigen::MatrixXd &prior, // only contains rows for spp that need surveys
-  Eigen::VectorXd &sensitivity, // only elements for spp needing surveys
-  Eigen::VectorXd &specificity, // only elements for spp needing surveys
-  Eigen::MatrixXd &out) {
-  const std::size_t n_pu = prior.cols();
-  const std::size_t n_f = sensitivity.size();
-  for (std::size_t j = 0; j < n_pu; ++j) {
-    for (std::size_t i = 0; i < n_f; ++i) {
-      out(i, j) =
-        ((1.0 - sensitivity[i]) * prior(i, j)) +
-        (specificity[i] * (1.0 - prior(i, j)));
-    }
-  }
-  out = out.cwiseMax(1.0e-10);
-  out = out.cwiseMin(1.0 - 1.0e-10);
-  return;
+double log_probability_of_outcome(
+  Eigen::MatrixXd &oij,
+  Eigen::MatrixXd &probability_of_positive_log,
+  Eigen::MatrixXd &probability_of_negative_log) {
+  // init
+  double out = 0.0;
+  const std::size_t n = oij.size();
+  // main
+  for (std::size_t i = 0; i < n; ++i)
+    out += (oij(i) * probability_of_positive_log(i)) +
+           ((1.0 - oij(i)) * probability_of_negative_log(i));
+  // return void
+  return out;
 }
 
 double log_probability_of_outcome(
@@ -131,26 +108,4 @@ double rcpp_probability_of_state(
   log_1m_matrix(pij_log1m);
   log_matrix(pij);
   return std::exp(log_probability_of_state(sij, pij, pij_log1m));
-}
-
-// [[Rcpp::export]]
-Eigen::MatrixXd rcpp_total_probability_of_positive_model_result(
-  Eigen::MatrixXd prior,
-  Eigen::VectorXd sensitivity,
-  Eigen::VectorXd specificity) {
-  Eigen::MatrixXd out(prior.cols(), prior.rows());
-  total_probability_of_positive_model_result(
-    prior, sensitivity, specificity, out);
-  return out;
-}
-
-// [[Rcpp::export]]
-Eigen::MatrixXd rcpp_total_probability_of_negative_model_result(
-  Eigen::MatrixXd prior,
-  Eigen::VectorXd sensitivity,
-  Eigen::VectorXd specificity) {
-  Eigen::MatrixXd out(prior.cols(), prior.rows());
-  total_probability_of_negative_model_result(
-    prior, sensitivity, specificity, out);
-  return out;
 }

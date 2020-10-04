@@ -1,15 +1,16 @@
+#pragma once
 #ifndef EXPECTED_VALUE_OF_ACTION_H
 #define EXPECTED_VALUE_OF_ACTION_H
 
 #include "package.h"
 #include "functions.h"
-#include "rcpp_conservation_value.h"
 
 double expected_value_of_action(
-  std::vector<bool>&, Eigen::MatrixXd&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&, Eigen::VectorXd&);
+  std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXi&);
 
-double expected_value_of_action(
-  std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXd&, Eigen::VectorXd&,
-  Eigen::VectorXd&);
+double approx_expected_value_of_action(
+  Eigen::MatrixXd&, Rcpp::IntegerVector&);
+
+double log_proxy_expected_value_of_action(Eigen::MatrixXd&);
 
 #endif

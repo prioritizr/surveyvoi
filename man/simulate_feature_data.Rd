@@ -4,14 +4,14 @@
 \alias{simulate_feature_data}
 \title{Simulate feature data}
 \usage{
-simulate_feature_data(n_features, proportion_of_survey_features)
+simulate_feature_data(n_features, proportion_of_survey_features = 1)
 }
 \arguments{
 \item{n_features}{\code{integer} number of features.}
 
 \item{proportion_of_survey_features}{\code{numeric} proportion of features
 that will be examined in the new surveys. Values must be between
-zero and one.}
+zero and one. Defaults to 1 such that all features should be surveyed.}
 }
 \value{
 \code{\link[tibble]{tibble}} object. It contains the following
@@ -33,12 +33,6 @@ data:
 
 \item{\code{model_specificity}}{\code{numeric} specificity (true negative
   rate) of the occupancy models for each features.}
-
-\item{\code{preweight}}{\code{numeric} weight values used to parametrize
-  the conservation benefit of managing of each feature.}
-
-\item{\code{postweight}}{\code{numeric} weight values used to parametrize
-  the conservation benefit of managing of each feature.}
 
 \item{\code{target}}{\code{numeric} target values used to parametrize
   the conservation benefit of managing of each feature.}
