@@ -62,7 +62,9 @@ probability of the initial models correctly predicting a presence of each
 feature in a given site (i.e. the sensitivity of the models).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
-This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
+This should ideally be calculated using
+\code{\link{fit_xgb_occupancy_models}} or
+\code{\link{fit_hglm_occupancy_models}}.}
 
 \item{feature_model_specificity_column}{\code{character} name of the
 column in the argument to \code{feature_data} that contains
@@ -70,7 +72,9 @@ probability of the initial models correctly predicting an absence of each
 feature in a given site (i.e. the specificity of the models).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
-This should ideally be calculated using \code{\link{fit_occupancy_models}}.}
+This should ideally be calculated using
+\code{\link{fit_xgb_occupancy_models}} or
+\code{\link{fit_hglm_occupancy_models}}.}
 }
 \value{
 \code{matrix} object containing the prior probabilities of each

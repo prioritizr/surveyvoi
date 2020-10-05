@@ -1,10 +1,11 @@
 #' @include internal.R
 NULL
 
-#' Fit models to estimate probability of occupancy
+#' Fit (Xgboost) boosted regression tree models to predict occupancy
 #'
 #' Estimate probability of occupancy for a set of features in a set of
-#' planning units.
+#' planning units. Models are fitted using gradient boosted trees (via
+#' \code{\link[xgboost]{xgb.train}}).
 #'
 #' @param site_data \code{\link[sf]{sf}} object with site data.
 #'
@@ -60,7 +61,7 @@ NULL
 #'   See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 100 for each feature.
 #'
-#' @param xgb_n_folds \code{numeric} number of folds to split the training
+#' @param n_folds \code{numeric} number of folds to split the training
 #'   data into when fitting models for each feature.
 #'   Defaults to 5 for each feature.
 #'
@@ -83,7 +84,7 @@ NULL
 #'  \enumerate{
 #'
 #'  \item The data are prepared for model fitting by partitioning the data using
-#'  k-fold cross-validation (set via argument to \code{xgb_n_folds}). The
+#'  k-fold cross-validation (set via argument to \code{n_folds}). The
 #'  training and evaluation folds are constructed
 #'  in such a manner as to ensure that each training and evaluation
 #'  fold contains at least one presence and one absence observation.
@@ -196,11 +197,11 @@ NULL
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
 #' # finishes quickly, you would probably want something like 1000+
-#' results <- fit_occupancy_models(
+#' results <- fit_xgb_occupancy_models(
 #'    site_data, feature_data,
 #'    c("f1", "f2"), c("n1", "n2"), c("e1", "e2", "e3"),
 #'    "survey_sensitivity", "survey_specificity",
-#'    xgb_n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
+#'    n_folds = rep(5, 2), xgb_early_stopping_rounds = rep(100, 2),
 #'    xgb_tuning_parameters = parameters, n_threads = 1)
 #'
 #' # print best found model parameters
@@ -213,7 +214,7 @@ NULL
 #' print(results$performance)
 #' }
 #' @export
-fit_occupancy_models <- function(
+fit_xgb_occupancy_models <- function(
   site_data, feature_data,
   site_detection_columns, site_n_surveys_columns,
   site_env_vars_columns,
@@ -221,7 +222,7 @@ fit_occupancy_models <- function(
   xgb_tuning_parameters,
   xgb_early_stopping_rounds = rep(20, length(site_detection_columns)),
   xgb_n_rounds = rep(100, length(site_detection_columns)),
-  xgb_n_folds = rep(5, length(site_detection_columns)),
+  n_folds = rep(5, length(site_detection_columns)),
   n_threads = 1, seed = 500, verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
@@ -258,11 +259,11 @@ fit_occupancy_models <- function(
     is.numeric(feature_data[[feature_survey_specificity_column]]),
     ## xgb_tuning_parameters
     is.list(xgb_tuning_parameters),
-    ## xgb_n_folds
-    is.numeric(xgb_n_folds),
-    assertthat::noNA(xgb_n_folds),
+    ## n_folds
+    is.numeric(n_folds),
+    assertthat::noNA(n_folds),
     all(xgb_n_rounds > 0),
-    length(xgb_n_folds) == nrow(feature_data),
+    length(n_folds) == nrow(feature_data),
     ## xgb_n_rounds
     is.numeric(xgb_n_rounds),
     assertthat::noNA(xgb_n_rounds),
@@ -299,12 +300,12 @@ fit_occupancy_models <- function(
     create_site_folds(
       prop_detected = site_data[[site_detection_columns[i]]][n_surveys > 0],
       n_total = n_surveys[n_surveys > 0],
-      n = xgb_n_folds[i], idx[n_surveys > 0], seed = seed)
+      n = n_folds[i], idx[n_surveys > 0], seed = seed)
   })
 
   # prepare data
   d <- lapply(seq_len(nrow(feature_data)), function(i) {
-    lapply(seq_len(xgb_n_folds[i]), function(k) {
+    lapply(seq_len(n_folds[i]), function(k) {
       # extract data
       sens <- feature_data[[feature_survey_sensitivity_column]][i]
       spec <- feature_data[[feature_survey_specificity_column]][i]
@@ -314,7 +315,7 @@ fit_occupancy_models <- function(
         round((1 - site_data[[site_detection_columns[i]]]) * n_surveys)
       site_data <- tibble::tibble(n_det = n_det, n_nondet = n_nondet,
                                   n_surveys = n_surveys, idx = seq_along(n_det))
-      # prepare training fold data
+      # prepare fitting fold data
       ## here we will prepare the data for model fitting by following the
       ## direct method described in: https://doi.org/10.1214/15-AOAS812
       ## note that this paper reports pretty poor performance for this
@@ -334,12 +335,18 @@ fit_occupancy_models <- function(
         prior_probability_of_occupancy(
           train_data$n_det[j], train_data$n_nondet[j], sens, spec, 0.5)
       })
+      y_fit <- c(rep(1, nrow(train_data)), rep(0, nrow(train_data)))
+      x_fit <- site_env_data[c(train_data$idx, train_data$idx), ,
+                               drop = FALSE]
+      ## note: multiply training weights by 100 to avoid floating point issues
+      w_fit <- c(prior_prob_pres, 1 - prior_prob_pres) * 100
+      # prepare train fold data (for performance stats)
       y_train <- c(rep(1, nrow(train_data)), rep(0, nrow(train_data)))
       x_train <- site_env_data[c(train_data$idx, train_data$idx), ,
                                drop = FALSE]
-      ## note: multiply training weights by 100 to avoid floating point issues
-      w_train <- c(prior_prob_pres, 1 - prior_prob_pres) * 100
-      # prepare test fold data
+      w_train <- c(train_data$n_det / train_data$n_surveys,
+                  train_data$n_nondet / train_data$n_surveys)
+      # prepare test fold data (for model evaluation + performance stats)
       test_data <- site_data[f[[i]]$test[[k]], , drop = FALSE]
       y_test <- c(rep(1, nrow(test_data)), rep(0, nrow(test_data)))
       x_test <- site_env_data[c(test_data$idx, test_data$idx), ,
@@ -347,7 +354,8 @@ fit_occupancy_models <- function(
       w_test <- c(test_data$n_det / test_data$n_surveys,
                   test_data$n_nondet / test_data$n_surveys)
       # return data
-      list(train = list(y = y_train, x = x_train, w = w_train),
+      list(fit = list(y = y_fit, x = x_fit, w = w_fit),
+           train = list(y = y_train, x = x_train, w = w_train),
            test = list(y = y_test, x = x_test, w = w_test))
     })
   })
@@ -362,13 +370,13 @@ fit_occupancy_models <- function(
         feature_data[[feature_survey_specificity_column]][i],
       parameters = xgb_tuning_parameters,
       early_stopping_rounds = xgb_early_stopping_rounds[i],
-      n_rounds = xgb_n_rounds[i], n_folds = xgb_n_folds[i],
+      n_rounds = xgb_n_rounds[i], n_folds = n_folds[i],
       n_threads = n_threads, verbose = verbose, seed = seed)
   })
 
   # assess models
   perf <- plyr::ldply(seq_len(nrow(feature_data)), function(i) {
-    out <- plyr::ldply(seq_len(xgb_n_folds[i]), function(k) {
+    out <- plyr::ldply(seq_len(n_folds[i]), function(k) {
       ## extract fold training and test data
       m_k <- m[[i]]$models[[k]]
       nround_k <- m[[i]]$models[[k]]$best_iteration
@@ -495,10 +503,10 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
     p <- as.list(full_parameters[i, , drop = FALSE])
     ## run cross-validation
     cv <- lapply(seq_len(n_folds), function(k) {
-      ### prepare data for xgboost
+      ### prepare data for xgboost (note we use the fit data not the train data)
       dtrain <- xgboost::xgb.DMatrix(
-        data[[k]]$train$x, label = data[[k]]$train$y,
-        weight = data[[k]]$train$w)
+        data[[k]]$fit$x, label = data[[k]]$fit$y,
+        weight = data[[k]]$fit$w)
       dtest <- xgboost::xgb.DMatrix(
         data[[k]]$test$x, label = data[[k]]$test$y,
         weight = data[[k]]$test$w)

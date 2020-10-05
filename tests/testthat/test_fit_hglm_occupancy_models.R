@@ -1,7 +1,9 @@
-context("fit_occupancy_models")
+context("fit_hglm_occupancy_models")
 
 test_that("single species", {
   # data
+  skip_on_cran()
+  skip_if_not(is_jags_installed())
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 1000
@@ -9,23 +11,18 @@ test_that("single species", {
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
   f <- simulate_feature_data(n_f = 1)
-  f$survey_sensitivity <- 0.9
-  f$survey_specificity <- 0.999
-  tuning_parameters <-
-    list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         objective = "binary:logistic", tree_method = "auto")
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_hglm_occupancy_models(
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
-      "survey_sensitivity", "survey_specificity",
-      xgb_tuning_parameters = tuning_parameters)
+      "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
+      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f))
   })
   # tests
   y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
-  expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
   expect_equal(nrow(r$predictions), n_pu)
   expect_is(r$predictions$f1, "numeric")
@@ -36,6 +33,7 @@ test_that("single species", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
+  expect_is(r$performance$max_mpsrf, "numeric")
   expect_is(r$performance$train_tss_mean, "numeric")
   expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
@@ -48,6 +46,7 @@ test_that("single species", {
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
+  expect_lte(max(r$performance$max_mpsrf), 1.1)
   expect_lte(max(r$performance$train_tss_mean), 1)
   expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)
@@ -76,6 +75,8 @@ test_that("single species", {
 
 test_that("multiple species", {
   # data
+  skip_on_cran()
+  skip_if_not(is_jags_installed())
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 300
@@ -83,22 +84,18 @@ test_that("multiple species", {
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
   f <- simulate_feature_data(n_f)
-  tuning_parameters <-
-    list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         objective = "binary:logistic")
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_hglm_occupancy_models(
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
-      "survey_sensitivity", "survey_specificity",
-      xgb_tuning_parameters = tuning_parameters,
-      xgb_early_stopping_rounds = rep(5, n_f))
+      "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
+      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f))
   })
   # tests
   y <- sf::st_drop_geometry(x)
   expect_is(r, "list")
-  expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
   expect_equal(nrow(r$predictions), n_pu)
   expect_is(r$predictions$f1, "numeric")
@@ -109,6 +106,7 @@ test_that("multiple species", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
+  expect_is(r$performance$max_mpsrf, "numeric")
   expect_is(r$performance$train_tss_mean, "numeric")
   expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
@@ -121,6 +119,7 @@ test_that("multiple species", {
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
+  expect_lte(max(r$performance$max_mpsrf), 1.1)
   expect_lte(max(r$performance$train_tss_mean), 1)
   expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)
@@ -149,6 +148,8 @@ test_that("multiple species", {
 
 test_that("multiple species (sparse, multiple threads)", {
   # data
+  skip_on_cran()
+  skip_if_not(is_jags_installed())
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 2000
@@ -156,9 +157,6 @@ test_that("multiple species (sparse, multiple threads)", {
   n_vars <- 2
   x <- simulate_site_data(n_pu, n_f, 0.5, n_env_vars = n_vars)
   f <- simulate_feature_data(n_f)
-  tuning_parameters <-
-    list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
-         objective = "binary:logistic")
   # randomly set sites to hvae 0 surveys for certain species
   x2 <- x
   for (i in seq_len(n_f)) {
@@ -172,17 +170,16 @@ test_that("multiple species (sparse, multiple threads)", {
   }
   # fit models
   suppressWarnings({
-    r <- fit_occupancy_models(
+    r <- fit_hglm_occupancy_models(
       x2, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
-      "survey_sensitivity", "survey_specificity",
-      xgb_tuning_parameters = tuning_parameters,
-      xgb_early_stopping_rounds = rep(5, n_f),
+      "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
+      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f),
       n_threads = 2)
   })
   # tests
   expect_is(r, "list")
-  expect_is(r$parameters, "list")
   expect_is(r$predictions, "tbl_df")
   expect_equal(nrow(r$predictions), n_pu)
   expect_is(r$predictions$f1, "numeric")
@@ -195,6 +192,7 @@ test_that("multiple species (sparse, multiple threads)", {
   expect_is(r$performance, "tbl_df")
   expect_equal(nrow(r$performance), n_f)
   expect_is(r$performance$feature, "character")
+  expect_is(r$performance$max_mpsrf, "numeric")
   expect_is(r$performance$train_tss_mean, "numeric")
   expect_is(r$performance$train_tss_std, "numeric")
   expect_is(r$performance$train_sensitivity_mean, "numeric")
@@ -207,6 +205,7 @@ test_that("multiple species (sparse, multiple threads)", {
   expect_is(r$performance$test_sensitivity_std, "numeric")
   expect_is(r$performance$test_specificity_mean, "numeric")
   expect_is(r$performance$test_specificity_std, "numeric")
+  expect_lte(max(r$performance$max_mpsrf), 1.1)
   expect_lte(max(r$performance$train_tss_mean), 1)
   expect_lte(max(r$performance$train_tss_std), 1)
   expect_lte(max(r$performance$train_sensitivity_mean), 1)

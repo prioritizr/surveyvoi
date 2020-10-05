@@ -5,7 +5,7 @@
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
-#' @inheritParams fit_occupancy_models
+#' @inheritParams fit_xgb_occupancy_models
 #'
 #' @param site_probability_columns \code{character} names of \code{numeric}
 #'   columns in the argument to \code{site_data} that contain modelled
@@ -47,7 +47,9 @@
 #'   feature in a given site (i.e. the sensitivity of the models).
 #'   This column should have \code{numeric} values that are between zero and
 #'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
+#'   This should ideally be calculated using
+#'   \code{\link{fit_xgb_occupancy_models}} or
+#'   \code{\link{fit_hglm_occupancy_models}}.
 #'
 #' @param feature_model_specificity_column \code{character} name of the
 #'   column in the argument to \code{feature_data} that contains
@@ -55,7 +57,9 @@
 #'   feature in a given site (i.e. the specificity of the models).
 #'   This column should have \code{numeric} values that are between zero and
 #'   one. No missing (\code{NA}) values are permitted in this column.
-#'   This should ideally be calculated using \code{\link{fit_occupancy_models}}.
+#'   This should ideally be calculated using
+#'   \code{\link{fit_xgb_occupancy_models}} or
+#'   \code{\link{fit_hglm_occupancy_models}}.
 #'
 #' @param feature_target_column \code{character} name of the column in the
 #'   argument to \code{feature_data} that contains the \eqn{target}
@@ -91,8 +95,6 @@
 #'  Rows correspond to features, and columns correspond to sites.
 #'  Defaults to \code{NULL} such that prior data is calculated automatically
 #'  using \code{\link{prior_probability_matrix}}.
-#'
-#' @inheritParams fit_occupancy_models
 #'
 #' @details This function calculates the expected value and does not
 #'  use approximation methods. As such, this function can only be applied

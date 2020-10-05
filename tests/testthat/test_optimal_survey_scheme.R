@@ -183,11 +183,11 @@ test_that("consistent results", {
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),
          objective = "binary:logistic")
-  xgb_model <- fit_occupancy_models(
+  xgb_model <- fit_xgb_occupancy_models(
     site_data, feature_data, "f1", "n1", c("e1", "e2"),
     "survey_sensitivity", "survey_specificity",
     xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2)
+    xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, n_folds = 2)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
   r <- lapply(seq_len(5), function(i) {
@@ -229,11 +229,11 @@ test_that("consistent results (multiple threads)", {
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),
          objective = "binary:logistic")
-  xgb_model <- fit_occupancy_models(
+  xgb_model <- fit_xgb_occupancy_models(
     site_data, feature_data, "f1", "n1", c("e1", "e2"),
     "survey_sensitivity", "survey_specificity",
     xgb_tuning_parameters = xgb_parameters,
-    xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, xgb_n_folds = 2)
+    xgb_early_stopping_rounds = 5, xgb_n_rounds = 10, n_folds = 2)
   site_data$p1 <- xgb_model$predictions$f1
   # run calculations
   suppressWarnings({
