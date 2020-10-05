@@ -160,15 +160,11 @@ to perform stochastic search variable selection (Kuo & Mallick 1998).
 }
 \details{
 This function (i) prepares the data for model fitting,
- (ii) splits the data into multiple folds for cross-validation,
- (iii) fits the models, and (iv) assesses the performance of the
+ (ii) fits the models, and (iii) assesses the performance of the
   models. These analyses are performed separately for each
  feature. For a given feature:
 
  \enumerate{
-
- \item The environmental data are standardized using a z-score
- transformation.
 
  \item The data are prepared for model fitting by partitioning the data using
  k-fold cross-validation (set via argument to \code{n_folds}). The

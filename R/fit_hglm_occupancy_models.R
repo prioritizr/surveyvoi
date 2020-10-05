@@ -28,15 +28,11 @@ NULL
 #'
 #' @details
 #'  This function (i) prepares the data for model fitting,
-#'  (ii) splits the data into multiple folds for cross-validation,
-#'  (iii) fits the models, and (iv) assesses the performance of the
+#'  (ii) fits the models, and (iii) assesses the performance of the
 #'   models. These analyses are performed separately for each
 #'  feature. For a given feature:
 #'
 #'  \enumerate{
-#'
-#'  \item The environmental data are standardized using a z-score
-#'  transformation.
 #'
 #'  \item The data are prepared for model fitting by partitioning the data using
 #'  k-fold cross-validation (set via argument to \code{n_folds}). The
@@ -250,15 +246,10 @@ fit_hglm_occupancy_models <- function(
   # drop geometry
   site_data <- sf::st_drop_geometry(site_data)
 
-  # standardize environmental variables (i.e. z-score them)
-  site_data_std <- site_data[, site_env_vars_columns]
-  site_data_std <-
-    apply(site_data_std, 2, function(x) (x - mean(x)) / stats::sd(x))
-  site_data_std <- as.data.frame(site_data_std)
-
   # convert env data to model matrix format
   site_env_data <-
-    as.matrix(stats::model.matrix(~ . - 1, data = site_data_std))
+    as.matrix(stats::model.matrix(~ . - 1,
+      data = site_data[, site_env_vars_columns]))
 
   # prepare folds
   f <- lapply(seq_len(nrow(feature_data)), function(i) {
