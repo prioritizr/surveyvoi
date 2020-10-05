@@ -1,0 +1,32 @@
+model {
+  # data
+  ## int<lower=1> n_vars
+  ## int<lower=1> train_n_sites
+  ## real sens
+  ## real spec
+  ## real[train_n_sites, n_vars] train_model_matrix
+  ## real[train_n_sites] train_n_obs
+  ## matrix[train_n_sites, max(train_n_obs)] train_obs
+
+  # priors
+  for (i in 1:n_vars) {
+    coefs_raw[i] ~ dnorm(0, 2.5) # raw model coefficients
+    ss[i] ~ dbern(0.5)           # spike-and-slab variable selection terms
+  }
+
+  # transformed parameters
+  for (i in 1:n_vars) {
+    coefs[i] <- coefs_raw[i] * ss[i] # raw model coefficients
+  }
+  for (i in 1:train_n_sites) {
+    logit(yhat[i]) <- coefs %*% train_model_matrix[i, ]
+  }
+
+  # likelihood
+  for (i in 1:train_n_sites) {
+    occ[i] ~ dbern(yhat[i])
+    for (j in 1:train_n_obs[i]) {
+      train_obs[i, j] ~ dbern((occ[i] * sens) + ((1 - occ[i]) * spec))
+    }
+  }
+}

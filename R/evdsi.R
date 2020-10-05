@@ -5,7 +5,7 @@
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
-#' @inheritParams fit_brt_occupancy_models
+#' @inheritParams fit_xgb_occupancy_models
 #'
 #' @param site_probability_columns \code{character} names of \code{numeric}
 #'   columns in the argument to \code{site_data} that contain modelled
@@ -48,8 +48,8 @@
 #'   This column should have \code{numeric} values that are between zero and
 #'   one. No missing (\code{NA}) values are permitted in this column.
 #'   This should ideally be calculated using
-#'   \code{\link{fit_brt_occupancy_models}} or
-#'   \code{\link{fit_imp_glm_occupancy_models}}.
+#'   \code{\link{fit_xgb_occupancy_models}} or
+#'   \code{\link{fit_hglm_occupancy_models}}.
 #'
 #' @param feature_model_specificity_column \code{character} name of the
 #'   column in the argument to \code{feature_data} that contains
@@ -58,8 +58,8 @@
 #'   This column should have \code{numeric} values that are between zero and
 #'   one. No missing (\code{NA}) values are permitted in this column.
 #'   This should ideally be calculated using
-#'   \code{\link{fit_brt_occupancy_models}} or
-#'   \code{\link{fit_imp_glm_occupancy_models}}.
+#'   \code{\link{fit_xgb_occupancy_models}} or
+#'   \code{\link{fit_hglm_occupancy_models}}.
 #'
 #' @param feature_target_column \code{character} name of the column in the
 #'   argument to \code{feature_data} that contains the \eqn{target}

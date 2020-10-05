@@ -317,3 +317,18 @@ create_site_folds <- function(
   # return result
   list(train = train, test = test)
 }
+
+#' Is JAGS installed?
+#'
+#' Check if JAGS is installed.
+#'
+#' @return \code{logical} indicating if JAGS is installed.
+#'
+#' @noRd
+is_jags_installed <- function() {
+  x <- try(runjags::findjags(), silent = TRUE)
+  if (inherits(x, "try-error")) return(FALSE)
+  if (!assertthat::is.string(x)) return(FALSE)
+  if (!file.exists(x)) return(FALSE)
+  TRUE
+}
