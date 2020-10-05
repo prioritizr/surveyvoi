@@ -50,8 +50,12 @@ probability values of occupancy should be output or not. Defaults
 to \code{TRUE}.}
 }
 \value{
-\code{\link[sf]{sf}} object with site data. Columns that start with
- (i) \code{"f"} (e.g. \code{"d1"}) contain the proportion of
+\code{\link[sf]{sf}} object with site data.
+ The \code{"management_cost"} column contains the site protection costs,
+ and the \code{"survey_cost"} column contains the costs for surveying
+ each site.
+ Additionally, columns that start with
+ (i) \code{"f"} (e.g. \code{"f1"}) contain the proportion of
   times that each feature was detected in each site,
  (ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
   of surveys for each feature within each site,

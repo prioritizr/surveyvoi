@@ -15,6 +15,7 @@ reference:
     desc: Summary of the package
     contents:
       - surveyvoi
+      - sim_data
   - title: Value of information
     desc: Functions for value of information analyses
     contents:

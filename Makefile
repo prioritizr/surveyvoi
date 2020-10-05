@@ -1,10 +1,13 @@
-all: initc data docs test check
+all: initc docs test check
 
 initc:
 	R --slave -e "Rcpp::compileAttributes()"
 	R --slave -e "tools::package_native_routine_registration_skeleton('.', 'src/init.c', character_only = FALSE)"
 
 docs: man readme vigns
+
+data:
+	Rscript --slave inst/extdata/simulate_data.R
 
 readme:
 	R --slave -e "rmarkdown::render('README.Rmd')"
@@ -62,4 +65,4 @@ examples:
 	R --slave -e "devtools::run_examples(test = TRUE);warnings()"  >> examples.log
 	rm -f Rplots.pdf
 
-.PHONY: initc docs site test check checkwb build install man readme vigns site quicksite benchmark examples
+.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples
