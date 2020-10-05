@@ -335,7 +335,7 @@ fit_hglm_occupancy_models <- function(
       n_chains = 1,
       n_adapt = jags_n_adapt[i],
       verbose = verbose,
-      seed = seed)
+      seed = seed + i + f + ch)
   })
   ## kill cluster
   if (n_threads > 1) {
