@@ -10,36 +10,36 @@ NULL
 #' spike-and-slab coefficients are used
 #' to perform stochastic search variable selection (Kuo & Mallick 1998).
 #'
-#' @inheritParams fit_xgb_occupancy_models
-#'
 #' @param jags_n_samples \code{integer} number of sample to generate per chain
 #'   for MCMC analyses.
 #'   See documentation for the \code{sample} parameter
-#'   in \code{\link[runjags]{run.jags} for more information).
+#'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_thin \code{integer} number of thinning iterations for MCMC
 #'   analyses.
 #'   See documentation for the \code{thin} parameter
-#'   in \code{\link[runjags]{run.jags} for more information).
+#'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 100 for each feature.
 #'
 #' @param jags_n_burnin \code{integer} number of warm up iterations for MCMC
 #'   analyses.
 #'   See documentation for the \code{burnin} parameter
-#'   in \code{\link[runjags]{run.jags} for more information).
+#'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_chains \code{integer} total number of chains for MCMC analyses.
 #'   See documentation for the \code{n.chains} parameter
-#'   in \code{\link[runjags]{run.jags} for more information).
+#'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 4 for each fold for each feature.
 #'
 #' @param jags_n_adapt \code{integer} number of adapting iterations for MCMC
 #'   analyses.
 #'   See documentation for the \code{adapt} parameter
-#'   in \code{\link[runjags]{run.jags} for more information).
+#'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 1,000 for each feature.
+#'
+#' @inheritParams fit_xgb_occupancy_models
 #'
 #' @details
 #'  This function (i) prepares the data for model fitting,
@@ -340,7 +340,7 @@ fit_hglm_occupancy_models <- function(
         feature_data[[feature_survey_sensitivity_column]][i],
       survey_specificity =
         feature_data[[feature_survey_specificity_column]][i],
-      n_sample = jags_n_samples[i],
+      n_samples = jags_n_samples[i],
       n_burnin = jags_n_burnin[i],
       n_thin = jags_n_thin[i],
       n_chains = 1,

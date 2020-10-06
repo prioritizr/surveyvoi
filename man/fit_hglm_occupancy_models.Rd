@@ -63,6 +63,35 @@ feature in a given site (i.e. the specificity of the survey methodology).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.}
 
+\item{jags_n_samples}{\code{integer} number of sample to generate per chain
+for MCMC analyses.
+See documentation for the \code{sample} parameter
+in \code{\link[runjags]{run.jags}} for more information).
+Defaults to 10,000 for each feature.}
+
+\item{jags_n_burnin}{\code{integer} number of warm up iterations for MCMC
+analyses.
+See documentation for the \code{burnin} parameter
+in \code{\link[runjags]{run.jags}} for more information).
+Defaults to 10,000 for each feature.}
+
+\item{jags_n_thin}{\code{integer} number of thinning iterations for MCMC
+analyses.
+See documentation for the \code{thin} parameter
+in \code{\link[runjags]{run.jags}} for more information).
+Defaults to 100 for each feature.}
+
+\item{jags_n_adapt}{\code{integer} number of adapting iterations for MCMC
+analyses.
+See documentation for the \code{adapt} parameter
+in \code{\link[runjags]{run.jags}} for more information).
+Defaults to 1,000 for each feature.}
+
+\item{jags_n_chains}{\code{integer} total number of chains for MCMC analyses.
+See documentation for the \code{n.chains} parameter
+in \code{\link[runjags]{run.jags}} for more information).
+Defaults to 4 for each fold for each feature.}
+
 \item{n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
 Defaults to 5 for each feature.}

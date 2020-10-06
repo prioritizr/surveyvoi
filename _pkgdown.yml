@@ -15,28 +15,24 @@ reference:
     desc: Summary of the package
     contents:
       - surveyvoi
+  - title: Survey schemes
+    desc: Functions for generating survey schemes
+    contents:
+      - optimal_survey_scheme
+      - approx_optimal_survey_scheme
+      - approx_near_optimal_survey_scheme
+      - env_div_survey_scheme
+      - geo_cov_survey_scheme
+      - weighted_survey_scheme
+      - feasible_survey_schemes
   - title: Value of information
     desc: Functions for value of information analysis
     contents:
       - evdci
       - evdsi
       - approx_evdsi
-      - optimal_survey_scheme
-      - approx_optimal_survey_scheme
-      - approx_near_optimal_survey_scheme
+      - n_states
       - prior_probability_matrix
-  - title: Survey schemes
-    desc: Functions for generating survey schemes
-    contents:
-      - env_div_survey_scheme
-      - geo_cov_survey_scheme
-      - weighted_survey_scheme
-      - feasible_survey_schemes
-  - title: Site scores
-    desc: Functions for calculating scores for sites
-    contents:
-      - relative_site_richness_scores
-      - relative_site_uncertainty_scores
   - title: Occupancy modelling
     desc: Functions for fitting species distribution models
     contents:
@@ -51,4 +47,5 @@ reference:
   - title: Miscellaneous function
     desc: Assorted functions with varying uses
     contents:
-      - n_states
+      - relative_site_richness_scores
+      - relative_site_uncertainty_scores
