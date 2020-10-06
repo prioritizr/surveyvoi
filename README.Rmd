@@ -9,6 +9,10 @@ output:
 # Survey Value of Information
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Travis Build Status](https://img.shields.io/travis/jeffreyhanson/surveyvoi/master.svg?label=Linux%20%26%20Mac%20OSX)](https://travis-ci.org/jeffreyhanson/surveyvoi)
+[![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jeffreyhanson/surveyvoi/master.svg?label=Windows)](https://ci.appveyor.com/project/jeffreyhanson/surveyvoi)
+[![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
@@ -34,42 +38,83 @@ remotes::install_github("jeffreyhanson/surveyvoi")
 
 ## Citation
 
-This package is still early in development and should not be used yet.
+Please cite the _surveyvoi R_ package when using it in publications. To cite the latest development version, please use:
+
+```{r, echo = FALSE, results = "asis", comment = ""}
+dev_version <- as.character(packageVersion("surveyvoi"))
+cat(paste0("> Hanson JO, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
+```
 
 ## Usage
 
-Here we will provide a short example showing how the _surveyvoi R_ package can be used to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (temred "survey schemes") using simulated data for `nrow(sim_sites)` sites and `nrow(sim_features)` conservation features (e.g. bird species). To start off, we will set the seed for the random number generator to ensure you get the same results as shown here, and load the package.
+Here we will provide a short example showing how the _surveyvoi R_ package can be used to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (temred "survey schemes") using simulated data for `nrow(sim_sites)` sites and `nrow(sim_features)` conservation features (e.g. bird species). To start off, we will set the seed for the random number generator to ensure you get the same results as shown here, and load some R packages.
 
-```{r}
+```{r, message = FALSE}
 set.seed(500)
-library(surveyvoi)
+library(surveyvoi) # package for value of information analysis
+library(dplyr)     # package for preparing data
+library(tidyr)     # package for preparing data
+library(ggplot2)   # package for plotting data
 ```
 
 Now we will load some datasets that are distributed with the package.  First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf`) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the `nrow(sim_features)` features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models` or `fit_xgb_occupancy_models` to generate such estimates for your own data).
 
 
-```{r}
+```{r, fig.show='hold', fig.height = h, fig.width = w}
 # load data
 data(sim_sites)
 
 # print table
 print(sim_sites, width = Inf)
 
-# plot management cost and survey cost data
-plot(sim_sites[, c("management_cost", "survey_cost")])
+# plot management cost data
+ggplot(sim_sites) +
+geom_sf(aes(color = management_cost), size = 4) +
+ggtitle("management_cost") +
+theme(legend.title = element_blank())
 
-# plot survey data
-# n1, n2, n3: number of surveys in each site that looked for each feature
-# f1, f2, f3: proportion of surveys in each site that looked for each feature
-#             that detected the featre
-plot(sim_sites[, c("n1", "n2", "n3")])
-plot(sim_sites[, c("f1", "f2", "f3")])
-
-# plot modelled probability data
-plot(sim_sites[, c("p1", "p2", "p3")])
+# plot management cost data
+ggplot(sim_sites) +
+geom_sf(aes(color = survey_cost), size = 4) +
+ggtitle("survey_cost") +
+theme(legend.title = element_blank())
 ```
 
-Next, we will load the `sim_features` object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the `"name"` column contains the name of each feature; `"survey"` column indicates whether future surveys would look for this species; `"survey_sensitivity"` and `"survey_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature;  `"model_sensitivity"` and `"model_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and `"target"` column denotes the required number of protected sites for each feature to be present within (termed "representation target").
+```{r "n_plot", fig.height = h, fig.width = w, out.width=ow}
+# plot survey data
+## n1, n2, n3: number of surveys in each site that looked for each feature
+sim_sites %>%
+select(n1, n2, n3) %>%
+gather(name, value, -geometry) %>%
+ggplot() +
+geom_sf(aes(color = value), size = 4) +
+facet_wrap(~name, nrow = 1)
+```
+
+```{r "f_plot", fig.height = h, fig.width = w, out.width=ow}
+## f1, f2, f3: proportion of surveys in each site that looked for each feature
+##             that detected the feature
+sim_sites %>%
+select(f1, f2, f3) %>%
+gather(name, value, -geometry) %>%
+ggplot() +
+geom_sf(aes(color = value), size = 4) +
+facet_wrap(~name, nrow = 1) +
+scale_color_continuous(limits = c(0, 1))
+```
+
+```{r "p_plot"}
+# plot modelled probability of occupancy data
+sim_sites %>%
+select(p1, p2, p3) %>%
+gather(name, value, -geometry) %>%
+ggplot() +
+geom_sf(aes(color = value), size = 4) +
+facet_wrap(~name, nrow = 1) +
+scale_color_continuous(limits = c(0, 1))
+```
+
+Next, we will load the `sim_features` object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the `"name"` column contains the name of each feature; `"survey"` column indicates whether future surveys would look for this species; `"survey_sensitivity"` and `"survey_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature;  `"model_sensitivity"` and `"model_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and `"target"` column denotes the required number of protected sites for each feature to be present within (termed "representation target", each feature has a target of `sim_sites$target[1]` sites).
 
 ```{r}
 # load data
@@ -79,17 +124,17 @@ data(sim_features)
 print(sim_features, width = Inf)
 ```
 
-After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_near_optimal_survey_scheme` function. This function uses bootstrap replicates to estimates values used in the value of information analysis, and employs a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (e.g. `optimal_survey_scheme`), such approaches can take a very long time to complete (because they use a brute-force approach to optimize return on investment).
+After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme` function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. `optimal_survey_scheme`), they can take a very long time to complete (because they use a brute-force approach to optimize return on investment).
 
-To perform this optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different conservation plans depending on available funds. For instance, if you have infinite funds then you wouldn't bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you would need to use all of those funds for protecting sites since conducting surveys would only diminish reduce available funds. It is somewhere between these two extremes that conducting additional surveys actually improves a conservation plan. For brevity, here we will set the total budget as 10% of the total costs for protecting sites.
+To perform this optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different conservation plans depending on available funds. For instance, if you have infinite funds then you wouldn't bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you would need to use all of those funds for protecting sites since conducting surveys would only diminish reduce available funds. It is somewhere between these two extremes that conducting additional surveys actually improves a conservation plan. For brevity, here we will set the total budget as 80% of the total costs for protecting sites.
 
-```{r}
+```{r, message=FALSE}
 # calculate budget
-budget <- sum(0.1 * sim_sites$management_cost)
+budget <- sum(0.8 * sim_sites$management_cost)
 
 # generate optimized survey scheme
-sim_sites$opt_scheme <-
-  approx_near_optimal_survey_scheme(
+opt_scheme <-
+  approx_optimal_survey_scheme(
     site_data = sim_sites,
     feature_data = sim_features,
     site_detection_columns = c("f1", "f2", "f3"),
@@ -106,9 +151,21 @@ sim_sites$opt_scheme <-
     total_budget = budget,
     survey_budget = budget,
     verbose = TRUE)
+```
+
+```{r}
+# the opt_scheme object is a matrix which can contain multiple survey schemes
+# in the event that there are multiple optimal survey scheme,
+print(str(opt_scheme))
+
+# let's add the first solution (row) in opt_scheme to the site data to plot it
+sim_sites$scheme <- c(opt_scheme[1, ])
 
 # plot scheme
-plot(sim_sites[, "opt_scheme"])
+ggplot(sim_sites) +
+geom_sf(aes(color = scheme), size = 4)
+ggtitle("scheme") +
+theme(legend.title = element_blank())
 ```
 
 This has just been a taster of the _surveyvoi R_ package. For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
