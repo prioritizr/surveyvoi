@@ -12,7 +12,7 @@ seed <- 600
 
 ## set simulation parameters
 number_features <- 3
-number_sites <- 15
+number_sites <- 5
 proportion_of_survey_features <- 1
 proportion_of_sites_missing_data <- 0.75
 n_env_vars <- 2
@@ -29,6 +29,7 @@ set.seed(seed)
 RFoptions(seed = seed)
 sim_features <- simulate_feature_data(
   number_features, proportion_of_survey_features)
+sim_features$target <- 1
 
 ## sites
 set.seed(seed)
