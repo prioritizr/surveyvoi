@@ -354,7 +354,7 @@ fit_hglm_occupancy_models <- function(
     cl <- parallel::stopCluster(cl)
   }
 
-  saveRDS(list(m_raw = m_raw, model_cmbs = model_cmbs), "data.rds", compress="xz")
+  saveRDS(list(m_raw = m_raw, model_cmbs = model_cmbs), "debug.rds", compress="xz")
   
   # combine models into single model object (quietly)
   m <- lapply(seq_len(nrow(feature_data)), function(i) {
