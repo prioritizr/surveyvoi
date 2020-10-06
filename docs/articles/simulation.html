@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -54,9 +54,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/approximation.html">Approximation Benchmark</a>
-    </li>
-    <li>
       <a href="../articles/simulation.html">Simulation Study</a>
     </li>
   </ul>
@@ -227,11 +224,11 @@
 <span class="co"># identify suitable parameters for model fitting</span>
 <span class="co"># ideally, we would try a larger range of values,</span>
 <span class="co"># but we will keep it low to reduce processing time for this example</span>
-<span class="no">xgb_results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_occupancy_models.html">fit_occupancy_models</a></span>(
+<span class="no">xgb_results</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/fit_xgb_occupancy_models.html">fit_xgb_occupancy_models</a></span>(
   <span class="no">site_data</span>, <span class="no">feature_data</span>,
   <span class="st">"f1"</span>, <span class="st">"n1"</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span>(<span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span>),
   <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,
-  <span class="kw">xgb_n_folds</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)</pre></body></html></div>
+  <span class="kw">n_folds</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">xgb_tuning_parameters</span> <span class="kw">=</span> <span class="no">xgb_parameters</span>)</pre></body></html></div>
 <p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># print best parameters</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">xgb_results</span>$<span class="no">parameters</span>)</pre></body></html></div>
@@ -252,9 +249,9 @@
 <span class="no">xgb_performance</span> <span class="kw">&lt;-</span> <span class="no">xgb_results</span>$<span class="no">performance</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">xgb_performance</span>))</pre></body></html></div>
 <pre><code>##   feature train_tss_mean train_tss_std train_sensitivity_mean
-## 1      f1      0.8491889    0.04208485                      1
+## 1      f1              1             0                      1
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
-## 1                     0              0.8491889            0.04208485
+## 1                     0                      1                     0
 ##   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
 ## 1     0.8788582    0.1713204                     1                    0
 ##   test_specificity_mean test_specificity_std
@@ -486,7 +483,6 @@
 <a href="#optimal-survey-scheme" class="anchor"></a>Optimal survey scheme</h2>
 <p>Now let’s identify the optimal survey scheme by directly maximizing the <em>expected value of the decision given a survey scheme</em>.</p>
 <div class="sourceCode"><html><body><pre class="r"><span class="co"># identify optimal survey scheme(s)</span>
-<span class="co"># (note here we use approximation methods to reduce computational burden)</span>
 <span class="no">opt_scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/optimal_survey_scheme.html">optimal_survey_scheme</a></span>(
     <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">site_data</span>,
     <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">feature_data</span>,

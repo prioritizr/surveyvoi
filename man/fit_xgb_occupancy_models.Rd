@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_xgb_occupancy_models.R
 \name{fit_xgb_occupancy_models}
 \alias{fit_xgb_occupancy_models}
-\title{Fit (Xgboost) boosted regression tree models to predict occupancy}
+\title{Fit boosted regression tree models to predict occupancy}
 \usage{
 fit_xgb_occupancy_models(
   site_data,
@@ -232,6 +232,6 @@ print(results$parameters)
 print(results$predictions)
 
 # print model performance
-print(results$performance)
+print(results$performance, width = Inf)
 }
 }

@@ -27,7 +27,7 @@ Please cite the *surveyvoi R* package when using it in publications. To cite the
 Usage
 -----
 
-Here we will provide a short example showing how the *surveyvoi R* package can be used to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (temred "survey schemes") using simulated data for `nrow(sim_sites)` sites and `nrow(sim_features)` conservation features (e.g. bird species). To start off, we will set the seed for the random number generator to ensure you get the same results as shown here, and load some R packages.
+Here we will provide a short example showing how the *surveyvoi R* package can be used to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (temred "survey schemes") using simulated data for 6 sites and 3 conservation features (e.g. bird species). To start off, we will set the seed for the random number generator to ensure you get the same results as shown here, and load some R packages.
 
 ``` r
 set.seed(500)
@@ -37,7 +37,7 @@ library(tidyr)     # package for preparing data
 library(ggplot2)   # package for plotting data
 ```
 
-Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf`) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the `nrow(sim_features)` features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models` or `fit_xgb_occupancy_models` to generate such estimates for your own data).
+Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf`) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the 3 features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models` or `fit_xgb_occupancy_models` to generate such estimates for your own data).
 
 ``` r
 # load data
@@ -47,42 +47,49 @@ data(sim_sites)
 print(sim_sites, width = Inf)
 ```
 
-    ## Simple feature collection with 5 features and 13 fields
+    ## Simple feature collection with 6 features and 13 fields
     ## geometry type:  POINT
     ## dimension:      XY
-    ## bbox:           xmin: 0.1313267 ymin: 0.07352338 xmax: 0.7405901 ymax: 0.6129639
+    ## bbox:           xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
     ## CRS:            NA
-    ## # A tibble: 5 x 14
+    ## # A tibble: 6 x 14
     ##   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
     ##         <dbl>           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl>
-    ## 1        6.21            58.4     1     1   0.6     5     5     5 -1.38   1.42 
-    ## 2        8.01            57.1     0     0   0       0     0     0  0.454 -0.532
-    ## 3        7.62            58.1     0     0   0       0     0     0  1.28  -0.409
-    ## 4        6.48            60.5     0     0   0       0     0     0 -0.489  0.604
-    ## 5        7.12            54.7     0     0   0       0     0     0  0.133 -1.08 
+    ## 1        3.43            43.8     1 1     0         5     5     5 -1.38   0.425
+    ## 2        6.07            59.0     0 0     0         0     0     0  0.736 -1.01 
+    ## 3        7.09            46.7     0 0     0         0     0     0  0.754 -0.959
+    ## 4        6.50            49.6     0 0     0         0     0     0  0.530  1.51 
+    ## 5        5.37            48.1     0 0     0         0     0     0  0.546 -0.525
+    ## 6        3.35            48.9     1 0.667 0.333     3     3     3 -1.18   0.557
     ##      p1    p2    p3               geometry
     ##   <dbl> <dbl> <dbl>                <POINT>
-    ## 1 0.835 1     0.605  (0.1313267 0.4181095)
-    ## 2 0.387 0.048 0.414  (0.6087037 0.4398096)
-    ## 3 0.073 0.002 0.927  (0.5785847 0.6129639)
-    ## 4 0.613 0.964 0.617  (0.3594235 0.4926529)
-    ## 5 0.716 0.073 0.043 (0.7405901 0.07352338)
+    ## 1 0.941 0.999 0.057  (0.1589075 0.8637977)
+    ## 2 0.36  0.006 0.259  (0.9764926 0.7485368)
+    ## 3 0.337 0.006 0.305  (0.8362375 0.2282762)
+    ## 4 0.048 0.579 0.998     (0.10513 0.179855)
+    ## 5 0.335 0.032 0.488 (0.5985786 0.04556193)
+    ## 6 0.896 0.998 0.145  (0.1504241 0.6821156)
 
 ``` r
-# plot management cost data
+# plot cost of protecting each site
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
 ggtitle("management_cost") +
 theme(legend.title = element_blank())
+```
 
-# plot management cost data
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+
+``` r
+# plot cost of conducting an additional survey in each site
+# note that these costs are much lower than the protection costs
 ggplot(sim_sites) +
 geom_sf(aes(color = survey_cost), size = 4) +
 ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -137,14 +144,14 @@ print(sim_features, width = Inf)
     ## # A tibble: 3 x 7
     ##   name  survey survey_sensitivity survey_specificity model_sensitivity
     ##   <chr> <lgl>               <dbl>              <dbl>             <dbl>
-    ## 1 f1    TRUE                0.964              0.844             0.707
-    ## 2 f2    TRUE                0.980              0.861             0.751
-    ## 3 f3    TRUE                0.967              0.849             0.793
+    ## 1 f1    TRUE                0.954              0.886             0.718
+    ## 2 f2    TRUE                0.974              0.875             0.705
+    ## 3 f3    TRUE                0.956              0.823             0.768
     ##   model_specificity target
     ##               <dbl>  <dbl>
     ## 1             0.811      1
-    ## 2             0.896      1
-    ## 3             0.805      1
+    ## 2             0.860      1
+    ## 3             0.887      1
 
 After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme` function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. `optimal_survey_scheme`), they can take a very long time to complete (because they use a brute-force approach to optimize return on investment).
 
@@ -175,48 +182,17 @@ opt_scheme <-
     verbose = TRUE)
 ```
 
-    ## 
-      |                                                                            
-      |                                                                      |   0%
-      |                                                                            
-      |=====                                                                 |   7%
-      |                                                                            
-      |=========                                                             |  13%
-      |                                                                            
-      |==============                                                        |  20%
-      |                                                                            
-      |===================                                                   |  27%
-      |                                                                            
-      |=======================                                               |  33%
-      |                                                                            
-      |============================                                          |  40%
-      |                                                                            
-      |=================================                                     |  47%
-      |                                                                            
-      |=====================================                                 |  53%
-      |                                                                            
-      |==========================================                            |  60%
-      |                                                                            
-      |===============================================                       |  67%
-      |                                                                            
-      |===================================================                   |  73%
-      |                                                                            
-      |========================================================              |  80%
-      |                                                                            
-      |=============================================================         |  87%
-      |                                                                            
-      |=================================================================     |  93%
-      |                                                                            
-      |======================================================================| 100%
-
 ``` r
-# the opt_scheme object is a matrix which can contain multiple survey schemes
-# in the event that there are multiple optimal survey scheme,
+# the opt_scheme object is a matrix that contains the survey schemes
+# each column corresponds to a different site,
+# and each row corresponds to a different solution
+# in the event that there are multiple optimal survey schemes, then this
+# matrix will have multiple rows
 print(str(opt_scheme))
 ```
 
-    ##  logi [1, 1:5] FALSE TRUE FALSE FALSE TRUE
-    ##  - attr(*, "ev")= num [1, 1:100] 2.88 2.88 2.88 2.88 2.88 ...
+    ##  logi [1, 1:6] FALSE TRUE TRUE TRUE FALSE FALSE
+    ##  - attr(*, "ev")= num [1, 1:100] 2.92 2.92 2.92 2.92 2.92 ...
     ## NULL
 
 ``` r
@@ -224,18 +200,15 @@ print(str(opt_scheme))
 sim_sites$scheme <- c(opt_scheme[1, ])
 
 # plot scheme
+# TRUE = selected for an additional ecological survey
+# FALSE = not selected
 ggplot(sim_sites) +
-geom_sf(aes(color = scheme), size = 4)
-```
-
-<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
-
-``` r
+geom_sf(aes(color = scheme), size = 4) +
 ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-    ## NULL
+<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
 

@@ -12,8 +12,8 @@ fit_hglm_occupancy_models(
   site_env_vars_columns,
   feature_survey_sensitivity_column,
   feature_survey_specificity_column,
-  jags_n_iter = rep(150000, length(site_detection_columns)),
-  jags_n_burnin = rep(1e+05, length(site_detection_columns)),
+  jags_n_samples = rep(10000, length(site_detection_columns)),
+  jags_n_burnin = rep(1000, length(site_detection_columns)),
   jags_n_thin = rep(100, length(site_detection_columns)),
   jags_n_adapt = rep(1000, length(site_detection_columns)),
   jags_n_chains = rep(4, length(site_detection_columns)),
@@ -62,20 +62,6 @@ probability of future surveys correctly detecting an absence of each
 feature in a given site (i.e. the specificity of the survey methodology).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.}
-
-\item{jags_n_iter}{\code{integer} total number of iterations per chain
-for MCMC analyses.}
-
-\item{jags_n_burnin}{\code{integer} number of warm up iterations for MCMC
-analyses.}
-
-\item{jags_n_thin}{\code{integer} number of thinning iterations for MCMC
-analyses.}
-
-\item{jags_n_adapt}{\code{integer} number of adapting iterations for MCMC
-analyses.}
-
-\item{jags_n_chains}{\code{integer} total number of chains for MCMC analyses.}
 
 \item{n_folds}{\code{numeric} number of folds to split the training
 data into when fitting models for each feature.
@@ -198,30 +184,27 @@ site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 
 # print JAGS model code
-cat(readLines(system.file("inst/jags/model.jags", package = "surveyvoi")),
+cat(readLines(system.file("jags", "model.jags", package = "surveyvoi")),
     sep = "\n")
 
 \dontrun{
 # fit models
-# note that we use a limited number of MCMC iterations so that the example
-# finishes quickly, you would probably want something like 10,000+
+# note that we use a small number of MCMC iterations so that the example
+# finishes quickly, you probably want to use the defaults for real work
 results <- fit_hglm_occupancy_models(
    site_data, feature_data,
    c("f1", "f2"), c("n1", "n2"), c("e1", "e2", "e3"),
    "survey_sensitivity", "survey_specificity",
    n_folds = rep(5, 2),
-   jags_n_iter = rep(500, 2), jags_n_burnin = rep(250, 2),
-   jags_n_thin = rep(1, 2), jags_n_adapt = rep(50, 2),
+   jags_n_samples = rep(250, 2), jags_n_burnin = rep(250, 2),
+   jags_n_thin = rep(1, 2), jags_n_adapt = rep(100, 2),
    n_threads = 1)
-
-# print best found model parameters
-print(results$parameters)
 
 # print model predictions
 print(results$predictions)
 
 # print model performance
-print(results$performance)
+print(results$performance, width = Inf)
 }
 }
 \references{

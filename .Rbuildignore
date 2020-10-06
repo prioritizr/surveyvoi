@@ -21,15 +21,7 @@ examples.log
 README.Rmd
 inst/extdata/dictionary.txt
 ^_pkgdown\.yml$
-^CONTRIBUTING\.md$
-^CONTRIBUTING\.Rmd$
-src/amalgamation/dmlc-minimum0.o
-src/amalgamation/xgboost-all0.o
-src/rabit/src/c_api.o
-src/rabit/src/engine_empty.o
 ^debug*
 .editorconfig
 .travis.yml
-^src/dmlc-core/tracker/yarn*
-approximation.R
-simulation.R
+^simulation.R$

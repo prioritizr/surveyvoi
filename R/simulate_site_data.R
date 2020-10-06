@@ -67,7 +67,7 @@ NULL
 #' d <- simulate_site_data(n_sites = 10, n_features = 4, prop = 0.5)
 #'
 #' # print data
-#' print(d)
+#' print(d, width = Inf)
 #'
 #' # plot cost data
 #' plot(d[, c("survey_cost", "management_cost")], axes = TRUE, pch = 16,

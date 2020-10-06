@@ -75,7 +75,7 @@ set of sites to inform the decision." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -97,9 +97,6 @@ set of sites to inform the decision." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/approximation.html">Approximation Benchmark</a>
-    </li>
     <li>
       <a href="../articles/simulation.html">Simulation Study</a>
     </li>
@@ -162,7 +159,6 @@ set of sites to inform the decision.</p>
   <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>n_approx_replicates</span> <span class='kw'>=</span> <span class='fl'>100</span>,
   <span class='kw'>n_approx_outcomes_per_replicate</span> <span class='kw'>=</span> <span class='fl'>10000</span>,
-  <span class='kw'>method_approx_outcomes</span> <span class='kw'>=</span> <span class='st'>"weighted_without_replacement"</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>
 )</pre>
 
@@ -265,7 +261,9 @@ probability of the initial models correctly predicting a presence of each
 feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
+This should ideally be calculated using
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -275,7 +273,9 @@ probability of the initial models correctly predicting an absence of each
 feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
+This should ideally be calculated using
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_target_column</th>
@@ -331,18 +331,6 @@ approximating the expected value calculations. Defaults to 100.</p></td>
       <th>n_approx_outcomes_per_replicate</th>
       <td><p><code>integer</code> number of outcomes to
 use per replicate for approximation calculations. Defaults to 10000.</p></td>
-    </tr>
-    <tr>
-      <th>method_approx_outcomes</th>
-      <td><p><code>character</code> name of method that is
-used to sample outcomes for approximating the expected value
-calculations. Available options are:
-<code>"uniform_with_replacement"</code>, <code>"uniform_without_replacement"</code>,
-<code>"weighted_with_replacement"</code>, <code>"weighted_without_replacement"</code>.
-Uniform sampling methods have an equal chance of returning each
-state, and weighted sampling methods are more likely to return
-outcomes with a higher prior probability of occurring.
-Defaults to <code>"weighted_without_replacement"</code>.</p></td>
     </tr>
     <tr>
       <th>seed</th>
@@ -427,7 +415,7 @@ replicate.</p>
   <span class='st'>"target"</span>, <span class='no'>total_budget</span>)
 
 <span class='co'># print mean value</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>approx_ev_survey</span>))</div><div class='output co'>#&gt; [1] 0.4738979</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span>(<span class='no'>approx_ev_survey</span>))</div><div class='output co'>#&gt; [1] 1.387088</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

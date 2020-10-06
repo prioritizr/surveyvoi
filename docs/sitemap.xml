@@ -25,7 +25,10 @@
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/feasible_survey_schemes.html</loc>
   </url>
   <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/reference/fit_occupancy_models.html</loc>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/fit_hglm_occupancy_models.html</loc>
+  </url>
+  <url>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/fit_xgb_occupancy_models.html</loc>
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/geo_cov_survey_scheme.html</loc>
@@ -46,6 +49,9 @@
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/relative_site_uncertainty_scores.html</loc>
   </url>
   <url>
+    <loc>https://jeffrey-hanson.com/surveyvoi/reference/sim_data.html</loc>
+  </url>
+  <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/simulate_feature_data.html</loc>
   </url>
   <url>
@@ -56,9 +62,6 @@
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/reference/weighted_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://jeffrey-hanson.com/surveyvoi/articles/approximation.html</loc>
   </url>
   <url>
     <loc>https://jeffrey-hanson.com/surveyvoi/articles/simulation.html</loc>

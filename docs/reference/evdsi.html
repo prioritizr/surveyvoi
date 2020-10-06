@@ -75,7 +75,7 @@ set of sites to inform the decision." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -97,9 +97,6 @@ set of sites to inform the decision." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/approximation.html">Approximation Benchmark</a>
-    </li>
     <li>
       <a href="../articles/simulation.html">Simulation Study</a>
     </li>
@@ -261,7 +258,9 @@ probability of the initial models correctly predicting a presence of each
 feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
+This should ideally be calculated using
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -271,7 +270,9 @@ probability of the initial models correctly predicting an absence of each
 feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
-This should ideally be calculated using <code><a href='fit_occupancy_models.html'>fit_occupancy_models</a></code>.</p></td>
+This should ideally be calculated using
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_target_column</th>
@@ -388,7 +389,7 @@ using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a>
   <span class='st'>"target"</span>, <span class='no'>total_budget</span>)
 
 <span class='co'># print value</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ev_survey</span>)</div><div class='output co'>#&gt; [1] 0.4738979</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ev_survey</span>)</div><div class='output co'>#&gt; [1] 1.387088</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

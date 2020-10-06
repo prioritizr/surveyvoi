@@ -17,7 +17,7 @@ test_that("single species", {
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
-      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_samples = rep(400, n_f), jags_n_burnin = rep(100, n_f),
       jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f))
   })
   # tests
@@ -90,7 +90,7 @@ test_that("multiple species", {
       x, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
-      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_samples = rep(400, n_f), jags_n_burnin = rep(100, n_f),
       jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f))
   })
   # tests
@@ -174,7 +174,7 @@ test_that("multiple species (sparse, multiple threads)", {
       x2, f, paste0("f", seq_len(n_f)), paste0("n", seq_len(n_f)),
       paste0("e", seq_len(n_vars)),
       "survey_sensitivity", "survey_specificity", n_folds = rep(2, n_f),
-      jags_n_iter = rep(400, n_f), jags_n_burnin = rep(100, n_f),
+      jags_n_samples = rep(400, n_f), jags_n_burnin = rep(100, n_f),
       jags_n_thin = rep(1, n_f), jags_n_adapt = rep(50, n_f),
       n_threads = 2)
   })

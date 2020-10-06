@@ -12,19 +12,34 @@ NULL
 #'
 #' @inheritParams fit_xgb_occupancy_models
 #'
-#' @param jags_n_iter \code{integer} total number of iterations per chain
+#' @param jags_n_samples \code{integer} number of sample to generate per chain
 #'   for MCMC analyses.
+#'   See documentation for the \code{sample} parameter
+#'   in \code{\link[runjags]{run.jags} for more information).
+#'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_thin \code{integer} number of thinning iterations for MCMC
 #'   analyses.
+#'   See documentation for the \code{thin} parameter
+#'   in \code{\link[runjags]{run.jags} for more information).
+#'   Defaults to 100 for each feature.
 #'
 #' @param jags_n_burnin \code{integer} number of warm up iterations for MCMC
 #'   analyses.
+#'   See documentation for the \code{burnin} parameter
+#'   in \code{\link[runjags]{run.jags} for more information).
+#'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_chains \code{integer} total number of chains for MCMC analyses.
+#'   See documentation for the \code{n.chains} parameter
+#'   in \code{\link[runjags]{run.jags} for more information).
+#'   Defaults to 4 for each fold for each feature.
 #'
 #' @param jags_n_adapt \code{integer} number of adapting iterations for MCMC
 #'   analyses.
+#'   See documentation for the \code{adapt} parameter
+#'   in \code{\link[runjags]{run.jags} for more information).
+#'   Defaults to 1,000 for each feature.
 #'
 #' @details
 #'  This function (i) prepares the data for model fitting,
@@ -132,30 +147,27 @@ NULL
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #'
 #' # print JAGS model code
-#' cat(readLines(system.file("inst/jags/model.jags", package = "surveyvoi")),
+#' cat(readLines(system.file("jags", "model.jags", package = "surveyvoi")),
 #'     sep = "\n")
 #'
 #' \dontrun{
 #' # fit models
-#' # note that we use a limited number of MCMC iterations so that the example
-#' # finishes quickly, you would probably want something like 10,000+
+#' # note that we use a small number of MCMC iterations so that the example
+#' # finishes quickly, you probably want to use the defaults for real work
 #' results <- fit_hglm_occupancy_models(
 #'    site_data, feature_data,
 #'    c("f1", "f2"), c("n1", "n2"), c("e1", "e2", "e3"),
 #'    "survey_sensitivity", "survey_specificity",
 #'    n_folds = rep(5, 2),
-#'    jags_n_iter = rep(500, 2), jags_n_burnin = rep(250, 2),
-#'    jags_n_thin = rep(1, 2), jags_n_adapt = rep(50, 2),
+#'    jags_n_samples = rep(250, 2), jags_n_burnin = rep(250, 2),
+#'    jags_n_thin = rep(1, 2), jags_n_adapt = rep(100, 2),
 #'    n_threads = 1)
-#'
-#' # print best found model parameters
-#' print(results$parameters)
 #'
 #' # print model predictions
 #' print(results$predictions)
 #'
 #' # print model performance
-#' print(results$performance)
+#' print(results$performance, width = Inf)
 #' }
 #' @export
 fit_hglm_occupancy_models <- function(
@@ -163,8 +175,8 @@ fit_hglm_occupancy_models <- function(
   site_detection_columns, site_n_surveys_columns,
   site_env_vars_columns,
   feature_survey_sensitivity_column, feature_survey_specificity_column,
-  jags_n_iter = rep(150000, length(site_detection_columns)),
-  jags_n_burnin = rep(100000, length(site_detection_columns)),
+  jags_n_samples = rep(10000, length(site_detection_columns)),
+  jags_n_burnin = rep(1000, length(site_detection_columns)),
   jags_n_thin = rep(100, length(site_detection_columns)),
   jags_n_adapt = rep(1000, length(site_detection_columns)),
   jags_n_chains = rep(4, length(site_detection_columns)),
@@ -208,11 +220,11 @@ fit_hglm_occupancy_models <- function(
     assertthat::noNA(n_folds),
     all(n_folds > 0),
     length(n_folds) == nrow(feature_data),
-    ## jags_n_iter
-    is.numeric(jags_n_iter),
-    assertthat::noNA(jags_n_iter),
-    length(jags_n_iter) == nrow(feature_data),
-    all(jags_n_iter > 0),
+    ## jags_n_samples
+    is.numeric(jags_n_samples),
+    assertthat::noNA(jags_n_samples),
+    length(jags_n_samples) == nrow(feature_data),
+    all(jags_n_samples > 0),
     ## jags_n_thin
     is.numeric(jags_n_thin),
     assertthat::noNA(jags_n_thin),
@@ -223,7 +235,6 @@ fit_hglm_occupancy_models <- function(
     assertthat::noNA(jags_n_burnin),
     length(jags_n_burnin) == nrow(feature_data),
     all(jags_n_burnin > 0),
-    all(jags_n_burnin < jags_n_iter),
     ## jags_n_chains
     is.numeric(jags_n_chains),
     assertthat::noNA(jags_n_chains),
@@ -329,7 +340,7 @@ fit_hglm_occupancy_models <- function(
         feature_data[[feature_survey_sensitivity_column]][i],
       survey_specificity =
         feature_data[[feature_survey_specificity_column]][i],
-      n_iter = jags_n_iter[i],
+      n_sample = jags_n_samples[i],
       n_burnin = jags_n_burnin[i],
       n_thin = jags_n_thin[i],
       n_chains = 1,
@@ -346,8 +357,8 @@ fit_hglm_occupancy_models <- function(
   # combine models into single model object (quietly)
   m <- lapply(seq_len(nrow(feature_data)), function(i) {
     lapply(seq_len(n_folds[i]), function(k) {
-      i <- model_cmbs$idx[model_cmbs$spp == i & model_cmbs$fold == k]
-      runjags::combine.jags(m_raw[i])
+      ii <- model_cmbs$idx[model_cmbs$spp == i & model_cmbs$fold == k]
+      runjags::combine.jags(m_raw[ii])
    })
   })
 
@@ -416,14 +427,14 @@ fit_hglm_occupancy_models <- function(
 
 #' @noRd
 fit_hglm_model <- function(data, survey_sensitivity, survey_specificity,
-  n_iter, n_thin, n_burnin, n_chains, n_adapt, verbose, seed) {
+  n_samples, n_thin, n_burnin, n_chains, n_adapt, verbose, seed) {
   # assert arguments are valid
   assertthat::assert_that(
     is.list(data),
     assertthat::is.number(survey_sensitivity),
     assertthat::is.number(survey_specificity),
-    assertthat::is.count(n_iter),
-    assertthat::noNA(n_iter),
+    assertthat::is.count(n_samples),
+    assertthat::noNA(n_samples),
     assertthat::is.count(n_burnin),
     assertthat::noNA(n_burnin),
     assertthat::is.count(n_adapt),
@@ -445,13 +456,13 @@ fit_hglm_model <- function(data, survey_sensitivity, survey_specificity,
     train_model_matrix = data$x,
     train_obs = data$y)
   # run JAGS
-  withr::with_seed(seed, {
+  suppressWarnings({withr::with_seed(seed, {
     runjags::run.jags(
       model = system.file("jags", "model.jags", package = "surveyvoi"),
       data = jags_data, monitor = c("coefs"),
-      n.chains = 1, sample = n_iter - n_burnin, burnin = n_burnin,
+      n.chains = 1, sample = n_samples, burnin = n_burnin,
       thin = n_thin, adapt = n_adapt)
-  })
+  })})
 }
 
 #' @noRd

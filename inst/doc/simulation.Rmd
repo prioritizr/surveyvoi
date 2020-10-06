@@ -162,11 +162,11 @@ xgb_parameters <- list(eta = 0.1, lambda = 0.1, objective = "binary:logistic")
 # identify suitable parameters for model fitting
 # ideally, we would try a larger range of values,
 # but we will keep it low to reduce processing time for this example
-xgb_results <- fit_occupancy_models(
+xgb_results <- fit_xgb_occupancy_models(
   site_data, feature_data,
   "f1", "n1", c("e1", "e2", "e3"),
   "survey_sensitivity", "survey_specificity",
-  xgb_n_folds = 2, xgb_tuning_parameters = xgb_parameters)
+  n_folds = 2, xgb_tuning_parameters = xgb_parameters)
 ```
 
 After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.
@@ -412,7 +412,6 @@ Now let's identify the optimal survey scheme by directly maximizing the _expecte
 
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 # identify optimal survey scheme(s)
-# (note here we use approximation methods to reduce computational burden)
 opt_scheme <- optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,

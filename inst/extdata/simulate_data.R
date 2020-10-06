@@ -8,11 +8,11 @@ source("R/simulate_feature_data.R")
 source("R/simulate_site_data.R")
 
 ## set seed for reproducibility
-seed <- 600
+seed <- 607
 
 ## set simulation parameters
 number_features <- 3
-number_sites <- 5
+number_sites <- 6
 proportion_of_survey_features <- 1
 proportion_of_sites_missing_data <- 0.75
 n_env_vars <- 2

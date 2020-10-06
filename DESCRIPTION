@@ -58,7 +58,6 @@ OS_type: unix
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),
-    gurobi (>= 8.1.0),
     libgmp-dev (>= 2:6.1.0),
     libmpfr-dev (>= 3.1.4-1)
 URL: https://github.com/jeffreyhanson/surveyvoi

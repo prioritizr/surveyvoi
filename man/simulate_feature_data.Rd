@@ -35,7 +35,7 @@ data:
   rate) of the occupancy models for each features.}
 
 \item{\code{target}}{\code{numeric} target values used to parametrize
-  the conservation benefit of managing of each feature.}
+  the conservation benefit of managing of each feature (defaults to 1).}
 
 }
 }
@@ -50,7 +50,7 @@ set.seed(123)
 d <- simulate_feature_data(n_features = 5,
                            proportion_of_survey_features = 0.5)
 # print data
-print(d)
+print(d, width = Inf)
 
 }
 \seealso{

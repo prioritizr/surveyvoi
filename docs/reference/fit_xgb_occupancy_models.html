@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Fit models to estimate probability of occupancy — fit_occupancy_models • surveyvoi</title>
+<title>Fit boosted regression tree models to predict occupancy — fit_xgb_occupancy_models • surveyvoi</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,10 @@
 
 
 
-<meta property="og:title" content="Fit models to estimate probability of occupancy — fit_occupancy_models" />
+<meta property="og:title" content="Fit boosted regression tree models to predict occupancy — fit_xgb_occupancy_models" />
 <meta property="og:description" content="Estimate probability of occupancy for a set of features in a set of
-planning units." />
+planning units. Models are fitted using gradient boosted trees (via
+xgb.train)." />
 
 
 
@@ -73,7 +74,7 @@ planning units." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -95,9 +96,6 @@ planning units." />
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/approximation.html">Approximation Benchmark</a>
-    </li>
     <li>
       <a href="../articles/simulation.html">Simulation Study</a>
     </li>
@@ -127,17 +125,18 @@ planning units." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Fit models to estimate probability of occupancy</h1>
-    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/fit_occupancy_models.R'><code>R/fit_occupancy_models.R</code></a></small>
-    <div class="hidden name"><code>fit_occupancy_models.Rd</code></div>
+    <h1>Fit boosted regression tree models to predict occupancy</h1>
+    <small class="dont-index">Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/R/fit_xgb_occupancy_models.R'><code>R/fit_xgb_occupancy_models.R</code></a></small>
+    <div class="hidden name"><code>fit_xgb_occupancy_models.Rd</code></div>
     </div>
 
     <div class="ref-description">
     <p>Estimate probability of occupancy for a set of features in a set of
-planning units.</p>
+planning units. Models are fitted using gradient boosted trees (via
+<code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgb.train</a></code>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fit_occupancy_models</span>(
+    <pre class="usage"><span class='fu'>fit_xgb_occupancy_models</span>(
   <span class='no'>site_data</span>,
   <span class='no'>feature_data</span>,
   <span class='no'>site_detection_columns</span>,
@@ -148,7 +147,7 @@ planning units.</p>
   <span class='no'>xgb_tuning_parameters</span>,
   <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>20</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
   <span class='kw'>xgb_n_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
+  <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
   <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
@@ -232,7 +231,7 @@ See <code><a href='https://rdrr.io/pkg/xgboost/man/xgb.train.html'>xgboost</a></
 Defaults to 100 for each feature.</p></td>
     </tr>
     <tr>
-      <th>xgb_n_folds</th>
+      <th>n_folds</th>
       <td><p><code>numeric</code> number of folds to split the training
 data into when fitting models for each feature.
 Defaults to 5 for each feature.</p></td>
@@ -305,7 +304,7 @@ tuning parameters for each feature.</p></dd>
  feature. For a given feature:</p>
 <p></p><ol>
 <li><p>The data are prepared for model fitting by partitioning the data using
- k-fold cross-validation (set via argument to <code>xgb_n_folds</code>). The
+ k-fold cross-validation (set via argument to <code>n_folds</code>). The
  training and evaluation folds are constructed
  in such a manner as to ensure that each training and evaluation
  fold contains at least one presence and one absence observation.</p></li>
@@ -359,11 +358,11 @@ tuning parameters for each feature.</p></dd>
 <span class='co'># fit models</span>
 <span class='co'># note that we use 10 random search iterations here so that the example</span>
 <span class='co'># finishes quickly, you would probably want something like 1000+</span>
-<span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_occupancy_models</span>(
+<span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_xgb_occupancy_models</span>(
    <span class='no'>site_data</span>, <span class='no'>feature_data</span>,
    <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
    <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-   <span class='kw'>xgb_n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>2</span>),
+   <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>), <span class='kw'>xgb_early_stopping_rounds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>2</span>),
    <span class='kw'>xgb_tuning_parameters</span> <span class='kw'>=</span> <span class='no'>parameters</span>, <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)
 
 <span class='co'># print best found model parameters</span>
@@ -413,17 +412,25 @@ tuning parameters for each feature.</p></dd>
 #&gt; </span><span style='color: #555555;'> 8</span><span> 0.466 0.626
 #&gt; </span><span style='color: #555555;'> 9</span><span> 0.540 0.656
 #&gt; </span><span style='color: #555555;'>10</span><span> 0.549 0.377
-#&gt; </span><span style='color: #555555;'># ... with 20 more rows</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># … with 20 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 13</span><span>
-#&gt;   feature train_tss_mean train_tss_std train_sensitivi~ train_sensitivi~
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.981        0.017</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
-#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.940        0.037</span><span style='text-decoration: underline;'>9</span><span>             1.00                0
-#&gt; </span><span style='color: #555555;'># ... with 8 more variables: train_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   train_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_tss_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   test_sensitivity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_sensitivity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   test_specificity_mean </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, test_specificity_std </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'># }
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 13</span><span>
+#&gt;   feature train_tss_mean train_tss_std train_sensitivity_mean
+#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.980      0.020</span><span style='text-decoration: underline;'>8</span><span>                     1.00
+#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.999      0.000</span><span style='text-decoration: underline;'>903</span><span>                   1.00
+#&gt;   train_sensitivity_std train_specificity_mean train_specificity_std
+#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>                     0                  0.980              0.020</span><span style='text-decoration: underline;'>8</span><span>  
+#&gt; </span><span style='color: #555555;'>2</span><span>                     0                  0.999              0.000</span><span style='text-decoration: underline;'>903</span><span>
+#&gt;   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
+#&gt;           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>         0.888        0.114                 0.959               0.091</span><span style='text-decoration: underline;'>2</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>         0.816        0.143                 0.936               0.095</span><span style='text-decoration: underline;'>6</span><span>
+#&gt;   test_specificity_mean test_specificity_std
+#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>                 0.929               0.091</span><span style='text-decoration: underline;'>0</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>                 0.879               0.125 </div><div class='input'># }
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

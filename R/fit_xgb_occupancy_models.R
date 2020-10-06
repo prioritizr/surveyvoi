@@ -1,7 +1,7 @@
 #' @include internal.R
 NULL
 
-#' Fit (Xgboost) boosted regression tree models to predict occupancy
+#' Fit boosted regression tree models to predict occupancy
 #'
 #' Estimate probability of occupancy for a set of features in a set of
 #' planning units. Models are fitted using gradient boosted trees (via
@@ -211,7 +211,7 @@ NULL
 #' print(results$predictions)
 #'
 #' # print model performance
-#' print(results$performance)
+#' print(results$performance, width = Inf)
 #' }
 #' @export
 fit_xgb_occupancy_models <- function(

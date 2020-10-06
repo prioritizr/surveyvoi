@@ -15,9 +15,8 @@ reference:
     desc: Summary of the package
     contents:
       - surveyvoi
-      - sim_data
   - title: Value of information
-    desc: Functions for value of information analyses
+    desc: Functions for value of information analysis
     contents:
       - evdci
       - evdsi
@@ -38,13 +37,18 @@ reference:
     contents:
       - relative_site_richness_scores
       - relative_site_uncertainty_scores
+  - title: Occupancy modelling
+    desc: Functions for fitting species distribution models
+    contents:
+      - fit_hglm_occupancy_models
+      - fit_xgb_occupancy_models
   - title: Simulate data
     desc: Functions for simulating datasets
     contents:
       - simulate_site_data
       - simulate_feature_data
+      - sim_data
   - title: Miscellaneous function
     desc: Assorted functions with varying uses
     contents:
       - n_states
-      - fit_occupancy_models

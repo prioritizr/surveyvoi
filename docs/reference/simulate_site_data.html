@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -94,9 +94,6 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/approximation.html">Approximation Benchmark</a>
-    </li>
     <li>
       <a href="../articles/simulation.html">Simulation Study</a>
     </li>
@@ -206,8 +203,12 @@ to <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data. Columns that start with
- (i) <code>"f"</code> (e.g. <code>"d1"</code>) contain the proportion of
+    <p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.
+ The <code>"management_cost"</code> column contains the site protection costs,
+ and the <code>"survey_cost"</code> column contains the costs for surveying
+ each site.
+ Additionally, columns that start with
+ (i) <code>"f"</code> (e.g. <code>"f1"</code>) contain the proportion of
   times that each feature was detected in each site,
  (ii) <code>"n"</code> (e.g. <code>"n1"</code>) contain the number of
   of surveys for each feature within each site,
@@ -235,7 +236,7 @@ simulations.</p>
 <span class='co'># simulate data</span>
 <span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'>
 <span class='co'># print data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>d</span>)</div><div class='output co'>#&gt; Simple feature collection with 10 features and 17 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>d</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; Simple feature collection with 10 features and 17 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9404673 ymax: 0.9568333
@@ -253,8 +254,18 @@ simulations.</p>
 #&gt; </span><span style='color: #555555;'> 8</span><span>        5.06            68.7     0     0     0     0     0     0     0     0
 #&gt; </span><span style='color: #555555;'> 9</span><span>        3.64            66.8     0     0     0     0     0     0     0     0
 #&gt; </span><span style='color: #555555;'>10</span><span>        7.38            61.8     0     0     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'># ... with 8 more variables: e1 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, e2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, e3 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p1 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   p3 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p4 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'>
+#&gt;        e1      e2     e3    p1    p2    p3    p4              geometry
+#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>               </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> -</span><span style='color: #BB0000;'>0.474</span><span>  0.555   0.948 1     0     0.007 1     (0.2875775 0.9568333)
+#&gt; </span><span style='color: #555555;'> 2</span><span> -</span><span style='color: #BB0000;'>0.360</span><span> -</span><span style='color: #BB0000;'>1.21</span><span>   -</span><span style='color: #BB0000;'>0.151</span><span> 0.047 0.517 1     1     (0.7883051 0.4533342)
+#&gt; </span><span style='color: #555555;'> 3</span><span>  0.493  0.632   1.01  1     0     0.04  0.999 (0.4089769 0.6775706)
+#&gt; </span><span style='color: #555555;'> 4</span><span> -</span><span style='color: #BB0000;'>0.801</span><span> -</span><span style='color: #BB0000;'>2.30</span><span>    0.304 0.765 0     1     1     (0.8830174 0.5726334)
+#&gt; </span><span style='color: #555555;'> 5</span><span> -</span><span style='color: #BB0000;'>0.586</span><span> -</span><span style='color: #BB0000;'>0.024</span><span style='color: #BB0000;text-decoration: underline;'>9</span><span> -</span><span style='color: #BB0000;'>1.49</span><span>  0     1     0     0     (0.9404673 0.1029247)
+#&gt; </span><span style='color: #555555;'> 6</span><span>  1.48   0.287   0.705 0.993 0     0.991 0.993  (0.0455565 0.899825)
+#&gt; </span><span style='color: #555555;'> 7</span><span>  1.30   0.960  -</span><span style='color: #BB0000;'>0.554</span><span> 0.001 0.997 0     0     (0.5281055 0.2460877)
+#&gt; </span><span style='color: #555555;'> 8</span><span> -</span><span style='color: #BB0000;'>0.607</span><span>  0.236  -</span><span style='color: #BB0000;'>1.60</span><span>  0     1     0     0     (0.892419 0.04205953)
+#&gt; </span><span style='color: #555555;'> 9</span><span>  1.01   0.655  -</span><span style='color: #BB0000;'>0.310</span><span> 0.009 0.919 0     0      (0.551435 0.3279207)
+#&gt; </span><span style='color: #555555;'>10</span><span> -</span><span style='color: #BB0000;'>1.46</span><span>   0.213   1.14  1     0     0.832 1     (0.4566147 0.9545036)</div><div class='input'>
 <span class='co'># plot cost data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"survey_cost"</span>, <span class='st'>"management_cost"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>,
      <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-1.png' alt='' width='700' height='433' /></div><div class='input'>

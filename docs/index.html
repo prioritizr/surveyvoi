@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.42</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.63</span>
       </span>
     </div>
 
@@ -56,9 +56,6 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/approximation.html">Approximation Benchmark</a>
-    </li>
-    <li>
       <a href="articles/simulation.html">Simulation Study</a>
     </li>
   </ul>
@@ -90,7 +87,7 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#survey-value-of-information" class="anchor"></a>Survey Value of Information</h1></div>
 
-<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve conservation plans for managing biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to identify which sites should be surveyed because doing so would likely lead to superior conservation management plans. It uses value of information analyses to measure return on investment for competing survey schemes. Furthermore, by directly maximizing the expected value of sample information, optimal survey schemes can also be identified.</p>
+<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their return on investment.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -98,15 +95,159 @@
 <div class="sourceCode"><pre class="r"><span class="kw">if</span> (!<span class="fu"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="no">remotes</span>)) <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">"remotes"</span>)
 <span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/remotes/man/install_github.html">install_github</a></span>(<span class="st">"jeffreyhanson/surveyvoi"</span>)</pre></div>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
-<p>TODO.</p>
-</div>
 <div id="citation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#citation" class="anchor"></a>Citation</h2>
-<p>This package is still early in development and should not be used yet.</p>
+<p>Please cite the <em>surveyvoi R</em> package when using it in publications. To cite the latest development version, please use:</p>
+<blockquote>
+<p>Hanson JO, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 0.0.63. Available at <a href="https://github.com/jeffreyhanson/surveyvoi" class="uri">https://github.com/jeffreyhanson/surveyvoi</a>.</p>
+</blockquote>
+</div>
+<div id="usage" class="section level2">
+<h2 class="hasAnchor">
+<a href="#usage" class="anchor"></a>Usage</h2>
+<p>Here we will provide a short example showing how the <em>surveyvoi R</em> package can be used to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (temred “survey schemes”) using simulated data for 6 sites and 3 conservation features (e.g. bird species). To start off, we will set the seed for the random number generator to ensure you get the same results as shown here, and load some R packages.</p>
+<div class="sourceCode"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">500</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">surveyvoi</span>) <span class="co"># package for value of information analysis</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)     <span class="co"># package for preparing data</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyr</span>)     <span class="co"># package for preparing data</span>
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)   <span class="co"># package for plotting data</span></pre></div>
+<p>Now we will load some datasets that are distributed with the package. First, we will load the <code>sim_sites</code> object. This spatially explicit dataset (i.e. <code>sf</code>) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the <code>"management_cost"</code> column indicates the cost of protecting each site; <code>"survey_cost"</code> column the cost of conducting an ecological survey within each site; and <code>"e1"</code> and <code>"e2"</code> columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The <code>"n1"</code>, <code>"n2"</code>, and <code>"n3"</code> columns indicate the number of surveys conducted within each site that looked for each of the 3 features (respectively); and <code>"f1"</code>, <code>"f2"</code>, and <code>"f3"</code> columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if <code>"n1"</code> has a value of 2 and <code>"f1"</code> has a value of 0.5 for a given site, then the feature <code>"f1"</code> was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the <code>"p1"</code>, <code>"p2"</code>, and <code>"p3"</code> columns contain modelled probability estimates of each species being present in each site (see <code>fit_hglm_occupancy_models</code> or <code>fit_xgb_occupancy_models</code> to generate such estimates for your own data).</p>
+<div class="sourceCode"><pre class="r"><span class="co"># load data</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">sim_sites</span>)
+
+<span class="co"># print table</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">sim_sites</span>, <span class="kw">width</span> <span class="kw">=</span> <span class="fl">Inf</span>)</pre></div>
+<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r">## Simple feature collection with 6 features and 13 fields
+## geometry type:  POINT
+## dimension:      XY
+## bbox:           xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
+## CRS:            NA
+## # A tibble: 6 x 14
+##   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
+##         &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1        3.43            43.8     1 1     0         5     5     5 -1.38   0.425
+## 2        6.07            59.0     0 0     0         0     0     0  0.736 -1.01 
+## 3        7.09            46.7     0 0     0         0     0     0  0.754 -0.959
+## 4        6.50            49.6     0 0     0         0     0     0  0.530  1.51 
+## 5        5.37            48.1     0 0     0         0     0     0  0.546 -0.525
+## 6        3.35            48.9     1 0.667 0.333     3     3     3 -1.18   0.557
+##      p1    p2    p3               geometry
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;                &lt;POINT&gt;
+## 1 0.941 0.999 0.057  (0.1589075 0.8637977)
+## 2 0.36  0.006 0.259  (0.9764926 0.7485368)
+## 3 0.337 0.006 0.305  (0.8362375 0.2282762)
+## 4 0.048 0.579 0.998     (0.10513 0.179855)
+## 5 0.335 0.032 0.488 (0.5985786 0.04556193)
+## 6 0.896 0.998 0.145  (0.1504241 0.6821156)</code></pre></div>
+<div class="sourceCode"><pre class="r"><span class="co"># plot cost of protecting each site</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">sim_sites</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">management_cost</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"management_cost"</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.title</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>())</pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="r"><span class="co"># plot cost of conducting an additional survey in each site</span>
+<span class="co"># note that these costs are much lower than the protection costs</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">sim_sites</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">survey_cost</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"survey_cost"</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.title</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>())</pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="r"><span class="co"># plot survey data</span>
+<span class="co">## n1, n2, n3: number of surveys in each site that looked for each feature</span>
+<span class="no">sim_sites</span> <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">n1</span>, <span class="no">n2</span>, <span class="no">n3</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">name</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~<span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>)</pre></div>
+<p><img src="reference/figures/README-n_plot-1.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="r"><span class="co">## f1, f2, f3: proportion of surveys in each site that looked for each feature</span>
+<span class="co">##             that detected the feature</span>
+<span class="no">sim_sites</span> <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">f1</span>, <span class="no">f2</span>, <span class="no">f3</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">name</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~<span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html">scale_color_continuous</a></span>(<span class="kw">limits</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>))</pre></div>
+<p><img src="reference/figures/README-f_plot-1.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode"><pre class="r"><span class="co"># plot modelled probability of occupancy data</span>
+<span class="no">sim_sites</span> <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">p1</span>, <span class="no">p2</span>, <span class="no">p3</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span>(<span class="no">name</span>, <span class="no">value</span>, -<span class="no">geometry</span>) <span class="kw">%&gt;%</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>() +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">value</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~<span class="no">name</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">1</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html">scale_color_continuous</a></span>(<span class="kw">limits</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0</span>, <span class="fl">1</span>))</pre></div>
+<p><img src="reference/figures/README-p_plot-1.png" style="display: block; margin: auto;"></p>
+<p>Next, we will load the <code>sim_features</code> object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the <code>"name"</code> column contains the name of each feature; <code>"survey"</code> column indicates whether future surveys would look for this species; <code>"survey_sensitivity"</code> and <code>"survey_specificity"</code> columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature; <code>"model_sensitivity"</code> and <code>"model_specificity"</code> columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and <code>"target"</code> column denotes the required number of protected sites for each feature to be present within (termed “representation target”, each feature has a target of <code>sim_sites$target[1]</code> sites).</p>
+<div class="sourceCode"><pre class="r"><span class="co"># load data</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="no">sim_features</span>)
+
+<span class="co"># print table</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">sim_features</span>, <span class="kw">width</span> <span class="kw">=</span> <span class="fl">Inf</span>)</pre></div>
+<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r">## # A tibble: 3 x 7
+##   name  survey survey_sensitivity survey_specificity model_sensitivity
+##   &lt;chr&gt; &lt;lgl&gt;               &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;
+## 1 f1    TRUE                0.954              0.886             0.718
+## 2 f2    TRUE                0.974              0.875             0.705
+## 3 f3    TRUE                0.956              0.823             0.768
+##   model_specificity target
+##               &lt;dbl&gt;  &lt;dbl&gt;
+## 1             0.811      1
+## 2             0.860      1
+## 3             0.887      1</code></pre></div>
+<p>After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use <code>approx_optimal_survey_scheme</code> function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. <code>optimal_survey_scheme</code>), they can take a very long time to complete (because they use a brute-force approach to optimize return on investment).</p>
+<p>To perform this optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different conservation plans depending on available funds. For instance, if you have infinite funds then you wouldn’t bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you would need to use all of those funds for protecting sites since conducting surveys would only diminish reduce available funds. It is somewhere between these two extremes that conducting additional surveys actually improves a conservation plan. For brevity, here we will set the total budget as 80% of the total costs for protecting sites.</p>
+<div class="sourceCode"><pre class="r"><span class="co"># calculate budget</span>
+<span class="no">budget</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="fl">0.8</span> * <span class="no">sim_sites</span>$<span class="no">management_cost</span>)
+
+<span class="co"># generate optimized survey scheme</span>
+<span class="no">opt_scheme</span> <span class="kw">&lt;-</span>
+  <span class="fu"><a href="reference/approx_optimal_survey_scheme.html">approx_optimal_survey_scheme</a></span>(
+    <span class="kw">site_data</span> <span class="kw">=</span> <span class="no">sim_sites</span>,
+    <span class="kw">feature_data</span> <span class="kw">=</span> <span class="no">sim_features</span>,
+    <span class="kw">site_detection_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"f1"</span>, <span class="st">"f2"</span>, <span class="st">"f3"</span>),
+    <span class="kw">site_n_surveys_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"n1"</span>, <span class="st">"n2"</span>, <span class="st">"n3"</span>),
+    <span class="kw">site_probability_columns</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>),
+    <span class="kw">site_management_cost_column</span> <span class="kw">=</span> <span class="st">"management_cost"</span>,
+    <span class="kw">site_survey_cost_column</span> <span class="kw">=</span> <span class="st">"survey_cost"</span>,
+    <span class="kw">feature_survey_column</span> <span class="kw">=</span> <span class="st">"survey"</span>,
+    <span class="kw">feature_survey_sensitivity_column</span> <span class="kw">=</span> <span class="st">"survey_sensitivity"</span>,
+    <span class="kw">feature_survey_specificity_column</span> <span class="kw">=</span> <span class="st">"survey_specificity"</span>,
+    <span class="kw">feature_model_sensitivity_column</span> <span class="kw">=</span> <span class="st">"model_sensitivity"</span>,
+    <span class="kw">feature_model_specificity_column</span> <span class="kw">=</span> <span class="st">"model_specificity"</span>,
+    <span class="kw">feature_target_column</span> <span class="kw">=</span> <span class="st">"target"</span>,
+    <span class="kw">total_budget</span> <span class="kw">=</span> <span class="no">budget</span>,
+    <span class="kw">survey_budget</span> <span class="kw">=</span> <span class="no">budget</span>,
+    <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">TRUE</span>)</pre></div>
+<div class="sourceCode"><pre class="r"><span class="co"># the opt_scheme object is a matrix that contains the survey schemes</span>
+<span class="co"># each column corresponds to a different site,</span>
+<span class="co"># and each row corresponds to a different solution</span>
+<span class="co"># in the event that there are multiple optimal survey schemes, then this</span>
+<span class="co"># matrix will have multiple rows</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">opt_scheme</span>))</pre></div>
+<div class="sourceCode"><pre class="sourceCode R"><code class="sourceCode r">##  logi [1, 1:6] FALSE TRUE TRUE TRUE FALSE FALSE
+##  - attr(*, "ev")= num [1, 1:100] 2.92 2.92 2.92 2.92 2.92 ...
+## NULL</code></pre></div>
+<div class="sourceCode"><pre class="r"><span class="co"># let's add the first solution (row) in opt_scheme to the site data to plot it</span>
+<span class="no">sim_sites</span>$<span class="no">scheme</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">opt_scheme</span>[<span class="fl">1</span>, ])
+
+<span class="co"># plot scheme</span>
+<span class="co"># TRUE = selected for an additional ecological survey</span>
+<span class="co"># FALSE = not selected</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">sim_sites</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">scheme</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">4</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span>(<span class="st">"scheme"</span>) +
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.title</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>())</pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;"></p>
+<p>This has just been a taster of the <em>surveyvoi R</em> package. For more information, see the <a href="https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html">package vignette</a>.</p>
+</div>
+<div id="getting-help" class="section level2">
+<h2 class="hasAnchor">
+<a href="#getting-help" class="anchor"></a>Getting help</h2>
+<p>If you have any questions about using the <em>surveyvoi R</em> package or suggestions for improving it, please <a href="https://github.com/jeffreyhanson/surveyvoi/issues/new">file an issue at the package’s online code repository</a>.</p>
 </div>
 </div>
   </div>
@@ -141,6 +282,10 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/Lifecycle-experimental-orange.svg" alt="lifecycle"></a></li>
+<li><a href="https://travis-ci.org/jeffreyhanson/surveyvoi"><img src="https://img.shields.io/travis/jeffreyhanson/surveyvoi/master.svg?label=Linux%20%26%20Mac%20OSX" alt="Travis Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/jeffreyhanson/surveyvoi"><img src="https://img.shields.io/appveyor/ci/jeffreyhanson/surveyvoi/master.svg?label=Windows" alt="AppVeyor Build Status"></a></li>
+<li><a href="https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master"><img src="https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master" alt="Coverage Status"></a></li>
+<li><a href="https://CRAN.R-project.org/package=surveyvoi"><img src="http://www.r-pkg.org/badges/version/surveyvoi" alt="CRAN_Status_Badge"></a></li>
 </ul>
 </div>
 </div>
