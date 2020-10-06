@@ -10,13 +10,13 @@ model {
 
   # priors
   for (i in 1:n_vars) {
-    coefs_raw[i] ~ dnorm(0, 2.5) # raw model coefficients
-    ss[i] ~ dbern(0.5)           # spike-and-slab variable selection terms
+    coefs_raw[i] ~ dnorm(0, 0.001) # raw model coefficients
+    ss[i] ~ dbern(0.5)             # spike-and-slab variable selection terms
   }
 
   # transformed parameters
   for (i in 1:n_vars) {
-    coefs[i] <- coefs_raw[i] * ss[i] # raw model coefficients
+    coefs[i] <- coefs_raw[i] * ss[i] # model coefficients
   }
   for (i in 1:train_n_sites) {
     logit(yhat[i]) <- coefs %*% train_model_matrix[i, ]
