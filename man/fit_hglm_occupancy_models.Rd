@@ -170,8 +170,9 @@ Estimate probability of occupancy for a set of features in a set of
 planning units. Models are fitted as hierarchical generalized linear models
 that account for for imperfect detection (following Royle & Link 2006)
 using JAGS (via \code{\link[runjags]{run.jags}}). To limit over-fitting,
-spike-and-slab coefficients are used
-to perform stochastic search variable selection (Kuo & Mallick 1998).
+covariate coefficients are sampled using a Laplace prior distribution
+(equivalent to L1 regularization used in machine learning contexts)
+(Park & Casella 2008).
 }
 \details{
 This function (i) prepares the data for model fitting,
@@ -237,8 +238,8 @@ print(results$performance, width = Inf)
 }
 }
 \references{
-Kuo L & Mallick B (1998) Variable selection for regression models.
-\emph{Sankhyā: The Indian Journal of Statistics, Series B}, 60: 65--81.
+Park T & Casella G (2008) The Bayesian lasso.
+\emph{Journal of the American Statistical Association}, 103: 681--686.
 
 Royle JA & Link WA (2006) Generalized site occupancy models allowing for
 false positive and false negative errors. \emph{Ecology}, 87: 835--841.

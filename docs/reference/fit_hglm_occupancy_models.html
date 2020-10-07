@@ -44,8 +44,9 @@
 planning units. Models are fitted as hierarchical generalized linear models
 that account for for imperfect detection (following Royle &amp;amp; Link 2006)
 using JAGS (via run.jags). To limit over-fitting,
-spike-and-slab coefficients are used
-to perform stochastic search variable selection (Kuo &amp;amp; Mallick 1998)." />
+covariate coefficients are sampled using a Laplace prior distribution
+(equivalent to L1 regularization used in machine learning contexts)
+(Park &amp;amp; Casella 2008)." />
 
 
 
@@ -77,7 +78,7 @@ to perform stochastic search variable selection (Kuo &amp;amp; Mallick 1998)." /
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.75</span>
       </span>
     </div>
 
@@ -138,8 +139,9 @@ to perform stochastic search variable selection (Kuo &amp;amp; Mallick 1998)." /
 planning units. Models are fitted as hierarchical generalized linear models
 that account for for imperfect detection (following Royle &amp; Link 2006)
 using JAGS (via <code><a href='https://rdrr.io/pkg/runjags/man/run.jags.html'>run.jags</a></code>). To limit over-fitting,
-spike-and-slab coefficients are used
-to perform stochastic search variable selection (Kuo &amp; Mallick 1998).</p>
+covariate coefficients are sampled using a Laplace prior distribution
+(equivalent to L1 regularization used in machine learning contexts)
+(Park &amp; Casella 2008).</p>
     </div>
 
     <pre class="usage"><span class='fu'>fit_hglm_occupancy_models</span>(
@@ -352,15 +354,17 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
 
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Kuo L &amp; Mallick B (1998) Variable selection for regression models.
-<em>Sankhyā: The Indian Journal of Statistics, Series B</em>, 60: 65--81.</p>
+    <p>Park T &amp; Casella G (2008) The Bayesian lasso.
+<em>Journal of the American Statistical Association</em>, 103: 681--686.</p>
 <p>Royle JA &amp; Link WA (2006) Generalized site occupancy models allowing for
 false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)</div><div class='output co'>#&gt; <span class='message'>Loading required package: sp</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: RandomFieldsUtils</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘RandomFields’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:RandomFieldsUtils’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    RFoptions</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
 <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
@@ -379,15 +383,13 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt;   ## matrix[train_n_sites, max(train_n_obs)] train_obs
 #&gt; 
 #&gt;   # priors
-#&gt;   for (i in 1:n_vars) {
-#&gt;     coefs_raw[i] ~ dnorm(0, 2.5) # raw model coefficients
-#&gt;     ss[i] ~ dbern(0.5)           # spike-and-slab variable selection terms
+#&gt;   lambda ~ dunif(0.001, 10)     # regularization parameter
+#&gt;   coefs[1] ~ dnorm(0, 0.001)    # intercept parameter
+#&gt;   for (i in 2:n_vars) {
+#&gt;     coefs[i] ~ ddexp(0, lambda) # covariate parameters
 #&gt;   }
 #&gt; 
 #&gt;   # transformed parameters
-#&gt;   for (i in 1:n_vars) {
-#&gt;     coefs[i] &lt;- coefs_raw[i] * ss[i] # raw model coefficients
-#&gt;   }
 #&gt;   for (i in 1:train_n_sites) {
 #&gt;     logit(yhat[i]) &lt;- coefs %*% train_model_matrix[i, ]
 #&gt;   }
@@ -754,36 +756,36 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt; Calculating the Gelman-Rubin statistic for 3 variables....</div><div class='input'>
 <span class='co'># print model predictions</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
-#&gt;       f1    f2
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.488 0.685
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.448 0.706
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.515 0.557
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.442 0.678
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.521 0.433
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.495 0.342
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.500 0.622
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.496 0.497
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.520 0.456
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.527 0.406
-#&gt; </span><span style='color: #555555;'># ... with 20 more rows</span><span></div><div class='input'>
+#&gt;        f1          f2
+#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
+#&gt; </span><span style='color: #555555;'> 1</span><span> 0.868  1.00       
+#&gt; </span><span style='color: #555555;'> 2</span><span> 0.405  1.00       
+#&gt; </span><span style='color: #555555;'> 3</span><span> 0.933  0.999      
+#&gt; </span><span style='color: #555555;'> 4</span><span> 0.275  1.00       
+#&gt; </span><span style='color: #555555;'> 5</span><span> 0.634  0.002</span><span style='text-decoration: underline;'>30</span><span>    
+#&gt; </span><span style='color: #555555;'> 6</span><span> 0.020</span><span style='text-decoration: underline;'>5</span><span> 0.000</span><span style='text-decoration: underline;'>000</span><span>117
+#&gt; </span><span style='color: #555555;'> 7</span><span> 0.903  1.00       
+#&gt; </span><span style='color: #555555;'> 8</span><span> 0.447  0.251      
+#&gt; </span><span style='color: #555555;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     
+#&gt; </span><span style='color: #555555;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   
+#&gt; </span><span style='color: #555555;'># … with 20 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 14</span><span>
 #&gt;   feature max_mpsrf train_tss_mean train_tss_std train_sensitivity_mean
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1           1.04          0.356         0.328                  0.670
-#&gt; </span><span style='color: #555555;'>2</span><span> f2           1.03          0.451         0.116                  0.573
+#&gt; </span><span style='color: #555555;'>1</span><span> f1           3.17          0.716        0.320                   0.859
+#&gt; </span><span style='color: #555555;'>2</span><span> f2           1.15          0.432        0.089</span><span style='text-decoration: underline;'>5</span><span>                  0.555
 #&gt;   train_sensitivity_std train_specificity_mean train_specificity_std
 #&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                 0.175                  0.686                0.190 
-#&gt; </span><span style='color: #555555;'>2</span><span>                 0.117                  0.878                0.062</span><span style='text-decoration: underline;'>9</span><span>
+#&gt; </span><span style='color: #555555;'>1</span><span>                0.249                   0.857                0.091</span><span style='text-decoration: underline;'>5</span><span>
+#&gt; </span><span style='color: #555555;'>2</span><span>                0.087</span><span style='text-decoration: underline;'>5</span><span>                  0.877                0.063</span><span style='text-decoration: underline;'>3</span><span>
 #&gt;   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
 #&gt;           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>         0.114        0.388                 0.628                0.127
+#&gt; </span><span style='color: #555555;'>1</span><span>         0.393        0.729                 0.717                0.439
 #&gt; </span><span style='color: #555555;'>2</span><span>         0.519        0.310                 0.613                0.341
 #&gt;   test_specificity_mean test_specificity_std
 #&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                 0.486                0.355
+#&gt; </span><span style='color: #555555;'>1</span><span>                 0.675                0.351
 #&gt; </span><span style='color: #555555;'>2</span><span>                 0.905                0.155</div><div class='input'># }
 </div></span></pre>
   </div>

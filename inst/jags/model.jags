@@ -9,15 +9,13 @@ model {
   ## matrix[train_n_sites, max(train_n_obs)] train_obs
 
   # priors
-  for (i in 1:n_vars) {
-    coefs_raw[i] ~ dnorm(0, 0.001) # raw model coefficients
-    ss[i] ~ dbern(0.5)             # spike-and-slab variable selection terms
+  lambda ~ dunif(0.001, 10)     # regularization parameter
+  coefs[1] ~ dnorm(0, 0.001)    # intercept parameter
+  for (i in 2:n_vars) {
+    coefs[i] ~ ddexp(0, lambda) # covariate parameters
   }
 
   # transformed parameters
-  for (i in 1:n_vars) {
-    coefs[i] <- coefs_raw[i] * ss[i] # model coefficients
-  }
   for (i in 1:train_n_sites) {
     logit(yhat[i]) <- coefs %*% train_model_matrix[i, ]
   }
