@@ -355,7 +355,7 @@ fit_hglm_occupancy_models <- function(
   }
 
   saveRDS(list(m_raw = m_raw, model_cmbs = model_cmbs), "debug.rds", compress="xz")
-  
+
   # combine models into single model object (quietly)
   m <- lapply(seq_len(nrow(feature_data)), function(i) {
     lapply(seq_len(n_folds[i]), function(k) {
@@ -457,13 +457,18 @@ fit_hglm_model <- function(data, survey_sensitivity, survey_specificity,
     spec = survey_specificity,
     train_model_matrix = data$x,
     train_obs = data$y)
+  # set JAGS RNG
+  withr::with_seed(seed, {
+    jags_inits <- list(.RNG.name="base::Wichmann-Hill",
+                       .RNG.seed = sample.int(1e+5, 1))
+  })
   # run JAGS
   suppressWarnings({withr::with_seed(seed, {
     runjags::run.jags(
       model = system.file("jags", "model.jags", package = "surveyvoi"),
       data = jags_data, monitor = c("coefs"),
       n.chains = 1, sample = n_samples, burnin = n_burnin,
-      thin = n_thin, adapt = n_adapt)
+      thin = n_thin, adapt = n_adapt, inits = list(jags_inits))
   })})
 }
 
