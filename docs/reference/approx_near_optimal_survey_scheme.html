@@ -75,7 +75,7 @@ and a greedy heuristic algorithm to maximize this metric." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -170,11 +170,11 @@ and a greedy heuristic algorithm to maximize this metric.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>base::data.frame()</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_detection_columns</th>
@@ -256,8 +256,8 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -268,8 +268,8 @@ feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_target_column</th>
@@ -331,7 +331,7 @@ Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
 the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to <code>NULL</code> such that prior data is calculated automatically
-using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></td>
+using <code><a href='prior_probability_matrix.html'>prior_probability_matrix()</a></code>.</p></td>
     </tr>
     <tr>
       <th>n_approx_replicates</th>
@@ -377,7 +377,7 @@ scheme and the greedy heuristic algorithm is provided for such cases.
 The greedy heuristic algorithm -- unlike the brute force algorithm --
 is not guaranteed to identify an optimal solution -- or even a "relatively
 good solution" for that matter -- though greedy heuristic algorithms tend to
-deliver solutions that are 15% from optimality. Specifically, this
+deliver solutions that are 15\<!-- % from optimality. Specifically, this -->
 greedy algorithms is implemented as:</p>
 <ol>
 <li><p>Initialize an empty <em>list of survey scheme solutions</em>, and an

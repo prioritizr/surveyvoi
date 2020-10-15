@@ -127,7 +127,7 @@ using \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.}
 \code{numeric} value.
 }
 \description{
-Calculate the \emph{expected value of the conservation management decision
+Calculate the \emph{expected value of the management decision
 given current information}. This metric describes the value of the management
 decision that is expected when the decision maker is limited to
 existing biodiversity data (i.e. survey data and environmental niche models).

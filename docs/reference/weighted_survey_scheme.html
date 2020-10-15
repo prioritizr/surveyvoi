@@ -73,7 +73,7 @@ overall weight value, a maximum budget for the survey scheme." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -149,7 +149,7 @@ overall weight value, a maximum budget for the survey scheme.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object containing the candidate survey
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object containing the candidate survey
 sites.</p></td>
     </tr>
     <tr>
@@ -196,19 +196,19 @@ printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>matrix</code> of <code>logical</code> (<code>TRUE</code>/ <code>FALSE</code>)
-  values indicating if a site is selected in a scheme or not. Columns
-  correspond to sites, and rows correspond to different schemes.</p>
+values indicating if a site is selected in a scheme or not. Columns
+correspond to sites, and rows correspond to different schemes.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Let \(J\) denote the set of sites (indexed by \(j\)), and let
-  \(b\) denote the maximum budget available for surveying the sites.
-  Next, let \(c_j\) represent the cost of surveying each site
-  \(j \in J\), and \(w_j\) denote the relative value (weight) for
-  surveying each site \(j \in J\). The set of sites with the greatest
-  overall weight values, subject to a given budget can the be identified by
-  solving the following integer programming problem. Here,
-  \(x_j\) is the binary decision variable indicating each if site
-  is selected in the survey scheme or not.</p>
+\(b\) denote the maximum budget available for surveying the sites.
+Next, let \(c_j\) represent the cost of surveying each site
+\(j \in J\), and \(w_j\) denote the relative value (weight) for
+surveying each site \(j \in J\). The set of sites with the greatest
+overall weight values, subject to a given budget can the be identified by
+solving the following integer programming problem. Here,
+\(x_j\) is the binary decision variable indicating each if site
+is selected in the survey scheme or not.</p>
 <p>$$\mathit{Maximize} \space \sum_{j \in J} x_j w_i \\
   \mathit{subject \space to} \\
   \sum_{j \in J} x_j c_j \leq b$$</p>

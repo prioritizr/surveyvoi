@@ -73,7 +73,7 @@ conditions that are surveyed." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -151,7 +151,7 @@ conditions that are surveyed.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object containing the candidate survey
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object containing the candidate survey
 sites.</p></td>
     </tr>
     <tr>
@@ -175,7 +175,7 @@ variables. No missing (<code>NA</code>) values are permitted.</p></td>
       <th>method</th>
       <td><p><code>character</code> name of the distance metric to use for
 calculating environmental dissimilarity scores. See
-<code><a href='https://rdrr.io/pkg/vegan/man/vegdist.html'>vegdist</a></code> documentation the <code>method</code> parameter
+<code><a href='https://rdrr.io/pkg/vegan/man/vegdist.html'>vegan::vegdist()</a></code> documentation the <code>method</code> parameter
 for other available distance metrics and more information.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>"mahalanobis"</code> for Mahalanobis distances.</p></td>
@@ -214,13 +214,13 @@ printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>matrix</code> of <code>logical</code> (<code>TRUE</code>/ <code>FALSE</code>)
-  values indicating if a site is selected in a scheme or not. Columns
-  correspond to sites, and rows correspond to different schemes.</p>
+values indicating if a site is selected in a scheme or not. Columns
+correspond to sites, and rows correspond to different schemes.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The integer programming formulation of the environmental diversity
-  reserve selection problem (Faith &amp; Walker 1996) is used to generate survey
-  schemes.</p>
+reserve selection problem (Faith &amp; Walker 1996) is used to generate survey
+schemes.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Faith DP &amp; Walker PA (1996) Environmental diversity: on the best-possible

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -203,30 +203,30 @@ to <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.
- The <code>"management_cost"</code> column contains the site protection costs,
- and the <code>"survey_cost"</code> column contains the costs for surveying
- each site.
- Additionally, columns that start with
- (i) <code>"f"</code> (e.g. <code>"f1"</code>) contain the proportion of
-  times that each feature was detected in each site,
- (ii) <code>"n"</code> (e.g. <code>"n1"</code>) contain the number of
-  of surveys for each feature within each site,
- (iii) <code>"p"</code> (e.g. <code>"p1"</code>) contain prior
- probability data,  and
- (iv) <code>"e"</code> (e.g. <code>"e1"</code>) contain environmental
- data. Note that columns that contain the same integer value (excepting
- environmental data columns) correspond to the same feature
- (e.g. <code>"d1"</code>, <code>"n1"</code>, <code>"p1"</code> contain data that correspond
- to the same feature).</p>
+    <p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.
+The <code>"management_cost"</code> column contains the site protection costs,
+and the <code>"survey_cost"</code> column contains the costs for surveying
+each site.
+Additionally, columns that start with
+(i) <code>"f"</code> (e.g. <code>"f1"</code>) contain the proportion of
+times that each feature was detected in each site,
+(ii) <code>"n"</code> (e.g. <code>"n1"</code>) contain the number of
+of surveys for each feature within each site,
+(iii) <code>"p"</code> (e.g. <code>"p1"</code>) contain prior
+probability data,  and
+(iv) <code>"e"</code> (e.g. <code>"e1"</code>) contain environmental
+data. Note that columns that contain the same integer value (excepting
+environmental data columns) correspond to the same feature
+(e.g. <code>"d1"</code>, <code>"n1"</code>, <code>"p1"</code> contain data that correspond
+to the same feature).</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The data are simulated using random fields
-(<code><a href='https://rdrr.io/pkg/RandomFields/man/RFsimulate.html'>RFsimulate</a></code>) to provide spatially auto-correlated
+(<code><a href='https://rdrr.io/pkg/RandomFields/man/RFsimulate.html'>RandomFields::RFsimulate()</a></code>) to provide spatially auto-correlated
 simulations.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='simulate_feature_data.html'>simulate_feature_data</a></code></p></div>
+    <div class='dont-index'><p><code><a href='simulate_feature_data.html'>simulate_feature_data()</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seed for reproducibility</span>

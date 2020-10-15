@@ -1,9 +1,10 @@
 #' Approximate expected value of the decision given survey information
 #'
-#' Calculate the *expected value of the conservation management decision
+#' Calculate the *expected value of the management decision
 #' given survey information*. This metric describes the value of the management
 #' decision that is expected when the decision maker conducts a surveys a
-#' set of sites to inform the decision.
+#' set of sites to inform the decision. To speed up the calculations,
+#' an approximation method is used.
 #'
 #' @inheritParams evdsi
 #'
@@ -18,9 +19,7 @@
 #'  Defaults to 500.
 #'
 #' @details This function uses approximation methods to estimate the
-#'   expected value calculations. As such, you will need to ensure that
-#'   the same seed is used when comparing results to other functions that
-#'   use approximation methods. Additionally, the accuracy of these
+#'   expected value calculations. The accuracy of these
 #'   calculations depend on the arguments to
 #'   `n_approx_replicates` and `n_approx_outcomes_per_replicate`, and
 #'   so you may need to increase these parameters for large problems.

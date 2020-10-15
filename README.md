@@ -1,7 +1,7 @@
 
 <!--- README.md is generated from README.Rmd. Please edit that file -->
-Survey Value of Information
-===========================
+surveyvoi: Survey Value of Information
+======================================
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) [![Travis Build Status](https://img.shields.io/travis/jeffreyhanson/surveyvoi/master.svg?label=Linux%20%26%20Mac%20OSX)](https://travis-ci.org/jeffreyhanson/surveyvoi) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jeffreyhanson/surveyvoi/master.svg?label=Windows)](https://ci.appveyor.com/project/jeffreyhanson/surveyvoi) [![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
@@ -22,7 +22,7 @@ Citation
 
 Please cite the *surveyvoi R* package when using it in publications. To cite the latest development version, please use:
 
-> Hanson JO, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 0.0.63. Available at <https://github.com/jeffreyhanson/surveyvoi>.
+> Hanson JO, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 0.0.8. Available at <https://github.com/jeffreyhanson/surveyvoi>.
 
 Usage
 -----

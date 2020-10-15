@@ -76,7 +76,7 @@ compared to each other." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -147,7 +147,7 @@ compared to each other.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>site_probability_columns</th>
@@ -163,7 +163,7 @@ values are permitted in these columns.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>numeric</code> <code>vector</code> of uncertainty scores. Note that
- these values are automatically rescaled between 0.01 and 1.</p>
+these values are automatically rescaled between 0.01 and 1.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The relative site uncertainty scores are calculated as joint Shannon's
@@ -172,14 +172,14 @@ other, we can calculate these statistics separately for each species in each
 site and then sum together the statistics for species in the same site:</p>
 <ol>
 <li><p>Let \(J\) denote the set of sites (indexed by \(j\)),
-  \(I\) denote the set of features (indexed by \(i\)), and
-  \(x_{ij}\) denote the modelled probability of feature \(i \in I\)
-  occurring in planning units \(j \in J\).</p></li>
+\(I\) denote the set of features (indexed by \(i\)), and
+\(x_{ij}\) denote the modelled probability of feature \(i \in I\)
+occurring in planning units \(j \in J\).</p></li>
 <li><p>Next, we will calculate the Shannon's entropy statistic for each
-  species in each site:
-  \(y_{ij} = - \big( (x_ij \mathit{log}_2 x_{ij}) + (1 - x_ij \mathit{log}_2 1 - x_{ij}) \big) \)</p></li>
+species in each site:
+\(y_{ij} = - \big( (x_ij \mathit{log}_2 x_{ij}) + (1 - x_ij \mathit{log}_2 1 - x_{ij}) \big) \)</p></li>
 <li><p>Finally, we will sum the entropy statistics together for each site:
-  \(s_{j} = \sum_{i \in I} y_{ij}\)</p></li>
+\(s_{j} = \sum_{i \in I} y_{ij}\)</p></li>
 </ol>
 
 

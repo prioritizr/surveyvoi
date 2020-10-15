@@ -1,9 +1,9 @@
 #' Expected value of the decision given survey information
 #'
-#' Calculate the *expected value of the conservation management decision
+#' Calculate the *expected value of the management decision
 #' given survey information*. This metric describes the value of the management
-#' decision that is expected when the decision maker conducts a surveys a
-#' set of sites to inform the decision.
+#' decision that is expected when the decision maker surveys a
+#' set of sites to help inform the decision.
 #'
 #' @inheritParams fit_xgb_occupancy_models
 #'

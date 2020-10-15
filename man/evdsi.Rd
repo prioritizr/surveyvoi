@@ -151,10 +151,10 @@ using \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.}
 \code{numeric} value.
 }
 \description{
-Calculate the \emph{expected value of the conservation management decision
+Calculate the \emph{expected value of the management decision
 given survey information}. This metric describes the value of the management
-decision that is expected when the decision maker conducts a surveys a
-set of sites to inform the decision.
+decision that is expected when the decision maker surveys a
+set of sites to help inform the decision.
 }
 \details{
 This function calculates the expected value and does not

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -149,11 +149,11 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>base::data.frame()</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_detection_columns</th>
@@ -209,8 +209,8 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -221,16 +221,16 @@ feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>matrix</code> object containing the prior probabilities of each
-  feature occupying each site. Each row corresponds to a different
-  feature and each column corresponds to a different site.</p>
+feature occupying each site. Each row corresponds to a different
+feature and each column corresponds to a different site.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>

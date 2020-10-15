@@ -75,7 +75,7 @@ matrices cannot be compared to each other." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -145,7 +145,7 @@ matrices cannot be compared to each other.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>site_probability_columns</th>
@@ -161,20 +161,20 @@ values are permitted in these columns.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>numeric</code> <code>vector</code> of richness scores. Note that
- these values are automatically rescaled between 0.01 and 1.</p>
+these values are automatically rescaled between 0.01 and 1.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The relative site richness scores are calculated using the following
 procedure:</p>
 <ol>
 <li><p>Let \(J\) denote the set of sites (indexed by \(j\)),
-  \(I\) denote the set of features (indexed by \(i\)), and
-  \(x_{ij}\) denote the modelled probability of feature \(i \in I\)
-  occurring in planning units \(j \in J\).</p></li>
+\(I\) denote the set of features (indexed by \(i\)), and
+\(x_{ij}\) denote the modelled probability of feature \(i \in I\)
+occurring in planning units \(j \in J\).</p></li>
 <li><p>Next, we will sum the values for each site:
-  \(y_j = \sum_{i \in I} x_{ij}\).</p></li>
+\(y_j = \sum_{i \in I} x_{ij}\).</p></li>
 <li><p>Finally, we will linearly rescale the \(y_j\) values between 0.01
-  and 1 to produce the scores.</p></li>
+and 1 to produce the scores.</p></li>
 </ol>
 
 

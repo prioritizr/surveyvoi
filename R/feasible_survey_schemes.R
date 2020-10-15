@@ -4,7 +4,7 @@ NULL
 #' Find all feasible survey schemes
 #'
 #' Generate a `matrix` representing all possible different
-#' survey schemes given surveying costs and a fixed budget.
+#' survey schemes given survey costs and a fixed budget.
 #'
 #' @inheritParams env_div_survey_scheme
 #'

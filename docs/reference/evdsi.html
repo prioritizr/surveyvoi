@@ -40,10 +40,10 @@
 
 
 <meta property="og:title" content="Expected value of the decision given survey information — evdsi" />
-<meta property="og:description" content="Calculate the expected value of the conservation management decision
+<meta property="og:description" content="Calculate the expected value of the management decision
 given survey information. This metric describes the value of the management
-decision that is expected when the decision maker conducts a surveys a
-set of sites to inform the decision." />
+decision that is expected when the decision maker surveys a
+set of sites to help inform the decision." />
 
 
 
@@ -75,7 +75,7 @@ set of sites to inform the decision." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -132,10 +132,10 @@ set of sites to inform the decision." />
     </div>
 
     <div class="ref-description">
-    <p>Calculate the <em>expected value of the conservation management decision
+    <p>Calculate the <em>expected value of the management decision
 given survey information</em>. This metric describes the value of the management
-decision that is expected when the decision maker conducts a surveys a
-set of sites to inform the decision.</p>
+decision that is expected when the decision maker surveys a
+set of sites to help inform the decision.</p>
     </div>
 
     <pre class="usage"><span class='fu'>evdsi</span>(
@@ -164,11 +164,11 @@ set of sites to inform the decision.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>base::data.frame()</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_detection_columns</th>
@@ -259,8 +259,8 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -271,8 +271,8 @@ feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_target_column</th>
@@ -317,7 +317,7 @@ conservation. Defaults to <code>NULL</code> such that no sites are locked out.</
 the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to <code>NULL</code> such that prior data is calculated automatically
-using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></td>
+using <code><a href='prior_probability_matrix.html'>prior_probability_matrix()</a></code>.</p></td>
     </tr>
     </table>
 
@@ -327,11 +327,11 @@ using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function calculates the expected value and does not
- use approximation methods. As such, this function can only be applied
- to very small problems.</p>
+use approximation methods. As such, this function can only be applied
+to very small problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></div>
+    <div class='dont-index'><p><code><a href='prior_probability_matrix.html'>prior_probability_matrix()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
@@ -362,13 +362,13 @@ using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a>
 #&gt; </span><span style='color: #555555;'> 8</span><span>        3.43            69.8   0.4     1     5     5  0.077</span><span style='text-decoration: underline;'>8</span><span> -</span><span style='color: #BB0000;'>0.443</span><span>  1.27 
 #&gt; </span><span style='color: #555555;'> 9</span><span>        3.62            65.0   1       1     1     1  0.270   0.835  0.497
 #&gt; </span><span style='color: #555555;'>10</span><span>        3.68            63.1   1       0     3     3  0.657   1.18   0.366
-#&gt; </span><span style='color: #555555;'># ... with 20 more rows, and 3 more variables: p1 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
+#&gt; </span><span style='color: #555555;'># … with 20 more rows, and 3 more variables: p1 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
 #&gt; </span><span style='color: #555555;'>#   geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
-#&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
+#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.950            0.867            0.745
 #&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.960            0.820            0.791
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># … with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
  <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>

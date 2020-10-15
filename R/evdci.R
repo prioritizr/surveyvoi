@@ -1,6 +1,6 @@
 #' Expected value of the decision given current information
 #'
-#' Calculate the *expected value of the conservation management decision
+#' Calculate the *expected value of the management decision
 #' given current information*. This metric describes the value of the management
 #' decision that is expected when the decision maker is limited to
 #' existing biodiversity data (i.e. survey data and environmental niche models).

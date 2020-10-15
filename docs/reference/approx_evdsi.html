@@ -40,10 +40,11 @@
 
 
 <meta property="og:title" content="Approximate expected value of the decision given survey information — approx_evdsi" />
-<meta property="og:description" content="Calculate the expected value of the conservation management decision
+<meta property="og:description" content="Calculate the expected value of the management decision
 given survey information. This metric describes the value of the management
 decision that is expected when the decision maker conducts a surveys a
-set of sites to inform the decision." />
+set of sites to inform the decision. To speed up the calculations,
+an approximation method is used." />
 
 
 
@@ -75,7 +76,7 @@ set of sites to inform the decision." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.70</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.8</span>
       </span>
     </div>
 
@@ -132,10 +133,11 @@ set of sites to inform the decision." />
     </div>
 
     <div class="ref-description">
-    <p>Calculate the <em>expected value of the conservation management decision
+    <p>Calculate the <em>expected value of the management decision
 given survey information</em>. This metric describes the value of the management
 decision that is expected when the decision maker conducts a surveys a
-set of sites to inform the decision.</p>
+set of sites to inform the decision. To speed up the calculations,
+an approximation method is used.</p>
     </div>
 
     <pre class="usage"><span class='fu'>approx_evdsi</span>(
@@ -167,11 +169,11 @@ set of sites to inform the decision.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
-      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></code> object with feature data.</p></td>
+      <td><p><code><a href='https://rdrr.io/r/base/data.frame.html'>base::data.frame()</a></code> object with feature data.</p></td>
     </tr>
     <tr>
       <th>site_detection_columns</th>
@@ -262,8 +264,8 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_model_specificity_column</th>
@@ -274,8 +276,8 @@ feature in a given site (i.e. the specificity of the models).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
-<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models</a></code> or
-<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models</a></code>.</p></td>
+<code><a href='fit_xgb_occupancy_models.html'>fit_xgb_occupancy_models()</a></code> or
+<code><a href='fit_hglm_occupancy_models.html'>fit_hglm_occupancy_models()</a></code>.</p></td>
     </tr>
     <tr>
       <th>feature_target_column</th>
@@ -320,7 +322,7 @@ conservation. Defaults to <code>NULL</code> such that no sites are locked out.</
 the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to <code>NULL</code> such that prior data is calculated automatically
-using <code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></td>
+using <code><a href='prior_probability_matrix.html'>prior_probability_matrix()</a></code>.</p></td>
     </tr>
     <tr>
       <th>n_approx_replicates</th>
@@ -347,15 +349,13 @@ replicate.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>This function uses approximation methods to estimate the
-  expected value calculations. As such, you will need to ensure that
-  the same seed is used when comparing results to other functions that
-  use approximation methods. Additionally, the accuracy of these
-  calculations depend on the arguments to
-  <code>n_approx_replicates</code> and <code>n_approx_outcomes_per_replicate</code>, and
-  so you may need to increase these parameters for large problems.</p>
+expected value calculations. The accuracy of these
+calculations depend on the arguments to
+<code>n_approx_replicates</code> and <code>n_approx_outcomes_per_replicate</code>, and
+so you may need to increase these parameters for large problems.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='prior_probability_matrix.html'>prior_probability_matrix</a></code>.</p></div>
+    <div class='dont-index'><p><code><a href='prior_probability_matrix.html'>prior_probability_matrix()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
