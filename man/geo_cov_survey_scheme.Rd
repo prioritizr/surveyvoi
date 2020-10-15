@@ -15,7 +15,7 @@ geo_cov_survey_scheme(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object containing the candidate survey
 sites.}
 
 \item{cost_column}{\code{character} name of the column in the argument to

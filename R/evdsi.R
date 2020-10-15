@@ -48,8 +48,8 @@
 #'   This column should have `numeric` values that are between zero and
 #'   one. No missing (`NA`) values are permitted in this column.
 #'   This should ideally be calculated using
-#'   \code{\link{fit_xgb_occupancy_models}} or
-#'   \code{\link{fit_hglm_occupancy_models}}.
+#'   [fit_xgb_occupancy_models()] or
+#'   [fit_hglm_occupancy_models()].
 #'
 #' @param feature_model_specificity_column `character` name of the
 #'   column in the argument to `feature_data` that contains
@@ -58,8 +58,8 @@
 #'   This column should have `numeric` values that are between zero and
 #'   one. No missing (`NA`) values are permitted in this column.
 #'   This should ideally be calculated using
-#'   \code{\link{fit_xgb_occupancy_models}} or
-#'   \code{\link{fit_hglm_occupancy_models}}.
+#'   [fit_xgb_occupancy_models()] or
+#'   [fit_hglm_occupancy_models()].
 #'
 #' @param feature_target_column `character` name of the column in the
 #'   argument to `feature_data` that contains the \eqn{target}
@@ -94,7 +94,7 @@
 #'  the prior probability of each feature occupying each site.
 #'  Rows correspond to features, and columns correspond to sites.
 #'  Defaults to `NULL` such that prior data is calculated automatically
-#'  using \code{\link{prior_probability_matrix}}.
+#'  using [prior_probability_matrix()].
 #'
 #' @details This function calculates the expected value and does not
 #'  use approximation methods. As such, this function can only be applied
@@ -102,7 +102,7 @@
 #'
 #' @return `numeric` value.
 #'
-#' @seealso \code{\link{prior_probability_matrix}}.
+#' @seealso [prior_probability_matrix()].
 #'
 #' @examples
 #' # set seeds for reproducibility

@@ -31,9 +31,9 @@ NULL
 #' The optimal survey scheme is determined using a brute-force algorithm.
 #' Initially, all feasible (valid) survey schemes are identified given the
 #' survey costs and the survey budget (using
-#' \code{\link{feasible_survey_schemes}}. Next, the expected value of each and
+#' [feasible_survey_schemes()]. Next, the expected value of each and
 #' every feasible survey scheme is computed
-#' (using \code{\link{evdsi}}).
+#' (using [evdsi()]).
 #' Finally, the greatest expected value is identified, and all survey schemes
 #' that share this greatest expected value are returned. Due to the nature of
 #' this algorithm, it can take a very long time to complete.

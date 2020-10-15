@@ -5,11 +5,11 @@ NULL
 #'
 #' Estimate probability of occupancy for a set of features in a set of
 #' planning units. Models are fitted using gradient boosted trees (via
-#' \code{\link[xgboost]{xgb.train}}).
+#' [xgboost::xgb.train()]).
 #'
-#' @param site_data \code{\link[sf]{sf}} object with site data.
+#' @param site_data [sf::sf()] object with site data.
 #'
-#' @param feature_data \code{\link[base]{data.frame}} object with feature data.
+#' @param feature_data [base::data.frame()] object with feature data.
 #'
 #' @param site_detection_columns `character` names of `numeric`
 #'   columns in the argument to `site_data` that contain the proportion of
@@ -51,14 +51,14 @@ NULL
 #'  `"max_depth"`, `"eta"`, `"lambda"`,
 #'  `"min_child_weight"`, `"subsample"`, `"colsample_by_tree"`,
 #'  `"objective"`. See documentation for the `params` argument in
-#'  \code{\link[xgboost]{xgb.train}} for more information.
+#'  [xgboost::xgb.train()] for more information.
 #'
 #' @param xgb_early_stopping_rounds `numeric` model rounds for parameter
-#'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
+#'   tuning. See [xgboost::xgboost()] for more information.
 #'   Defaults to 10 for each feature.
 #'
 #' @param xgb_n_rounds `numeric` model rounds for model fitting
-#'   See \code{\link[xgboost]{xgboost}} for more information.
+#'   See [xgboost::xgboost()] for more information.
 #'   Defaults to 100 for each feature.
 #'
 #' @param n_folds `numeric` number of folds to split the training
@@ -94,11 +94,11 @@ NULL
 #'  used to generate a full set of parameter combinations, and these
 #'  parameter combinations are subsequently used for tuning the models.
 #'  To account for unbalanced datasets, the
-#'  `scale_pos_weight` \code{\link[xgboost]{xgboost}} parameter
+#'  `scale_pos_weight` [xgboost::xgboost()] parameter
 #'  is calculated as the mean value across each of the training folds
 #'  (i.e. number of absence divided by number of presences per feature).
 #'  For a given parameter combination, models are fit using k-fold cross-
-#'  validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
+#'  validation (via [xgboost::xgb.cv()]) -- using the previously
 #'  mentioned training and evaluation folds -- and the True Skill Statistic
 #'  (TSS) calculated using the data held out from each fold is
 #'  used to quantify the performance (i.e. `"test_tss_mean"` column in
@@ -129,10 +129,10 @@ NULL
 #' \item{parameters}{`list` of `list` objects containing the best
 #' tuning parameters for each feature.}
 #'
-#' \item{predictions}{\code{\link[tibble]{tibble}} object containing
+#' \item{predictions}{[tibble::tibble()] object containing
 #'  predictions for each feature.}
 #'
-#' \item{performance}{\code{\link[tibble]{tibble}} object containing the
+#' \item{performance}{[tibble::tibble()] object containing the
 #'  performance of the best models for each feature. It contains the following
 #'  columns:
 #'

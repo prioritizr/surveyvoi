@@ -24,9 +24,9 @@ fit_hglm_occupancy_models(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
-\item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
+\item{feature_data}{\code{\link[base:data.frame]{base::data.frame()}} object with feature data.}
 
 \item{site_detection_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain the proportion of
@@ -66,30 +66,30 @@ one. No missing (\code{NA}) values are permitted in this column.}
 \item{jags_n_samples}{\code{integer} number of sample to generate per chain
 for MCMC analyses.
 See documentation for the \code{sample} parameter
-in \code{\link[runjags]{run.jags}} for more information).
+in \code{\link[runjags:run.jags]{runjags::run.jags()}} for more information).
 Defaults to 10,000 for each feature.}
 
 \item{jags_n_burnin}{\code{integer} number of warm up iterations for MCMC
 analyses.
 See documentation for the \code{burnin} parameter
-in \code{\link[runjags]{run.jags}} for more information).
+in \code{\link[runjags:run.jags]{runjags::run.jags()}} for more information).
 Defaults to 10,000 for each feature.}
 
 \item{jags_n_thin}{\code{integer} number of thinning iterations for MCMC
 analyses.
 See documentation for the \code{thin} parameter
-in \code{\link[runjags]{run.jags}} for more information).
+in \code{\link[runjags:run.jags]{runjags::run.jags()}} for more information).
 Defaults to 100 for each feature.}
 
 \item{jags_n_adapt}{\code{integer} number of adapting iterations for MCMC
 analyses.
 See documentation for the \code{adapt} parameter
-in \code{\link[runjags]{run.jags}} for more information).
+in \code{\link[runjags:run.jags]{runjags::run.jags()}} for more information).
 Defaults to 1,000 for each feature.}
 
 \item{jags_n_chains}{\code{integer} total number of chains for MCMC analyses.
 See documentation for the \code{n.chains} parameter
-in \code{\link[runjags]{run.jags}} for more information).
+in \code{\link[runjags:run.jags]{runjags::run.jags()}} for more information).
 Defaults to 4 for each fold for each feature.}
 
 \item{n_folds}{\code{numeric} number of folds to split the training
@@ -111,10 +111,10 @@ printed during computations. Defaults to \code{FALSE}.}
 
 \item{models}{\code{list} of \code{list} objects containing the models.}
 
-\item{predictions}{\code{\link[tibble]{tibble}} object containing
+\item{predictions}{\code{\link[tibble:tibble]{tibble::tibble()}} object containing
 predictions for each feature.}
 
-\item{performance}{\code{\link[tibble]{tibble}} object containing the
+\item{performance}{\code{\link[tibble:tibble]{tibble::tibble()}} object containing the
 performance of the best models for each feature. It contains the following
 columns:
 
@@ -169,7 +169,7 @@ test data in cross-validation.}
 Estimate probability of occupancy for a set of features in a set of
 planning units. Models are fitted as hierarchical generalized linear models
 that account for for imperfect detection (following Royle & Link 2006)
-using JAGS (via \code{\link[runjags]{run.jags}}). To limit over-fitting,
+using JAGS (via \code{\link[runjags:run.jags]{runjags::run.jags()}}). To limit over-fitting,
 covariate coefficients are sampled using a Laplace prior distribution
 (equivalent to L1 regularization used in machine learning contexts)
 (Park & Casella 2008).

@@ -17,7 +17,7 @@ env_div_survey_scheme(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object containing the candidate survey
 sites.}
 
 \item{cost_column}{\code{character} name of the column in the argument to
@@ -33,7 +33,7 @@ variables. No missing (\code{NA}) values are permitted.}
 
 \item{method}{\code{character} name of the distance metric to use for
 calculating environmental dissimilarity scores. See
-\code{\link[vegan]{vegdist}} documentation the \code{method} parameter
+\code{\link[vegan:vegdist]{vegan::vegdist()}} documentation the \code{method} parameter
 for other available distance metrics and more information.
 No missing (\code{NA}) values are permitted.
 Defaults to \code{"mahalanobis"} for Mahalanobis distances.}

@@ -22,9 +22,9 @@ fit_xgb_occupancy_models(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
-\item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
+\item{feature_data}{\code{\link[base:data.frame]{base::data.frame()}} object with feature data.}
 
 \item{site_detection_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain the proportion of
@@ -66,14 +66,14 @@ parameter values for fitting models. Valid parameters include:
 \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
 \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
 \code{"objective"}. See documentation for the \code{params} argument in
-\code{\link[xgboost]{xgb.train}} for more information.}
+\code{\link[xgboost:xgb.train]{xgboost::xgb.train()}} for more information.}
 
 \item{xgb_early_stopping_rounds}{\code{numeric} model rounds for parameter
-tuning. See \code{\link[xgboost]{xgboost}} for more information.
+tuning. See \code{\link[xgboost:xgb.train]{xgboost::xgboost()}} for more information.
 Defaults to 10 for each feature.}
 
 \item{xgb_n_rounds}{\code{numeric} model rounds for model fitting
-See \code{\link[xgboost]{xgboost}} for more information.
+See \code{\link[xgboost:xgb.train]{xgboost::xgboost()}} for more information.
 Defaults to 100 for each feature.}
 
 \item{n_folds}{\code{numeric} number of folds to split the training
@@ -96,10 +96,10 @@ printed during computations. Defaults to \code{FALSE}.}
 \item{parameters}{\code{list} of \code{list} objects containing the best
 tuning parameters for each feature.}
 
-\item{predictions}{\code{\link[tibble]{tibble}} object containing
+\item{predictions}{\code{\link[tibble:tibble]{tibble::tibble()}} object containing
 predictions for each feature.}
 
-\item{performance}{\code{\link[tibble]{tibble}} object containing the
+\item{performance}{\code{\link[tibble:tibble]{tibble::tibble()}} object containing the
 performance of the best models for each feature. It contains the following
 columns:
 
@@ -148,7 +148,7 @@ test data in cross-validation.}
 \description{
 Estimate probability of occupancy for a set of features in a set of
 planning units. Models are fitted using gradient boosted trees (via
-\code{\link[xgboost]{xgb.train}}).
+\code{\link[xgboost:xgb.train]{xgboost::xgb.train()}}).
 }
 \details{
 This function (i) prepares the data for model fitting, (ii) calibrates
@@ -170,11 +170,11 @@ candidate values for each parameter (specified via \code{parameters}) are
 used to generate a full set of parameter combinations, and these
 parameter combinations are subsequently used for tuning the models.
 To account for unbalanced datasets, the
-\code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
+\code{scale_pos_weight} \code{\link[xgboost:xgb.train]{xgboost::xgboost()}} parameter
 is calculated as the mean value across each of the training folds
 (i.e. number of absence divided by number of presences per feature).
 For a given parameter combination, models are fit using k-fold cross-
-validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
+validation (via \code{\link[xgboost:xgb.cv]{xgboost::xgb.cv()}}) -- using the previously
 mentioned training and evaluation folds -- and the True Skill Statistic
 (TSS) calculated using the data held out from each fold is
 used to quantify the performance (i.e. \code{"test_tss_mean"} column in

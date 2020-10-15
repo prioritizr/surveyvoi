@@ -6,7 +6,7 @@ NULL
 #' Estimate probability of occupancy for a set of features in a set of
 #' planning units. Models are fitted as hierarchical generalized linear models
 #' that account for for imperfect detection (following Royle & Link 2006)
-#' using JAGS (via \code{\link[runjags]{run.jags}}). To limit over-fitting,
+#' using JAGS (via [runjags::run.jags()]). To limit over-fitting,
 #' covariate coefficients are sampled using a Laplace prior distribution
 #' (equivalent to L1 regularization used in machine learning contexts)
 #' (Park & Casella 2008).
@@ -14,30 +14,30 @@ NULL
 #' @param jags_n_samples `integer` number of sample to generate per chain
 #'   for MCMC analyses.
 #'   See documentation for the `sample` parameter
-#'   in \code{\link[runjags]{run.jags}} for more information).
+#'   in [runjags::run.jags()] for more information).
 #'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_thin `integer` number of thinning iterations for MCMC
 #'   analyses.
 #'   See documentation for the `thin` parameter
-#'   in \code{\link[runjags]{run.jags}} for more information).
+#'   in [runjags::run.jags()] for more information).
 #'   Defaults to 100 for each feature.
 #'
 #' @param jags_n_burnin `integer` number of warm up iterations for MCMC
 #'   analyses.
 #'   See documentation for the `burnin` parameter
-#'   in \code{\link[runjags]{run.jags}} for more information).
+#'   in [runjags::run.jags()] for more information).
 #'   Defaults to 10,000 for each feature.
 #'
 #' @param jags_n_chains `integer` total number of chains for MCMC analyses.
 #'   See documentation for the `n.chains` parameter
-#'   in \code{\link[runjags]{run.jags}} for more information).
+#'   in [runjags::run.jags()] for more information).
 #'   Defaults to 4 for each fold for each feature.
 #'
 #' @param jags_n_adapt `integer` number of adapting iterations for MCMC
 #'   analyses.
 #'   See documentation for the `adapt` parameter
-#'   in \code{\link[runjags]{run.jags}} for more information).
+#'   in [runjags::run.jags()] for more information).
 #'   Defaults to 1,000 for each feature.
 #'
 #' @inheritParams fit_xgb_occupancy_models
@@ -83,10 +83,10 @@ NULL
 #'
 #' \item{models}{`list` of `list` objects containing the models.}
 #'
-#' \item{predictions}{\code{\link[tibble]{tibble}} object containing
+#' \item{predictions}{[tibble::tibble()] object containing
 #'  predictions for each feature.}
 #'
-#' \item{performance}{\code{\link[tibble]{tibble}} object containing the
+#' \item{performance}{[tibble::tibble()] object containing the
 #'  performance of the best models for each feature. It contains the following
 #'  columns:
 #'

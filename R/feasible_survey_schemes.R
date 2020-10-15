@@ -14,7 +14,7 @@ NULL
 #' @param verbose `logical` indicating if information should be
 #'   printed while searching for feasible schemes. Defaults to `FALSE`.
 #'
-#' @return \code{\link{matrix}} where each row corresponds to a different
+#' @return [matrix()] where each row corresponds to a different
 #'   survey scheme, and each column corresponds to a different planning unit.
 #'   Cell values are `logical` (`TRUE` / `FALSE`) indicating
 #'   if a given site is selected in a given survey scheme.

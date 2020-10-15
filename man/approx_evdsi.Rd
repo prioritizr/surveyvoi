@@ -29,9 +29,9 @@ approx_evdsi(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
-\item{feature_data}{\code{\link[base]{data.frame}} object with feature data.}
+\item{feature_data}{\code{\link[base:data.frame]{base::data.frame()}} object with feature data.}
 
 \item{site_detection_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain the proportion of
@@ -102,8 +102,8 @@ feature in a given site (i.e. the sensitivity of the models).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using
-\code{\link{fit_xgb_occupancy_models}} or
-\code{\link{fit_hglm_occupancy_models}}.}
+\code{\link[=fit_xgb_occupancy_models]{fit_xgb_occupancy_models()}} or
+\code{\link[=fit_hglm_occupancy_models]{fit_hglm_occupancy_models()}}.}
 
 \item{feature_model_specificity_column}{\code{character} name of the
 column in the argument to \code{feature_data} that contains
@@ -112,8 +112,8 @@ feature in a given site (i.e. the specificity of the models).
 This column should have \code{numeric} values that are between zero and
 one. No missing (\code{NA}) values are permitted in this column.
 This should ideally be calculated using
-\code{\link{fit_xgb_occupancy_models}} or
-\code{\link{fit_hglm_occupancy_models}}.}
+\code{\link[=fit_xgb_occupancy_models]{fit_xgb_occupancy_models()}} or
+\code{\link[=fit_hglm_occupancy_models]{fit_hglm_occupancy_models()}}.}
 
 \item{feature_target_column}{\code{character} name of the column in the
 argument to \code{feature_data} that contains the \eqn{target}
@@ -148,7 +148,7 @@ conservation. Defaults to \code{NULL} such that no sites are locked out.}
 the prior probability of each feature occupying each site.
 Rows correspond to features, and columns correspond to sites.
 Defaults to \code{NULL} such that prior data is calculated automatically
-using \code{\link{prior_probability_matrix}}.}
+using \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.}
 
 \item{n_approx_replicates}{\code{integer} number of replicates to use for
 approximating the expected value calculations. Defaults to 100.}
@@ -218,5 +218,5 @@ print(mean(approx_ev_survey))
 
 }
 \seealso{
-\code{\link{prior_probability_matrix}}.
+\code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.
 }

@@ -14,7 +14,7 @@ feasible_survey_schemes(
 )
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object containing the candidate survey
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object containing the candidate survey
 sites.}
 
 \item{cost_column}{\code{character} name of the column in the argument to
@@ -42,7 +42,7 @@ Defaults to \code{NULL} such that no sites are locked out.}
 printed while searching for feasible schemes. Defaults to \code{FALSE}.}
 }
 \value{
-\code{\link{matrix}} where each row corresponds to a different
+\code{\link[=matrix]{matrix()}} where each row corresponds to a different
 survey scheme, and each column corresponds to a different planning unit.
 Cell values are \code{logical} (\code{TRUE} / \code{FALSE}) indicating
 if a given site is selected in a given survey scheme.

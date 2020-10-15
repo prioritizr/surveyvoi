@@ -38,10 +38,10 @@ NULL
 #'
 #' @details
 #' The data are simulated using random fields
-#' (\code{\link[RandomFields]{RFsimulate}}) to provide spatially auto-correlated
+#' ([RandomFields::RFsimulate()]) to provide spatially auto-correlated
 #' simulations.
 #'
-#' @return \code{\link[sf]{sf}} object with site data.
+#' @return [sf::sf()] object with site data.
 #'  The `"management_cost"` column contains the site protection costs,
 #'  and the `"survey_cost"` column contains the costs for surveying
 #'  each site.
@@ -85,7 +85,7 @@ NULL
 #' # plot feature prior probability data
 #' plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
 #'
-#' @seealso \code{\link{simulate_feature_data}}
+#' @seealso [simulate_feature_data()]
 #'
 #' @export
 simulate_site_data <- function(n_sites, n_features,

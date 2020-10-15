@@ -50,7 +50,7 @@ probability values of occupancy should be output or not. Defaults
 to \code{TRUE}.}
 }
 \value{
-\code{\link[sf]{sf}} object with site data.
+\code{\link[sf:sf]{sf::sf()}} object with site data.
 The \code{"management_cost"} column contains the site protection costs,
 and the \code{"survey_cost"} column contains the costs for surveying
 each site.
@@ -72,7 +72,7 @@ Simulate site data for developing simulated survey schemes.
 }
 \details{
 The data are simulated using random fields
-(\code{\link[RandomFields]{RFsimulate}}) to provide spatially auto-correlated
+(\code{\link[RandomFields:RFsimulate]{RandomFields::RFsimulate()}}) to provide spatially auto-correlated
 simulations.
 }
 \examples{
@@ -104,5 +104,5 @@ plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
 
 }
 \seealso{
-\code{\link{simulate_feature_data}}
+\code{\link[=simulate_feature_data]{simulate_feature_data()}}
 }

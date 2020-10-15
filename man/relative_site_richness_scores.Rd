@@ -7,7 +7,7 @@
 relative_site_richness_scores(site_data, site_probability_columns)
 }
 \arguments{
-\item{site_data}{\code{\link[sf]{sf}} object with site data.}
+\item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
 columns in the argument to \code{site_data} that contain modelled

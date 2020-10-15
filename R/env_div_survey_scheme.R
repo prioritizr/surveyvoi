@@ -6,7 +6,7 @@ NULL
 #' Generate a survey scheme by maximizing the diversity of environmental
 #' conditions that are surveyed.
 #'
-#' @param site_data \code{\link[sf]{sf}} object containing the candidate survey
+#' @param site_data [sf::sf()] object containing the candidate survey
 #'   sites.
 #'
 #' @param cost_column `character` name of the column in the argument to
@@ -22,7 +22,7 @@ NULL
 #'
 #' @param method `character` name of the distance metric to use for
 #'   calculating environmental dissimilarity scores. See
-#'   \code{\link[vegan]{vegdist}} documentation the `method` parameter
+#'   [vegan::vegdist()] documentation the `method` parameter
 #'   for other available distance metrics and more information.
 #'   No missing (`NA`) values are permitted.
 #'   Defaults to `"mahalanobis"` for Mahalanobis distances.
