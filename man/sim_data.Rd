@@ -7,7 +7,10 @@
 \alias{sim_features}
 \title{Simulated datasets}
 \format{
-TODO.
+\describe{
+\item{sim_sites}{\code{\link[sf:sf]{sf::sf()}} object.}
+\item{sim_features}{\code{\link[tibble:tibble]{tibble::tibble()}} object.}
+}.
 }
 \usage{
 data(sim_features)
@@ -18,7 +21,34 @@ data(sim_sites)
 Simulated data for prioritizing sites for ecological surveys.
 }
 \details{
-TODO.
+The simulated datasets provide data for six sites and three features. The
+sites can potentially acquired for protected area establishment. However,
+existing information on the spatial distribution of the features is
+incomplete. Only some of the sites have existing ecological survey data.
+To help inform management decisions, species distribution models have been
+fitted to predict the probability of each species occupying each site.
+
+\describe{
+\item{\code{sim_sites}}{This object describes the sites and contains the
+following data: cost of surveying the sites (\code{survey_cost} column),
+cost of acquiring sites for conservation (\code{management_cost} column),
+results from previous ecological surveys (\code{f1}, \code{f2}, \code{f3} columns),
+previous survey effort (\code{n1}, \code{n2}, \code{n3} columns),
+environmental conditions of the sites (\code{e1}, \code{e2} columns),
+and modelled probability of the features occupying the sites
+(\code{p1}, \code{p2}, \code{p3} columns).}
+
+\item{\code{sim_features}}{This object describes the features and contains
+the following data:
+the name of each feature (\code{name} column),
+whether each feature should be considered in future surveys
+(\code{survey} column),
+the sensitivity and specificity of the survey methodology for each
+the sensitivity and specificity of the species distribution model
+for each feature (\code{model_sensitivity}, \code{model_specificity} columns),
+and the representation target thresholds for each feature
+(\code{target} column).}
+}
 }
 \examples{
 # load data
@@ -29,5 +59,9 @@ print(sim_features, width = Inf)
 # print site data
 print(sim_sites, width = Inf)
 
+}
+\seealso{
+These datasets were simulated using \code{\link[=simulate_feature_data]{simulate_feature_data()}}
+and \code{\link[=simulate_site_data]{simulate_site_data()}}.
 }
 \keyword{datasets}

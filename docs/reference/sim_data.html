@@ -139,10 +139,47 @@
 
     <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>TODO.</p>
+    
+<dl'>
+<dt>sim_sites</dt><dd><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object.</p></dd>
+<dt>sim_features</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble::tibble()</a></code> object.</p></dd>
+
+</dl><p>.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>TODO.</p>
+    <p>The simulated datasets provide data for six sites and three features. The
+sites can potentially acquired for protected area establishment. However,
+existing information on the spatial distribution of the features is
+incomplete. Only some of the sites have existing ecological survey data.
+To help inform management decisions, species distribution models have been
+fitted to predict the probability of each species occupying each site.</p>
+<dl'>
+<dt><code>sim_sites</code></dt><dd><p>This object describes the sites and contains the
+following data: cost of surveying the sites (<code>survey_cost</code> column),
+cost of acquiring sites for conservation (<code>management_cost</code> column),
+results from previous ecological surveys (<code>f1</code>, <code>f2</code>, <code>f3</code> columns),
+previous survey effort (<code>n1</code>, <code>n2</code>, <code>n3</code> columns),
+environmental conditions of the sites (<code>e1</code>, <code>e2</code> columns),
+and modelled probability of the features occupying the sites
+(<code>p1</code>, <code>p2</code>, <code>p3</code> columns).</p></dd>
+
+<dt><code>sim_features</code></dt><dd><p>This object describes the features and contains
+the following data:
+the name of each feature (<code>name</code> column),
+whether each feature should be considered in future surveys
+(<code>survey</code> column),
+the sensitivity and specificity of the survey methodology for each
+the sensitivity and specificity of the species distribution model
+for each feature (<code>model_sensitivity</code>, <code>model_specificity</code> columns),
+and the representation target thresholds for each feature
+(<code>target</code> column).</p></dd>
+
+</dl>
+
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>These datasets were simulated using <code><a href='simulate_feature_data.html'>simulate_feature_data()</a></code>
+and <code><a href='simulate_site_data.html'>simulate_site_data()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># load data</span>
