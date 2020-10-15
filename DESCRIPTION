@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 0.0.76
+Version: 0.0.8
 Title: Survey Value of Information
 Description: Develop candidate survey schemes for sampling biodiversity, and
     and evaluate their return on investment using value of
@@ -89,3 +89,4 @@ Collate:
     'simulate_site_data.R'
     'validate.R'
     'weighted_survey_scheme.R'
+Roxygen: list(markdown = TRUE)

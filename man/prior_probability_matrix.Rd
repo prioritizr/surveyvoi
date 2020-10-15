@@ -78,8 +78,8 @@ This should ideally be calculated using
 }
 \value{
 \code{matrix} object containing the prior probabilities of each
-  feature occupying each site. Each row corresponds to a different
-  feature and each column corresponds to a different site.
+feature occupying each site. Each row corresponds to a different
+feature and each column corresponds to a different site.
 }
 \description{
 Create prior probability matrix for the value of information analysis.

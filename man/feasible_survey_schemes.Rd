@@ -43,9 +43,9 @@ printed while searching for feasible schemes. Defaults to \code{FALSE}.}
 }
 \value{
 \code{\link{matrix}} where each row corresponds to a different
-  survey scheme, and each column corresponds to a different planning unit.
-  Cell values are \code{logical} (\code{TRUE} / \code{FALSE}) indicating
-  if a given site is selected in a given survey scheme.
+survey scheme, and each column corresponds to a different planning unit.
+Cell values are \code{logical} (\code{TRUE} / \code{FALSE}) indicating
+if a given site is selected in a given survey scheme.
 }
 \description{
 Generate a \code{matrix} representing all possible different

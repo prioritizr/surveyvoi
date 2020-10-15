@@ -48,8 +48,8 @@ printed while generating survey scheme(s). Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
-  values indicating if a site is selected in a scheme or not. Columns
-  correspond to sites, and rows correspond to different schemes.
+values indicating if a site is selected in a scheme or not. Columns
+correspond to sites, and rows correspond to different schemes.
 }
 \description{
 Generate a survey scheme by maximizing the geographic coverage
@@ -57,7 +57,7 @@ of surveys.
 }
 \details{
 The integer programming formulation of the \emph{p}-Median
-  problem (Daskin & Maass 2015) is used to generate survey schemes.
+problem (Daskin & Maass 2015) is used to generate survey schemes.
 }
 \examples{
 # set seed for reproducibility

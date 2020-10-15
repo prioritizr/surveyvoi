@@ -47,8 +47,8 @@ printed while generating survey scheme(s). Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
-  values indicating if a site is selected in a scheme or not. Columns
-  correspond to sites, and rows correspond to different schemes.
+values indicating if a site is selected in a scheme or not. Columns
+correspond to sites, and rows correspond to different schemes.
 }
 \description{
 Generate a survey scheme by selecting the set of sites with the greatest
@@ -56,16 +56,16 @@ overall weight value, a maximum budget for the survey scheme.
 }
 \details{
 Let \eqn{J} denote the set of sites (indexed by \eqn{j}), and let
-  \eqn{b} denote the maximum budget available for surveying the sites.
-  Next, let \eqn{c_j} represent the cost of surveying each site
-  \eqn{j \in J}, and \eqn{w_j} denote the relative value (weight) for
-  surveying each site \eqn{j \in J}. The set of sites with the greatest
-  overall weight values, subject to a given budget can the be identified by
-  solving the following integer programming problem. Here,
-  \eqn{x_j} is the binary decision variable indicating each if site
-  is selected in the survey scheme or not.
+\eqn{b} denote the maximum budget available for surveying the sites.
+Next, let \eqn{c_j} represent the cost of surveying each site
+\eqn{j \in J}, and \eqn{w_j} denote the relative value (weight) for
+surveying each site \eqn{j \in J}. The set of sites with the greatest
+overall weight values, subject to a given budget can the be identified by
+solving the following integer programming problem. Here,
+\eqn{x_j} is the binary decision variable indicating each if site
+is selected in the survey scheme or not.
 
-  \deqn{\mathit{Maximize} \space \sum_{j \in J} x_j w_i \\
+\deqn{\mathit{Maximize} \space \sum_{j \in J} x_j w_i \\
   \mathit{subject \space to} \\
   \sum_{j \in J} x_j c_j \leq b}{
   Minimize sum_j^J (xi * wi) subject to sum_j^J (xi * ci) <= b}

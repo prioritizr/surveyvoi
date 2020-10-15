@@ -158,8 +158,8 @@ set of sites to inform the decision.
 }
 \details{
 This function calculates the expected value and does not
- use approximation methods. As such, this function can only be applied
- to very small problems.
+use approximation methods. As such, this function can only be applied
+to very small problems.
 }
 \examples{
 # set seeds for reproducibility

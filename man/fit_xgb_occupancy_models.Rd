@@ -97,51 +97,51 @@ printed during computations. Defaults to \code{FALSE}.}
 tuning parameters for each feature.}
 
 \item{predictions}{\code{\link[tibble]{tibble}} object containing
- predictions for each feature.}
+predictions for each feature.}
 
 \item{performance}{\code{\link[tibble]{tibble}} object containing the
- performance of the best models for each feature. It contains the following
- columns:
+performance of the best models for each feature. It contains the following
+columns:
 
- \describe{
- \item{feature}{name of the feature.}
- \item{train_tss_mean}{
-   mean TSS statistic for models calculated using training data in
-   cross-validation.}
- \item{train_tss_std}{
-   standard deviation in TSS statistics for models calculated using training
-   data in cross-validation.}
- \item{train_sensitivity_mean}{
-   mean sensitivity statistic for models calculated using training data in
-   cross-validation.}
- \item{train_sensitivity_std}{
-   standard deviation in sensitivity statistics for models calculated using
-   training data in cross-validation.}
- \item{train_specificity_mean}{
-   mean specificity statistic for models calculated using training data in
-   cross-validation.}
- \item{train_specificity_std}{
-   standard deviation in specificity statistics for models calculated using
-   training data in cross-validation.}
- \item{test_tss_mean}{
-   mean TSS statistic for models calculated using test data in
-   cross-validation.}
- \item{test_tss_std}{
-   standard deviation in TSS statistics for models calculated using test
-   data in cross-validation.}
- \item{test_sensitivity_mean}{
-   mean sensitivity statistic for models calculated using test data in
-   cross-validation.}
- \item{test_sensitivity_std}{
-   standard deviation in sensitivity statistics for models calculated using
-   test data in cross-validation.}
- \item{test_specificity_mean}{
-   mean specificity statistic for models calculated using test data in
-   cross-validation.}
- \item{test_specificity_std}{
-   standard deviation in specificity statistics for models calculated using
-   test data in cross-validation.}
- }}
+\describe{
+\item{feature}{name of the feature.}
+\item{train_tss_mean}{
+mean TSS statistic for models calculated using training data in
+cross-validation.}
+\item{train_tss_std}{
+standard deviation in TSS statistics for models calculated using training
+data in cross-validation.}
+\item{train_sensitivity_mean}{
+mean sensitivity statistic for models calculated using training data in
+cross-validation.}
+\item{train_sensitivity_std}{
+standard deviation in sensitivity statistics for models calculated using
+training data in cross-validation.}
+\item{train_specificity_mean}{
+mean specificity statistic for models calculated using training data in
+cross-validation.}
+\item{train_specificity_std}{
+standard deviation in specificity statistics for models calculated using
+training data in cross-validation.}
+\item{test_tss_mean}{
+mean TSS statistic for models calculated using test data in
+cross-validation.}
+\item{test_tss_std}{
+standard deviation in TSS statistics for models calculated using test
+data in cross-validation.}
+\item{test_sensitivity_mean}{
+mean sensitivity statistic for models calculated using test data in
+cross-validation.}
+\item{test_sensitivity_std}{
+standard deviation in sensitivity statistics for models calculated using
+test data in cross-validation.}
+\item{test_specificity_mean}{
+mean specificity statistic for models calculated using test data in
+cross-validation.}
+\item{test_specificity_std}{
+standard deviation in specificity statistics for models calculated using
+test data in cross-validation.}
+}}
 
 }
 }
@@ -152,50 +152,50 @@ planning units. Models are fitted using gradient boosted trees (via
 }
 \details{
 This function (i) prepares the data for model fitting, (ii) calibrates
- the tuning parameters for model fitting, (iii) generate predictions using
- the best found tuning parameters, and (iv) assess the performance of the
- best supported models. These analyses are performed separately for each
- feature. For a given feature:
+the tuning parameters for model fitting, (iii) generate predictions using
+the best found tuning parameters, and (iv) assess the performance of the
+best supported models. These analyses are performed separately for each
+feature. For a given feature:
 
- \enumerate{
+\enumerate{
 
- \item The data are prepared for model fitting by partitioning the data using
- k-fold cross-validation (set via argument to \code{n_folds}). The
- training and evaluation folds are constructed
- in such a manner as to ensure that each training and evaluation
- fold contains at least one presence and one absence observation.
+\item The data are prepared for model fitting by partitioning the data using
+k-fold cross-validation (set via argument to \code{n_folds}). The
+training and evaluation folds are constructed
+in such a manner as to ensure that each training and evaluation
+fold contains at least one presence and one absence observation.
 
- \item A grid search method is used to tune the model parameters. The
- candidate values for each parameter (specified via \code{parameters}) are
- used to generate a full set of parameter combinations, and these
- parameter combinations are subsequently used for tuning the models.
- To account for unbalanced datasets, the
- \code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
- is calculated as the mean value across each of the training folds
- (i.e. number of absence divided by number of presences per feature).
- For a given parameter combination, models are fit using k-fold cross-
- validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
- mentioned training and evaluation folds -- and the True Skill Statistic
- (TSS) calculated using the data held out from each fold is
- used to quantify the performance (i.e. \code{"test_tss_mean"} column in
- output). These models are also fitted using the
- \code{early_stopping_rounds} parameter to reduce time-spent
- tuning models. If relevant, they are also fitted using the supplied weights
- (per by the argument to \code{site_weights_data}). After exploring the
- full set of parameter combinations, the best parameter combination is
- identified, and the associated parameter values and models are stored for
- later use.
+\item A grid search method is used to tune the model parameters. The
+candidate values for each parameter (specified via \code{parameters}) are
+used to generate a full set of parameter combinations, and these
+parameter combinations are subsequently used for tuning the models.
+To account for unbalanced datasets, the
+\code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
+is calculated as the mean value across each of the training folds
+(i.e. number of absence divided by number of presences per feature).
+For a given parameter combination, models are fit using k-fold cross-
+validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
+mentioned training and evaluation folds -- and the True Skill Statistic
+(TSS) calculated using the data held out from each fold is
+used to quantify the performance (i.e. \code{"test_tss_mean"} column in
+output). These models are also fitted using the
+\code{early_stopping_rounds} parameter to reduce time-spent
+tuning models. If relevant, they are also fitted using the supplied weights
+(per by the argument to \code{site_weights_data}). After exploring the
+full set of parameter combinations, the best parameter combination is
+identified, and the associated parameter values and models are stored for
+later use.
 
- \item The cross-validation models associated with the best parameter
-  combination are used to generate predict the average probability that the
-  feature occupies each site. These predictions include sites that have
-  been surveyed before, and also sites that have not been surveyed before.
+\item The cross-validation models associated with the best parameter
+combination are used to generate predict the average probability that the
+feature occupies each site. These predictions include sites that have
+been surveyed before, and also sites that have not been surveyed before.
 
- \item The performance of the cross-validation models is evaluated.
- Specifically, the TSS, sensitivity, and specificity statistics are
- calculated (if relevant, weighted by the argument to
- \code{site_weights_data}). These performance values are calculated using
- the models' training and evaluation folds.
+\item The performance of the cross-validation models is evaluated.
+Specifically, the TSS, sensitivity, and specificity statistics are
+calculated (if relevant, weighted by the argument to
+\code{site_weights_data}). These performance values are calculated using
+the models' training and evaluation folds.
 
 }
 }

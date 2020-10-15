@@ -112,56 +112,56 @@ printed during computations. Defaults to \code{FALSE}.}
 \item{models}{\code{list} of \code{list} objects containing the models.}
 
 \item{predictions}{\code{\link[tibble]{tibble}} object containing
- predictions for each feature.}
+predictions for each feature.}
 
 \item{performance}{\code{\link[tibble]{tibble}} object containing the
- performance of the best models for each feature. It contains the following
- columns:
+performance of the best models for each feature. It contains the following
+columns:
 
- \describe{
- \item{feature}{name of the feature.}
- \item{max_mpsrf}{maximum multi-variate potential scale reduction factor
-   (MPSRF) value for the models. A MPSRF value less than 1.05 means that all
-   coefficients in a given model have converged, and so a value less than
-   1.05 in this column means that all the models fit for a given feature
-   have successfully converged.}
- \item{train_tss_mean}{
-   mean TSS statistic for models calculated using training data in
-   cross-validation.}
- \item{train_tss_std}{
-   standard deviation in TSS statistics for models calculated using training
-   data in cross-validation.}
- \item{train_sensitivity_mean}{
-   mean sensitivity statistic for models calculated using training data in
-   cross-validation.}
- \item{train_sensitivity_std}{
-   standard deviation in sensitivity statistics for models calculated using
-   training data in cross-validation.}
- \item{train_specificity_mean}{
-   mean specificity statistic for models calculated using training data in
-   cross-validation.}
- \item{train_specificity_std}{
-   standard deviation in specificity statistics for models calculated using
-   training data in cross-validation.}
- \item{test_tss_mean}{
-   mean TSS statistic for models calculated using test data in
-   cross-validation.}
- \item{test_tss_std}{
-   standard deviation in TSS statistics for models calculated using test
-   data in cross-validation.}
- \item{test_sensitivity_mean}{
-   mean sensitivity statistic for models calculated using test data in
-   cross-validation.}
- \item{test_sensitivity_std}{
-   standard deviation in sensitivity statistics for models calculated using
-   test data in cross-validation.}
- \item{test_specificity_mean}{
-   mean specificity statistic for models calculated using test data in
-   cross-validation.}
- \item{test_specificity_std}{
-   standard deviation in specificity statistics for models calculated using
-   test data in cross-validation.}
- }}
+\describe{
+\item{feature}{name of the feature.}
+\item{max_mpsrf}{maximum multi-variate potential scale reduction factor
+(MPSRF) value for the models. A MPSRF value less than 1.05 means that all
+coefficients in a given model have converged, and so a value less than
+1.05 in this column means that all the models fit for a given feature
+have successfully converged.}
+\item{train_tss_mean}{
+mean TSS statistic for models calculated using training data in
+cross-validation.}
+\item{train_tss_std}{
+standard deviation in TSS statistics for models calculated using training
+data in cross-validation.}
+\item{train_sensitivity_mean}{
+mean sensitivity statistic for models calculated using training data in
+cross-validation.}
+\item{train_sensitivity_std}{
+standard deviation in sensitivity statistics for models calculated using
+training data in cross-validation.}
+\item{train_specificity_mean}{
+mean specificity statistic for models calculated using training data in
+cross-validation.}
+\item{train_specificity_std}{
+standard deviation in specificity statistics for models calculated using
+training data in cross-validation.}
+\item{test_tss_mean}{
+mean TSS statistic for models calculated using test data in
+cross-validation.}
+\item{test_tss_std}{
+standard deviation in TSS statistics for models calculated using test
+data in cross-validation.}
+\item{test_sensitivity_mean}{
+mean sensitivity statistic for models calculated using test data in
+cross-validation.}
+\item{test_sensitivity_std}{
+standard deviation in sensitivity statistics for models calculated using
+test data in cross-validation.}
+\item{test_specificity_mean}{
+mean specificity statistic for models calculated using test data in
+cross-validation.}
+\item{test_specificity_std}{
+standard deviation in specificity statistics for models calculated using
+test data in cross-validation.}
+}}
 
 }
 }
@@ -176,30 +176,30 @@ covariate coefficients are sampled using a Laplace prior distribution
 }
 \details{
 This function (i) prepares the data for model fitting,
- (ii) fits the models, and (iii) assesses the performance of the
-  models. These analyses are performed separately for each
- feature. For a given feature:
+(ii) fits the models, and (iii) assesses the performance of the
+models. These analyses are performed separately for each
+feature. For a given feature:
 
- \enumerate{
+\enumerate{
 
- \item The data are prepared for model fitting by partitioning the data using
- k-fold cross-validation (set via argument to \code{n_folds}). The
- training and evaluation folds are constructed
- in such a manner as to ensure that each training and evaluation
- fold contains at least one presence and one absence observation.
+\item The data are prepared for model fitting by partitioning the data using
+k-fold cross-validation (set via argument to \code{n_folds}). The
+training and evaluation folds are constructed
+in such a manner as to ensure that each training and evaluation
+fold contains at least one presence and one absence observation.
 
- \item A model for fit separately for each fold (see
- \code{inst/jags/model.jags} for model code). To assess convergence,
- the multi-variate potential scale reduction factor
- (MPSRF) statistic is calculated for each model.
+\item A model for fit separately for each fold (see
+\code{inst/jags/model.jags} for model code). To assess convergence,
+the multi-variate potential scale reduction factor
+(MPSRF) statistic is calculated for each model.
 
- \item The performance of the cross-validation models is evaluated.
- Specifically, the TSS, sensitivity, and specificity statistics are
- calculated (if relevant, weighted by the argument to
- \code{site_weights_data}). These performance values are calculated using
- the models' training and evaluation folds. To assess convergence,
- the maximum MPSRF statistic for the models fit for each feature
- is calculated.
+\item The performance of the cross-validation models is evaluated.
+Specifically, the TSS, sensitivity, and specificity statistics are
+calculated (if relevant, weighted by the argument to
+\code{site_weights_data}). These performance values are calculated using
+the models' training and evaluation folds. To assess convergence,
+the maximum MPSRF statistic for the models fit for each feature
+is calculated.
 
 }
 }

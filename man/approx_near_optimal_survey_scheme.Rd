@@ -196,7 +196,7 @@ scheme and the greedy heuristic algorithm is provided for such cases.
 The greedy heuristic algorithm -- unlike the brute force algorithm --
 is not guaranteed to identify an optimal solution -- or even a "relatively
 good solution" for that matter -- though greedy heuristic algorithms tend to
-deliver solutions that are 15\% from optimality. Specifically, this
+deliver solutions that are 15\\% from optimality. Specifically, this
 greedy algorithms is implemented as:
 
 \enumerate{

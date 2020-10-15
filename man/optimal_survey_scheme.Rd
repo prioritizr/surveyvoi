@@ -163,11 +163,11 @@ printed during processing. Defaults to \code{FALSE}.}
 }
 \value{
 \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
-  values indicating if a site is selected in the scheme or not. Columns
-  correspond to sites, and rows correspond to different schemes. If
-  there is only one optimal survey scheme then the \code{matrix} will only
-  contain a single row. This matrix also has a \code{numeric} \code{"ev"}
-  attribute that contains the expected value of each scheme.
+values indicating if a site is selected in the scheme or not. Columns
+correspond to sites, and rows correspond to different schemes. If
+there is only one optimal survey scheme then the \code{matrix} will only
+contain a single row. This matrix also has a \code{numeric} \code{"ev"}
+attribute that contains the expected value of each scheme.
 }
 \description{
 Find the optimal survey scheme that maximizes return on investment using

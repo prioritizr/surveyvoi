@@ -18,7 +18,7 @@ values are permitted in these columns.}
 }
 \value{
 \code{numeric} \code{vector} of uncertainty scores. Note that
- these values are automatically rescaled between 0.01 and 1.
+these values are automatically rescaled between 0.01 and 1.
 }
 \description{
 Calculate scores to describe the overall uncertainty of modelled species'
@@ -35,16 +35,16 @@ site and then sum together the statistics for species in the same site:
 
 \enumerate{
 \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
-  \eqn{I} denote the set of features (indexed by \eqn{i}), and
-  \eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
-  occurring in planning units \eqn{j \in J}.
+\eqn{I} denote the set of features (indexed by \eqn{i}), and
+\eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+occurring in planning units \eqn{j \in J}.
 
 \item Next, we will calculate the Shannon's entropy statistic for each
-  species in each site:
-  \eqn{y_{ij} = - \big( (x_ij \mathit{log}_2 x_{ij}) + (1 - x_ij \mathit{log}_2 1 - x_{ij}) \big) }
+species in each site:
+\eqn{y_{ij} = - \big( (x_ij \mathit{log}_2 x_{ij}) + (1 - x_ij \mathit{log}_2 1 - x_{ij}) \big) }
 
 \item Finally, we will sum the entropy statistics together for each site:
-  \eqn{s_{j} = \sum_{i \in I} y_{ij}}
+\eqn{s_{j} = \sum_{i \in I} y_{ij}}
 
 }
 }

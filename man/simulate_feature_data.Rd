@@ -20,22 +20,22 @@ data:
 \item{\code{name}}{\code{character} name of each feature.}
 
 \item{\code{survey}}{\code{logical} (\code{TRUE} / \code{FALSE}) values
-  indicating if each feature should be examined in surveys or not.}
+indicating if each feature should be examined in surveys or not.}
 
 \item{\code{survey_sensitivity}}{\code{numeric} sensitivity (true positive
-  rate) of the survey methodology for each features.}
+rate) of the survey methodology for each features.}
 
 \item{\code{survey_specificity}}{\code{numeric} specificity (true negative
-  rate) of the survey methodology for each features.}
+rate) of the survey methodology for each features.}
 
 \item{\code{model_sensitivity}}{\code{numeric} specificity (true positive
-  rate) of the occupancy models for each features.}
+rate) of the occupancy models for each features.}
 
 \item{\code{model_specificity}}{\code{numeric} specificity (true negative
-  rate) of the occupancy models for each features.}
+rate) of the occupancy models for each features.}
 
 \item{\code{target}}{\code{numeric} target values used to parametrize
-  the conservation benefit of managing of each feature (defaults to 1).}
+the conservation benefit of managing of each feature (defaults to 1).}
 
 }
 }

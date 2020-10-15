@@ -18,7 +18,7 @@ values are permitted in these columns.}
 }
 \value{
 \code{numeric} \code{vector} of richness scores. Note that
- these values are automatically rescaled between 0.01 and 1.
+these values are automatically rescaled between 0.01 and 1.
 }
 \description{
 Calculate relative site richness scores. Sites with greater scores
@@ -32,15 +32,15 @@ procedure:
 
 \enumerate{
 \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
-  \eqn{I} denote the set of features (indexed by \eqn{i}), and
-  \eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
-  occurring in planning units \eqn{j \in J}.
+\eqn{I} denote the set of features (indexed by \eqn{i}), and
+\eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+occurring in planning units \eqn{j \in J}.
 
 \item Next, we will sum the values for each site:
-  \eqn{y_j = \sum_{i \in I} x_{ij}}.
+\eqn{y_j = \sum_{i \in I} x_{ij}}.
 
 \item Finally, we will linearly rescale the \eqn{y_j} values between 0.01
-  and 1 to produce the scores.
+and 1 to produce the scores.
 
 }
 }

@@ -51,21 +51,21 @@ to \code{TRUE}.}
 }
 \value{
 \code{\link[sf]{sf}} object with site data.
- The \code{"management_cost"} column contains the site protection costs,
- and the \code{"survey_cost"} column contains the costs for surveying
- each site.
- Additionally, columns that start with
- (i) \code{"f"} (e.g. \code{"f1"}) contain the proportion of
-  times that each feature was detected in each site,
- (ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
-  of surveys for each feature within each site,
- (iii) \code{"p"} (e.g. \code{"p1"}) contain prior
- probability data,  and
- (iv) \code{"e"} (e.g. \code{"e1"}) contain environmental
- data. Note that columns that contain the same integer value (excepting
- environmental data columns) correspond to the same feature
- (e.g. \code{"d1"}, \code{"n1"}, \code{"p1"} contain data that correspond
- to the same feature).
+The \code{"management_cost"} column contains the site protection costs,
+and the \code{"survey_cost"} column contains the costs for surveying
+each site.
+Additionally, columns that start with
+(i) \code{"f"} (e.g. \code{"f1"}) contain the proportion of
+times that each feature was detected in each site,
+(ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
+of surveys for each feature within each site,
+(iii) \code{"p"} (e.g. \code{"p1"}) contain prior
+probability data,  and
+(iv) \code{"e"} (e.g. \code{"e1"}) contain environmental
+data. Note that columns that contain the same integer value (excepting
+environmental data columns) correspond to the same feature
+(e.g. \code{"d1"}, \code{"n1"}, \code{"p1"} contain data that correspond
+to the same feature).
 }
 \description{
 Simulate site data for developing simulated survey schemes.
