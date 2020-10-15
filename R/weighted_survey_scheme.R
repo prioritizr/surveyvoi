@@ -6,8 +6,8 @@ NULL
 #' Generate a survey scheme by selecting the set of sites with the greatest
 #' overall weight value, a maximum budget for the survey scheme.
 #'
-#' @param weight_column \code{character} name of the column in the argument
-#'   to \code{site_data} with the weights for each site.
+#' @param weight_column `character` name of the column in the argument
+#'   to `site_data` with the weights for each site.
 #'
 #' @inheritParams env_div_survey_scheme
 #'

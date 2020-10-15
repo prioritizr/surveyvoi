@@ -10,11 +10,11 @@ NULL
 #'
 #' @inherit env_div_survey_scheme return
 #'
-#' @details The integer programming formulation of the \emph{p}-Median
+#' @details The integer programming formulation of the *p*-Median
 #'   problem (Daskin & Maass 2015) is used to generate survey schemes.
 #'
 #' @references
-#' Daskin MS & Maass KL (2015) The p-median problem. In \emph{Location Science}
+#' Daskin MS & Maass KL (2015) The p-median problem. In *Location Science*
 #' (pp. 21-45). Springer, Cham.
 #'
 #' @examples

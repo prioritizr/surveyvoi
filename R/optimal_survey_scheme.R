@@ -9,23 +9,23 @@ NULL
 #'
 #' @inheritParams evdsi
 #'
-#' @param n_threads \code{integer} number of threads to use for computation.
+#' @param n_threads `integer` number of threads to use for computation.
 #'
-#' @param survey_budget \code{numeric} maximum expenditure permitted
+#' @param survey_budget `numeric` maximum expenditure permitted
 #'   for conducting surveys.
 #'
-#' @param site_survey_locked_out_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked out (\code{TRUE}) from being selected for future surveys or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#' @param site_survey_locked_out_column `character` name of the column
+#'   in the argument to `site_data` that contains `logical`
+#'   (`TRUE` / `FALSE`) values indicating which sites should
+#'   be locked out (`TRUE`) from being selected for future surveys or
+#'   (`FALSE`) not. No missing (`NA`) values are permitted in this
 #'   column. This is useful if some sites will never be considered for future
 #'   surveys (e.g. because they are too costly to survey, or have a
 #'   low chance of containing the target species).
-#'   Defaults to \code{NULL} such that no sites are locked out.
+#'   Defaults to `NULL` such that no sites are locked out.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed during processing. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed during processing. Defaults to `FALSE`.
 #'
 #' @details
 #' The optimal survey scheme is determined using a brute-force algorithm.
@@ -38,11 +38,11 @@ NULL
 #' that share this greatest expected value are returned. Due to the nature of
 #' this algorithm, it can take a very long time to complete.
 #'
-#' @return \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+#' @return `matrix` of `logical` (`TRUE`/ `FALSE`)
 #'   values indicating if a site is selected in the scheme or not. Columns
 #'   correspond to sites, and rows correspond to different schemes. If
-#'   there is only one optimal survey scheme then the \code{matrix} will only
-#'   contain a single row. This matrix also has a \code{numeric} \code{"ev"}
+#'   there is only one optimal survey scheme then the `matrix` will only
+#'   contain a single row. This matrix also has a `numeric` `"ev"`
 #'   attribute that contains the expected value of each scheme.
 #'
 #' @examples

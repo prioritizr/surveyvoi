@@ -3,20 +3,20 @@ NULL
 
 #' Find all feasible survey schemes
 #'
-#' Generate a \code{matrix} representing all possible different
+#' Generate a `matrix` representing all possible different
 #' survey schemes given surveying costs and a fixed budget.
 #'
 #' @inheritParams env_div_survey_scheme
 #'
-#' @param survey_budget \code{numeric} the maximum possible expenditure
+#' @param survey_budget `numeric` the maximum possible expenditure
 #'  permitted for conducting surveys.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed while searching for feasible schemes. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed while searching for feasible schemes. Defaults to `FALSE`.
 #'
 #' @return \code{\link{matrix}} where each row corresponds to a different
 #'   survey scheme, and each column corresponds to a different planning unit.
-#'   Cell values are \code{logical} (\code{TRUE} / \code{FALSE}) indicating
+#'   Cell values are `logical` (`TRUE` / `FALSE`) indicating
 #'   if a given site is selected in a given survey scheme.
 #'
 #' @examples

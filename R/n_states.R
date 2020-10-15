@@ -3,11 +3,11 @@
 #' Calculate the total number of presence/absence states for a given
 #' number of sites and features.
 #'
-#' @param n_sites \code{numeric} number of sites.
+#' @param n_sites `numeric` number of sites.
 #'
-#' @param n_features \code{numeric} number of features.
+#' @param n_features `numeric` number of features.
 #'
-#' @return \code{numeric} value.
+#' @return `numeric` value.
 #'
 #' @examples
 #' # calculate number of states for 3 sites and 2 features

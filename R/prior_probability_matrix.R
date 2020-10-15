@@ -4,7 +4,7 @@
 #'
 #' @inheritParams evdci
 #'
-#' @return \code{matrix} object containing the prior probabilities of each
+#' @return `matrix` object containing the prior probabilities of each
 #'   feature occupying each site. Each row corresponds to a different
 #'   feature and each column corresponds to a different site.
 #'
@@ -115,10 +115,10 @@ prior_probability_matrix <- function(
 #'
 #' @inheritParams prior_probability_matrix
 #'
-#' @param prefer_survey_data \code{logical} should survey data be used
+#' @param prefer_survey_data `logical` should survey data be used
 #'  preferentially instead of model predictions, even if the species
 #'  distribution models outperform the survey methodology?
-#'  Defaults to \code{FALSE}
+#'  Defaults to `FALSE`
 #'
 #' @inherit prior_probability_matrix return
 #'
@@ -208,22 +208,22 @@ internal_prior_probability_matrix <- function(
 #' given that a series of surveys which protected a number of
 #' detections and non-detections.
 #'
-#' @param n_det \code{numeric} number of detections.
+#' @param n_det `numeric` number of detections.
 #'
-#' @param n_nondet \code{numeric} number of non-detections.
+#' @param n_nondet `numeric` number of non-detections.
 #'
-#' @param sensitivity \code{numeric} sensitivity of the surveys.
+#' @param sensitivity `numeric` sensitivity of the surveys.
 #'
-#' @param specificity \code{numeric} specificity of the surveys.
+#' @param specificity `numeric` specificity of the surveys.
 #'
-#' @param prior \code{numeric} initial prior probability of occupancy.
+#' @param prior `numeric` initial prior probability of occupancy.
 #'   Defaults to 0.5.
 #'
-#' @param clamp \code{logical} should values be clamped to between 1e-10
+#' @param clamp `logical` should values be clamped to between 1e-10
 #'   and 1-1e10 to avoid issues with probabilities that are exactly equal to
 #'   zero and one.
 #'
-#' @return \code{numeric} probability value.
+#' @return `numeric` probability value.
 #'
 #' @noRd
 prior_probability_of_occupancy <- function(

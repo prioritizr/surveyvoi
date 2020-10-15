@@ -32,7 +32,7 @@ NULL
 #'
 #' }
 #'
-#' @return \code{numeric} \code{vector} of uncertainty scores. Note that
+#' @return `numeric` `vector` of uncertainty scores. Note that
 #'  these values are automatically rescaled between 0.01 and 1.
 #'
 #' @examples

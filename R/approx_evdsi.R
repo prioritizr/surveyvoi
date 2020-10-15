@@ -1,19 +1,19 @@
 #' Approximate expected value of the decision given survey information
 #'
-#' Calculate the \emph{expected value of the conservation management decision
-#' given survey information}. This metric describes the value of the management
+#' Calculate the *expected value of the conservation management decision
+#' given survey information*. This metric describes the value of the management
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
 #' @inheritParams evdsi
 #'
-#' @param n_approx_replicates \code{integer} number of replicates to use for
+#' @param n_approx_replicates `integer` number of replicates to use for
 #'   approximating the expected value calculations. Defaults to 100.
 #'
-#' @param n_approx_outcomes_per_replicate \code{integer} number of outcomes to
+#' @param n_approx_outcomes_per_replicate `integer` number of outcomes to
 #'   use per replicate for approximation calculations. Defaults to 10000.
 #'
-#' @param seed \code{integer} state of the random number generator for
+#' @param seed `integer` state of the random number generator for
 #'  simulating outcomes when conducting the value of information analyses.
 #'  Defaults to 500.
 #'
@@ -22,10 +22,10 @@
 #'   the same seed is used when comparing results to other functions that
 #'   use approximation methods. Additionally, the accuracy of these
 #'   calculations depend on the arguments to
-#'   \code{n_approx_replicates} and \code{n_approx_outcomes_per_replicate}, and
+#'   `n_approx_replicates` and `n_approx_outcomes_per_replicate`, and
 #'   so you may need to increase these parameters for large problems.
 #'
-#' @return \code{numeric} vector containing the expected values for each
+#' @return `numeric` vector containing the expected values for each
 #' replicate.
 #'
 #' @inherit evdci seealso

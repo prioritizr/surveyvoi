@@ -10,23 +10,23 @@ NULL
 #'
 #' @inheritParams approx_evdsi
 #'
-#' @param n_threads \code{integer} number of threads to use for computation.
+#' @param n_threads `integer` number of threads to use for computation.
 #'
-#' @param survey_budget \code{numeric} maximum expenditure permitted
+#' @param survey_budget `numeric` maximum expenditure permitted
 #'   for conducting surveys.
 #'
-#' @param site_survey_locked_out_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked out (\code{TRUE}) from being selected for future surveys or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#' @param site_survey_locked_out_column `character` name of the column
+#'   in the argument to `site_data` that contains `logical`
+#'   (`TRUE` / `FALSE`) values indicating which sites should
+#'   be locked out (`TRUE`) from being selected for future surveys or
+#'   (`FALSE`) not. No missing (`NA`) values are permitted in this
 #'   column. This is useful if some sites will never be considered for future
 #'   surveys (e.g. because they are too costly to survey, or have a
 #'   low chance of containing the target species).
-#'   Defaults to \code{NULL} such that no sites are locked out.
+#'   Defaults to `NULL` such that no sites are locked out.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed during processing. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed during processing. Defaults to `FALSE`.
 #'
 #' @details
 #' Ideally, the brute-force algorithm would be used to identify the optimal
@@ -42,16 +42,16 @@ NULL
 #'
 #' \enumerate{
 #'
-#' \item Initialize an empty \emph{list of survey scheme solutions}, and an
-#' empty \emph{list of approximate expected values}.
+#' \item Initialize an empty *list of survey scheme solutions*, and an
+#' empty *list of approximate expected values*.
 #'
 #' \item Calculate the expected value of current information.
 #'
 #' \item Add a survey scheme with no sites selected for surveying to the
-#' \emph{list of survey scheme solutions}, and add the expected value of current
-#' information to the \emph{list of approximate expected values}.
+#' *list of survey scheme solutions*, and add the expected value of current
+#' information to the *list of approximate expected values*.
 #'
-#' \item Set the \emph{current survey solution} as the survey scheme with no
+#' \item Set the *current survey solution* as the survey scheme with no
 #' sites selected for surveying.
 #'
 #' \item For each remaining candidate site that has not been selected for
@@ -60,43 +60,43 @@ NULL
 #'
 #' \item Calculate the approximate expected value of each
 #' new candidate survey scheme. If the cost of a given candidate survey scheme
-#' exceeds the survey budget, then store a missing \code{NA value} instead.
+#' exceeds the survey budget, then store a missing `NA value` instead.
 #' Also if the the cost of a given candidate survey scheme plus the
 #' management costs of locked in planning units exceeds the total budget,
-#' then a store a missing value \code{NA} value too.
+#' then a store a missing value `NA` value too.
 #'
 #' \item If all of the new candidate survey schemes are associated with
-#' missing \code{NA} values -- because they all exceed the survey budget -- then
+#' missing `NA` values -- because they all exceed the survey budget -- then
 #' go to step 12.
 #'
 #' \item Calculate the cost effectiveness of each new candidate survey
 #' scheme. This calculated as the difference between the approximate expected
 #' value of a given new candidate survey scheme and that of the
-#' \emph{current survey solution}, and dividing this difference by the the cost
+#' *current survey solution*, and dividing this difference by the the cost
 #' of the newly selected candidate site.
 #'
 #' \item Find the new candidate survey scheme that is associated with the
-#' highest cost-effectiveness value, ignoring any missing \code{NA} values.
+#' highest cost-effectiveness value, ignoring any missing `NA` values.
 #' This new candidate survey scheme is now set as the
-#' \emph{current survey scheme}.
+#' *current survey scheme*.
 #'
-#' \item Store the \emph{current survey scheme} in the
-#' \emph{list of survey scheme solutions} and store its approximate expected
-#' value in the \emph{list of approximate expected values}.
+#' \item Store the *current survey scheme* in the
+#' *list of survey scheme solutions* and store its approximate expected
+#' value in the *list of approximate expected values*.
 #'
 #' \item Go to step 12.
 #'
-#' \item Find the solution in the \emph{list of survey scheme solutions} that
+#' \item Find the solution in the *list of survey scheme solutions* that
 #' has the highest expected value in the
-#' \emph{list of approximate expected values} and return this solution.
+#' *list of approximate expected values* and return this solution.
 #'
 #' }
 #'
 #' @return
-#' \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+#' `matrix` of `logical` (`TRUE`/ `FALSE`)
 #' values indicating if a site is selected in the scheme or not. Columns
 #' correspond to sites, and rows correspond to different schemes. If there
-#' are no ties for the best identified solution, then the the \code{matrix}
+#' are no ties for the best identified solution, then the the `matrix`
 #' will only contain a single row.
 #'
 #' @examples

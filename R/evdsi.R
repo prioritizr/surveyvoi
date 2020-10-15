@@ -1,106 +1,106 @@
 #' Expected value of the decision given survey information
 #'
-#' Calculate the \emph{expected value of the conservation management decision
-#' given survey information}. This metric describes the value of the management
+#' Calculate the *expected value of the conservation management decision
+#' given survey information*. This metric describes the value of the management
 #' decision that is expected when the decision maker conducts a surveys a
 #' set of sites to inform the decision.
 #'
 #' @inheritParams fit_xgb_occupancy_models
 #'
-#' @param site_probability_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain modelled
+#' @param site_probability_columns `character` names of `numeric`
+#'   columns in the argument to `site_data` that contain modelled
 #'   probabilities of occupancy for each feature in each site.
 #'   Each column should correspond to a different feature, and contain
-#'   probability data (values between zero and one). No missing (\code{NA})
+#'   probability data (values between zero and one). No missing (`NA`)
 #'   values are permitted in these columns.
 #'
-#' @param site_survey_scheme_column \code{character} name of \code{logical}
-#'  (\code{TRUE} / \code{FALSE}) column in the argument to \code{site_data}
+#' @param site_survey_scheme_column `character` name of `logical`
+#'  (`TRUE` / `FALSE`) column in the argument to `site_data`
 #'  that indicates which sites are selected in the scheme or not.
-#'  No missing \code{NA} values are permitted. Additionally, only sites
+#'  No missing `NA` values are permitted. Additionally, only sites
 #'  that are missing data can be selected or surveying (as per the
-#'  argument to \code{site_detection_columns}).
+#'  argument to `site_detection_columns`).
 #'
-#' @param feature_survey_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains \code{logical} (\code{TRUE} /
-#'   \code{FALSE}) values indicating if the feature will be surveyed in
+#' @param feature_survey_column `character` name of the column in the
+#'   argument to `feature_data` that contains `logical` (`TRUE` /
+#'   `FALSE`) values indicating if the feature will be surveyed in
 #'   the planned surveys or not. Note that considering additional features will
 #'   rapidly increase computational burden, and so it is only recommended to
 #'   consider features that are of specific conservation interest.
-#'   No missing (\code{NA}) values are permitted in this column.
+#'   No missing (`NA`) values are permitted in this column.
 #'
-#' @param site_survey_cost_column \code{character} name of column in the
-#'   argument to  \code{site_data} that contains costs for surveying each
-#'   site. This column should have \code{numeric} values that are equal to
-#'   or greater than zero. No missing (\code{NA}) values are permitted in this
+#' @param site_survey_cost_column `character` name of column in the
+#'   argument to  `site_data` that contains costs for surveying each
+#'   site. This column should have `numeric` values that are equal to
+#'   or greater than zero. No missing (`NA`) values are permitted in this
 #'   column.
 #'
-#' @param site_management_cost_column \code{character} name of column in the
-#'   argument to \code{site_data} that contains costs for managing each
-#'   site for conservation. This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
+#' @param site_management_cost_column `character` name of column in the
+#'   argument to `site_data` that contains costs for managing each
+#'   site for conservation. This column should have `numeric` values that
+#'   are equal to or greater than zero. No missing (`NA`) values are
 #'   permitted in this column.
 #'
-#' @param feature_model_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
+#' @param feature_model_sensitivity_column `character` name of the
+#'   column in the argument to `feature_data` that contains
 #'   probability of the initial models correctly predicting a presence of each
 #'   feature in a given site (i.e. the sensitivity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This column should have `numeric` values that are between zero and
+#'   one. No missing (`NA`) values are permitted in this column.
 #'   This should ideally be calculated using
 #'   \code{\link{fit_xgb_occupancy_models}} or
 #'   \code{\link{fit_hglm_occupancy_models}}.
 #'
-#' @param feature_model_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
+#' @param feature_model_specificity_column `character` name of the
+#'   column in the argument to `feature_data` that contains
 #'   probability of the initial models correctly predicting an absence of each
 #'   feature in a given site (i.e. the specificity of the models).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This column should have `numeric` values that are between zero and
+#'   one. No missing (`NA`) values are permitted in this column.
 #'   This should ideally be calculated using
 #'   \code{\link{fit_xgb_occupancy_models}} or
 #'   \code{\link{fit_hglm_occupancy_models}}.
 #'
-#' @param feature_target_column \code{character} name of the column in the
-#'   argument to \code{feature_data} that contains the \eqn{target}
+#' @param feature_target_column `character` name of the column in the
+#'   argument to `feature_data` that contains the \eqn{target}
 #'   values used to parametrize the conservation benefit of managing of each
 #'   feature.
-#'   This column should have \code{numeric} values that
-#'   are equal to or greater than zero. No missing (\code{NA}) values are
+#'   This column should have `numeric` values that
+#'   are equal to or greater than zero. No missing (`NA`) values are
 #'   permitted in this column.
 #'
-#' @param total_budget \code{numeric} maximum expenditure permitted
+#' @param total_budget `numeric` maximum expenditure permitted
 #'   for conducting surveys and managing sites for conservation.
 #'
-#' @param site_management_locked_in_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked in for (\code{TRUE}) being managed for conservation or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#' @param site_management_locked_in_column `character` name of the column
+#'   in the argument to `site_data` that contains `logical`
+#'   (`TRUE` / `FALSE`) values indicating which sites should
+#'   be locked in for (`TRUE`) being managed for conservation or
+#'   (`FALSE`) not. No missing (`NA`) values are permitted in this
 #'   column. This is useful if some sites have already been earmarked for
 #'   conservation, or if some sites are already being managed for conservation.
-#'   Defaults to \code{NULL} such that no sites are locked in.
+#'   Defaults to `NULL` such that no sites are locked in.
 #'
-#' @param site_management_locked_out_column \code{character} name of the column
-#'   in the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE} / \code{FALSE}) values indicating which sites should
-#'   be locked out for (\code{TRUE}) being managed for conservation or
-#'   (\code{FALSE}) not. No missing (\code{NA}) values are permitted in this
+#' @param site_management_locked_out_column `character` name of the column
+#'   in the argument to `site_data` that contains `logical`
+#'   (`TRUE` / `FALSE`) values indicating which sites should
+#'   be locked out for (`TRUE`) being managed for conservation or
+#'   (`FALSE`) not. No missing (`NA`) values are permitted in this
 #'   column. This is useful if some sites could potentially be surveyed
 #'   to improve model predictions even if they cannot be managed for
-#'   conservation. Defaults to \code{NULL} such that no sites are locked out.
+#'   conservation. Defaults to `NULL` such that no sites are locked out.
 #'
-#' @param prior_matrix \code{numeric} \code{matrix} containing
+#' @param prior_matrix `numeric` `matrix` containing
 #'  the prior probability of each feature occupying each site.
 #'  Rows correspond to features, and columns correspond to sites.
-#'  Defaults to \code{NULL} such that prior data is calculated automatically
+#'  Defaults to `NULL` such that prior data is calculated automatically
 #'  using \code{\link{prior_probability_matrix}}.
 #'
 #' @details This function calculates the expected value and does not
 #'  use approximation methods. As such, this function can only be applied
 #'  to very small problems.
 #'
-#' @return \code{numeric} value.
+#' @return `numeric` value.
 #'
 #' @seealso \code{\link{prior_probability_matrix}}.
 #'

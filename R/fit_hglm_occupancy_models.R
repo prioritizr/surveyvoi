@@ -11,32 +11,32 @@ NULL
 #' (equivalent to L1 regularization used in machine learning contexts)
 #' (Park & Casella 2008).
 #'
-#' @param jags_n_samples \code{integer} number of sample to generate per chain
+#' @param jags_n_samples `integer` number of sample to generate per chain
 #'   for MCMC analyses.
-#'   See documentation for the \code{sample} parameter
+#'   See documentation for the `sample` parameter
 #'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 10,000 for each feature.
 #'
-#' @param jags_n_thin \code{integer} number of thinning iterations for MCMC
+#' @param jags_n_thin `integer` number of thinning iterations for MCMC
 #'   analyses.
-#'   See documentation for the \code{thin} parameter
+#'   See documentation for the `thin` parameter
 #'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 100 for each feature.
 #'
-#' @param jags_n_burnin \code{integer} number of warm up iterations for MCMC
+#' @param jags_n_burnin `integer` number of warm up iterations for MCMC
 #'   analyses.
-#'   See documentation for the \code{burnin} parameter
+#'   See documentation for the `burnin` parameter
 #'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 10,000 for each feature.
 #'
-#' @param jags_n_chains \code{integer} total number of chains for MCMC analyses.
-#'   See documentation for the \code{n.chains} parameter
+#' @param jags_n_chains `integer` total number of chains for MCMC analyses.
+#'   See documentation for the `n.chains` parameter
 #'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 4 for each fold for each feature.
 #'
-#' @param jags_n_adapt \code{integer} number of adapting iterations for MCMC
+#' @param jags_n_adapt `integer` number of adapting iterations for MCMC
 #'   analyses.
-#'   See documentation for the \code{adapt} parameter
+#'   See documentation for the `adapt` parameter
 #'   in \code{\link[runjags]{run.jags}} for more information).
 #'   Defaults to 1,000 for each feature.
 #'
@@ -51,20 +51,20 @@ NULL
 #'  \enumerate{
 #'
 #'  \item The data are prepared for model fitting by partitioning the data using
-#'  k-fold cross-validation (set via argument to \code{n_folds}). The
+#'  k-fold cross-validation (set via argument to `n_folds`). The
 #'  training and evaluation folds are constructed
 #'  in such a manner as to ensure that each training and evaluation
 #'  fold contains at least one presence and one absence observation.
 #'
 #'  \item A model for fit separately for each fold (see
-#'  \code{inst/jags/model.jags} for model code). To assess convergence,
+#'  `inst/jags/model.jags` for model code). To assess convergence,
 #'  the multi-variate potential scale reduction factor
 #'  (MPSRF) statistic is calculated for each model.
 #'
 #'  \item The performance of the cross-validation models is evaluated.
 #'  Specifically, the TSS, sensitivity, and specificity statistics are
 #'  calculated (if relevant, weighted by the argument to
-#'  \code{site_weights_data}). These performance values are calculated using
+#'  `site_weights_data`). These performance values are calculated using
 #'  the models' training and evaluation folds. To assess convergence,
 #'  the maximum MPSRF statistic for the models fit for each feature
 #'  is calculated.
@@ -73,15 +73,15 @@ NULL
 #'
 #' @references
 #' Park T & Casella G (2008) The Bayesian lasso.
-#' \emph{Journal of the American Statistical Association}, 103: 681--686.
+#' *Journal of the American Statistical Association*, 103: 681--686.
 #'
 #' Royle JA & Link WA (2006) Generalized site occupancy models allowing for
-#' false positive and false negative errors. \emph{Ecology}, 87: 835--841.
+#' false positive and false negative errors. *Ecology*, 87: 835--841.
 #'
-#' @return \code{list} object containing:
+#' @return `list` object containing:
 #' \describe{
 #'
-#' \item{models}{\code{list} of \code{list} objects containing the models.}
+#' \item{models}{`list` of `list` objects containing the models.}
 #'
 #' \item{predictions}{\code{\link[tibble]{tibble}} object containing
 #'  predictions for each feature.}

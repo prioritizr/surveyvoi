@@ -9,44 +9,44 @@ NULL
 #' @param site_data \code{\link[sf]{sf}} object containing the candidate survey
 #'   sites.
 #'
-#' @param cost_column \code{character} name of the column in the argument to
-#'   the argument to \code{site_data} that contains the cost for surveying each
-#'   site. No missing (\code{NA}) values are permitted.
+#' @param cost_column `character` name of the column in the argument to
+#'   the argument to `site_data` that contains the cost for surveying each
+#'   site. No missing (`NA`) values are permitted.
 #'
-#' @param survey_budget \code{numeric} vector of maximum budgets for the survey
-#'   schemes. No missing (\code{NA}) values are permitted.
+#' @param survey_budget `numeric` vector of maximum budgets for the survey
+#'   schemes. No missing (`NA`) values are permitted.
 #'
-#' @param env_vars_columns \code{character} vector names of the columns in
-#'   the argument to \code{site_data} that contain \code{numeric} environmental
-#'   variables. No missing (\code{NA}) values are permitted.
+#' @param env_vars_columns `character` vector names of the columns in
+#'   the argument to `site_data` that contain `numeric` environmental
+#'   variables. No missing (`NA`) values are permitted.
 #'
-#' @param method \code{character} name of the distance metric to use for
+#' @param method `character` name of the distance metric to use for
 #'   calculating environmental dissimilarity scores. See
-#'   \code{\link[vegan]{vegdist}} documentation the \code{method} parameter
+#'   \code{\link[vegan]{vegdist}} documentation the `method` parameter
 #'   for other available distance metrics and more information.
-#'   No missing (\code{NA}) values are permitted.
-#'   Defaults to \code{"mahalanobis"} for Mahalanobis distances.
+#'   No missing (`NA`) values are permitted.
+#'   Defaults to `"mahalanobis"` for Mahalanobis distances.
 #'
-#' @param locked_in_column \code{character} (optional) name of the column in
-#'   the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE}/ \code{FALSE}) values indicating if certain sites should be
+#' @param locked_in_column `character` (optional) name of the column in
+#'   the argument to `site_data` that contains `logical`
+#'   (`TRUE`/ `FALSE`) values indicating if certain sites should be
 #'   locked into the survey scheme.
-#'   No missing (\code{NA}) values are permitted.
-#'   Defaults to \code{NULL} such that no sites are locked in.
+#'   No missing (`NA`) values are permitted.
+#'   Defaults to `NULL` such that no sites are locked in.
 #'
-#' @param locked_out_column \code{character} (optional) name of the column in
-#'   the argument to \code{site_data} that contains \code{logical}
-#'   (\code{TRUE}/ \code{FALSE}) values indicating if certain sites should be
+#' @param locked_out_column `character` (optional) name of the column in
+#'   the argument to `site_data` that contains `logical`
+#'   (`TRUE`/ `FALSE`) values indicating if certain sites should be
 #'   locked out of the survey scheme.
-#'   No missing (\code{NA}) values are permitted.
-#'   Defaults to \code{NULL} such that no sites are locked out.
+#'   No missing (`NA`) values are permitted.
+#'   Defaults to `NULL` such that no sites are locked out.
 #'
-#' @param exclude_locked_out \code{logical} should locked out planning units
+#' @param exclude_locked_out `logical` should locked out planning units
 #'  be entirely excluded from the optimization process?
-#'  Defaults to \code{FALSE}.
+#'  Defaults to `FALSE`.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed while generating survey scheme(s). Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed while generating survey scheme(s). Defaults to `FALSE`.
 #'
 #' @details The integer programming formulation of the environmental diversity
 #'   reserve selection problem (Faith & Walker 1996) is used to generate survey
@@ -55,9 +55,9 @@ NULL
 #' @references
 #' Faith DP & Walker PA (1996) Environmental diversity: on the best-possible
 #' use of surrogate data for assessing the relative biodiversity of sets of
-#' areas. \emph{Biodiversity & Conservation}, \strong{5}, 399--415.
+#' areas. *Biodiversity & Conservation*, **5**, 399--415.
 #'
-#' @return \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+#' @return `matrix` of `logical` (`TRUE`/ `FALSE`)
 #'   values indicating if a site is selected in a scheme or not. Columns
 #'   correspond to sites, and rows correspond to different schemes.
 #'

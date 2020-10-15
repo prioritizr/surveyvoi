@@ -5,36 +5,36 @@ NULL
 #'
 #' Simulate site data for developing simulated survey schemes.
 #'
-#' @param n_sites \code{integer} number of sites.
+#' @param n_sites `integer` number of sites.
 #'
-#' @param n_features \code{integer} number of features.
+#' @param n_features `integer` number of features.
 #'
-#' @param proportion_of_sites_missing_data \code{numeric} proportion of sites
+#' @param proportion_of_sites_missing_data `numeric` proportion of sites
 #'   that do not have existing presence/absence data. Values must be between
 #'   zero and one.
 #'
-#' @param n_env_vars \code{integer} number of environmental variables for
+#' @param n_env_vars `integer` number of environmental variables for
 #'   simulating feature distributions. Defaults to 3.
 #'
-#' @param survey_cost_intensity \code{numeric} intensity of the costs of
+#' @param survey_cost_intensity `numeric` intensity of the costs of
 #'   surveying sites. Larger values correspond to larger costs on average.
 #'   Defaults to 2.
 #'
-#' @param survey_cost_radius \code{numeric} value corresponding to
+#' @param survey_cost_radius `numeric` value corresponding to
 #'   the spatial homogeneity of the survey costs. Defaults to 0.1.
 #'
-#' @param management_cost_intensity \code{numeric} intensity of the costs of
+#' @param management_cost_intensity `numeric` intensity of the costs of
 #'   average cost of managing sites for conservation. Defaults to 100.
 #'
-#' @param management_cost_radius \code{numeric} value corresponding to
+#' @param management_cost_radius `numeric` value corresponding to
 #'   the spatial homogeneity of the survey costs. Defaults to 0.1.
 #'
-#' @param max_number_surveys_per_site \code{integer} maximum number of
+#' @param max_number_surveys_per_site `integer` maximum number of
 #'   surveys per site in the simulated data. Defaults to 5.
 #'
-#' @param output_probabilities \code{logical} value indicating if
+#' @param output_probabilities `logical` value indicating if
 #'   probability values of occupancy should be output or not. Defaults
-#'   to \code{TRUE}.
+#'   to `TRUE`.
 #'
 #' @details
 #' The data are simulated using random fields
@@ -42,20 +42,20 @@ NULL
 #' simulations.
 #'
 #' @return \code{\link[sf]{sf}} object with site data.
-#'  The \code{"management_cost"} column contains the site protection costs,
-#'  and the \code{"survey_cost"} column contains the costs for surveying
+#'  The `"management_cost"` column contains the site protection costs,
+#'  and the `"survey_cost"` column contains the costs for surveying
 #'  each site.
 #'  Additionally, columns that start with
-#'  (i) \code{"f"} (e.g. \code{"f1"}) contain the proportion of
+#'  (i) `"f"` (e.g. `"f1"`) contain the proportion of
 #'   times that each feature was detected in each site,
-#'  (ii) \code{"n"} (e.g. \code{"n1"}) contain the number of
+#'  (ii) `"n"` (e.g. `"n1"`) contain the number of
 #'   of surveys for each feature within each site,
-#'  (iii) \code{"p"} (e.g. \code{"p1"}) contain prior
+#'  (iii) `"p"` (e.g. `"p1"`) contain prior
 #'  probability data,  and
-#'  (iv) \code{"e"} (e.g. \code{"e1"}) contain environmental
+#'  (iv) `"e"` (e.g. `"e1"`) contain environmental
 #'  data. Note that columns that contain the same integer value (excepting
 #'  environmental data columns) correspond to the same feature
-#'  (e.g. \code{"d1"}, \code{"n1"}, \code{"p1"} contain data that correspond
+#'  (e.g. `"d1"`, `"n1"`, `"p1"` contain data that correspond
 #'  to the same feature).
 #'
 #' @examples

@@ -7,31 +7,31 @@ NULL
 #'
 #' @inheritParams simulate_site_data
 #'
-#' @param proportion_of_survey_features \code{numeric} proportion of features
+#' @param proportion_of_survey_features `numeric` proportion of features
 #'   that will be examined in the new surveys. Values must be between
 #'   zero and one. Defaults to 1 such that all features should be surveyed.
 #'
 #' @return \code{\link[tibble]{tibble}} object. It contains the following
 #' data:
 #' \describe{
-#' \item{\code{name}}{\code{character} name of each feature.}
+#' \item{`name`}{`character` name of each feature.}
 #'
-#' \item{\code{survey}}{\code{logical} (\code{TRUE} / \code{FALSE}) values
+#' \item{`survey`}{`logical` (`TRUE` / `FALSE`) values
 #'   indicating if each feature should be examined in surveys or not.}
 #'
-#' \item{\code{survey_sensitivity}}{\code{numeric} sensitivity (true positive
+#' \item{`survey_sensitivity`}{`numeric` sensitivity (true positive
 #'   rate) of the survey methodology for each features.}
 #'
-#' \item{\code{survey_specificity}}{\code{numeric} specificity (true negative
+#' \item{`survey_specificity`}{`numeric` specificity (true negative
 #'   rate) of the survey methodology for each features.}
 #'
-#' \item{\code{model_sensitivity}}{\code{numeric} specificity (true positive
+#' \item{`model_sensitivity`}{`numeric` specificity (true positive
 #'   rate) of the occupancy models for each features.}
 #'
-#' \item{\code{model_specificity}}{\code{numeric} specificity (true negative
+#' \item{`model_specificity`}{`numeric` specificity (true negative
 #'   rate) of the occupancy models for each features.}
 #'
-#' \item{\code{target}}{\code{numeric} target values used to parametrize
+#' \item{`target`}{`numeric` target values used to parametrize
 #'   the conservation benefit of managing of each feature (defaults to 1).}
 #'
 #' }

@@ -11,68 +11,68 @@ NULL
 #'
 #' @param feature_data \code{\link[base]{data.frame}} object with feature data.
 #'
-#' @param site_detection_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain the proportion of
+#' @param site_detection_columns `character` names of `numeric`
+#'   columns in the argument to `site_data` that contain the proportion of
 #'   surveys conducted within each site that detected each feature.
 #'   Each column should correspond to a different feature, and contain
 #'   a proportion value (between zero and one). If a site has
 #'   not previously been surveyed, a value of zero should be used.
 #'
-#' @param site_n_surveys_columns \code{character} names of \code{numeric}
-#'   columns in the argument to \code{site_data} that contain the total
+#' @param site_n_surveys_columns `character` names of `numeric`
+#'   columns in the argument to `site_data` that contain the total
 #'   number of surveys conducted for each each feature within each site.
 #'   Each column should correspond to a different feature, and contain
 #'   a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
 #'   not previously been surveyed, a value of zero should be used.
 #'
-#' @param site_env_vars_columns \code{character} names of columns in the
-#'   argument to \code{site_data} that contain environmental information
+#' @param site_env_vars_columns `character` names of columns in the
+#'   argument to `site_data` that contain environmental information
 #'   for fitting updated occupancy models based on possible survey outcomes.
 #'   Each column should correspond to a different environmental variable,
-#'   and contain \code{numeric}, \code{factor}, or \code{character} data.
-#'   No missing (\code{NA}) values are permitted in these columns.
+#'   and contain `numeric`, `factor`, or `character` data.
+#'   No missing (`NA`) values are permitted in these columns.
 #'
-#' @param feature_survey_sensitivity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
+#' @param feature_survey_sensitivity_column `character` name of the
+#'   column in the argument to `feature_data` that contains
 #'   probability of future surveys correctly detecting a presence of each
 #'   feature in a given site (i.e. the sensitivity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This column should have `numeric` values that are between zero and
+#'   one. No missing (`NA`) values are permitted in this column.
 #'
-#' @param feature_survey_specificity_column \code{character} name of the
-#'   column in the argument to \code{feature_data} that contains
+#' @param feature_survey_specificity_column `character` name of the
+#'   column in the argument to `feature_data` that contains
 #'   probability of future surveys correctly detecting an absence of each
 #'   feature in a given site (i.e. the specificity of the survey methodology).
-#'   This column should have \code{numeric} values that are between zero and
-#'   one. No missing (\code{NA}) values are permitted in this column.
+#'   This column should have `numeric` values that are between zero and
+#'   one. No missing (`NA`) values are permitted in this column.
 #'
-#' @param xgb_tuning_parameters \code{list} object containing the candidate
+#' @param xgb_tuning_parameters `list` object containing the candidate
 #'  parameter values for fitting models. Valid parameters include:
-#'  \code{"max_depth"}, \code{"eta"}, \code{"lambda"},
-#'  \code{"min_child_weight"}, \code{"subsample"}, \code{"colsample_by_tree"},
-#'  \code{"objective"}. See documentation for the \code{params} argument in
+#'  `"max_depth"`, `"eta"`, `"lambda"`,
+#'  `"min_child_weight"`, `"subsample"`, `"colsample_by_tree"`,
+#'  `"objective"`. See documentation for the `params` argument in
 #'  \code{\link[xgboost]{xgb.train}} for more information.
 #'
-#' @param xgb_early_stopping_rounds \code{numeric} model rounds for parameter
+#' @param xgb_early_stopping_rounds `numeric` model rounds for parameter
 #'   tuning. See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 10 for each feature.
 #'
-#' @param xgb_n_rounds \code{numeric} model rounds for model fitting
+#' @param xgb_n_rounds `numeric` model rounds for model fitting
 #'   See \code{\link[xgboost]{xgboost}} for more information.
 #'   Defaults to 100 for each feature.
 #'
-#' @param n_folds \code{numeric} number of folds to split the training
+#' @param n_folds `numeric` number of folds to split the training
 #'   data into when fitting models for each feature.
 #'   Defaults to 5 for each feature.
 #'
-#' @param n_threads \code{integer} number of threads to use for parameter
+#' @param n_threads `integer` number of threads to use for parameter
 #'   tuning. Defaults to 1.
 #'
-#' @param seed \code{integer} initial random number generator state for model
+#' @param seed `integer` initial random number generator state for model
 #'   fitting. Defaults to 500.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed during computations. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed during computations. Defaults to `FALSE`.
 #'
 #' @details
 #'  This function (i) prepares the data for model fitting, (ii) calibrates
@@ -84,28 +84,28 @@ NULL
 #'  \enumerate{
 #'
 #'  \item The data are prepared for model fitting by partitioning the data using
-#'  k-fold cross-validation (set via argument to \code{n_folds}). The
+#'  k-fold cross-validation (set via argument to `n_folds`). The
 #'  training and evaluation folds are constructed
 #'  in such a manner as to ensure that each training and evaluation
 #'  fold contains at least one presence and one absence observation.
 #'
 #'  \item A grid search method is used to tune the model parameters. The
-#'  candidate values for each parameter (specified via \code{parameters}) are
+#'  candidate values for each parameter (specified via `parameters`) are
 #'  used to generate a full set of parameter combinations, and these
 #'  parameter combinations are subsequently used for tuning the models.
 #'  To account for unbalanced datasets, the
-#'  \code{scale_pos_weight} \code{\link[xgboost]{xgboost}} parameter
+#'  `scale_pos_weight` \code{\link[xgboost]{xgboost}} parameter
 #'  is calculated as the mean value across each of the training folds
 #'  (i.e. number of absence divided by number of presences per feature).
 #'  For a given parameter combination, models are fit using k-fold cross-
 #'  validation (via \code{\link[xgboost]{xgb.cv}}) -- using the previously
 #'  mentioned training and evaluation folds -- and the True Skill Statistic
 #'  (TSS) calculated using the data held out from each fold is
-#'  used to quantify the performance (i.e. \code{"test_tss_mean"} column in
+#'  used to quantify the performance (i.e. `"test_tss_mean"` column in
 #'  output). These models are also fitted using the
-#'  \code{early_stopping_rounds} parameter to reduce time-spent
+#'  `early_stopping_rounds` parameter to reduce time-spent
 #'  tuning models. If relevant, they are also fitted using the supplied weights
-#'  (per by the argument to \code{site_weights_data}). After exploring the
+#'  (per by the argument to `site_weights_data`). After exploring the
 #'  full set of parameter combinations, the best parameter combination is
 #'  identified, and the associated parameter values and models are stored for
 #'  later use.
@@ -118,15 +118,15 @@ NULL
 #'  \item The performance of the cross-validation models is evaluated.
 #'  Specifically, the TSS, sensitivity, and specificity statistics are
 #'  calculated (if relevant, weighted by the argument to
-#'  \code{site_weights_data}). These performance values are calculated using
+#'  `site_weights_data`). These performance values are calculated using
 #'  the models' training and evaluation folds.
 #'
 #' }
 #'
-#' @return \code{list} object containing:
+#' @return `list` object containing:
 #' \describe{
 #'
-#' \item{parameters}{\code{list} of \code{list} objects containing the best
+#' \item{parameters}{`list` of `list` objects containing the best
 #' tuning parameters for each feature.}
 #'
 #' \item{predictions}{\code{\link[tibble]{tibble}} object containing

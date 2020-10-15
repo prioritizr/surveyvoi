@@ -28,7 +28,7 @@ NULL
 #'
 #' }
 #'
-#' @return \code{numeric} \code{vector} of richness scores. Note that
+#' @return `numeric` `vector` of richness scores. Note that
 #'  these values are automatically rescaled between 0.01 and 1.
 #'
 #' @examples

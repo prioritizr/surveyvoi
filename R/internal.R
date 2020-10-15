@@ -1,36 +1,36 @@
 #' Space based prioritizations
 #'
 #' This function generates space-based prioritizations by solving the
-#' \emph{p}-median problem to optimality.
+#' *p*-median problem to optimality.
 #'
-#' @param x \code{matrix} object containing a symmetric distance matrix that
+#' @param x `matrix` object containing a symmetric distance matrix that
 #'   measures the dissimilarity between different planning units.
 #'
-#' @param budget \code{numeric} vector indicating the maximum expenditure for
+#' @param budget `numeric` vector indicating the maximum expenditure for
 #'   each solution. The values must be between one and
-#'   the number of planning units (i.e. length of \code{x}).
+#'   the number of planning units (i.e. length of `x`).
 #'
-#' @param costs \code{numeric} cost values for each planning units. Defaults
+#' @param costs `numeric` cost values for each planning units. Defaults
 #'   to a vector assigning a cost of one for each planning unit.
 #'
-#' @param locked_in \code{logical} vector indicating if each planning unit
-#'   is (\code{TRUE}) locked into the solution or (\code{FALSE}) not. Defaults
-#'   to a vector of \code{FALSE} for each planning unit.
+#' @param locked_in `logical` vector indicating if each planning unit
+#'   is (`TRUE`) locked into the solution or (`FALSE`) not. Defaults
+#'   to a vector of `FALSE` for each planning unit.
 #'
-#' @param locked_out \code{logical} vector indicating if each planning unit
-#'   is (\code{TRUE}) locked out of the solution or (\code{FALSE}) not. Defaults
-#'   to a vector of \code{FALSE} for each planning unit.
+#' @param locked_out `logical` vector indicating if each planning unit
+#'   is (`TRUE`) locked out of the solution or (`FALSE`) not. Defaults
+#'   to a vector of `FALSE` for each planning unit.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed while generating prioritization. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed while generating prioritization. Defaults to `FALSE`.
 #'
-#' @return \code{matrix} containing the solution. Each column corresponds
+#' @return `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
 #'   solution. Cell values indicate if a given planning unit was selected in a
 #'   given solution.
 #'
-#' @seealso For more information on the \emph{p}-median problem
-#'   see \url{http://www.hyuan.com/java/how.html}.
+#' @seealso For more information on the *p*-median problem
+#'   see <http://www.hyuan.com/java/how.html>.
 #'
 #' @noRd
 distance_based_prioritizations <- function(x, budget, costs, locked_in,
@@ -101,24 +101,24 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
 #' select a set of planning units with the highest sum of weights, subject
 #' to a budget.
 #'
-#' @param x \code{numeric} vector containing the weights.
+#' @param x `numeric` vector containing the weights.
 #'
-#' @param budget \code{numeric} number indicating how many planning units
+#' @param budget `numeric` number indicating how many planning units
 #'   should be selected in the solution. The value must be between one and
-#'   the number of planning units (i.e. length of \code{x}).
+#'   the number of planning units (i.e. length of `x`).
 #'
-#' @param locked_in \code{logical} vector indicating if each planning unit
-#'   is (\code{TRUE}) locked into the solution or (\code{FALSE}) not. Defaults
-#'   to a vector of \code{FALSE} for each planning unit.
+#' @param locked_in `logical` vector indicating if each planning unit
+#'   is (`TRUE`) locked into the solution or (`FALSE`) not. Defaults
+#'   to a vector of `FALSE` for each planning unit.
 #'
-#' @param locked_out \code{logical} vector indicating if each planning unit
-#'   is (\code{TRUE}) locked out of the solution or (\code{FALSE}) not. Defaults
-#'   to a vector of \code{FALSE} for each planning unit.
+#' @param locked_out `logical` vector indicating if each planning unit
+#'   is (`TRUE`) locked out of the solution or (`FALSE`) not. Defaults
+#'   to a vector of `FALSE` for each planning unit.
 #'
-#' @param verbose \code{logical} indicating if information should be
-#'   printed while generating prioritization. Defaults to \code{FALSE}.
+#' @param verbose `logical` indicating if information should be
+#'   printed while generating prioritization. Defaults to `FALSE`.
 #'
-#' @return \code{matrix} containing the solution. Each column corresponds
+#' @return `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
 #'   row. Cell values indicate if a given planning unit was selected in a
 #'   given solution.
@@ -189,27 +189,27 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
 #'
 #' Create k-folds given survey data in multiple sites.
 #'
-#' @param prop_detected \code{integer} proportion of surveys for each site
+#' @param prop_detected `integer` proportion of surveys for each site
 #'   within which the species was detected. Each
 #'   element corresponds to a different site, and values indicate the
 #'   proportion of times a species was detected within a given site.
 #'   If a site does not have any detections, then a value of zero should be
-#'   used (not \code{NA}).
+#'   used (not `NA`).
 #'
-#' @param n_total \code{integer} number of total surveys conducted within
+#' @param n_total `integer` number of total surveys conducted within
 #'   each site.
 #'   Each element corresponds to a different site, and values indicate the
 #'   number of surveys conducted within the given site.
 #'   If a site does not have any non-detections, then a value of zero should be
-#'   used (not \code{NA}).
+#'   used (not `NA`).
 #'
-#' @param n \code{numeric} number of folds.
+#' @param n `numeric` number of folds.
 #'
-#' @param index \code{integer} indices associated with each site.
+#' @param index `integer` indices associated with each site.
 #'   Defaults to a sequence ranging from 1 to the cardinality of the
-#'   argument to \code{x} (i.e. \code{seq_along(x)}).
+#'   argument to `x` (i.e. `seq_along(x)`).
 #'
-#' @param seed \code{numeric} random number generated seed for generating
+#' @param seed `numeric` random number generated seed for generating
 #'   folds. Defaults to 500.
 #'
 #' @details
@@ -219,7 +219,7 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
 #'  sites with have zero detections and zero non-detections are
 #'  randomly allocated to folds.
 #'
-#' @return \code{list} of \code{list} objects containing the
+#' @return `list` of `list` objects containing the
 #'  indices excluded from each fold.
 #'
 #' @noRd
@@ -322,7 +322,7 @@ create_site_folds <- function(
 #'
 #' Check if JAGS is installed.
 #'
-#' @return \code{logical} indicating if JAGS is installed.
+#' @return `logical` indicating if JAGS is installed.
 #'
 #' @noRd
 is_jags_installed <- function() {
