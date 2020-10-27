@@ -26,19 +26,11 @@ knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
 devtools::load_all()
 ```
 
-```{r, include = FALSE}
-h <- 3.5
-w <- 3.5
-is_check <- ("CheckExEnv" %in% search()) || any(c("_R_CHECK_TIMINGS_",
-             "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
-knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
-```
-
 ## Introduction
 
 The resources available for conservation are limited. To ensure that conservation resources are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns is incomplete. As a consequence, spatial prioritizations can potentially be improved by collecting additional data (e.g. surveying sites to refine estimates of which species are present inside them). However, this is complicated by the fact that surveying sites consumes limited resources that also need to be used for conservation management. Thus decision makers need to strategically prioritize sites for surveys that will substantially improve spatial prioritisations---this is not a trivial task.
 
-The _surveyvoi_ package is decision support tool for prioritizing sites for surveys based on their potential to improve spatial prioritizations for managing biodiversity. Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package aims to identify which sites should be surveyed because doing so could lead to vastly superior conservation management plans (i.e. the management _decision_). Methods are provided to calculate the _expected value of the decision given current information_, and the _expected value of the decision given a survey scheme_ (using exact methods for small problems, and approximation methods for large problems). Furthermore, by examining survey schemes, optimal survey schemes can be identified. In this vignette, we will use a simulated dataset to explore these methods.
+The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their return on investment.
 
 ## Setup
 
@@ -56,27 +48,30 @@ library(tibble)
 library(RandomFields)
 
 # set RNG seeds for reproducibility
-seed <- 715
+seed <- 722
 set.seed(seed)
 RFoptions(seed = seed)
 
 # set default table printing options
-options(pillar.sigfig = 6)
+options(pillar.sigfig = 6, tibble.width = Inf)
 ```
 
 ## Simulate data
 
-Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 18 sites---meaning that 12 of the sites will not have survey data. We will also simulate two spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
+Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites---meaning that 15 of the sites will not have survey data. We will also simulate three spatially auto-correlated variables to characterise the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
 
 ```{r}
 # simulate site data
 site_data <- simulate_site_data(
-  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 12 / 30,
-  n_env_vars = 3, max_number_surveys_per_site = 1, output_probabilities = FALSE)
+  n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 15 / 30,
+  n_env_vars = 3, survey_cost_intensity = 5, management_cost_intensity = 100,
+  max_number_surveys_per_site = 1, output_probabilities = FALSE)
 
 # print site data
 print(site_data)
+```
 
+```{r, fig.height = h, fig.width = w}
 # plot the spatial location of the sites
 ggplot(site_data) +
   geom_sf() +
@@ -89,25 +84,33 @@ To help understand the simulated data, let's create some visualizations.
 
 ```{r, fig.height = h, fig.width = w}
 # plot site occupancy data from previous surveys
+# 1 = species was detected in 100% of the previous surveys
+# 0 = species was detected in 0% of the previous surveys
 site_data %>%
-  mutate(f1 = as.character(f1)) %>%
+  select(starts_with("f")) %>%
+  gather(name, value, -geometry) %>%
+  mutate(value = as.character(value)) %>%
   ggplot() +
-  geom_sf(aes(color = f1)) +
+  geom_sf(aes(color = value)) +
     scale_color_manual(values = c("1" = "red", "0" = "black")) +
+    facet_wrap(~ name) +
     labs(title = "detection/non-detection data")
 ```
 
 ```{r, fig.height = h, fig.width = w}
 # plot number of previous surveys within each site
 site_data %>%
-  mutate(n1 = as.character(n1)) %>%
+  select(starts_with("n")) %>%
+  gather(name, value, -geometry) %>%
+  mutate(value = as.character(value)) %>%
   ggplot() +
-  geom_sf(aes(color = n1)) +
+  geom_sf(aes(color = value)) +
     scale_color_manual(values = c("1" = "blue", "0" = "black")) +
+    facet_wrap(~ name) +
     labs(title = "number of previous surveys data")
 ```
 
-```{r, fig.height = h, fig.width = w * 1.8}
+```{r, fig.height = h, fig.width = w * 2.0}
 # plot site cost data
 # note that survey and management costs are on different scales
 p1 <- ggplot(site_data) +
@@ -123,7 +126,7 @@ p2 <- ggplot(site_data) +
 grid.arrange(p1, p2, nrow = 1)
 ```
 
-```{r, fig.height = h, fig.width = w * 1.5}
+```{r, fig.height = h, fig.width = w * 2.25}
 # plot site environmental data
 site_data %>%
   select(starts_with("e")) %>%
@@ -142,14 +145,18 @@ After simulating data for the sites, we will simulate data for the conservation 
 feature_data <- simulate_feature_data(
   n_features = 1, proportion_of_survey_features = 1)
 
+# remove simulated model performance statistics since we will fit models below
+feature_data$model_sensitivity <- NULL
+feature_data$model_specificity <- NULL
+
 # manually set target
-feature_data$target <- 15
+feature_data$target <- 5
 
 # print feature data
 print(feature_data)
 ```
 
-The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `target` column specifies the amount of occupied sites for each species that should ideally be represented by the prioritization. Finally, the `sensitivity` and `specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology.
+The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly detecting a presence) and specificity (probability of correctly detecting an absence) of the survey methodology. Finally, the `target` column specifies the number of occupied sites for each species that should ideally be represented by the prioritization.
 
 ## Modelling probability of occupancy
 
@@ -160,13 +167,13 @@ After simulating the data, we need to estimate the probability of the feature oc
 xgb_parameters <- list(eta = 0.1, lambda = 0.1, objective = "binary:logistic")
 
 # identify suitable parameters for model fitting
-# ideally, we would try a larger range of values,
+# ideally we would try a larger range of values,
 # but we will keep it low to reduce processing time for this example
 xgb_results <- fit_xgb_occupancy_models(
   site_data, feature_data,
-  "f1", "n1", c("e1", "e2", "e3"),
+  c("f1"), c("n1"), c("e1", "e2", "e3"),
   "survey_sensitivity", "survey_specificity",
-  n_folds = 2, xgb_tuning_parameters = xgb_parameters)
+  n_folds = c(2), xgb_tuning_parameters = xgb_parameters)
 ```
 
 After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.
@@ -188,15 +195,20 @@ xgb_predictions <- xgb_results$predictions
 print(xgb_predictions)
 site_data$p1 <- xgb_predictions$f1
 
+```{r, fig.height = h, fig.width = w}
 # plot site estimated occupancy probabilities
-ggplot(site_data) +
-  geom_sf(aes(color = p1)) +
+site_data %>%
+  select(starts_with("p")) %>%
+  gather(name, value, -geometry) %>%
+  ggplot() +
+  geom_sf(aes(color = value)) +
+  facet_wrap(~name) +
   scale_color_viridis() +
   labs(title = "modelled probabilities")
 ```
 
 ```{r, include = FALSE}
-stopifnot(xgb_performance$test_tss_mean > 0)
+stopifnot(all(xgb_performance$test_tss_mean > 0))
 stopifnot(all(feature_data$model_sensitivity > 0.5))
 stopifnot(all(feature_data$model_specificity > 0.5))
 ```
@@ -207,7 +219,7 @@ After simulating and modelling the data, we will now examine the _expected value
 
 ```{r}
 # calculate total budget for surveying and managing sites
-total_budget <- sum(site_data$management_cost) * 0.8
+total_budget <- sum(site_data$management_cost) * 0.5
 
 # print total budget
 print(total_budget)
@@ -220,9 +232,9 @@ Given the total budget, we can now calculate the _expected value of the decision
 evd_current <- evdci(
   site_data = site_data,
   feature_data = feature_data,
-  site_detection_columns = "f1",
-  site_n_surveys_columns = "n1",
-  site_probability_columns = "p1",
+  site_detection_columns = c("f1"),
+  site_n_surveys_columns = c("n1"),
+  site_probability_columns = c("p1"),
   site_management_cost_column = "management_cost",
   feature_survey_sensitivity_column = "survey_sensitivity",
   feature_survey_specificity_column = "survey_specificity",
@@ -270,7 +282,7 @@ print(total_budget)
 stopifnot(total_budget >= survey_budget)
 ```
 
-We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; @r2], (iii) select unsurveyed site with highly uncertain modelled predictions (i.e. modelled probabilities close to 0.5), (iv) increase coverage of sites that have low management costs, and (v) increase coverage of sites with high modelled probabilities of occupancy (i.e. predicted site richness).
+We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites [@r3], (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; @r2], (iii) increase coverage of sites with highly uncertain information [@r5], (iv) increase coverage of sites where species are predicted to occur [@r4], and (v) increase coverage of sites that have low management costs.
 
 ```{r}
 # (i) generate survey scheme to increase geographic coverage
@@ -344,9 +356,9 @@ site_data %>%
 
 We can see that different approaches yield different survey schemes -- but which survey scheme is the best?
 
-## Expected value of the decision given the candidate survey schemes
+## Expected value of the decision given sample information
 
-Now that we've generated the survey schemes, let's calculate the _expected value of the decision of each survey scheme_.
+Now that we've generated the survey schemes, let's calculate the _expected value of the decision given sample information_ for each survey scheme.
 
 ```{r, fig.height = h, fig.width = w * 2.0}
 # create table to store results
@@ -360,9 +372,9 @@ evd_survey_schemes$value <- sapply(
     evdsi(
       site_data = site_data,
       feature_data = feature_data,
-      site_detection_columns = "f1",
-      site_n_surveys_columns = "n1",
-      site_probability_columns = "p1",
+      site_detection_columns = c("f1"),
+      site_n_surveys_columns = c("n1"),
+      site_probability_columns = c("p1"),
       site_survey_scheme_column = as.character(x),
       site_management_cost_column = "management_cost",
       site_survey_cost_column = "survey_cost",
@@ -381,7 +393,7 @@ print(evd_survey_schemes)
 
 We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the _return on investment_ for each survey scheme.
 
-```{r}
+```{r, fig.height = h, fig.width = w * 1.5}
 # estimate the return on investment for each survey scheme
 evd_survey_schemes$roi <-
   evd_survey_schemes$value - evd_current
@@ -404,7 +416,7 @@ evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that all of the survey schemes have a very low return on investment (i.e. most values are very close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent conducting them. So, we would not choose to implement any of these surveys schemes. But what is the best possible -- the optimal -- survey scheme?
+In this particular simulation, we can see that all of the survey schemes have a low return on investment (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent conducting them. Although surveying sites with the highest probability of occupancy is the best strategy -- in this particular situation -- because it has the best return on investment, can we improve on this? What is the optimal survey scheme?
 
 ## Optimal survey scheme
 
@@ -412,12 +424,12 @@ Now let's identify the optimal survey scheme by directly maximizing the _expecte
 
 ```{r, results = "hide", message = FALSE, warning = FALSE}
 # identify optimal survey scheme(s)
-opt_scheme <- optimal_survey_scheme(
+opt_scheme <- approx_near_optimal_survey_scheme(
     site_data = site_data,
     feature_data = feature_data,
-    site_detection_columns = "f1",
-    site_n_surveys_columns = "n1",
-    site_probability_columns = "p1",
+    site_detection_columns = c("f1"),
+    site_n_surveys_columns = c("n1"),
+    site_probability_columns = c("p1"),
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
     feature_survey_column = "survey",
@@ -428,6 +440,8 @@ opt_scheme <- optimal_survey_scheme(
     feature_target_column = "target",
     total_budget = total_budget,
     survey_budget = total_budget,
+    n_approx_replicates = 5,
+    n_approx_outcomes_per_replicate = 1000,
     verbose = TRUE)
 ```
 
@@ -449,18 +463,20 @@ scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black"))
 
 ```{r, include = FALSE}
 assertthat::assert_that(sum(site_data$opt_scheme) >= 1)
+assertthat::assert_that(sum(site_data$opt_scheme) > sum(site_data$geo_scheme))
+assertthat::assert_that(!all(site_data$opt_scheme == (site_data$n1 > 0.5)))
 ```
 
-We can see that the optimal survey scheme (`opt_scheme`) is different to the previous survey schemes. In particular, the optimal scheme selects fewer sites than the other survey schemes. This result shows that survey schemes need to ensure adequate funds remain for actually achieving conservation objectives.
+We can see that the optimal survey scheme (`opt_scheme`) is different to the previous survey schemes. In particular, the optimal scheme selects more sites than the other survey schemes.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # calculate return on investment of the optimal scheme
 evd_opt <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
-    site_detection_columns = "f1",
-    site_n_surveys_columns = "n1",
-    site_probability_columns = "p1",
+    site_detection_columns = c("f1"),
+    site_n_surveys_columns = c("n1"),
+    site_probability_columns = c("p1"),
     site_survey_scheme_column = "opt_scheme",
     site_management_cost_column = "management_cost",
     site_survey_cost_column = "survey_cost",
