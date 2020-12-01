@@ -17,7 +17,7 @@ Imports:
     progress (>= 1.2.2),
     magrittr (>= 1.5),
     assertthat (>= 0.2.0),
-    xgboost (>= 1.0.0.1),
+    xgboost (>= 1.2.0.1),
     Metrics (>= 0.1.4),
     plyr (>= 1.8.4),
     withr (>= 2.1.2),
@@ -54,7 +54,6 @@ LinkingTo:
     nloptr (>= 1.2.2.2)
 License: GPL-3
 LazyData: true
-OS_type: unix
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),

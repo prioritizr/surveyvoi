@@ -58,7 +58,7 @@ check:
 	touch inst/doc/.gitkeep
 
 install:
-	R --slave -e "devtools::install_local('../surveyroi', force = TRUE, upgrade = 'never')"
+	R --slave -e "devtools::install_local('../surveyvoi', force = TRUE, upgrade = 'never')"
 
 examples:
 	rm -f examples.log

@@ -393,6 +393,11 @@ fit_xgb_occupancy_models <- function(
         stats::predict(m_k, x_train_k, ntreelimit = nround_k)))
       p_test_k <- c(withr::with_package("xgboost",
         stats::predict(m_k, x_test_k, ntreelimit = nround_k)))
+      ## validate predictions
+      assertthat::assert_that(all(p_train_k >= 0), all(p_train_k <= 1),
+        msg = "xgboost predictions are not between zero and one")
+      assertthat::assert_that(all(p_test_k >= 0), all(p_test_k <= 1),
+        msg = "xgboost predictions are not between zero and one")
       ## calculate performance
       perf_train_k <- rcpp_model_performance(
         y_train_k, p_train_k, w_train_k, survey_sens, survey_spec)
@@ -431,8 +436,14 @@ fit_xgb_occupancy_models <- function(
     rowMeans(
       vapply(m[[i]]$models, FUN.VALUE = numeric(nrow(site_env_data)),
              function(x) {
-      c(withr::with_package("xgboost", stats::predict(
+      ## generate predictions
+      out <- c(withr::with_package("xgboost", stats::predict(
         x, site_env_data, ntreelimit = x$best_iteration)))
+      ## validate predictions
+      assertthat::assert_that(all(out >= 0), all(out <= 1),
+        msg = "xgboost predictions are not between zero and one")
+      ## return result
+      out
     }))
   })
   colnames(pred) <- site_detection_columns
@@ -522,10 +533,14 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       withr::with_seed(seed, {
         model <- do.call(what = xgboost::xgb.train, args)
       })
-      ### evaluate model
+      ### generate predictions
       yhat_test <- c(withr::with_package("xgboost",
           stats::predict(
             model, data[[k]]$test$x, ntreelimit = model$best_iteration)))
+      ### validate predictions
+      assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
+        msg = "xgboost predictions are not between zero and one")
+      ### evaluate model
       perf <- rcpp_model_performance(
         data[[k]]$test$y, yhat_test, data[[k]]$test$w,
         survey_sensitivity, survey_specificity)[[1]]
@@ -558,11 +573,12 @@ make_feval_tss <- function(sens, spec) {
   function(preds, dtest) {
     labels <- xgboost::getinfo(dtest, "label")
     wts <- xgboost::getinfo(dtest, "weight")
+    preds <- stats::plogis(preds)
     assertthat::assert_that(
       any(labels >= 0.5), any(labels < 0.5),
       msg = "test labels need at least one presence and one absence")
     assertthat::assert_that(all(preds >= 0), all(preds <= 1),
-      msg = "xgboost predictions are not between zero and one")
+      msg = "xgboost predictions are not between zero and one (eval_matric)")
     value <- rcpp_model_performance(labels, preds, wts, sens, spec)
     list(metric = "tss", value = value[[1]])
   }

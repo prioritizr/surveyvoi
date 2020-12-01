@@ -88,19 +88,10 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/surveyvoi.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/simulation.html">Simulation Study</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -138,30 +129,30 @@ decision that is expected when the decision maker is limited to
 existing biodiversity data (i.e. survey data and environmental niche models).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>evdci</span>(
-  <span class='no'>site_data</span>,
-  <span class='no'>feature_data</span>,
-  <span class='no'>site_detection_columns</span>,
-  <span class='no'>site_n_surveys_columns</span>,
-  <span class='no'>site_probability_columns</span>,
-  <span class='no'>site_management_cost_column</span>,
-  <span class='no'>feature_survey_sensitivity_column</span>,
-  <span class='no'>feature_survey_specificity_column</span>,
-  <span class='no'>feature_model_sensitivity_column</span>,
-  <span class='no'>feature_model_specificity_column</span>,
-  <span class='no'>feature_target_column</span>,
-  <span class='no'>total_budget</span>,
-  <span class='kw'>site_management_locked_in_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>site_management_locked_out_column</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>prior_matrix</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>evdci</span><span class='op'>(</span>
+  <span class='va'>site_data</span>,
+  <span class='va'>feature_data</span>,
+  <span class='va'>site_detection_columns</span>,
+  <span class='va'>site_n_surveys_columns</span>,
+  <span class='va'>site_probability_columns</span>,
+  <span class='va'>site_management_cost_column</span>,
+  <span class='va'>feature_survey_sensitivity_column</span>,
+  <span class='va'>feature_survey_specificity_column</span>,
+  <span class='va'>feature_model_sensitivity_column</span>,
+  <span class='va'>feature_model_specificity_column</span>,
+  <span class='va'>feature_target_column</span>,
+  <span class='va'>total_budget</span>,
+  site_management_locked_in_column <span class='op'>=</span> <span class='cn'>NULL</span>,
+  site_management_locked_out_column <span class='op'>=</span> <span class='cn'>NULL</span>,
+  prior_matrix <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://r-spatial.github.io/sf/reference/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
@@ -305,16 +296,18 @@ to very small problems.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># simulate data</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
-<span class='no'>feature_data</span>$<span class='no'>target</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='fl'>1</span>, <span class='fl'>1</span>)
+<span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>5</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>feature_data</span><span class='op'>$</span><span class='va'>target</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>site_data</span>)</div><div class='output co'>#&gt; Simple feature collection with 5 features and 11 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Simple feature collection with 5 features and 11 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
@@ -327,25 +320,27 @@ to very small problems.</p>
 #&gt; </span><span style='color: #555555;'>3</span><span>        3.74            62.0   0       0     0     0  1.77   1.42   1.11  0.892
 #&gt; </span><span style='color: #555555;'>4</span><span>        6.82            71.8   0       0     2     2 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span> 0.064
 #&gt; </span><span style='color: #555555;'>5</span><span>        5.22            70.7   0       0     0     0 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span> 0.099
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>feature_data</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
-#&gt;   name  survey survey_sensitiv~ survey_specific~ model_sensitivi~
+#&gt; </span><span style='color: #555555;'># … with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
+#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.965            0.821            0.701
 #&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.960            0.814            0.701
-#&gt; </span><span style='color: #555555;'># ... with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># … with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
-<span class='no'>total_budget</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>site_data</span>$<span class='no'>management_cost</span>) * <span class='fl'>0.5</span>
+<span class='va'>total_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>management_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.5</span>
 
 <span class='co'># calculate expected value of management decision given current information</span>
 <span class='co'># using exact method</span>
-<span class='no'>ev_current</span> <span class='kw'>&lt;-</span> <span class='fu'>evdci</span>(
-  <span class='no'>site_data</span>, <span class='no'>feature_data</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>),
+<span class='va'>ev_current</span> <span class='op'>&lt;-</span> <span class='fu'>evdci</span><span class='op'>(</span>
+  <span class='va'>site_data</span>, <span class='va'>feature_data</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span><span class='op'>)</span>,
   <span class='st'>"management_cost"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
   <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
-  <span class='st'>"target"</span>, <span class='no'>total_budget</span>)
+  <span class='st'>"target"</span>, <span class='va'>total_budget</span><span class='op'>)</span>
 
 <span class='co'># print exact value</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>ev_current</span>)</div><div class='output co'>#&gt; [1] 1.999758</div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>ev_current</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 1.999758</div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -362,7 +357,7 @@ to very small problems.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

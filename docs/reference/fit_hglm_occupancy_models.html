@@ -91,19 +91,10 @@ covariate coefficients are sampled using a Laplace prior distribution
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/surveyvoi.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/simulation.html">Simulation Study</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -144,31 +135,31 @@ covariate coefficients are sampled using a Laplace prior distribution
 (Park &amp; Casella 2008).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>fit_hglm_occupancy_models</span>(
-  <span class='no'>site_data</span>,
-  <span class='no'>feature_data</span>,
-  <span class='no'>site_detection_columns</span>,
-  <span class='no'>site_n_surveys_columns</span>,
-  <span class='no'>site_env_vars_columns</span>,
-  <span class='no'>feature_survey_sensitivity_column</span>,
-  <span class='no'>feature_survey_specificity_column</span>,
-  <span class='kw'>jags_n_samples</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>10000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>jags_n_burnin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>jags_n_thin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>jags_n_adapt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>jags_n_chains</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>4</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span>(<span class='no'>site_detection_columns</span>)),
-  <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>500</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>fit_hglm_occupancy_models</span><span class='op'>(</span>
+  <span class='va'>site_data</span>,
+  <span class='va'>feature_data</span>,
+  <span class='va'>site_detection_columns</span>,
+  <span class='va'>site_n_surveys_columns</span>,
+  <span class='va'>site_env_vars_columns</span>,
+  <span class='va'>feature_survey_sensitivity_column</span>,
+  <span class='va'>feature_survey_specificity_column</span>,
+  jags_n_samples <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>10000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  jags_n_burnin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  jags_n_thin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  jags_n_adapt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1000</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  jags_n_chains <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>4</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  n_folds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>site_detection_columns</span><span class='op'>)</span><span class='op'>)</span>,
+  n_threads <span class='op'>=</span> <span class='fl'>1</span>,
+  seed <span class='op'>=</span> <span class='fl'>500</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>site_data</th>
-      <td><p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.</p></td>
+      <td><p><code><a href='https://r-spatial.github.io/sf/reference/sf.html'>sf::sf()</a></code> object with site data.</p></td>
     </tr>
     <tr>
       <th>feature_data</th>
@@ -283,7 +274,7 @@ printed during computations. Defaults to <code>FALSE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>list</code> object containing:</p><dl'>
+    <p><code>list</code> object containing:</p><dl>
 
 <dt>models</dt><dd><p><code>list</code> of <code>list</code> objects containing the models.</p></dd>
 
@@ -292,7 +283,7 @@ predictions for each feature.</p></dd>
 
 <dt>performance</dt><dd><p><code><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble::tibble()</a></code> object containing the
 performance of the best models for each feature. It contains the following
-columns:<dl'>
+columns:<dl>
 <dt>feature</dt><dd><p>name of the feature.</p></dd>
 <dt>max_mpsrf</dt><dd><p>maximum multi-variate potential scale reduction factor
 (MPSRF) value for the models. A MPSRF value less than 1.05 means that all
@@ -361,16 +352,18 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>RandomFields</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
-<span class='no'>site_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>30</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.1</span>)</div><div class='output co'>#&gt; ...</div><div class='input'><span class='no'>feature_data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span>(<span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+<span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># print JAGS model code</span>
-<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"jags"</span>, <span class='st'>"model.jags"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"surveyvoi"</span>)),
-    <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>"\n"</span>)</div><div class='output co'>#&gt; model {
+<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"jags"</span>, <span class='st'>"model.jags"</span>, package <span class='op'>=</span> <span class='st'>"surveyvoi"</span><span class='op'>)</span><span class='op'>)</span>,
+    sep <span class='op'>=</span> <span class='st'>"\n"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; model {
 #&gt;   # data
 #&gt;   ## int&lt;lower=1&gt; n_vars
 #&gt;   ## int&lt;lower=1&gt; train_n_sites
@@ -404,14 +397,15 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 <span class='co'># fit models</span>
 <span class='co'># note that we use a small number of MCMC iterations so that the example</span>
 <span class='co'># finishes quickly, you probably want to use the defaults for real work</span>
-<span class='no'>results</span> <span class='kw'>&lt;-</span> <span class='fu'>fit_hglm_occupancy_models</span>(
-   <span class='no'>site_data</span>, <span class='no'>feature_data</span>,
-   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>), <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>),
+<span class='va'>results</span> <span class='op'>&lt;-</span> <span class='fu'>fit_hglm_occupancy_models</span><span class='op'>(</span>
+   <span class='va'>site_data</span>, <span class='va'>feature_data</span>,
+   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span>,
    <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-   <span class='kw'>n_folds</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>5</span>, <span class='fl'>2</span>),
-   <span class='kw'>jags_n_samples</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>250</span>, <span class='fl'>2</span>), <span class='kw'>jags_n_burnin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>250</span>, <span class='fl'>2</span>),
-   <span class='kw'>jags_n_thin</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='fl'>2</span>), <span class='kw'>jags_n_adapt</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>100</span>, <span class='fl'>2</span>),
-   <span class='kw'>n_threads</span> <span class='kw'>=</span> <span class='fl'>1</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='message'>Loading required namespace: rjags</span></div><div class='output co'>#&gt; Compiling rjags model...
+   n_folds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,
+   jags_n_samples <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_burnin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>,
+   jags_n_thin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_adapt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>2</span><span class='op'>)</span>,
+   n_threads <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='message'>Loading required namespace: rjags</span></div><div class='output co'>#&gt; Compiling rjags model...
 #&gt; Calling the simulation using the rjags method...
 #&gt; Adapting the model for 100 iterations...
 #&gt; Burning in the model for 250 iterations...
@@ -753,7 +747,8 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt; Calculating summary statistics...
 #&gt; Calculating the Gelman-Rubin statistic for 3 variables....</div><div class='input'>
 <span class='co'># print model predictions</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>predictions</span>)</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>predictions</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
 #&gt;        f1          f2
 #&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'> 1</span><span> 0.868  1.00       
@@ -766,9 +761,10 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt; </span><span style='color: #555555;'> 8</span><span> 0.447  0.251      
 #&gt; </span><span style='color: #555555;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     
 #&gt; </span><span style='color: #555555;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   
-#&gt; </span><span style='color: #555555;'># ... with 20 more rows</span><span></div><div class='input'>
+#&gt; </span><span style='color: #555555;'># … with 20 more rows</span><span></div><div class='input'>
 <span class='co'># print model performance</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>results</span>$<span class='no'>performance</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 14</span><span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>performance</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 14</span><span>
 #&gt;   feature max_mpsrf train_tss_mean train_tss_std train_sensitivity_mean
 #&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span> f1           3.17          0.716        0.320                   0.859
@@ -784,7 +780,7 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt;   test_specificity_mean test_specificity_std
 #&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
 #&gt; </span><span style='color: #555555;'>1</span><span>                 0.675                0.351
-#&gt; </span><span style='color: #555555;'>2</span><span>                 0.905                0.155</div><div class='input'># }
+#&gt; </span><span style='color: #555555;'>2</span><span>                 0.905                0.155</div><div class='input'><span class='co'># }</span>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -801,7 +797,7 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

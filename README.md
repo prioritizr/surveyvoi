@@ -3,7 +3,7 @@
 surveyvoi: Survey Value of Information
 ======================================
 
-[![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) [![Travis Build Status](https://img.shields.io/travis/jeffreyhanson/surveyvoi/master.svg?label=Linux%20%26%20Mac%20OSX)](https://travis-ci.org/jeffreyhanson/surveyvoi) [![AppVeyor Build Status](https://img.shields.io/appveyor/ci/jeffreyhanson/surveyvoi/master.svg?label=Windows)](https://ci.appveyor.com/project/jeffreyhanson/surveyvoi) [![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
+[![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/jeffreyhanson/surveyvoi/actions) [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/jeffreyhanson/surveyvoi/actions) [![R-CMD-check-Mac-OSX](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Mac%20OSX/master.svg?label=Mac%20OSX)](https://github.com/jeffreyhanson/surveyvoi/actions) [![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 The *surveyvoi* package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their return on investment.
 
@@ -30,7 +30,7 @@ Usage
 Here we provide a short example showing how to use the *surveyvoi R* package to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (termed "survey schemes") using simulated data for six sites and three conservation features (e.g. bird species). To start off, we will set the seed for the random number generator for reproducibility load some R packages.
 
 ``` r
-set.seed(500)
+set.seed(500)      # set RNG for reproducibility
 library(surveyvoi) # package for value of information analysis
 library(dplyr)     # package for preparing data
 library(tidyr)     # package for preparing data
@@ -154,7 +154,7 @@ print(sim_features, width = Inf)
     ## 2             0.860      1
     ## 3             0.887      1
 
-After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme` function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. `optimal_survey_scheme`), they can take a very long time to complete because they use a brute-force approach.
+After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme` function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. `optimal_survey_scheme`), they can take a very long time to complete because they use a brute-force approach. This function also uses an approximation routine to reduce computational burden.
 
 To perform the optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different plans depending on available funds. For instance, if you have near infinite funds then you wouldn't bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you wouldn't survey any sites to ensure that at least one site could be protected. Generally, conservation planning problems occur somewhere between these two extremes---but the optimization process can't take that into account if you don't specify a budget. For brevity, here we will set the total budget as 80% of the total costs for protecting sites.
 
@@ -187,7 +187,7 @@ opt_scheme <-
 # the opt_scheme object is a matrix that contains the survey schemes
 # each column corresponds to a different site,
 # and each row corresponds to a different solution
-# in the event that there are multiple optimal survey schemes, then this
+# in the event that there are multiple near-optimal survey schemes, then this
 # matrix will have multiple rows
 print(str(opt_scheme))
 ```
@@ -211,7 +211,7 @@ theme(legend.title = element_blank())
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
-This has just been a taster of the *surveyvoi R* package. It provides functions for evaluating survey schemes using value of information analysis. Additionally, functions are provided for generating survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
+This has just been a taster of the *surveyvoi R* package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
 
 Getting help
 ------------

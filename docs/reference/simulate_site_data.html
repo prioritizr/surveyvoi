@@ -85,19 +85,10 @@
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/surveyvoi.html">Get started</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-    <li>
-      <a href="../articles/simulation.html">Simulation Study</a>
-    </li>
-  </ul>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -132,18 +123,18 @@
     <p>Simulate site data for developing simulated survey schemes.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simulate_site_data</span>(
-  <span class='no'>n_sites</span>,
-  <span class='no'>n_features</span>,
-  <span class='no'>proportion_of_sites_missing_data</span>,
-  <span class='kw'>n_env_vars</span> <span class='kw'>=</span> <span class='fl'>3</span>,
-  <span class='kw'>survey_cost_intensity</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='kw'>survey_cost_radius</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>management_cost_intensity</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>management_cost_radius</span> <span class='kw'>=</span> <span class='fl'>0.5</span>,
-  <span class='kw'>max_number_surveys_per_site</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>output_probabilities</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>simulate_site_data</span><span class='op'>(</span>
+  <span class='va'>n_sites</span>,
+  <span class='va'>n_features</span>,
+  <span class='va'>proportion_of_sites_missing_data</span>,
+  n_env_vars <span class='op'>=</span> <span class='fl'>3</span>,
+  survey_cost_intensity <span class='op'>=</span> <span class='fl'>10</span>,
+  survey_cost_radius <span class='op'>=</span> <span class='fl'>0.5</span>,
+  management_cost_intensity <span class='op'>=</span> <span class='fl'>100</span>,
+  management_cost_radius <span class='op'>=</span> <span class='fl'>0.5</span>,
+  max_number_surveys_per_site <span class='op'>=</span> <span class='fl'>5</span>,
+  output_probabilities <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -203,7 +194,7 @@ to <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code><a href='https://rdrr.io/pkg/sf/man/sf.html'>sf::sf()</a></code> object with site data.
+    <p><code><a href='https://r-spatial.github.io/sf/reference/sf.html'>sf::sf()</a></code> object with site data.
 The <code>"management_cost"</code> column contains the site protection costs,
 and the <code>"survey_cost"</code> column contains the costs for surveying
 each site.
@@ -230,13 +221,15 @@ simulations.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># set seed for reproducibility</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span>(<span class='fl'>123</span>)
-<span class='kw pkg'>RandomFields</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span>(<span class='kw'>seed</span> <span class='kw'>=</span> <span class='fl'>123</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<span class='fu'>RandomFields</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span>
 
 <span class='co'># simulate data</span>
-<span class='no'>d</span> <span class='kw'>&lt;-</span> <span class='fu'>simulate_site_data</span>(<span class='kw'>n_sites</span> <span class='kw'>=</span> <span class='fl'>10</span>, <span class='kw'>n_features</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>prop</span> <span class='kw'>=</span> <span class='fl'>0.5</span>)</div><div class='output co'>#&gt; ...</div><div class='input'>
+<span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'>simulate_site_data</span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>10</span>, n_features <span class='op'>=</span> <span class='fl'>4</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; ...</div><div class='input'>
 <span class='co'># print data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>d</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>Inf</span>)</div><div class='output co'>#&gt; Simple feature collection with 10 features and 17 fields
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>d</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; Simple feature collection with 10 features and 17 fields
 #&gt; geometry type:  POINT
 #&gt; dimension:      XY
 #&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9404673 ymax: 0.9568333
@@ -267,16 +260,21 @@ simulations.</p>
 #&gt; </span><span style='color: #555555;'> 9</span><span>  1.01   0.655  -</span><span style='color: #BB0000;'>0.310</span><span> 0.009 0.919 0     0      (0.551435 0.3279207)
 #&gt; </span><span style='color: #555555;'>10</span><span> -</span><span style='color: #BB0000;'>1.46</span><span>   0.213   1.14  1     0     0.832 1     (0.4566147 0.9545036)</div><div class='input'>
 <span class='co'># plot cost data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"survey_cost"</span>, <span class='st'>"management_cost"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>,
-     <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"survey_cost"</span>, <span class='st'>"management_cost"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>,
+     cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='img'><img src='simulate_site_data-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot environmental data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='img'><img src='simulate_site_data-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature detection data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"f1"</span>, <span class='st'>"f2"</span>, <span class='st'>"f3"</span>, <span class='st'>"f4"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span>, <span class='st'>"f3"</span>, <span class='st'>"f4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='img'><img src='simulate_site_data-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature survey effort</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"n1"</span>, <span class='st'>"n2"</span>, <span class='st'>"n3"</span>, <span class='st'>"n4"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-4.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span>, <span class='st'>"n3"</span>, <span class='st'>"n4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='img'><img src='simulate_site_data-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature prior probability data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>d</span>[, <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span>, <span class='st'>"p4"</span>)], <span class='kw'>axes</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>pch</span> <span class='kw'>=</span> <span class='fl'>16</span>, <span class='kw'>cex</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='img'><img src='simulate_site_data-5.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span>, <span class='st'>"p4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+</div><div class='img'><img src='simulate_site_data-5.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -293,7 +291,7 @@ simulations.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
