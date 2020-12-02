@@ -323,8 +323,10 @@ fit_hglm_occupancy_models <- function(
   model_cmbs$idx <- seq_len(nrow(model_cmbs))
   ## prepare cluster
   if (n_threads > 1) {
-    cl <- parallel::makeCluster(n_threads, "FORK")
-    doParallel::registerDoParallel(cl)
+    cl <- start_cluster(n_threads,
+      c("model_cmbs", "d", "feature_data", "seed",
+        "jags_n_samples", "jags_n_burnin", "jags_n_thin", "jags_n_adapt",
+        "fit_hglm_model"))
   }
   ## main processing
   m_raw <- plyr::llply(
@@ -351,8 +353,7 @@ fit_hglm_occupancy_models <- function(
   })
   ## kill cluster
   if (n_threads > 1) {
-    doParallel::stopImplicitCluster()
-    cl <- parallel::stopCluster(cl)
+    cl <- stop_cluster(cl)
   }
 
   # combine models into single model object (quietly)

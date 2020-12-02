@@ -399,8 +399,21 @@ approx_near_optimal_survey_scheme <- function(
     # each candidate remaining site to the previous solution
     ## initialize cluster
     if (n_threads > 1) {
-      cl <- parallel::makeCluster(n_threads, "FORK")
-      doParallel::registerDoParallel(cl)
+      cl <- start_cluster(n_threads,
+        c("pij", "prev_solution", "survey_budget", "seed",
+          "site_data", "feature_data",
+          "site_management_cost_column",
+          "site_management_locked_in",
+          "site_survey_cost_column",
+          "feature_survey_column",
+          "feature_survey_sensitivity_column",
+          "site_management_locked_out",
+          "feature_target_column",
+          "total_budget",
+          "n_approx_replicates",
+          "n_approx_replicates",
+          "n_approx_outcomes_per_replicate",
+          "rcpp_approx_expected_value_of_decision_given_survey_scheme"))
     }
     ## run calculations
     curr_sites_approx_evsdi <- plyr::laply(
@@ -444,8 +457,7 @@ approx_near_optimal_survey_scheme <- function(
 
     ## kill cluster
     if (n_threads > 1) {
-      doParallel::stopImplicitCluster()
-      cl <- parallel::stopCluster(cl)
+      cl <- stop_cluster(cl)
     }
 
     # update progress bar

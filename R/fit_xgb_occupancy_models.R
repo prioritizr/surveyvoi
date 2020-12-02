@@ -505,8 +505,10 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
   ## fit models using all parameters combinations
   is_parallel <- (n_threads > 1) && (nrow(full_parameters) > 1)
   if (is_parallel) {
-    cl <- parallel::makeCluster(n_threads, "FORK")
-    doParallel::registerDoParallel(cl)
+    cl <- start_cluster(n_threads,
+      c("full_parameters", "data", "survey_sensitivity", "survey_specificity",
+        "spw", "n_rounds", "early_stopping_rounds", "seed",
+        "rcpp_model_performance", "make_feval_tss"))
   }
   cv <- plyr::ldply(seq_len(nrow(full_parameters)), .parallel = is_parallel,
                     function(i)  {
@@ -555,8 +557,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       models = list(lapply(cv, `[[`, "model")))
   })
   if (is_parallel) {
-    cl <- parallel::stopCluster(cl)
-    doParallel::stopImplicitCluster()
+    cl <- stop_cluster(cl)
   }
   ## determine best parameters for i'th species
   cv <- tibble::as_tibble(cv)
