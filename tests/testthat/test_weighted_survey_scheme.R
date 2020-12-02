@@ -1,6 +1,7 @@
 context("weighted_survey_scheme")
 
 test_that("single solution", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -20,6 +21,7 @@ test_that("single solution", {
 })
 
 test_that("multiple solutions", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -42,6 +44,7 @@ test_that("multiple solutions", {
 })
 
 test_that("variable costs", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -62,6 +65,7 @@ test_that("variable costs", {
 })
 
 test_that("locked in", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -82,6 +86,7 @@ test_that("locked in", {
 })
 
 test_that("locked_out", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),

@@ -64,6 +64,8 @@ test_that("lower voi when most of budget spent on surveys", {
 })
 
 test_that("current == optimal info, when all pu selected", {
+  skip_if_not_installed("gurobi")
+  # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(
@@ -131,6 +133,7 @@ test_that("current == optimal info, when all pu selected", {
 })
 
 test_that("current < optimal info, some pu selected", {
+  skip_if_not_installed("gurobi")
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
@@ -204,6 +207,7 @@ test_that("current < optimal info, some pu selected", {
 })
 
 test_that("locking out planning units lowers voi", {
+  skip_if_not_installed("gurobi")
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
@@ -316,6 +320,8 @@ test_that("locking out planning units lowers voi", {
 })
 
 test_that("evdsi >= evdci when solution is fixed", {
+  skip_if_not_installed("gurobi")
+  # data
   set.seed(500)
   site_data <- sf::st_as_sf(
     tibble::tibble(

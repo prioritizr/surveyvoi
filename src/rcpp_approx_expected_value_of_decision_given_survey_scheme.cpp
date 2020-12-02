@@ -38,7 +38,7 @@ Rcpp::NumericVector rcpp_approx_expected_value_of_decision_given_survey_scheme(
     n_approx_outcomes_per_replicate;
   mpz_class n_outcomes;
   mpz_class n_approx_outcomes_per_replicate2 =
-    n_approx_survey_outcomes_per_replicate;
+    static_cast<unsigned long>(n_approx_survey_outcomes_per_replicate);
   if ((n_pu_surveyed_in_scheme * n_f_survey) < 20) {
     n_states(n_pu_surveyed_in_scheme * n_f_survey, n_outcomes);
     n_outcomes = n_outcomes + 1; // increment to include final outcome
