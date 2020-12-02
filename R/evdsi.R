@@ -105,6 +105,7 @@
 #' @seealso [prior_probability_matrix()].
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -140,7 +141,7 @@
 #'
 #' # print value
 #' print(ev_survey)
-#'
+#' }
 #' @export
 evdsi <- function(
   site_data, feature_data,

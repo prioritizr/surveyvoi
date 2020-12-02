@@ -74,6 +74,7 @@ reserve selection problem (Faith & Walker 1996) is used to generate survey
 schemes.
 }
 \examples{
+\dontrun{
 # set seed for reproducibility
 set.seed(123)
 
@@ -97,6 +98,7 @@ print(s)
 # plot scheme
 x$scheme <- c(s)
 plot(x[, "scheme"], pch = 16, cex = 3)
+}
 }
 \references{
 Faith DP & Walker PA (1996) Environmental diversity: on the best-possible

@@ -62,6 +62,7 @@ NULL
 #'   correspond to sites, and rows correspond to different schemes.
 #'
 #' @examples
+#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -85,7 +86,7 @@ NULL
 #' # plot scheme
 #' x$scheme <- c(s)
 #' plot(x[, "scheme"], pch = 16, cex = 3)
-#
+#' }
 #' @export
 env_div_survey_scheme <- function(
   site_data, cost_column, survey_budget, env_vars_columns,

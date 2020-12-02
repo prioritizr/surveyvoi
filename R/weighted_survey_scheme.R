@@ -30,6 +30,7 @@ NULL
 #'   Minimize sum_j^J (xi * wi) subject to sum_j^J (xi * ci) <= b}
 #'
 #' @examples
+#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -53,7 +54,7 @@ NULL
 #' # plot solution
 #' x$s <- c(s)
 #' plot(x[, "s"], pch = 16, cex = 3)
-#'
+#' }
 #' @export
 weighted_survey_scheme <- function(
   site_data, cost_column, survey_budget, weight_column, locked_in_column = NULL,

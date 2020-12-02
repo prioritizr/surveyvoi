@@ -52,6 +52,7 @@ NULL
 #' and each column corresponds to a different replicate.
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -86,7 +87,7 @@ NULL
 #'
 #' # print result
 #' print(approx_opt_survey)
-#'
+#' }
 #' @export
 approx_optimal_survey_scheme <- function(
   site_data, feature_data,

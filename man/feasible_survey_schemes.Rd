@@ -52,6 +52,7 @@ Generate a \code{matrix} representing all possible different
 survey schemes given survey costs and a fixed budget.
 }
 \examples{
+\dontrun{
 # set seed for reproducibility
 set.seed(123)
 
@@ -75,5 +76,5 @@ print(s)
 # plot first scheme
 x$scheme_1 <- s[1, ]
 plot(x[, "scheme_1"], pch = 16, cex = 3)
-
+}
 }

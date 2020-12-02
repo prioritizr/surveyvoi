@@ -71,6 +71,7 @@ is selected in the survey scheme or not.
   Minimize sum_j^J (xi * wi) subject to sum_j^J (xi * ci) <= b}
 }
 \examples{
+\dontrun{
 # set seed for reproducibility
 set.seed(123)
 
@@ -94,5 +95,5 @@ print(s)
 # plot solution
 x$s <- c(s)
 plot(x[, "s"], pch = 16, cex = 3)
-
+}
 }

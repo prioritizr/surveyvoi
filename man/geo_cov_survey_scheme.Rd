@@ -60,6 +60,7 @@ The integer programming formulation of the \emph{p}-Median
 problem (Daskin & Maass 2015) is used to generate survey schemes.
 }
 \examples{
+\dontrun{
 # set seed for reproducibility
 set.seed(123)
 
@@ -83,6 +84,7 @@ print(s)
 # plot scheme
 x$scheme <- c(s)
 plot(x[, "scheme"], pch = 16, cex = 3)
+}
 }
 \references{
 Daskin MS & Maass KL (2015) The p-median problem. In \emph{Location Science}

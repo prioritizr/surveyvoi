@@ -20,6 +20,7 @@ NULL
 #'   if a given site is selected in a given survey scheme.
 #'
 #' @examples
+#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -43,7 +44,7 @@ NULL
 #' # plot first scheme
 #' x$scheme_1 <- s[1, ]
 #' plot(x[, "scheme_1"], pch = 16, cex = 3)
-#'
+#' }
 #' @export
 feasible_survey_schemes <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,

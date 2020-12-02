@@ -204,6 +204,7 @@ that share this greatest expected value are returned. Due to the nature of
 this algorithm, it can take a very long time to complete.
 }
 \examples{
+\dontrun{
 # set seeds for reproducibility
 library(RandomFields)
 set.seed(123)
@@ -238,5 +239,5 @@ approx_opt_survey <- approx_optimal_survey_scheme(
 
 # print result
 print(approx_opt_survey)
-
+}
 }
