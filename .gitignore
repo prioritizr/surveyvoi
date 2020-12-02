@@ -41,3 +41,8 @@ debug*R
 doc/*
 Meta/*
 .build.timestamp
+
+# autoconf files
+autom4te.cache
+config.log
+config.status

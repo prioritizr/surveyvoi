@@ -1,0 +1,107 @@
+#!/bin/bash
+PKGCONFIG_DEB_NAME="pkg-config"
+PKGCONFIG_RPM_NAME="pkgconfig"
+
+GMP_CONFIG_NAME="gmp"
+GMP_DEB_NAME="libgmp3-dev"
+GMP_RPM_NAME="gmp-devel"
+GMP_CSW_NAME=""
+GMP_BREW_NAME="gmp"
+GMP_TEST_HEADER="<gmp.h>"
+
+GMPXX_CONFIG_NAME="gmp"
+GMPXX_DEB_NAME="libgmp3-dev"
+GMPXX_RPM_NAME="gmp-devel"
+GMPXX_CSW_NAME=""
+GMPXX_BREW_NAME="gmp"
+GMPXX_TEST_HEADER="<gmpxx.h>"
+
+MPRF_CONFIG_NAME="mprf"
+MPRF_DEB_NAME="libmprf-devel"
+MPRF_RPM_NAME="mprf-devel"
+MPRF_CSW_NAME=""
+MPRF_BREW_NAME="mprf"
+MPRF_TEST_HEADER="<mpfr.h>"
+
+NLOPT_CONFIG_NAME="nlopt"
+NLOPT_DEB_NAME="libnlopt-dev"
+NLOPT_RPM_NAME="NLopt-devel"
+NLOPT_CSW_NAME=""
+NLOPT_brew_NAME="nlopt"
+NLOPT_TEST_HEADER="<nlopt.hpp>"
+
+# Use pkg-config if available
+pkg-config --version >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+  GMP_LIBS="-lgmp"
+  GMPXX_LIBS="-lgmpxx"
+  MPRF_LIBS="-lmpfr"
+  NLOPT_LIBS=`pkg-config --libs ${NLOPT_CONFIG_NAME}`
+else
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because pkg-config is not installed. Try installing: "
+  echo " * deb: $PKGCONFIG_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $PKGCONFIG_RPM_NAME (Fedora, EPEL)"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Test for gmp
+echo "#include $GMP_TEST_HEADER" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because $GMP_CONFIG_NAME was not found. Try installing:"
+  echo " * deb: $GMP_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $GMP_RPM_NAME (Fedora, EPEL)"
+  echo " * brew: $GMP_BREW_NAME (Mac OSX)"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Test for gmpxx
+echo "#include $GMPXX_TEST_HEADER" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because $GMPXX_CONFIG_NAME was not found. Try installing:"
+  echo " * deb: $GMPXX_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $GMPXX_RPM_NAME (Fedora, EPEL)"
+  echo " * brew: $GMPXX_BREW_NAME (Mac OSX)"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Test for mprf
+echo "#include $MPRF_TEST_HEADER" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because $MPRF_CONFIG_NAME was not found. Try installing:"
+  echo " * deb: $MPRF_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $MPRF_RPM_NAME (Fedora, EPEL)"
+  echo " * brew: $MPRF_BREW_NAME (Mac OSX)"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Test for nlopt
+echo "#include $NLOPT_TEST_HEADER" >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+  echo "------------------------- ANTICONF ERROR ---------------------------"
+  echo "Configuration failed because $NLOPT_CONFIG_NAME was not found. Try installing:"
+  echo " * deb: $NLOPT_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $NLOPT_RPM_NAME (Fedora, EPEL)"
+  echo " * brew: $NLOPT_BREW_NAME (Mac OSX)"
+  echo "--------------------------------------------------------------------"
+  exit 1;
+fi
+
+# Store all variables
+PKG_LIBS="${GMP_LIBS} ${GMPXX_LIBS} ${MPRF_LIBS} ${NLOPT_LIBS}"
+
+# Report variables
+echo "Using PKG_LIBS=$PKG_LIBS"
+
+# Write to Makevars
+sed -e "s|@PKG_LIBS@|$PKG_LIBS|" src/Makevars.in > src/Makevars
+
+# Success
+exit 0
