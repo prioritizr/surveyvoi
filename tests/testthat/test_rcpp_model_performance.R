@@ -59,6 +59,7 @@ test_that("maxlik (complex example)", {
 })
 
 test_that("model_performance (Foody example)", {
+  skip_on_os("mac")
   # create data
   conf_matrix <- matrix(c(120, 180, 220, 480), ncol = 2, nrow = 2)
   rse <- 0.75
@@ -77,6 +78,7 @@ test_that("model_performance (Foody example)", {
 })
 
 test_that("model_performance (complex example)", {
+  skip_on_os("mac")
   # create data
   conf_matrix <- matrix(c(1005, 134, 147, 1668), ncol = 2, nrow = 2)
   rse <- 0.98
