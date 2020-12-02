@@ -3,6 +3,7 @@ NULL
 
 #' @import sf
 #' @import Matrix
+#' @importFrom Rcpp sourceCpp
 NULL
 
 #' @useDynLib surveyvoi, .registration = TRUE
