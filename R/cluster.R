@@ -48,8 +48,6 @@ start_cluster <- function(
   })
   # set up PSOCK cluster if needed
   if (identical(type, "PSOCK")) {
-    ## load package
-    parallel::clusterEvalQ(cl, {require(surveyvoi)})
     ## export data to cluster
     parallel::clusterExport(cl, varlist = names, envir = envir)
   }

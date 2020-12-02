@@ -508,7 +508,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
     cl <- start_cluster(n_threads,
       c("full_parameters", "data", "survey_sensitivity", "survey_specificity",
         "spw", "n_rounds", "early_stopping_rounds", "seed",
-        "rcpp_model_performance", "make_feval_tss"))
+        "rcpp_model_performance", "_surveyvoi_rcpp_model_performance", "make_feval_tss"))
   }
   cv <- plyr::ldply(seq_len(nrow(full_parameters)), .parallel = is_parallel,
                     function(i)  {
@@ -580,9 +580,7 @@ make_feval_tss <- function(sens, spec) {
       msg = "test labels need at least one presence and one absence")
     assertthat::assert_that(all(preds >= 0), all(preds <= 1),
       msg = "xgboost predictions are not between zero and one (eval_matric)")
-    value <-
-      utils::getFromNamespace("rcpp_model_performance", "surveyvoi")(
-        labels, preds, wts, sens, spec)
+    value <- rcpp_model_performance(labels, preds, wts, sens, spec)
     list(metric = "tss", value = value[[1]])
   }
 }
