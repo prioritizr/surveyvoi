@@ -25,8 +25,8 @@ test_that("maxlik (Foody example)", {
   r1 <- r_maxlik_sensitivity_and_specificity(conf_matrix, rse, rsp)
   r2 <- rcpp_maxlik_sensitivity_and_specificity(conf_matrix, rse, rsp)
   # tests
-  expect_equal(r1, r0)
-  expect_lte(max(abs(r2 - r0)), 1e-5)
+  expect_lte(max(abs(r1 - r0)), 1e-4)
+  expect_lte(max(abs(r2 - r0)), 1e-4)
 })
 
 test_that("formula (complex example)", {

@@ -580,7 +580,9 @@ make_feval_tss <- function(sens, spec) {
       msg = "test labels need at least one presence and one absence")
     assertthat::assert_that(all(preds >= 0), all(preds <= 1),
       msg = "xgboost predictions are not between zero and one (eval_matric)")
-    value <- rcpp_model_performance(labels, preds, wts, sens, spec)
+    value <-
+      utils::getFromNamespace("rcpp_model_performance", "surveyvoi")(
+        labels, preds, wts, sens, spec)
     list(metric = "tss", value = value[[1]])
   }
 }

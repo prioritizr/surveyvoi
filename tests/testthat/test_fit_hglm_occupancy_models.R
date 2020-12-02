@@ -2,7 +2,7 @@ context("fit_hglm_occupancy_models")
 
 test_that("single species", {
   skip_on_cran()
-  skip_if_not(is_jags_installed())
+  skip_if_not(suppressWarnings(is_jags_installed()))
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -75,7 +75,7 @@ test_that("single species", {
 
 test_that("multiple species", {
   skip_on_cran()
-  skip_if_not(is_jags_installed())
+  skip_if_not(suppressWarnings(is_jags_installed()))
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
