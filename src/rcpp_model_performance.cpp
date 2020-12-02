@@ -98,18 +98,19 @@ void maxlik_sensitivity_and_specificity(
   f_data.dsp = data_spec;
 
   // run optimization
-  nlopt::opt opt(nlopt::LN_BOBYQA, static_cast<unsigned>(3));
-  opt.set_lower_bounds(lb);
-  opt.set_upper_bounds(ub);
-  opt.set_min_objective(nll, &f_data);
-  opt.set_xtol_rel(1.0e-5);
+  nlopt_opt opt = nlopt_create(NLOPT_LN_BOBYQA, 3);
+  nlopt_set_lower_bounds(opt, lb.data());
+  nlopt_set_upper_bounds(opt, ub.data());
+  nlopt_set_min_objective(opt, nll, &f_data);
+  nlopt_set_xtol_rel(opt, 1.0e-5);
   try {
-    nlopt::result res = opt.optimize(par, value);
+    nlopt_optimize(opt, par.data(), &value);
   } catch (std::exception &e) {
 
   }
 
   // clean up
+  nlopt_destroy(opt);
   mpfr_clears(
     f_data.t1, f_data.t2, f_data.t3, f_data.t4,
     f_data.tp, f_data.fn, f_data.fp, f_data.tn, (mpfr_ptr) 0);
@@ -124,7 +125,7 @@ void maxlik_sensitivity_and_specificity(
 }
 
 double nll (
-  const std::vector<double> &x, std::vector<double> &grad, void *f_data) {
+  unsigned n, const double *x, double *grad, void *f_data) {
   // calculate negative log likelihood
   nll_data *d = reinterpret_cast<nll_data*>(f_data);
   mpfr_set_d(

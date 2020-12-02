@@ -1,2 +1,2 @@
 CXX_STD = CXX11
-PKG_LIBS = -lgmp -lgmpxx -lmpfr -lnlopt -lm
+PKG_LIBS = -lgmp -lgmpxx -lmpfr

@@ -3,7 +3,7 @@
 #define MODEL_PERFORMANCE_H
 
 #include "package.h"
-#include <nlopt.hpp>
+#include <nloptrAPI.h>
 
 void model_sensitivity_and_specificity(
   Eigen::VectorXf&, Eigen::VectorXf&, Eigen::VectorXf&,
@@ -15,7 +15,7 @@ void formula_sensitivity_and_specificity(
 void maxlik_sensitivity_and_specificity(
   double, double, double, double, double, double, double&, double&);
 
-double nll(const std::vector<double>&, std::vector<double>&, void*);
+double nll(unsigned n, const double*, double*, void*);
 
 /* typedefs */
 typedef struct {

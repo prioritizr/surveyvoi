@@ -44,21 +44,21 @@ Suggests:
     Rmpfr (>= 0.8-1),
     runjags (>= 2.0.4.6)
 Depends:
-    R (>= 3.4.0),
+    R (>= 3.5.0),
     Matrix,
     sf (>= 0.8.0)
 LinkingTo:
     Rcpp (>= 0.12.19),
     RcppEigen (>= 0.3.3.7.0),
-    PoissonBinomial (>= 1.1.1)
+    PoissonBinomial (>= 1.1.1),
+    nloptr (>= 1.2.2.2)
 License: GPL-3
 LazyData: true
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),
     gmp (>= 4.2.3),
-    mpfr (>= 3.0.0),
-    nlopt (>= 2.4.2)
+    mpfr (>= 3.0.0)
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr
