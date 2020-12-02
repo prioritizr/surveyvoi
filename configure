@@ -75,7 +75,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Store all variables
-PKG_LIBS="${GMP_LIBS} ${GMPXX_LIBS} ${MPRF_LIBS}"
+PKG_LIBS="${GMPXX_LIBS} ${MPRF_LIBS} ${GMP_LIBS}"
 
 # Report variables
 echo "Using PKG_LIBS=$PKG_LIBS"
