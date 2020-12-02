@@ -57,7 +57,8 @@ SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),
     gmp (>= 4.2.3),
-    mpfr (>= 3.0.0)
+    mpfr (>= 3.0.0),
+    nlopt (>= 2.4.2)
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr
