@@ -6,9 +6,11 @@ Description: Develop candidate survey schemes for sampling biodiversity, and
     and evaluate their return on investment using value of
     information analyses.
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
-               email='jeffrey.hanson@uqconnect.edu.au', role = c('aut', 'cre')),
+               email='jeffrey.hanson@uqconnect.edu.au', role = c('aut', 'cre'),
+               comment = c(ORCID = '0000-0002-4716-6134')),
              person(c('Joseph'), 'Bennett',
-               email='joseph.bennett@carleton.ca', role = c('aut')))
+               email='joseph.bennett@carleton.ca', role = c('aut'),
+               comment = c(ORCID = '0000-0002-3901-9513')))
 Imports:
     utils,
     methods,
