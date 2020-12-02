@@ -41,4 +41,6 @@ debug*R
 doc/*
 Meta/*
 .build.timestamp
-*.tmp
+.DS_Store
+src/functions-1675a5d6.o.tmp
+src/functions-de4908ce.o.tmp
