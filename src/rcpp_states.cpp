@@ -167,7 +167,7 @@ Eigen::MatrixXd rcpp_nth_state(std::size_t n, Eigen::MatrixXd matrix) {
 
 // [[Rcpp::export]]
 std::size_t rcpp_n_states(std::size_t n) {
-  n_states(n);
+  return n_states(n);
 }
 
 // [[Rcpp::export]]
