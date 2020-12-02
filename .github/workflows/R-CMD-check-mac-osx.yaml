@@ -61,7 +61,7 @@ jobs:
       - name: Install system dependencies
         run: |
           brew install gmp
-          brew install mprf
+          brew install mpfr
           brew install nlopt
 
       - name: Install dependencies
