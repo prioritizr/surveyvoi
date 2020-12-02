@@ -3,6 +3,7 @@ NULL
 
 #' @import sf
 #' @import Matrix
+#' @import nloptr
 #' @importFrom Rcpp sourceCpp
 NULL
 
