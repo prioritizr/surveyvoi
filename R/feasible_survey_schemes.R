@@ -20,6 +20,7 @@ NULL
 #'   if a given site is selected in a given survey scheme.
 #'
 #' @examples
+#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -43,7 +44,7 @@ NULL
 #' # plot first scheme
 #' x$scheme_1 <- s[1, ]
 #' plot(x[, "scheme_1"], pch = 16, cex = 3)
-#'
+#' }
 #' @export
 feasible_survey_schemes <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,
@@ -186,9 +187,12 @@ gurobi_feasible_survey_schemes <- function(cost, budget, locked_in,
     msg = "some sites are locked in and locked out")
 
   # generate solutions
-  g <- suppressMessages(gurobi::gurobi(m, list(
-    LogToConsole = as.integer(verbose), Presolve = 2, PoolSearchMode = 2,
-    PoolSolutions = 1e+100)))
+  withr::with_locale(
+    c(LC_CTYPE = "C"), {
+    g <- suppressMessages(gurobi::gurobi(m, list(
+      LogToConsole = as.integer(verbose), Presolve = 2, PoolSearchMode = 2,
+      PoolSolutions = 1e+100)))
+  })
 
   # verify that solutions are found
   if (identical(g$status, "INFEASIBLE"))

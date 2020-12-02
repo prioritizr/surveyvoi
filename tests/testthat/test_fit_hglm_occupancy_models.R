@@ -1,9 +1,9 @@
 context("fit_hglm_occupancy_models")
 
 test_that("single species", {
-  # data
   skip_on_cran()
   skip_if_not(is_jags_installed())
+  # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 1000
@@ -74,9 +74,9 @@ test_that("single species", {
 })
 
 test_that("multiple species", {
-  # data
   skip_on_cran()
   skip_if_not(is_jags_installed())
+  # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 300
@@ -147,9 +147,9 @@ test_that("multiple species", {
 })
 
 test_that("multiple species (sparse, multiple threads)", {
-  # data
   skip_on_cran()
   skip_if_not(is_jags_installed())
+  # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 2000

@@ -30,6 +30,7 @@
 #' @inherit evdci seealso
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -65,7 +66,7 @@
 #'
 #' # print mean value
 #' print(mean(approx_ev_survey))
-#'
+#' }
 #' @export
 approx_evdsi <- function(
   site_data, feature_data,

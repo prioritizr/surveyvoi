@@ -18,6 +18,7 @@ NULL
 #' (pp. 21-45). Springer, Cham.
 #'
 #' @examples
+#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -41,7 +42,7 @@ NULL
 #' # plot scheme
 #' x$scheme <- c(s)
 #' plot(x[, "scheme"], pch = 16, cex = 3)
-#
+#' }
 #' @export
 geo_cov_survey_scheme <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,

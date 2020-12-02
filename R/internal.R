@@ -83,7 +83,10 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
     ## update budget
     m$rhs[1] <- budget[b]
     ## solve problem
-    s <- gurobi::gurobi(m, p)$x[seq_len(n)]
+    withr::with_locale(
+      c(LC_CTYPE = "C"), {
+      s <- gurobi::gurobi(m, p)$x[seq_len(n)]
+    })
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
       isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),
@@ -173,7 +176,11 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
     ## update budget
     m$rhs[1] <- budget[b]
     ## solve problem
-    s <- gurobi::gurobi(m, p)$x
+    withr::with_locale(
+      c(LC_CTYPE = "C"), {
+      s <- gurobi::gurobi(m, p)$x
+    })
+    ## assert valid solution
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
       isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),

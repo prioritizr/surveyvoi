@@ -46,6 +46,7 @@ NULL
 #'   attribute that contains the expected value of each scheme.
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -79,7 +80,7 @@ NULL
 #'
 #' # print result
 #' print(opt_survey)
-#'
+#' }
 #' @export
 optimal_survey_scheme <- function(
   site_data, feature_data,

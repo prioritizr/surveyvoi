@@ -1,6 +1,7 @@
 context("feasible_survey_schemes")
 
 test_that("equal costs (no locked sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -18,6 +19,7 @@ test_that("equal costs (no locked sites)", {
 })
 
 test_that("equal costs (locked in sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -35,6 +37,7 @@ test_that("equal costs (locked in sites)", {
 })
 
 test_that("equal costs (locked out sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -54,6 +57,7 @@ test_that("equal costs (locked out sites)", {
 
 
 test_that("equal costs (all sites fixed)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -72,6 +76,7 @@ test_that("equal costs (all sites fixed)", {
 })
 
 test_that("equal costs (one site fixed)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -91,6 +96,7 @@ test_that("equal costs (one site fixed)", {
 })
 
 test_that("variable costs (no locked sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -108,6 +114,7 @@ test_that("variable costs (no locked sites)", {
 })
 
 test_that("variable costs (locked in sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
@@ -125,6 +132,7 @@ test_that("variable costs (locked in sites)", {
 })
 
 test_that("variable costs (locked out sites)", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),

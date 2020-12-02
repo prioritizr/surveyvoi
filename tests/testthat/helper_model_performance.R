@@ -60,7 +60,7 @@ r_maxlik_sensitivity_and_specificity <- function(
   # estimate test sensitivity and specificity by minimizing negative loglik,
   # note parameters are bounded to avoid issues with log(0)
   res <- nloptr::bobyqa(c(0.9, 0.9, 0.5), nll,
-                        lower = rep(1e-10, 3), upper = rep(1 - 1e-10, 3))
+                        lower = rep(1e-5, 3), upper = rep(1 - 1e-5, 3))
   # return result
   c(res$par[[1]], res$par[[2]])
 }

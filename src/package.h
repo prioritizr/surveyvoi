@@ -18,7 +18,6 @@
 // standard C++/C libraries
 #include <vector>
 #include <string>
-#include <utility>
 #include <cstring>
 #include <cstdio>
 #include <unordered_map>

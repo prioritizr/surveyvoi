@@ -1,6 +1,7 @@
 context("geo_cov_survey_scheme")
 
 test_that("single solution", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.3, 10),
@@ -19,6 +20,7 @@ test_that("single solution", {
 })
 
 test_that("multiple solutions", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.3, 10),
@@ -38,6 +40,7 @@ test_that("multiple solutions", {
 })
 
 test_that("variable costs", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
@@ -56,6 +59,7 @@ test_that("variable costs", {
 })
 
 test_that("locked in", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
@@ -74,6 +78,7 @@ test_that("locked in", {
 })
 
 test_that("locked out", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
@@ -92,6 +97,7 @@ test_that("locked out", {
 })
 
 test_that("locked out, exclude = TRUE", {
+  skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),

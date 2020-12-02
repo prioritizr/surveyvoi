@@ -10,6 +10,7 @@
 #' @inherit evdsi details return seealso
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -38,7 +39,7 @@
 #'
 #' # print exact value
 #' print(ev_current)
-#'
+#' }
 #' @export
 evdci <- function(
   site_data, feature_data,

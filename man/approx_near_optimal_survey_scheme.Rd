@@ -252,6 +252,7 @@ has the highest expected value in the
 }
 }
 \examples{
+\dontrun{
 # set seeds for reproducibility
 library(RandomFields)
 set.seed(123)
@@ -286,5 +287,5 @@ approx_near_optimal_survey <- approx_near_optimal_survey_scheme(
 
 # print result
 print(approx_near_optimal_survey)
-
+}
 }
