@@ -508,10 +508,11 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
     cl <- start_cluster(n_threads,
       c("full_parameters", "data", "survey_sensitivity", "survey_specificity",
         "spw", "n_rounds", "early_stopping_rounds", "seed",
-        "rcpp_model_performance", "_surveyvoi_rcpp_model_performance", "make_feval_tss"))
+        "rcpp_model_performance", "make_feval_tss"))
   }
-  cv <- plyr::ldply(seq_len(nrow(full_parameters)), .parallel = is_parallel,
-                    function(i)  {
+  cv <- plyr::ldply(
+    seq_len(nrow(full_parameters)), .parallel = is_parallel,
+   .paropts = list(.packages = "surveyvoi"), function(i)  {
     ## extract tuning parameters
     p <- as.list(full_parameters[i, , drop = FALSE])
     ## run cross-validation
