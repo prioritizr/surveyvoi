@@ -4,7 +4,6 @@
 
 #include "package.h"
 // [[Rcpp::depends(nloptr)]]
-#include "nloptrAPI.h"
 
 void model_sensitivity_and_specificity(
   Eigen::VectorXf&, Eigen::VectorXf&, Eigen::VectorXf&,

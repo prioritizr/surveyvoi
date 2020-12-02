@@ -1,4 +1,5 @@
-# include "rcpp_model_performance.h"
+#include "rcpp_model_performance.h"
+#include "nloptrAPI.h"
 
 void model_sensitivity_and_specificity(
   Eigen::VectorXf &y, Eigen::VectorXf &yhat, Eigen::VectorXf &w,
