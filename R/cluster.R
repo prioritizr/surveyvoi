@@ -33,6 +33,9 @@ start_cluster <- function(
   if (is.null(type)) {
     type <- ifelse(.Platform$OS.type == "unix", "FORK", "PSOCK")
   }
+
+  stop("deliberately throw error to verify CI tests this")
+
   # validate cluster type
   assertthat::assert_that(
     assertthat::is.string(type),
