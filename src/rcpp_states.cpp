@@ -79,7 +79,7 @@ void which_state(Eigen::MatrixXd &matrix, mpz_class &out) {
   for (auto itr = matrix.data(); itr != matrix.data() + matrix.size(); ++itr) {
     // out = out * 2 + matrix(*itr);
     tmp = out * 2;
-    out = tmp + static_cast<std::size_t>(*itr);
+    out = tmp + static_cast<unsigned long>(*itr);
   }
   // return void
   return;
@@ -102,7 +102,7 @@ void which_state_sparse(
   for (auto itr = idx.cbegin(); itr != idx.cend(); ++itr) {
     // out = out * 2 + matrix(*itr);
     tmp = out * 2;
-    out = tmp + static_cast<std::size_t>(matrix(*itr));
+    out = tmp + static_cast<unsigned long>(matrix(*itr));
   }
   // return void
   return;
@@ -149,7 +149,7 @@ Eigen::MatrixXd rcpp_nth_state_sparse(
   // initialization
   for (auto& i : idx)
     i -= 1;
-  mpz_class m = n;
+  mpz_class m = static_cast<unsigned long>(n);
   // main processing
   nth_state_sparse(m, idx, matrix);
   // clean-up
@@ -159,7 +159,7 @@ Eigen::MatrixXd rcpp_nth_state_sparse(
 // [[Rcpp::export]]
 Eigen::MatrixXd rcpp_nth_state(std::size_t n, Eigen::MatrixXd matrix) {
   // initialization
-  mpz_class m = n;
+  mpz_class m = static_cast<unsigned long>(n);
   // main processing
   nth_state(m, matrix);
   return matrix;
