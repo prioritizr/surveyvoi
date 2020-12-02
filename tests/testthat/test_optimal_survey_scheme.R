@@ -218,6 +218,9 @@ test_that("consistent results", {
 })
 
 test_that("consistent results (multiple threads)", {
+  # skip if using PSOCK cluster and package not installed
+  skip_if_not(requireNamespace("surveyvoi") &&
+              identical(.Platform$OS.type, "unix"))
   skip_if_not_installed("gurobi")
   # seeds
   set.seed(505)

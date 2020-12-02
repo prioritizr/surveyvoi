@@ -417,7 +417,10 @@ approx_near_optimal_survey_scheme <- function(
     }
     ## run calculations
     curr_sites_approx_evsdi <- plyr::laply(
-      curr_remaining_sites, .parallel = n_threads > 1, function(j) {
+      curr_remaining_sites,
+      .parallel = n_threads > 1,
+      .paropts = list(.packages = "surveyvoi"),
+      function(j) {
       ## generate solution
       curr_candidate_solution <- prev_solution
       curr_candidate_solution[j] <- TRUE

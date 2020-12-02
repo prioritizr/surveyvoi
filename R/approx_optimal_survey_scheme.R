@@ -356,8 +356,11 @@ approx_optimal_survey_scheme <- function(
   }
   ## run calculations
   evd_new_info <- plyr::laply(
-    seq_along(new_info_idx), .parallel = n_threads > 1,
-    .progress = ifelse(verbose && n_threads == 1, "text", "none"), function(i) {
+    seq_along(new_info_idx),
+    .parallel = n_threads > 1,
+    .progress = ifelse(verbose && (n_threads == 1), "text", "none"),
+    .paropts = list(.packages = "surveyvoi"),
+    function(i) {
     ## extract i'th survey scheme
     site_survey_scheme <- all_feasible_schemes[new_info_idx[i], , drop = TRUE]
     ## calculate expected value of decision given survey scheme

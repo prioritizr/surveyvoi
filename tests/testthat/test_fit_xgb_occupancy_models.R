@@ -148,6 +148,9 @@ test_that("multiple species", {
 })
 
 test_that("multiple species (sparse, multiple threads)", {
+  # skip if using PSOCK cluster and package not installed
+  skip_if_not(requireNamespace("surveyvoi") &&
+              identical(.Platform$OS.type, "unix"))
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)

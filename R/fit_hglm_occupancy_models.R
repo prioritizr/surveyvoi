@@ -332,6 +332,7 @@ fit_hglm_occupancy_models <- function(
   m_raw <- plyr::llply(
     seq_len(nrow(model_cmbs)),
     .parallel = n_threads > 1,
+    .paropts = list(.packages = "surveyvoi"),
     .progress = ifelse(n_threads > 1, "none", "text"),
     function(cm) {
     i <- model_cmbs$spp[[cm]]
