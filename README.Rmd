@@ -39,7 +39,12 @@ remotes::install_github("jeffreyhanson/surveyvoi")
 
 ## Citation
 
-This package is still under active development and is not ready to be used.
+This package is still under active development so we do not yet encourage using it. To cite the latest development version, please use:
+
+```{r, echo = FALSE, results = "asis", comment = ""}
+dev_version <- as.character(packageVersion("surveyvoi"))
+cat(paste0("> Hanson JO, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
+```
 
 ## Usage
 

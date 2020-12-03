@@ -20,7 +20,9 @@ remotes::install_github("jeffreyhanson/surveyvoi")
 Citation
 --------
 
-This package is still under active development and is not ready to be used.
+This package is still under active development so we do not yet encourage using it. To cite the latest development version, please use:
+
+> Hanson JO, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 1.0.0. Available at <https://github.com/jeffreyhanson/surveyvoi>.
 
 Usage
 -----
@@ -76,7 +78,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -87,7 +89,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -207,7 +209,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
 
