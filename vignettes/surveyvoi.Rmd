@@ -35,7 +35,7 @@ The funding available for conservation is limited. To ensure that conservation f
 
 The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and by directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their performance.
 
-This tutorial provides a brief overview of the _surveyvoi_ package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species -- to keep the tutorial simple -- the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code `?function`, where `function` is the name of desired function).
+This tutorial provides a brief overview of the _surveyvoi_ package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species -- to keep the tutorial simple and reduce computational burden -- the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code `?function`, where `function` is the name of desired function).
 
 ## Setup
 
@@ -144,7 +144,7 @@ site_data %>%
     labs(title = "Environmental conditions", xlab="X coordinate", ylab="Y coordinate")
 ```
 
-After simulating data for the sites, we will simulate data for the conservation feature. We set `proportion_of_survey_features` to 1 to ensure that this feature will be examined in future surveys.
+After simulating data for the sites, we will simulate data for the conservation feature. We set `proportion_of_survey_features = 1` to indicate that this feature will be examined in future surveys.
 
 ```{r}
 # simulate feature data
@@ -166,7 +166,7 @@ The `feature_data` object is a table (i.e. `tibble` object) that contains inform
 
 ## Modelling probability of occupancy
 
-After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Further, these models can incorporate prior knowledge of species presence/absence within their fitting process.
+After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).
 
 ```{r}
 # create list of candidate parameter values for calibration procedure
@@ -430,7 +430,7 @@ In this particular simulation, we can see that all of the survey schemes have a 
 
 Now let's generate an optimized survey scheme by directly maximizing the _expected value of the decision given a survey scheme_.
 
-```{r, results = "hide", message = FALSE, warning = FALSE}
+```{r, results = "hide", message = FALSE}
 # generate optimized survey scheme(s)
 opt_scheme <- approx_near_optimal_survey_scheme(
     site_data = site_data,
@@ -563,6 +563,10 @@ evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-We can see that the optimized survey scheme performs much better than all the other survey schemes. This result shows that value of information analyses can potentially improve management decisions by strategically allocating funds to surveys and conservation management.
+We can see that the optimized survey scheme performs better than the other survey schemes. Although the optimized survey scheme doesn't provide a substantial improvement in this particular situation, we can see how value of information analysis can potentially improve management decisions by strategically allocating funds to surveys and conservation management. Indeed, since we only considered a single species and a handful of sites -- to keep the tutorial simple and reduce computational burden -- it was unlikely that an optimized survey scheme would perform substantially better than simply using current information. If you want to try something more complex, try adapting the code in this tutorial to simulate a larger number of sites and multiple species?
+
+## Conclusion
+
+Hopefully, this tutorial has been useful. If you have any questions about using the _surveyvoi_ package or suggestions for improving it, please file an issue on the package's online coding repository (https://github.com/jeffreyhanson/surveyvoi/issues).
 
 ## References

@@ -19,7 +19,7 @@ vigns:
 	rm -f doc/*.html
 	rm -f vignettes/*.html
 	rm -f inst/doc/*.html
-	R --slave -e "devtools::build_vignettes(install = FALSE)"
+	R --slave -e "options(rmarkdown.html_vignette.check_title = FALSE);devtools::build_vignettes(install = FALSE)"
 	rm -f vignettes/*.utf8.md
 	rm -f vignettes/*.md
 	cp -R doc inst/
@@ -28,17 +28,13 @@ vigns:
 purl_vigns:
 	R --slave -e "lapply(dir('vignettes', '^.*\\\\.Rmd$$'), function(x) knitr::purl(file.path('vignettes', x), gsub('.Rmd', '.R', x, fixed = TRUE)))"
 
-benchmark:
-	R --slave -e "library(devtools);load_all()"
-	R --slave -e "library(devtools);load_all();source('inst/code/benchmark.R')" > benchmark.log 2>&1
-
 quicksite:
-	R --slave -e "pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
+	R --slave -e "options(rmarkdown.html_vignette.check_title = FALSE);pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
 	cp -R doc inst/
 
 site:
 	R --slave -e "pkgdown::clean_site()"
-	R --slave -e "pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
+	R --slave -e "options(rmarkdown.html_vignette.check_title = FALSE);pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
 	cp -R doc inst/
 
 test:
