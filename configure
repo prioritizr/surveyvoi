@@ -22,7 +22,7 @@ GMPXX_BREW_NAME="gmp"
 GMPXX_TEST_HEADER="<gmpxx.h>"
 
 MPRF_CONFIG_NAME="mpfr"
-MPRF_DEB_NAME="libmpfr-devel"
+MPRF_DEB_NAME="libmpfr-dev"
 MPRF_RPM_NAME="mpfr-devel"
 MPRF_CSW_NAME=""
 MPRF_BREW_NAME="mpfr"
