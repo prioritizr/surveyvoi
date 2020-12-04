@@ -8,9 +8,10 @@ Description: Develop candidate survey schemes for sampling biodiversity, and
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
                email='jeffrey.hanson@uqconnect.edu.au', role = c('aut', 'cre'),
                comment = c(ORCID = '0000-0002-4716-6134')),
-             person(c('Joseph'), 'Bennett',
+             person(c('Joseph', 'R'), 'Bennett',
                email='joseph.bennett@carleton.ca', role = c('aut'),
-               comment = c(ORCID = '0000-0002-3901-9513')))
+               comment = c(ORCID = '0000-0002-3901-9513')),
+             person("Free Software Foundation, Inc", role = "cph"))
 Imports:
     utils,
     methods,
@@ -54,13 +55,12 @@ LinkingTo:
     Rcpp (>= 0.12.19),
     RcppEigen (>= 0.3.3.7.0),
     PoissonBinomial (>= 1.1.1),
-    nloptr (>= 1.2.2.2)
+    nloptr (>= 1.2.2.2),
 License: GPL-3
 LazyData: true
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),
-    gmp (>= 4.2.3),
     mpfr (>= 3.0.0)
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues

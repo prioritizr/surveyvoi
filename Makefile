@@ -61,4 +61,11 @@ examples:
 	R --slave -e "devtools::run_examples(test = TRUE);warnings()"  >> examples.log
 	rm -f Rplots.pdf
 
-.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples
+wbcheck:
+	R --slave -e "devtools::check_win_devel()"
+	cp -R doc inst/
+
+solarischeck:
+	R --slave -e "rhub::check(platform = 'solaris-x86-patched', email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
+
+.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples solarischeck wbcheck

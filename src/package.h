@@ -27,7 +27,14 @@
 #include <stdarg.h>
 // GMP library for large integers
 #include <gmp.h>
-#include <gmpxx.h>
+// GMPXXX header for C++ for convinence
+#ifndef WINDOWS
+#include <gmpxx.h> // use system version if not on Winddows
+#else
+#include "gmp/gmpxx.h" // use custom version since WinBuilder has incompatible
+                       // versions of gmpxx.h and gmp.h installed
+#endif
+
 // MPFR library for large and small floats (used in maximum likelihood calc)
 #include <mpfr.h>
 
