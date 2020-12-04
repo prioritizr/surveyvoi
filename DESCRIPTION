@@ -61,6 +61,7 @@ LazyData: true
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),
+    gmp (>= 4.2.3),
     mpfr (>= 3.0.0)
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
