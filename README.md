@@ -17,6 +17,28 @@ if (!require(remotes)) install.packages("remotes")
 remotes::install_github("jeffreyhanson/surveyvoi")
 ```
 
+### Windows
+
+The [Rtools](https://cran.r-project.org/bin/windows/Rtools/) software needs to be installed to install the *surveyvoi R* package from source. This software provides system requirements from [rwinlib](https://github.com/rwinlib/).
+
+### Ubuntu
+
+The `gmp` and `mpfr` libraries need to be installed to install the *surveyvoi R* package from source. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
+
+    apt-get -y update && apt-get install -y libgmp3-dev libmpfr-dev
+
+### Linux
+
+For Unix-alikes, `gmp` (&gt;= 4.2.3) and `mpfr` (&gt;= 3.0.0) are required.
+
+### MacOS
+
+The `gmp` and `mpfr` libraries need to be installed to install the *surveyvoi R* package from source. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
+
+    brew install pkg-config
+    brew install gmp
+    brew install mpfr
+
 Citation
 --------
 
@@ -211,7 +233,7 @@ theme(legend.title = element_blank())
 
 <img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
-This has just been a taster of the *surveyvoi R* package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](https://jeffreyhanson.github.io/surveyvoi/articles/surveyvoi.html).
+This has just been a taster of the *surveyvoi R* package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](http://jeffrey-hanson.com/surveyvoi/articles/surveyvoi.html).
 
 Getting help
 ------------
