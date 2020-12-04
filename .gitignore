@@ -42,5 +42,4 @@ doc/*
 Meta/*
 .build.timestamp
 .DS_Store
-src/functions-1675a5d6.o.tmp
-src/functions-de4908ce.o.tmp
+*.tmp
