@@ -69,7 +69,7 @@ This package is still under active development so we do not yet encourage using 
 
 ```{r, echo = FALSE, results = "asis", comment = ""}
 dev_version <- as.character(packageVersion("surveyvoi"))
-cat(paste0("> Hanson JO, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
+cat(paste0("> Hanson JO, Hudgins EJ, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
 ```
 
 ## Usage
