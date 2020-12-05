@@ -61,7 +61,7 @@ Suggests:
     Rmpfr (>= 0.8-1),
     runjags (>= 2.0.4.6)
 Depends:
-    R (>= 3.5.0),
+    R (>= 4.0.0),
     Matrix,
     sf (>= 0.8.0),
     nloptr (>= 1.2.2.2),
