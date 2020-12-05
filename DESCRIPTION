@@ -2,9 +2,20 @@ Package: surveyvoi
 Type: Package
 Version: 1.0.0
 Title: Survey Value of Information
-Description: Develop candidate survey schemes for sampling biodiversity, and
-    and evaluate their return on investment using value of
-    information analyses.
+Description: Decision support tool for prioritizing sites for ecological
+    surveys based on their potential to improve plans for conserving
+    biodiversity (e.g. plans for establishing protected areas). Given a set of
+    sites that could potentially be acquired for conservation management --
+    wherein some sites have previously been surveyed and other sites have not -
+    -  it can be used to generate and evaluate plans for
+    additional surveys. Specifically, plans for ecological surveys can be
+    generated using various conventional approaches (e.g. maximizing expected
+    species richness, geographic coverage, diversity of sampled environmental
+    conditions) and directly maximizing return on investment via optimization
+    algorithms. After generating such survey plans, they can be evaluated using
+    value of information analysis. Please note that several functions depend on
+    the 'Gurobi' optimization software (available from
+    <https://www.gurobi.com>).
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
                email='jeffrey.hanson@uqconnect.edu.au', role = c('aut', 'cre'),
                comment = c(ORCID = '0000-0002-4716-6134')),

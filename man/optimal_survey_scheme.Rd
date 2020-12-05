@@ -173,6 +173,9 @@ attribute that contains the expected value of each scheme.
 Find the optimal survey scheme that maximizes return on investment using
 value of information analyses. This function uses the exact method for
 calculating the expected value of the decision given a survey scheme.
+Please note that this function requires the Gurobi optimization software
+(\url{https://www.gurobi.com/}) and the \pkg{gurobi} R package
+(installation instructions available for \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
 }
 \details{
 The optimal survey scheme is determined using a brute-force algorithm.

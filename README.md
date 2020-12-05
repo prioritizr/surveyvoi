@@ -17,21 +17,21 @@ if (!require(remotes)) install.packages("remotes")
 remotes::install_github("jeffreyhanson/surveyvoi")
 ```
 
-### Windows
+#### Windows
 
 The [Rtools](https://cran.r-project.org/bin/windows/Rtools/) software needs to be installed to install the *surveyvoi R* package from source. This software provides system requirements from [rwinlib](https://github.com/rwinlib/).
 
-### Ubuntu
+#### Ubuntu
 
 The `gmp` and `mpfr` libraries need to be installed to install the *surveyvoi R* package from source. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
 
     apt-get -y update && apt-get install -y libgmp3-dev libmpfr-dev
 
-### Linux
+#### Linux
 
 For Unix-alikes, `gmp` (&gt;= 4.2.3) and `mpfr` (&gt;= 3.0.0) are required.
 
-### MacOS
+#### MacOS
 
 The `gmp` and `mpfr` libraries need to be installed to install the *surveyvoi R* package from source. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
 
@@ -44,7 +44,7 @@ Citation
 
 This package is still under active development so we do not yet encourage using it. To cite the latest development version, please use:
 
-> Hanson JO, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 1.0.0. Available at <https://github.com/jeffreyhanson/surveyvoi>.
+> Hanson JO, Hudgins EJ, Bennett J (2020). surveyvoi: Survey Value of Information. R package version 1.0.0. Available at <https://github.com/jeffreyhanson/surveyvoi>.
 
 Usage
 -----

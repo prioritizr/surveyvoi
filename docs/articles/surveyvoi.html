@@ -76,7 +76,7 @@
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
                         <h4 class="author">Jeffrey O. Hanson</h4>
             
-            <h4 class="date">2020-12-03</h4>
+            <h4 class="date">2020-12-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/master/vignettes/surveyvoi.Rmd"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
@@ -89,8 +89,8 @@
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>The funding available for conservation is limited. To ensure that conservation funds are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns are incomplete. As a consequence, prioritizations can potentially be improved by collecting additional data. Specifically, ecological surveys can be conducted in sites to learn more about which species are present within them. However, conducting ecological surveys reduces the funds available for conservation management. Thus, decision makers need to strategically allocate funding for surveying sites and managing them for conservation—this is not a trivial task.</p>
-<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and by directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their performance.</p>
-<p>This tutorial provides a brief overview of the <em>surveyvoi</em> package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species – to keep the tutorial simple and reduce computational burden – the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code <code>?function</code>, where <code>function</code> is the name of desired function).</p>
+<p>The <em>surveyvoi R</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing return on investment via optimization algorithms. After generating such survey plans, they can be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="uri">https://www.gurobi.com</a>) and the <em>gurobi R</em> package (installation instructions available for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html">Linux</a>, <a href="https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html">Windows</a>, and <a href="https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html">Mac OS</a>).</p>
+<p>This tutorial provides a brief overview of the <em>surveyvoi R</em> package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species – to keep the tutorial simple and reduce computational burden – the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code <code>?function</code>, where <code>function</code> is the name of desired function).</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
@@ -653,7 +653,7 @@
 <div id="conclusion" class="section level2">
 <h2 class="hasAnchor">
 <a href="#conclusion" class="anchor"></a>Conclusion</h2>
-<p>Hopefully, this tutorial has been useful. If you have any questions about using the <em>surveyvoi</em> package or suggestions for improving it, please file an issue on the package’s online coding repository (<a href="https://github.com/jeffreyhanson/surveyvoi/issues" class="uri">https://github.com/jeffreyhanson/surveyvoi/issues</a>).</p>
+<p>Hopefully, this tutorial has been useful. If you have any questions about using the <em>surveyvoi R</em> package or suggestions for improving it, please file an issue on the package’s online coding repository (<a href="https://github.com/jeffreyhanson/surveyvoi/issues" class="uri">https://github.com/jeffreyhanson/surveyvoi/issues</a>).</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
@@ -686,7 +686,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://jeffrey-hanson.com">Jeffrey O Hanson</a>, <a href="https://josephrbennett.wordpress.com">Joseph Bennett</a>.</p>
+  <p>Developed by <a href="https://jeffrey-hanson.com">Jeffrey O Hanson</a>, <a href="https://ejhudgins.com">Emma J Hudgins</a>, Joseph R Bennett.</p>
 </div>
 
 <div class="pkgdown">

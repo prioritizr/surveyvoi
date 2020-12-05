@@ -5,6 +5,9 @@ NULL
 #'
 #' Generate a `matrix` representing all possible different
 #' survey schemes given survey costs and a fixed budget.
+#' Please note that this function requires the Gurobi optimization software
+#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
+#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @inheritParams env_div_survey_scheme
 #'

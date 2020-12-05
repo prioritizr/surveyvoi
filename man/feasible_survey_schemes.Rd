@@ -50,6 +50,9 @@ if a given site is selected in a given survey scheme.
 \description{
 Generate a \code{matrix} representing all possible different
 survey schemes given survey costs and a fixed budget.
+Please note that this function requires the Gurobi optimization software
+(\url{https://www.gurobi.com/}) and the \pkg{gurobi} R package
+(installation instructions available for \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
 }
 \examples{
 \dontrun{

@@ -5,6 +5,9 @@ NULL
 #'
 #' Generate a survey scheme by selecting the set of sites with the greatest
 #' overall weight value, a maximum budget for the survey scheme.
+#' Please note that this function requires the Gurobi optimization software
+#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
+#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @param weight_column `character` name of the column in the argument
 #'   to `site_data` with the weights for each site.
