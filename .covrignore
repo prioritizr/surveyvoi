@@ -4,3 +4,5 @@ R/weighted_survey_scheme.R
 R/env_div_survey_scheme.R
 R/optimal_survey_scheme.R
 R/approx_optimal_survey_scheme.R
+R/ilp.R
+src/rcpp_feasible_actions_ilp_matrix.cpp

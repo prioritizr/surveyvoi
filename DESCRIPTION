@@ -91,6 +91,7 @@ Collate:
     'approx_optimal_survey_scheme.R'
     'cluster.R'
     'data.R'
+    'ilp.R'
     'env_div_survey_scheme.R'
     'evdci.R'
     'feasible_survey_schemes.R'

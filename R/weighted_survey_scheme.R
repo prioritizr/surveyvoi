@@ -1,4 +1,4 @@
-#' @include internal.R env_div_survey_scheme.R
+#' @include internal.R ilp.R env_div_survey_scheme.R
 NULL
 
 #' Weighted survey scheme

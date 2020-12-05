@@ -1,4 +1,4 @@
-#' @include internal.R
+#' @include internal.R ilp.R
 NULL
 
 #' Environmental diversity survey scheme
