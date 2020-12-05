@@ -26,3 +26,4 @@ inst/extdata/dictionary.txt
 .travis.yml
 ^simulation.R$
 ^\.github$
+.covrignore

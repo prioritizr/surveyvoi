@@ -1,0 +1,6 @@
+R/feasible_survey_schemes.R
+R/geo_cov_survey_scheme.R
+R/weighted_survey_scheme.R
+R/env_div_survey_scheme.R
+R/optimal_survey_scheme.R
+R/approx_optimal_survey_scheme.R

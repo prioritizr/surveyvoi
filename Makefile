@@ -44,13 +44,11 @@ quickcheck:
 	echo "\n===== R CMD CHECK =====\n" > check.log 2>&1
 	R --slave -e "devtools::check(build_args = '--no-build-vignettes', args = '--no-build-vignettes', run_dont_test = TRUE, vignettes = FALSE)" >> check.log 2>&1se
 	cp -R doc inst/
-	touch inst/doc/.gitkeep
 
 check:
 	echo "\n===== R CMD CHECK =====\n" > check.log 2>&1
 	R --slave -e "devtools::check(build_args = '--no-build-vignettes', args = '--no-build-vignettes', run_dont_test = TRUE, vignettes = FALSE)" >> check.log 2>&1
 	cp -R doc inst/
-	touch inst/doc/.gitkeep
 
 install:
 	R --slave -e "devtools::install_local('../surveyvoi', force = TRUE, upgrade = 'never')"
@@ -67,4 +65,10 @@ wbcheck:
 solarischeck:
 	R --slave -e "rhub::check(platform = 'solaris-x86-patched', email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
 
-.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples solarischeck wbcheck
+sancheck:
+	R --slave -e "rhub::check(platform = 'linux-x86_64-rocker-gcc-san', email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
+
+vgcheck:
+	R --slave -e "rhub::check(platform = 'ubuntu-gcc-devel', valgrind = TRUE, email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
+
+.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples solarischeck wbcheck sancheck vgcheck
