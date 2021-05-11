@@ -32,7 +32,13 @@ https://www.gurobi.com).
 
 ## Installation
 
-The _surveyvoi R_ package is still in an experimental phase of the development cycle and so it is not yet available on [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/). To install latest developmental version from [GitHub](https://github.com/jeffreyhanson/surveyvoi), please use the following R code. Note that developmental versions may contain coding errors.
+The latest official version of the _surveyvoi R_ package can be installed from the [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) using the following _R_ code.
+
+```{r, eval = FALSE}
+install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
+```
+
+Alternatively, the latest development version can be installed from [GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following code. Please note that while developmental versions may contain additional features not present in the official version, they may also contain coding errors.
 
 ```{r, eval = FALSE}
 if (!require(remotes)) install.packages("remotes")
@@ -67,11 +73,12 @@ brew install mpfr
 
 ## Citation
 
-This package is still under active development so we do not yet encourage using it. To cite the latest development version, please use:
+Please cite the _surveyvoi R_ package when using it in publications. To cite the latest official version, please use:
 
 ```{r, echo = FALSE, results = "asis", comment = ""}
-dev_version <- as.character(packageVersion("surveyvoi"))
-cat(paste0("> Hanson JO, Hudgins EJ, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
+off_version <- "1.0.1"
+off_year <- "2021"
+cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", off_year, "). surveyvoi: Survey Value of Information. R package version ", off_version, ". Available at https://CRAN.R-project.org/package=surveyvoi.\n"))
 ```
 
 ## Usage

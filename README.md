@@ -26,13 +26,19 @@ on the ‘Gurobi’ optimization software (available from
 
 ## Installation
 
-The *surveyvoi R* package is still in an experimental phase of the
-development cycle and so it is not yet available on [Comprehensive R
-Archive Network (CRAN)](https://cran.r-project.org/). To install latest
-developmental version from
-[GitHub](https://github.com/jeffreyhanson/surveyvoi), please use the
-following R code. Note that developmental versions may contain coding
-errors.
+The latest official version of the *surveyvoi R* package can be
+installed from the [Comprehensive R Archive Network
+(CRAN)](https://cran.r-project.org/) using the following *R* code.
+
+``` r
+install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
+```
+
+Alternatively, the latest development version can be installed from
+[GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following
+code. Please note that while developmental versions may contain
+additional features not present in the official version, they may also
+contain coding errors.
 
 ``` r
 if (!require(remotes)) install.packages("remotes")
@@ -74,12 +80,12 @@ terminal:
 
 ## Citation
 
-This package is still under active development so we do not yet
-encourage using it. To cite the latest development version, please use:
+Please cite the *surveyvoi R* package when using it in publications. To
+cite the latest official version, please use:
 
-> Hanson JO, Hudgins EJ, Bennett J (2021). surveyvoi: Survey Value of
-> Information. R package version 1.0.1. Available at
-> <https://github.com/jeffreyhanson/surveyvoi>.
+> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey
+> Value of Information. R package version 1.0.1. Available at
+> <https://CRAN.R-project.org/package=surveyvoi>.
 
 ## Usage
 
@@ -163,7 +169,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -174,7 +180,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -326,7 +332,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using
