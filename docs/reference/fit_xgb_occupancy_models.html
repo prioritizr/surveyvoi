@@ -47,6 +47,8 @@ xgboost::xgb.train())." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -58,9 +60,18 @@ xgboost::xgb.train())." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -81,12 +92,6 @@ xgboost::xgb.train())." />
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -99,7 +104,7 @@ xgboost::xgb.train())." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -339,7 +344,7 @@ the models' training and evaluation folds.</p></li>
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
 <span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># create list of possible tuning parameters for modelling</span>
 <span class='va'>parameters</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>eta <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.5</span>, length.out <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,
@@ -359,7 +364,7 @@ the models' training and evaluation folds.</p></li>
 
 <span class='co'># print best found model parameters</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>parameters</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
+</div><div class='co'>#&gt; [[1]]
 #&gt; [[1]]$eta
 #&gt; [1] 0.1
 #&gt; 
@@ -393,40 +398,40 @@ the models' training and evaluation folds.</p></li>
 #&gt; </div><div class='input'>
 <span class='co'># print model predictions</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>predictions</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 30 x 2</span>
 #&gt;       f1    f2
-#&gt;    </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.529 0.719
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.451 0.719
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.549 0.593
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.451 0.713
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.550 0.700
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.450 0.279
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.549 0.546
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.466 0.626
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.540 0.656
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.549 0.377
-#&gt; </span><span style='color: #555555;'># … with 20 more rows</span><span></div><div class='input'>
+#&gt;    <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'> 1</span><span> 0.529 0.719</span>
+#&gt; <span style='color: #BCBCBC;'> 2</span><span> 0.451 0.719</span>
+#&gt; <span style='color: #BCBCBC;'> 3</span><span> 0.549 0.593</span>
+#&gt; <span style='color: #BCBCBC;'> 4</span><span> 0.451 0.713</span>
+#&gt; <span style='color: #BCBCBC;'> 5</span><span> 0.550 0.700</span>
+#&gt; <span style='color: #BCBCBC;'> 6</span><span> 0.450 0.279</span>
+#&gt; <span style='color: #BCBCBC;'> 7</span><span> 0.549 0.546</span>
+#&gt; <span style='color: #BCBCBC;'> 8</span><span> 0.466 0.626</span>
+#&gt; <span style='color: #BCBCBC;'> 9</span><span> 0.540 0.656</span>
+#&gt; <span style='color: #BCBCBC;'>10</span><span> 0.549 0.377</span>
+#&gt; <span style='color: #949494;'># … with 20 more rows</span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>performance</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 13</span><span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 13</span>
 #&gt;   feature train_tss_mean train_tss_std train_sensitivity_mean
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1               0.980      0.020</span><span style='text-decoration: underline;'>8</span><span>                     1.00
-#&gt; </span><span style='color: #555555;'>2</span><span> f2               0.999      0.000</span><span style='text-decoration: underline;'>903</span><span>                   1.00
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>            </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> f1               0.980      0.020</span><span style='text-decoration: underline;'>8</span><span>                     1.00</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> f2               0.999      0.000</span><span style='text-decoration: underline;'>903</span><span>                   1.00</span>
 #&gt;   train_sensitivity_std train_specificity_mean train_specificity_std
-#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                     0                  0.980              0.020</span><span style='text-decoration: underline;'>8</span><span>  
-#&gt; </span><span style='color: #555555;'>2</span><span>                     0                  0.999              0.000</span><span style='text-decoration: underline;'>903</span><span>
+#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>                     0                  0.980              0.020</span><span style='text-decoration: underline;'>8</span><span>  </span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>                     0                  0.999              0.000</span><span style='text-decoration: underline;'>903</span>
 #&gt;   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
-#&gt;           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>         0.888        0.114                 0.959               0.091</span><span style='text-decoration: underline;'>2</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span>         0.816        0.143                 0.936               0.095</span><span style='text-decoration: underline;'>6</span><span>
+#&gt;           <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>         0.888        0.114                 0.959               0.091</span><span style='text-decoration: underline;'>2</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>         0.816        0.143                 0.936               0.095</span><span style='text-decoration: underline;'>6</span>
 #&gt;   test_specificity_mean test_specificity_std
-#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                 0.929               0.091</span><span style='text-decoration: underline;'>0</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span>                 0.879               0.125 </div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>                 0.929               0.091</span><span style='text-decoration: underline;'>0</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>                 0.879               0.125 </span></div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -438,11 +443,11 @@ the models' training and evaluation folds.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -450,6 +455,8 @@ the models' training and evaluation folds.</p></li>
 
   
 
+
+  
 
   </body>
 </html>

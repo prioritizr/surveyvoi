@@ -51,6 +51,8 @@ covariate coefficients are sampled using a Laplace prior distribution
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -62,9 +64,18 @@ covariate coefficients are sampled using a Laplace prior distribution
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -85,12 +96,6 @@ covariate coefficients are sampled using a Laplace prior distribution
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -103,7 +108,7 @@ covariate coefficients are sampled using a Laplace prior distribution
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -358,12 +363,12 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
 <span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
 <span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># print JAGS model code</span>
 <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"jags"</span>, <span class='st'>"model.jags"</span>, package <span class='op'>=</span> <span class='st'>"surveyvoi"</span><span class='op'>)</span><span class='op'>)</span>,
     sep <span class='op'>=</span> <span class='st'>"\n"</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; model {
+</div><div class='co'>#&gt; model {
 #&gt;   # data
 #&gt;   ## int&lt;lower=1&gt; n_vars
 #&gt;   ## int&lt;lower=1&gt; train_n_sites
@@ -405,7 +410,7 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
    jags_n_samples <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_burnin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>,
    jags_n_thin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_adapt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>2</span><span class='op'>)</span>,
    n_threads <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='message'>Loading required namespace: rjags</span></div><div class='output co'>#&gt; Compiling rjags model...
+</div><div class='co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='co'>#&gt; Loading required namespace: rjags</div><div class='co'>#&gt; Compiling rjags model...
 #&gt; Calling the simulation using the rjags method...
 #&gt; Adapting the model for 100 iterations...
 #&gt; Burning in the model for 250 iterations...
@@ -748,40 +753,40 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 #&gt; Calculating the Gelman-Rubin statistic for 3 variables....</div><div class='input'>
 <span class='co'># print model predictions</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>predictions</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 30 x 2</span><span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 30 x 2</span>
 #&gt;        f1          f2
-#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> 0.868  1.00       
-#&gt; </span><span style='color: #555555;'> 2</span><span> 0.405  1.00       
-#&gt; </span><span style='color: #555555;'> 3</span><span> 0.933  0.999      
-#&gt; </span><span style='color: #555555;'> 4</span><span> 0.275  1.00       
-#&gt; </span><span style='color: #555555;'> 5</span><span> 0.634  0.002</span><span style='text-decoration: underline;'>30</span><span>    
-#&gt; </span><span style='color: #555555;'> 6</span><span> 0.020</span><span style='text-decoration: underline;'>5</span><span> 0.000</span><span style='text-decoration: underline;'>000</span><span>117
-#&gt; </span><span style='color: #555555;'> 7</span><span> 0.903  1.00       
-#&gt; </span><span style='color: #555555;'> 8</span><span> 0.447  0.251      
-#&gt; </span><span style='color: #555555;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     
-#&gt; </span><span style='color: #555555;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   
-#&gt; </span><span style='color: #555555;'># … with 20 more rows</span><span></div><div class='input'>
+#&gt;     <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'> 1</span><span> 0.868  1.00       </span>
+#&gt; <span style='color: #BCBCBC;'> 2</span><span> 0.405  1.00       </span>
+#&gt; <span style='color: #BCBCBC;'> 3</span><span> 0.933  0.999      </span>
+#&gt; <span style='color: #BCBCBC;'> 4</span><span> 0.275  1.00       </span>
+#&gt; <span style='color: #BCBCBC;'> 5</span><span> 0.634  0.002</span><span style='text-decoration: underline;'>30</span><span>    </span>
+#&gt; <span style='color: #BCBCBC;'> 6</span><span> 0.020</span><span style='text-decoration: underline;'>5</span><span> 0.000</span><span style='text-decoration: underline;'>000</span><span>117</span>
+#&gt; <span style='color: #BCBCBC;'> 7</span><span> 0.903  1.00       </span>
+#&gt; <span style='color: #BCBCBC;'> 8</span><span> 0.447  0.251      </span>
+#&gt; <span style='color: #BCBCBC;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     </span>
+#&gt; <span style='color: #BCBCBC;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   </span>
+#&gt; <span style='color: #949494;'># … with 20 more rows</span></div><div class='input'>
 <span class='co'># print model performance</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>performance</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 14</span><span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 14</span>
 #&gt;   feature max_mpsrf train_tss_mean train_tss_std train_sensitivity_mean
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1           3.17          0.716        0.320                   0.859
-#&gt; </span><span style='color: #555555;'>2</span><span> f2           1.15          0.432        0.089</span><span style='text-decoration: underline;'>5</span><span>                  0.555
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> f1           3.17          0.716        0.320                   0.859</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> f2           1.15          0.432        0.089</span><span style='text-decoration: underline;'>5</span><span>                  0.555</span>
 #&gt;   train_sensitivity_std train_specificity_mean train_specificity_std
-#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                0.249                   0.857                0.091</span><span style='text-decoration: underline;'>5</span><span>
-#&gt; </span><span style='color: #555555;'>2</span><span>                0.087</span><span style='text-decoration: underline;'>5</span><span>                  0.877                0.063</span><span style='text-decoration: underline;'>3</span><span>
+#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>                0.249                   0.857                0.091</span><span style='text-decoration: underline;'>5</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>                0.087</span><span style='text-decoration: underline;'>5</span><span>                  0.877                0.063</span><span style='text-decoration: underline;'>3</span>
 #&gt;   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
-#&gt;           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>         0.393        0.729                 0.717                0.439
-#&gt; </span><span style='color: #555555;'>2</span><span>         0.519        0.310                 0.613                0.341
+#&gt;           <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>         0.393        0.729                 0.717                0.439</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>         0.519        0.310                 0.613                0.341</span>
 #&gt;   test_specificity_mean test_specificity_std
-#&gt;                   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>                 0.675                0.351
-#&gt; </span><span style='color: #555555;'>2</span><span>                 0.905                0.155</div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>                 0.675                0.351</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>                 0.905                0.155</span></div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -793,11 +798,11 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -805,6 +810,8 @@ false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
   
 
+
+  
 
   </body>
 </html>

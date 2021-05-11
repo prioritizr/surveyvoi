@@ -3,8 +3,8 @@ NULL
 
 #' Approximately near optimal survey scheme
 #'
-#' Find a near optimal survey scheme that maximizes return on investment using
-#' value of information analyses. This function uses the approximation method
+#' Find a near optimal survey scheme that maximizes value of information.
+#' This function uses the approximation method
 #' for calculating the expected value of the decision given a survey scheme,
 #' and a greedy heuristic algorithm to maximize this metric.
 #'

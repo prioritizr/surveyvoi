@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -38,12 +40,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -55,8 +51,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/jeffreyhanson/surveyvoi/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -70,15 +66,15 @@
 
       
 
-      </header><div class="row">
+      </header><script src="surveyvoi_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
-                        <h4 class="author">Jeffrey O. Hanson</h4>
+                        <h4 data-toc-skip class="author">Jeffrey O. Hanson</h4>
             
-            <h4 class="date">2020-12-05</h4>
+            <h4 data-toc-skip class="date">2021-05-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/master/vignettes/surveyvoi.Rmd"><code>vignettes/surveyvoi.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/master/vignettes/surveyvoi.Rmd" class="external-link"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
 
     </div>
@@ -87,53 +83,53 @@
     
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
-<a href="#introduction" class="anchor"></a>Introduction</h2>
+<a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h2>
 <p>The funding available for conservation is limited. To ensure that conservation funds are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns are incomplete. As a consequence, prioritizations can potentially be improved by collecting additional data. Specifically, ecological surveys can be conducted in sites to learn more about which species are present within them. However, conducting ecological surveys reduces the funds available for conservation management. Thus, decision makers need to strategically allocate funding for surveying sites and managing them for conservation—this is not a trivial task.</p>
-<p>The <em>surveyvoi R</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing return on investment via optimization algorithms. After generating such survey plans, they can be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="uri">https://www.gurobi.com</a>) and the <em>gurobi R</em> package (installation instructions available for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html">Linux</a>, <a href="https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html">Windows</a>, and <a href="https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html">Mac OS</a>).</p>
+<p>The <em>surveyvoi R</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing value of information using optimization algorithms. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>) and the <em>gurobi R</em> package (installation instructions available for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html" class="external-link">Linux</a>, <a href="https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html" class="external-link">Windows</a>, and <a href="https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html" class="external-link">Mac OS</a>).</p>
 <p>This tutorial provides a brief overview of the <em>surveyvoi R</em> package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species – to keep the tutorial simple and reduce computational burden – the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code <code>?function</code>, where <code>function</code> is the name of desired function).</p>
 </div>
 <div id="setup" class="section level2">
 <h2 class="hasAnchor">
-<a href="#setup" class="anchor"></a>Setup</h2>
+<a href="#setup" class="anchor" aria-hidden="true"></a>Setup</h2>
 <p>Let’s start by setting up our R session. Here we will load some R packages and pre-set the random number generators for reproducibility.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># load packages</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jeffreyhanson/surveyvoi">surveyvoi</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">gridExtra</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sjmgarnier/viridis">viridis</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/">tibble</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ms.math.uni-mannheim.de/de/publications/software/randomfields">RandomFields</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link">surveyvoi</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gridExtra</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://ms.math.uni-mannheim.de/de/publications/software/randomfields" class="external-link">RandomFields</a></span><span class="op">)</span>
 
 <span class="co"># set RNG seeds for reproducibility</span>
 <span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">722</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html">RFoptions</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="va">seed</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html" class="external-link">RFoptions</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="va">seed</span><span class="op">)</span>
 
 <span class="co"># set default table printing options</span>
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>pillar.sigfig <span class="op">=</span> <span class="fl">6</span>, tibble.width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>pillar.sigfig <span class="op">=</span> <span class="fl">6</span>, tibble.width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="simulate-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#simulate-data" class="anchor"></a>Simulate data</h2>
-<p>Let’s simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites—meaning that 15 of the sites will not have survey data. We will also simulate three spatially-autocorrelated variables to characterize the environmental conditions within the sites. Although the simulation code (i.e. <code>simulate_site_data</code>) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<a href="#simulate-data" class="anchor" aria-hidden="true"></a>Simulate data</h2>
+<p>Let’s simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites—meaning that 15 of the sites will not have survey data. We will also simulate three spatially-autocorrelated variables to characterize the environmental conditions within the sites. Although the simulation code (i.e. <code>simulate_site_data</code>) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate site data</span>
 <span class="va">site_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_site_data.html">simulate_site_data</a></span><span class="op">(</span>
   n_sites <span class="op">=</span> <span class="fl">30</span>, n_features <span class="op">=</span> <span class="fl">1</span>, proportion_of_sites_missing_data <span class="op">=</span> <span class="fl">15</span> <span class="op">/</span> <span class="fl">30</span>,
   n_env_vars <span class="op">=</span> <span class="fl">3</span>, survey_cost_intensity <span class="op">=</span> <span class="fl">5</span>, management_cost_intensity <span class="op">=</span> <span class="fl">2500</span>,
   max_number_surveys_per_site <span class="op">=</span> <span class="fl">1</span>, output_probabilities <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code>## ...</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># print site data</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span></code></pre></div>
 <pre><code>## Simple feature collection with 30 features and 7 fields
-## geometry type:  POINT
-## dimension:      XY
-## bbox:           xmin: 0.1270337 ymin: 0.008288463 xmax: 0.987045 ymax: 0.9969118
-## CRS:            NA
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 0.1270337 ymin: 0.008288463 xmax: 0.987045 ymax: 0.9969118
+## CRS:           NA
 ## # A tibble: 30 x 8
 ##    survey_cost management_cost    f1    n1         e1        e2        e3
 ##          &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
@@ -160,69 +156,69 @@
 ##  9     (0.67577 0.81784)
 ## 10   (0.611484 0.551849)
 ## # … with 20 more rows</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the spatial location of the sites</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Sites"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Sites"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-5-1.png" width="336" style="display: block; margin: auto;"></p>
-<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional site attributes. Here, each row corresponds to a different site, and each column contains a different site attribute. The <code>f1</code> column contains the results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site has had at most a single previous survey, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The <code>n1</code> column contains the number of previous surveys conducted within each site. Thus, sites with zeros in this column have not previously been surveyed. The <code>e1</code>, <code>e2</code>, and <code>e3</code> columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The <code>survey_cost</code> column contains the cost of surveying each site, and the <code>management_cost</code> column contains the cost of managing each site for conservation.</p>
+<p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional site attributes. Here, each row corresponds to a different site, and each column contains a different site attribute. The <code>f1</code> column contains the results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site has had at most a single previous survey, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The <code>n1</code> column contains the number of previous surveys conducted within each site. Thus, sites with zeros in this column have not previously been surveyed. The <code>e1</code>, <code>e2</code>, and <code>e3</code> columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The <code>survey_cost</code> column contains the cost of surveying each site, and the <code>management_cost</code> column contains the cost of managing each site for conservation.</p>
 <p>To help understand the simulated data, let’s create some visualizations.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot site occupancy data from previous surveys</span>
 <span class="co"># 1 = species was detected in 100% of the previous surveys</span>
 <span class="co"># 0 = species was detected in 0% of the previous surveys</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"f"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Detection/non-detection data"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"f"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Detection/non-detection data"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-6-1.png" width="336" style="display: block; margin: auto;"></p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot number of previous surveys within each site</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"n"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Number of previous surveys"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"n"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Number of previous surveys"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-7-1.png" width="336" style="display: block; margin: auto;"></p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot site cost data</span>
 <span class="co"># note that survey and management costs are on different scales</span>
-<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">survey_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Survey cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">management_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Management cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"X coordinate"</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html">grid.arrange</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
+<span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">survey_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Survey cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">management_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Management cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"X coordinate"</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">grid.arrange</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot site environmental data</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span><span class="va">var</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">var</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Environmental conditions"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"e"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">var</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">var</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Environmental conditions"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-9-1.png" width="756" style="display: block; margin: auto;"></p>
 <p>After simulating data for the sites, we will simulate data for the conservation feature. We set <code>proportion_of_survey_features = 1</code> to indicate that this feature will be examined in future surveys.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># simulate feature data</span>
 <span class="va">feature_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_feature_data.html">simulate_feature_data</a></span><span class="op">(</span>
   n_features <span class="op">=</span> <span class="fl">1</span>, proportion_of_survey_features <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
@@ -235,33 +231,33 @@
 <span class="va">feature_data</span><span class="op">$</span><span class="va">target</span> <span class="op">&lt;-</span> <span class="fl">2</span>
 
 <span class="co"># print feature data</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">feature_data</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">feature_data</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 1 x 5
 ##   name  survey survey_sensitivity survey_specificity target
 ##   &lt;chr&gt; &lt;lgl&gt;               &lt;dbl&gt;              &lt;dbl&gt;  &lt;dbl&gt;
 ## 1 f1    TRUE             0.957543           0.864061      2</code></pre>
-<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly recording a presence) and specificity (probability of correctly recording an absence) of the survey methodology. Finally, the <code>target</code> column specifies the number of occupied sites for each species that should ideally be represented in the prioritization.</p>
+<p>The <code>feature_data</code> object is a table (i.e. <code>tibble</code> object) that contains information on the conservation feature. Here, each row corresponds to a different feature – and so it only has one row because we only have one feature – and each column contains different information about the feature(s). The <code>name</code> column contains the name of the feature. The <code>survey</code> column indicates if the feature will be examined in future surveys. The <code>survey_sensitivity</code> and <code>survey_specificity</code> columns denote the sensitivity (probability of correctly recording a presence) and specificity (probability of correctly recording an absence) of the survey methodology. Finally, the <code>target</code> column specifies the number of occupied sites for each species that should ideally be represented in the prioritization.</p>
 </div>
 <div id="modelling-probability-of-occupancy" class="section level2">
 <h2 class="hasAnchor">
-<a href="#modelling-probability-of-occupancy" class="anchor"></a>Modelling probability of occupancy</h2>
-<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to survey them. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/">xgboost R package</a>. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<a href="#modelling-probability-of-occupancy" class="anchor" aria-hidden="true"></a>Modelling probability of occupancy</h2>
+<p>After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the potential benefits of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to conduct any additional surveys. Specifically, we will fit gradient boosted regression trees – via the <a href="https://xgboost.readthedocs.io/en/latest/" class="external-link">xgboost R package</a>. These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species’ environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create list of candidate parameter values for calibration procedure</span>
-<span class="va">xgb_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>eta <span class="op">=</span> <span class="fl">0.1</span>, lambda <span class="op">=</span> <span class="fl">0.1</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span><span class="op">)</span>
+<span class="va">xgb_parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>eta <span class="op">=</span> <span class="fl">0.1</span>, lambda <span class="op">=</span> <span class="fl">0.1</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span><span class="op">)</span>
 
 <span class="co"># identify suitable parameters for model fitting</span>
 <span class="co"># ideally we would try a larger range of values (i.e. not just a single value of 0.1),</span>
 <span class="co"># but we will keep it low to reduce processing time for this example</span>
 <span class="va">xgb_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_xgb_occupancy_models.html">fit_xgb_occupancy_models</a></span><span class="op">(</span>
   <span class="va">site_data</span>, <span class="va">feature_data</span>,
-  <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span><span class="op">)</span>,
+  <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span><span class="op">)</span>,
   <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,
-  n_folds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, xgb_tuning_parameters <span class="op">=</span> <span class="va">xgb_parameters</span><span class="op">)</span></code></pre></div>
+  n_folds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, xgb_tuning_parameters <span class="op">=</span> <span class="va">xgb_parameters</span><span class="op">)</span></code></pre></div>
 <p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># print best parameters</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">xgb_results</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">xgb_results</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span></code></pre></div>
 <pre><code>## [[1]]
 ## [[1]]$eta
 ## [1] 0.1
@@ -275,10 +271,10 @@
 ## [[1]]$scale_pos_weight
 ## [[1]]$scale_pos_weight[[1]]
 ## [1] 1 1</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># print model performance (TSS value)</span>
 <span class="va">xgb_performance</span> <span class="op">&lt;-</span> <span class="va">xgb_results</span><span class="op">$</span><span class="va">performance</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">xgb_performance</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xgb_performance</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>##   feature train_tss_mean train_tss_std train_sensitivity_mean
 ## 1      f1              1             0                      1
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
@@ -287,14 +283,14 @@
 ## 1     0.5384635    0.4318228             0.9219042            0.1104442
 ##   test_specificity_mean test_specificity_std
 ## 1             0.6165593             0.542267</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># store the model sensitivities and specificities in the feature_data object</span>
 <span class="va">feature_data</span><span class="op">$</span><span class="va">model_sensitivity</span> <span class="op">&lt;-</span> <span class="va">xgb_performance</span><span class="op">$</span><span class="va">test_sensitivity_mean</span>
 <span class="va">feature_data</span><span class="op">$</span><span class="va">model_specificity</span> <span class="op">&lt;-</span> <span class="va">xgb_performance</span><span class="op">$</span><span class="va">test_specificity_mean</span>
 
 <span class="co"># store predicted probabilities in the site_data object</span>
 <span class="va">xgb_predictions</span> <span class="op">&lt;-</span> <span class="va">xgb_results</span><span class="op">$</span><span class="va">predictions</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">xgb_predictions</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">xgb_predictions</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 30 x 1
 ##          f1
 ##       &lt;dbl&gt;
@@ -309,40 +305,40 @@
 ##  9 0.496156
 ## 10 0.496156
 ## # … with 20 more rows</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">site_data</span><span class="op">$</span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">xgb_predictions</span><span class="op">$</span><span class="va">f1</span></code></pre></div>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot site-level estimated occupancy probabilities</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">starts_with</a></span><span class="op">(</span><span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/viridis/man/scale_viridis.html">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modelled probabilities"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modelled probabilities"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-13-1.png" width="336" style="display: block; margin: auto;"></p>
 </div>
 <div id="expected-value-given-current-information" class="section level2">
 <h2 class="hasAnchor">
-<a href="#expected-value-given-current-information" class="anchor"></a>Expected value given current information</h2>
-<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation value of a near-optimal prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set at 10% of the total site management costs.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<a href="#expected-value-given-current-information" class="anchor" aria-hidden="true"></a>Expected value given current information</h2>
+<p>After simulating and modelling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation value of a near-optimal prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set at 10% of the total site management costs.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate total budget for surveying and managing sites</span>
-<span class="va">total_budget</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">$</span><span class="va">management_cost</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.1</span>
+<span class="va">total_budget</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">$</span><span class="va">management_cost</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.1</span>
 
 <span class="co"># print total budget</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 5215.122</code></pre>
 <p>Given the total budget, we can now calculate the <em>expected value of the decision given current information</em>.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># expected value of the decision given current information</span>
 <span class="va">evd_current</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evdci.html">evdci</a></span><span class="op">(</span>
   site_data <span class="op">=</span> <span class="va">site_data</span>,
   feature_data <span class="op">=</span> <span class="va">feature_data</span>,
-  site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
-  site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
-  site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
+  site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
+  site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
+  site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
   site_management_cost_column <span class="op">=</span> <span class="st">"management_cost"</span>,
   feature_survey_sensitivity_column <span class="op">=</span> <span class="st">"survey_sensitivity"</span>,
   feature_survey_specificity_column <span class="op">=</span> <span class="st">"survey_specificity"</span>,
@@ -352,15 +348,15 @@
   total_budget <span class="op">=</span> <span class="va">total_budget</span><span class="op">)</span>
 
 <span class="co"># print value</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">evd_current</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_current</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.9205891</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
 <h2 class="hasAnchor">
-<a href="#survey-schemes" class="anchor"></a>Survey schemes</h2>
-<p>Now we will generate some candidate survey schemes to see if we can improve the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. <code>survey_budget</code>) will be set at 25% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<a href="#survey-schemes" class="anchor" aria-hidden="true"></a>Survey schemes</h2>
+<p>Now we will generate some candidate survey schemes to see if we can improve the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. <code>survey_budget</code>) will be set at 25% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate budget for surveying sites</span>
 <span class="co">#   add column to site_data indicating if the sites already have data or not</span>
 <span class="va">site_data</span><span class="op">$</span><span class="va">surveyed</span> <span class="op">&lt;-</span> <span class="va">site_data</span><span class="op">$</span><span class="va">n1</span> <span class="op">&gt;</span> <span class="fl">0.5</span>
@@ -369,24 +365,24 @@
 <span class="co">#   i.e. sites that already have data have zero cost, and</span>
 <span class="co">#   sites that are missing data retain their cost values</span>
 <span class="va">site_data</span> <span class="op">&lt;-</span>
-  <span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>new_survey_cost <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else</a></span><span class="op">(</span><span class="va">surveyed</span>, <span class="fl">0</span>, <span class="va">survey_cost</span><span class="op">)</span><span class="op">)</span>
+  <span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>new_survey_cost <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">surveyed</span>, <span class="fl">0</span>, <span class="va">survey_cost</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co">#   calculate total cost of surveying remaining unsurveyed sites</span>
 <span class="va">total_cost_of_surveying_remaining_sites</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">$</span><span class="va">new_survey_cost</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">$</span><span class="va">new_survey_cost</span><span class="op">)</span>
 
 <span class="co">#   calculate budget for surveying sites</span>
 <span class="va">survey_budget</span> <span class="op">&lt;-</span> <span class="va">total_cost_of_surveying_remaining_sites</span> <span class="op">*</span> <span class="fl">0.25</span>
 
 <span class="co"># print budgets</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">survey_budget</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survey_budget</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 14.80791</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 5215.122</code></pre>
-<p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites <span class="citation">(Yates 1948)</span>, (ii) increase coverage of environmental conditions among surveyed sites <span class="citation">(i.e. environmental diversity; Faith &amp; Walker 1996)</span>, (iii) increase coverage of sites with highly uncertain information <span class="citation">(Guisan <em>et al.</em> 2006)</span>, (iv) increase coverage of sites where species are predicted to occur <span class="citation">(Le Lay <em>et al.</em> 2010)</span>, and (v) increase coverage of sites that have low management costs.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites <span class="citation">(Yates 1948)</span>, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; <span class="citation">Faith &amp; Walker (1996)</span>], (iii) increase coverage of sites with highly uncertain information <span class="citation">(Guisan <em>et al.</em> 2006)</span>, (iv) increase coverage of sites where species are predicted to occur <span class="citation">(Le Lay <em>et al.</em> 2010)</span>, and (v) increase coverage of sites that have low management costs.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># (i) generate survey scheme to increase geographic coverage</span>
 <span class="va">geo_scheme</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/geo_cov_survey_scheme.html">geo_cov_survey_scheme</a></span><span class="op">(</span>
@@ -398,7 +394,7 @@
 <span class="co"># real dataset to account for correlations among environmental variables)</span>
 <span class="va">env_scheme</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/env_div_survey_scheme.html">env_div_survey_scheme</a></span><span class="op">(</span>
-    <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span><span class="op">)</span>,
+    <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span><span class="op">)</span>,
     locked_out <span class="op">=</span> <span class="st">"surveyed"</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span>
 
 <span class="co"># (iii) generate survey scheme using site uncertainty scores</span>
@@ -429,48 +425,48 @@
     <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, <span class="st">"richness_score"</span>,
     locked_out <span class="op">=</span> <span class="st">"surveyed"</span><span class="op">)</span></code></pre></div>
 <p>Let’s visualize the different survey schemes.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># add schemes to site_data</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">geo_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">geo_scheme</span><span class="op">)</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">env_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">env_scheme</span><span class="op">)</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">unc_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">unc_scheme</span><span class="op">)</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">cheap_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">cheap_scheme</span><span class="op">)</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">rich_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">rich_scheme</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">geo_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">geo_scheme</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">env_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">env_scheme</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">unc_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">unc_scheme</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">cheap_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">cheap_scheme</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">rich_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">rich_scheme</span><span class="op">)</span>
 
 <span class="co"># plot the schemes</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">contains</a></span><span class="op">(</span><span class="st">"scheme"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html">mutate_if</a></span><span class="op">(</span><span class="va">is.logical</span>, <span class="va">as.character</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"scheme"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span>, <span class="op">-</span><span class="va">geometry</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html" class="external-link">mutate_if</a></span><span class="op">(</span><span class="va">is.logical</span>, <span class="va">as.character</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">name</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-21-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <p>We can see that different approaches yield different survey schemes – but how well do they perform?</p>
 </div>
 <div id="expected-value-of-the-decision-given-sample-information" class="section level2">
 <h2 class="hasAnchor">
-<a href="#expected-value-of-the-decision-given-sample-information" class="anchor"></a>Expected value of the decision given sample information</h2>
+<a href="#expected-value-of-the-decision-given-sample-information" class="anchor" aria-hidden="true"></a>Expected value of the decision given sample information</h2>
 <p>Now that we’ve generated the survey schemes, let’s calculate the <em>expected value of the decision given sample information</em> for each survey scheme.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create table to store results</span>
 <span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span>
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
+  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
                   <span class="st">"rich_scheme"</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># expected value of the decision given each survey scheme</span>
-<span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span>
+<span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span>
   <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">name</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
     <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span><span class="op">(</span>
       site_data <span class="op">=</span> <span class="va">site_data</span>,
       feature_data <span class="op">=</span> <span class="va">feature_data</span>,
-      site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
-      site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
-      site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
-      site_survey_scheme_column <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,
+      site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
+      site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
+      site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
+      site_survey_scheme_column <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,
       site_management_cost_column <span class="op">=</span> <span class="st">"management_cost"</span>,
       site_survey_cost_column <span class="op">=</span> <span class="st">"survey_cost"</span>,
       feature_survey_column <span class="op">=</span> <span class="st">"survey"</span>,
@@ -483,7 +479,7 @@
 <span class="op">}</span><span class="op">)</span>
 
 <span class="co"># print values</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 2
 ##   name            value
 ##   &lt;chr&gt;           &lt;dbl&gt;
@@ -492,51 +488,51 @@
 ## 3 unc_scheme   0.931152
 ## 4 cheap_scheme 0.894194
 ## 5 rich_scheme  0.918878</code></pre>
-<p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>return on investment</em> for each survey scheme.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># estimate the return on investment for each survey scheme</span>
-<span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">roi</span> <span class="op">&lt;-</span>
+<p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>expected value of sample information (EVSI)</em> for each survey scheme.</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># estimate expected value of sample information for each survey scheme</span>
+<span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span> <span class="op">&lt;-</span>
   <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">value</span> <span class="op">-</span> <span class="va">evd_current</span>
 
 <span class="co"># print values</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 5 x 3
-##   name            value         roi
+##   name            value        evsi
 ##   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;
 ## 1 geo_scheme   0.917786 -0.00280285
 ## 2 env_scheme   0.917786 -0.00280285
 ## 3 unc_scheme   0.931152  0.0105629 
 ## 4 cheap_scheme 0.894194 -0.0263951 
 ## 5 rich_scheme  0.918878 -0.00171063</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># visualize the return on investment for each survey scheme</span>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># visualize the expected value of sample information for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
-<span class="va">evd_survey_schemes</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
-         is_best <span class="op">=</span> <span class="va">roi</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">max</a></span><span class="op">(</span><span class="va">roi</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">roi</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Return on investment"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
+<span class="va">evd_survey_schemes</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
+         is_best <span class="op">=</span> <span class="va">evsi</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">max</a></span><span class="op">(</span><span class="va">evsi</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">evsi</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected value of sample information"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>In this particular simulation, we can see that all of the survey schemes have a low return on investment (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy – in this particular situation – because it has the highest return on investment, but can we do even better with a different scheme?</p>
+<p>In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy – in this particular situation – because it has the highest expected value of sample information, but can we do even better with a different scheme?</p>
 </div>
 <div id="optimized-survey-scheme" class="section level2">
 <h2 class="hasAnchor">
-<a href="#optimized-survey-scheme" class="anchor"></a>Optimized survey scheme</h2>
+<a href="#optimized-survey-scheme" class="anchor" aria-hidden="true"></a>Optimized survey scheme</h2>
 <p>Now let’s generate an optimized survey scheme by directly maximizing the <em>expected value of the decision given a survey scheme</em>.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># generate optimized survey scheme(s)</span>
 <span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/approx_near_optimal_survey_scheme.html">approx_near_optimal_survey_scheme</a></span><span class="op">(</span>
     site_data <span class="op">=</span> <span class="va">site_data</span>,
     feature_data <span class="op">=</span> <span class="va">feature_data</span>,
-    site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
-    site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
-    site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
+    site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
+    site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
+    site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
     site_management_cost_column <span class="op">=</span> <span class="st">"management_cost"</span>,
     site_survey_cost_column <span class="op">=</span> <span class="st">"survey_cost"</span>,
     feature_survey_column <span class="op">=</span> <span class="st">"survey"</span>,
@@ -550,35 +546,35 @@
     n_approx_replicates <span class="op">=</span> <span class="fl">5</span>,
     n_approx_outcomes_per_replicate <span class="op">=</span> <span class="fl">10000</span>,
     verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># print number of optimized survey schemes</span>
 <span class="co"># if there are multiple optimized survey schemes,</span>
 <span class="co"># this means that multiple different survey schemes are likely to deliver</span>
 <span class="co"># similar results (even if they select different sites for surveys)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 4</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># add first optimized scheme to site data</span>
-<span class="va">site_data</span><span class="op">$</span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span>
+<span class="va">site_data</span><span class="op">$</span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span>
 
 <span class="co"># plot optimized scheme</span>
-<span class="va">site_data</span> <span class="op">%&gt;%</span>
-<span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"opt_scheme"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<span class="va">site_data</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"opt_scheme"</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># calculate return on investment of the optimized scheme</span>
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># calculate expected value of sample information for the optimized scheme</span>
 <span class="va">evd_opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span><span class="op">(</span>
     site_data <span class="op">=</span> <span class="va">site_data</span>,
     feature_data <span class="op">=</span> <span class="va">feature_data</span>,
-    site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
-    site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
-    site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
+    site_detection_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>,
+    site_n_surveys_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>,
+    site_probability_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span><span class="op">)</span>,
     site_survey_scheme_column <span class="op">=</span> <span class="st">"opt_scheme"</span>,
     site_management_cost_column <span class="op">=</span> <span class="st">"management_cost"</span>,
     site_survey_cost_column <span class="op">=</span> <span class="st">"survey_cost"</span>,
@@ -591,18 +587,18 @@
     total_budget <span class="op">=</span> <span class="va">total_budget</span><span class="op">)</span>
 
 <span class="co"># calculate value</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.9341498</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># append optimized results to results table</span>
-<span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">rbind</a></span><span class="op">(</span>
+<span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
   <span class="va">evd_survey_schemes</span>,
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"opt_scheme"</span>, value <span class="op">=</span> <span class="va">evd_opt</span>, roi <span class="op">=</span> <span class="va">evd_opt</span> <span class="op">-</span> <span class="va">evd_current</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"opt_scheme"</span>, value <span class="op">=</span> <span class="va">evd_opt</span>, evsi <span class="op">=</span> <span class="va">evd_opt</span> <span class="op">-</span> <span class="va">evd_current</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># print updated results table</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
 <pre><code>## # A tibble: 6 x 3
-##   name            value         roi
+##   name            value        evsi
 ##   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;
 ## 1 geo_scheme   0.917786 -0.00280285
 ## 2 env_scheme   0.917786 -0.00280285
@@ -610,66 +606,66 @@
 ## 4 cheap_scheme 0.894194 -0.0263951 
 ## 5 rich_scheme  0.918878 -0.00171063
 ## 6 opt_scheme   0.934150  0.0135607</code></pre>
-<div class="sourceCode"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># visualize return on investment values</span>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># visualize expected value of sample information</span>
 <span class="co"># color the best survey scheme in blue</span>
-<span class="va">evd_survey_schemes</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
-         is_best <span class="op">=</span> <span class="va">roi</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">max</a></span><span class="op">(</span><span class="va">roi</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">roi</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Return on investment"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
+<span class="va">evd_survey_schemes</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
+         is_best <span class="op">=</span> <span class="va">evsi</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">max</a></span><span class="op">(</span><span class="va">evsi</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">evsi</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Expected value of sample information"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>We can see that the optimized survey scheme has the highest <em>return on investment</em> of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let’s compute their relative performance and visualize them.</p>
-<div class="sourceCode"><pre class="downlit sourceCode r">
+<p>We can see that the optimized survey scheme has the highest <em>expected value of sample information</em> of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let’s compute their relative performance and visualize them.</p>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># express values in terms of relative performance</span>
 <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">relative_performance</span> <span class="op">&lt;-</span>
-  <span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">max</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">roi</span><span class="op">)</span> <span class="op">-</span> <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">roi</span><span class="op">)</span> <span class="op">/</span>
-   <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">max</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">roi</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>
+  <span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">max</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">-</span> <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">/</span>
+   <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>
 
 <span class="co"># visualize relative performance</span>
 <span class="co"># zero = same performance as optimized scheme,</span>
 <span class="co"># higher values indicate greater sub-optimality</span>
-<span class="va">evd_survey_schemes</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
-         relative_performance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">abs</a></span><span class="op">(</span><span class="va">relative_performance</span><span class="op">)</span>,
-         is_best <span class="op">=</span> <span class="va">relative_performance</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">min</a></span><span class="op">(</span><span class="va">relative_performance</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">relative_performance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Performance gap (%)"</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
+<span class="va">evd_survey_schemes</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">name</span>, levels <span class="op">=</span> <span class="va">name</span><span class="op">)</span>,
+         relative_performance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">relative_performance</span><span class="op">)</span>,
+         is_best <span class="op">=</span> <span class="va">relative_performance</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">min</a></span><span class="op">(</span><span class="va">relative_performance</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">name</span>, y <span class="op">=</span> <span class="va">relative_performance</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">is_best</span>, color <span class="op">=</span> <span class="va">is_best</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Survey scheme"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Performance gap (%)"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme performs better than the other survey schemes. Although the optimized survey scheme doesn’t provide a substantial improvement in this particular situation, we can see how value of information analysis can potentially improve management decisions by strategically allocating funds to surveys and conservation management. Indeed, since we only considered a single species and a handful of sites – to keep the tutorial simple and reduce computational burden – it was unlikely that an optimized survey scheme would perform substantially better than simply using current information. If you want to try something more complex, try adapting the code in this tutorial to simulate a larger number of sites and multiple species?</p>
 </div>
 <div id="conclusion" class="section level2">
 <h2 class="hasAnchor">
-<a href="#conclusion" class="anchor"></a>Conclusion</h2>
-<p>Hopefully, this tutorial has been useful. If you have any questions about using the <em>surveyvoi R</em> package or suggestions for improving it, please file an issue on the package’s online coding repository (<a href="https://github.com/jeffreyhanson/surveyvoi/issues" class="uri">https://github.com/jeffreyhanson/surveyvoi/issues</a>).</p>
+<a href="#conclusion" class="anchor" aria-hidden="true"></a>Conclusion</h2>
+<p>Hopefully, this tutorial has been useful. If you have any questions about using the <em>surveyvoi R</em> package or suggestions for improving it, please file an issue on the package’s online coding repository (<a href="https://github.com/jeffreyhanson/surveyvoi/issues" class="external-link uri">https://github.com/jeffreyhanson/surveyvoi/issues</a>).</p>
 </div>
 <div id="references" class="section level2 unnumbered">
 <h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
-<div id="refs" class="references">
-<div id="ref-r2">
-<p>Faith, D.P. &amp; Walker, P. (1996). Environmental diversity: On the best-possible use of surrogate data for assessing the relative biodiversity of sets of areas. <em>Biodiversity &amp; Conservation</em>, <em>5</em>, 399–415.</p>
+<a href="#references" class="anchor" aria-hidden="true"></a>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-r2" class="csl-entry">
+Faith, D.P. &amp; Walker, P. (1996). Environmental diversity: On the best-possible use of surrogate data for assessing the relative biodiversity of sets of areas. <em>Biodiversity &amp; Conservation</em>, <em>5</em>, 399–415.
 </div>
-<div id="ref-r5">
-<p>Guisan, A., Broennimann, O., Engler, R., Vust, M., Yoccoz, N.G., Lehmann, A. &amp; Zimmermann, N.E. (2006). Using niche-based models to improve the sampling of rare species. <em>Conservation Biology</em>, <em>20</em>, 501–511.</p>
+<div id="ref-r5" class="csl-entry">
+Guisan, A., Broennimann, O., Engler, R., Vust, M., Yoccoz, N.G., Lehmann, A. &amp; Zimmermann, N.E. (2006). Using niche-based models to improve the sampling of rare species. <em>Conservation Biology</em>, <em>20</em>, 501–511.
 </div>
-<div id="ref-r4">
-<p>Le Lay, G., Engler, R., Franc, E. &amp; Guisan, A. (2010). Prospective sampling based on model ensembles improves the detection of rare species. <em>Ecography</em>, <em>33</em>, 1015–1027.</p>
+<div id="ref-r4" class="csl-entry">
+Le Lay, G., Engler, R., Franc, E. &amp; Guisan, A. (2010). Prospective sampling based on model ensembles improves the detection of rare species. <em>Ecography</em>, <em>33</em>, 1015–1027.
 </div>
-<div id="ref-r3">
-<p>Yates, F. (1948). Systematic sampling. <em>Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences</em>, <em>241</em>, 345–377.</p>
+<div id="ref-r3" class="csl-entry">
+Yates, F. (1948). Systematic sampling. <em>Philosophical Transactions of the Royal Society of London. Series A, Mathematical and Physical Sciences</em>, <em>241</em>, 345–377.
 </div>
 </div>
 </div>
@@ -686,11 +682,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://jeffrey-hanson.com">Jeffrey O Hanson</a>, <a href="https://ejhudgins.com">Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p></p>
+<p>Developed by <a href="https://jeffrey-hanson.com" class="external-link external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link external-link">Emma J Hudgins</a>, Joseph R Bennett.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -698,6 +696,8 @@
 
   
 
+
+  
 
   </body>
 </html>

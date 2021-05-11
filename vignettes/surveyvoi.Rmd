@@ -12,7 +12,7 @@ documentclass: article
 bibliography: references.bib
 csl: reference-style.csl
 vignette: >
-  %\VignetteIndexEntry{surveyvoi}
+  %\VignetteIndexEntry{surveyvoi: Survey Value of Information}
   %\VignetteEngine{knitr::rmarkdown_notangle}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ devtools::load_all()
 
 The funding available for conservation is limited. To ensure that conservation funds are allocated cost-effectively, conservation plans (termed prioritizations) can be developed -- using a combination of economic, biodiversity, and land-use data -- to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns are incomplete. As a consequence, prioritizations can potentially be improved by collecting additional data. Specifically, ecological surveys can be conducted in sites to learn more about which species are present within them. However, conducting ecological surveys reduces the funds available for conservation management. Thus, decision makers need to strategically allocate funding for surveying sites and managing them for conservation---this is not a trivial task.
 
-The _surveyvoi R_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing return on investment via optimization algorithms. After generating such survey plans, they can be evaluated using value of information analysis. Please note that several functions depend on the 'Gurobi' optimization software (available from <https://www.gurobi.com>) and the _gurobi R_ package (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
+The _surveyvoi R_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing value of information using optimization algorithms. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the 'Gurobi' optimization software (available from <https://www.gurobi.com>) and the _gurobi R_ package (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 
 This tutorial provides a brief overview of the _surveyvoi R_ package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species -- to keep the tutorial simple and reduce computational burden -- the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code `?function`, where `function` is the name of desired function).
 
@@ -166,7 +166,7 @@ The `feature_data` object is a table (i.e. `tibble` object) that contains inform
 
 ## Modelling probability of occupancy
 
-After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the return on investment of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to survey them. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).
+After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the potential benefits of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to conduct any additional surveys. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).
 
 ```{r}
 # create list of candidate parameter values for calibration procedure
@@ -399,32 +399,32 @@ evd_survey_schemes$value <- sapply(
 print(evd_survey_schemes)
 ```
 
-We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the _return on investment_ for each survey scheme.
+We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the _expected value of sample information (EVSI)_ for each survey scheme.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
-# estimate the return on investment for each survey scheme
-evd_survey_schemes$roi <-
+# estimate expected value of sample information for each survey scheme
+evd_survey_schemes$evsi <-
   evd_survey_schemes$value - evd_current
 
 # print values
 print(evd_survey_schemes)
 
-# visualize the return on investment for each survey scheme
+# visualize the expected value of sample information for each survey scheme
 # color the best survey scheme in blue
 evd_survey_schemes %>%
   mutate(name = factor(name, levels = name),
-         is_best = roi == max(roi)) %>%
-  ggplot(aes(x = name, y = roi)) +
+         is_best = evsi == max(evsi)) %>%
+  ggplot(aes(x = name, y = evsi)) +
     geom_col(aes(fill = is_best, color = is_best)) +
     xlab("Survey scheme") +
-    ylab("Return on investment") +
+    ylab("Expected value of sample information") +
     scale_color_manual(values = c("TRUE" = "#3366FF", "FALSE" = "black")) +
     scale_fill_manual(values = c("TRUE" = "#3366FF", "FALSE" = "black")) +
     theme(axis.text.x = element_text(angle = 30, vjust = 0.65),
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that all of the survey schemes have a low return on investment (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy -- in this particular situation -- because it has the highest return on investment, but can we do even better with a different scheme?
+In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy -- in this particular situation -- because it has the highest expected value of sample information, but can we do even better with a different scheme?
 
 ## Optimized survey scheme
 
@@ -483,7 +483,7 @@ assertthat::assert_that(!all(site_data$opt_scheme == (site_data$n1 < 0.5)))
 We can see that the optimized survey scheme (`opt_scheme`) is different to the previous survey schemes.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
-# calculate return on investment of the optimized scheme
+# calculate expected value of sample information for the optimized scheme
 evd_opt <- evdsi(
     site_data = site_data,
     feature_data = feature_data,
@@ -507,20 +507,20 @@ print(evd_opt)
 # append optimized results to results table
 evd_survey_schemes <- rbind(
   evd_survey_schemes,
-  tibble(name = "opt_scheme", value = evd_opt, roi = evd_opt - evd_current))
+  tibble(name = "opt_scheme", value = evd_opt, evsi = evd_opt - evd_current))
 
 # print updated results table
 print(evd_survey_schemes)
 
-# visualize return on investment values
+# visualize expected value of sample information
 # color the best survey scheme in blue
 evd_survey_schemes %>%
   mutate(name = factor(name, levels = name),
-         is_best = roi == max(roi)) %>%
-  ggplot(aes(x = name, y = roi)) +
+         is_best = evsi == max(evsi)) %>%
+  ggplot(aes(x = name, y = evsi)) +
     geom_col(aes(fill = is_best, color = is_best)) +
     xlab("Survey scheme") +
-    ylab("Return on investment") +
+    ylab("Expected value of sample information") +
     scale_color_manual(values = c("TRUE" = "#3366FF", "FALSE" = "black")) +
     scale_fill_manual(values = c("TRUE" = "#3366FF", "FALSE" = "black")) +
     theme(axis.text.x = element_text(angle = 30, vjust = 0.65),
@@ -538,13 +538,13 @@ assertthat::assert_that(
       evd_survey_schemes$value[evd_survey_schemes$name != "opt_scheme"]))
 ```
 
-We can see that the optimized survey scheme has the highest _return on investment_ of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let's compute their relative performance and visualize them.
+We can see that the optimized survey scheme has the highest _expected value of sample information_ of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let's compute their relative performance and visualize them.
 
 ```{r, fig.height = h, fig.width = w * 1.5}
 # express values in terms of relative performance
 evd_survey_schemes$relative_performance <-
-  ((max(evd_survey_schemes$roi) - evd_survey_schemes$roi) /
-   max(evd_survey_schemes$roi)) * 100
+  ((max(evd_survey_schemes$evsi) - evd_survey_schemes$evsi) /
+   evd_survey_schemes$evsi) * 100
 
 # visualize relative performance
 # zero = same performance as optimized scheme,

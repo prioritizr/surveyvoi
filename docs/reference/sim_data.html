@@ -45,6 +45,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -56,9 +58,18 @@
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -79,12 +90,6 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -97,7 +102,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -178,41 +183,41 @@ and <code><a href='simulate_site_data.html'>simulate_site_data()</a></code>.</p>
 
 <span class='co'># print feature data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_features</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #555555;'># A tibble: 3 x 7</span><span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 3 x 7</span>
 #&gt;   name  survey survey_sensitivity survey_specificity model_sensitivity
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE                0.954              0.886             0.718
-#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE                0.974              0.875             0.705
-#&gt; </span><span style='color: #555555;'>3</span><span> f3    TRUE                0.956              0.823             0.768
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.954              0.886             0.718</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.974              0.875             0.705</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span> f3    TRUE                0.956              0.823             0.768</span>
 #&gt;   model_specificity target
-#&gt;               </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>             0.811      1
-#&gt; </span><span style='color: #555555;'>2</span><span>             0.860      1
-#&gt; </span><span style='color: #555555;'>3</span><span>             0.887      1</div><div class='input'><span class='co'># print site data</span>
+#&gt;               <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>             0.811      1</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>             0.860      1</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span>             0.887      1</span></div><div class='input'><span class='co'># print site data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_sites</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 6 features and 13 fields
-#&gt; geometry type:  POINT
-#&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
-#&gt; CRS:            NA
-#&gt; </span><span style='color: #555555;'># A tibble: 6 x 14</span><span>
+</div><div class='co'>#&gt; Simple feature collection with 6 features and 13 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
+#&gt; CRS:           NA
+#&gt; <span style='color: #949494;'># A tibble: 6 x 14</span>
 #&gt;   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
-#&gt;         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>        3.43            43.8     1 1     0         5     5     5 -</span><span style='color: #BB0000;'>1.38</span><span>   0.425
-#&gt; </span><span style='color: #555555;'>2</span><span>        6.07            59.0     0 0     0         0     0     0  0.736 -</span><span style='color: #BB0000;'>1.01</span><span> 
-#&gt; </span><span style='color: #555555;'>3</span><span>        7.09            46.7     0 0     0         0     0     0  0.754 -</span><span style='color: #BB0000;'>0.959</span><span>
-#&gt; </span><span style='color: #555555;'>4</span><span>        6.50            49.6     0 0     0         0     0     0  0.530  1.51 
-#&gt; </span><span style='color: #555555;'>5</span><span>        5.37            48.1     0 0     0         0     0     0  0.546 -</span><span style='color: #BB0000;'>0.525</span><span>
-#&gt; </span><span style='color: #555555;'>6</span><span>        3.35            48.9     1 0.667 0.333     3     3     3 -</span><span style='color: #BB0000;'>1.18</span><span>   0.557
+#&gt;         <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>        3.43            43.8     1 1     0         5     5     5 -</span><span style='color: #BB0000;'>1.38</span><span>   0.425</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>        6.07            59.0     0 0     0         0     0     0  0.736 -</span><span style='color: #BB0000;'>1.01</span><span> </span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span>        7.09            46.7     0 0     0         0     0     0  0.754 -</span><span style='color: #BB0000;'>0.959</span>
+#&gt; <span style='color: #BCBCBC;'>4</span><span>        6.50            49.6     0 0     0         0     0     0  0.530  1.51 </span>
+#&gt; <span style='color: #BCBCBC;'>5</span><span>        5.37            48.1     0 0     0         0     0     0  0.546 -</span><span style='color: #BB0000;'>0.525</span>
+#&gt; <span style='color: #BCBCBC;'>6</span><span>        3.35            48.9     1 0.667 0.333     3     3     3 -</span><span style='color: #BB0000;'>1.18</span><span>   0.557</span>
 #&gt;      p1    p2    p3               geometry
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 0.941 0.999 0.057  (0.1589075 0.8637977)
-#&gt; </span><span style='color: #555555;'>2</span><span> 0.36  0.006 0.259  (0.9764926 0.7485368)
-#&gt; </span><span style='color: #555555;'>3</span><span> 0.337 0.006 0.305  (0.8362375 0.2282762)
-#&gt; </span><span style='color: #555555;'>4</span><span> 0.048 0.579 0.998     (0.10513 0.179855)
-#&gt; </span><span style='color: #555555;'>5</span><span> 0.335 0.032 0.488 (0.5985786 0.04556193)
-#&gt; </span><span style='color: #555555;'>6</span><span> 0.896 0.998 0.145  (0.1504241 0.6821156)</div><div class='input'>
-</div></span></pre>
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> 0.941 0.999 0.057  (0.1589075 0.8637977)</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> 0.36  0.006 0.259  (0.9764926 0.7485368)</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span> 0.337 0.006 0.305  (0.8362375 0.2282762)</span>
+#&gt; <span style='color: #BCBCBC;'>4</span><span> 0.048 0.579 0.998     (0.10513 0.179855)</span>
+#&gt; <span style='color: #BCBCBC;'>5</span><span> 0.335 0.032 0.488 (0.5985786 0.04556193)</span>
+#&gt; <span style='color: #BCBCBC;'>6</span><span> 0.896 0.998 0.145  (0.1504241 0.6821156)</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -224,11 +229,11 @@ and <code><a href='simulate_site_data.html'>simulate_site_data()</a></code>.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -236,6 +241,8 @@ and <code><a href='simulate_site_data.html'>simulate_site_data()</a></code>.</p>
 
   
 
+
+  
 
   </body>
 </html>

@@ -48,6 +48,8 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -59,9 +61,18 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -82,12 +93,6 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -100,7 +105,7 @@ existing biodiversity data (i.e. survey data and environmental niche models)." /
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -303,31 +308,31 @@ to very small problems.</p>
 
 <span class='co'># simulate data</span>
 <span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>5</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>feature_data</span><span class='op'>$</span><span class='va'>target</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>1</span><span class='op'>)</span>
 
 <span class='co'># preview simulated data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 5 features and 11 fields
-#&gt; geometry type:  POINT
-#&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
-#&gt; CRS:            NA
-#&gt; <span style='color: #555555;'># A tibble: 5 x 12</span><span>
+</div><div class='co'>#&gt; Simple feature collection with 5 features and 11 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419
+#&gt; CRS:           NA
+#&gt; <span style='color: #949494;'># A tibble: 5 x 12</span>
 #&gt;   survey_cost management_cost    f1    f2    n1    n2     e1     e2     e3    p1
-#&gt;         </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span>        8.13            73.9   1       1     5     5 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08  0.991
-#&gt; </span><span style='color: #555555;'>2</span><span>        6.07            69.7   0.2     0     5     5 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span> 0.126
-#&gt; </span><span style='color: #555555;'>3</span><span>        3.74            62.0   0       0     0     0  1.77   1.42   1.11  0.892
-#&gt; </span><span style='color: #555555;'>4</span><span>        6.82            71.8   0       0     2     2 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span> 0.064
-#&gt; </span><span style='color: #555555;'>5</span><span>        5.22            70.7   0       0     0     0 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span> 0.099
-#&gt; </span><span style='color: #555555;'># … with 2 more variables: p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
-#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.965            0.821            0.701
-#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.960            0.814            0.701
-#&gt; </span><span style='color: #555555;'># … with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;         <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span>        8.13            73.9   1       1     5     5 -</span><span style='color: #BB0000;'>0.365</span><span>  0.642  1.08  0.991</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span>        6.07            69.7   0.2     0     5     5 -</span><span style='color: #BB0000;'>0.303</span><span> -</span><span style='color: #BB0000;'>0.382</span><span> -</span><span style='color: #BB0000;'>0.838</span><span> 0.126</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span>        3.74            62.0   0       0     0     0  1.77   1.42   1.11  0.892</span>
+#&gt; <span style='color: #BCBCBC;'>4</span><span>        6.82            71.8   0       0     2     2 -</span><span style='color: #BB0000;'>0.404</span><span> -</span><span style='color: #BB0000;'>0.771</span><span> -</span><span style='color: #BB0000;'>0.732</span><span> 0.064</span>
+#&gt; <span style='color: #BCBCBC;'>5</span><span>        5.22            70.7   0       0     0     0 -</span><span style='color: #BB0000;'>0.697</span><span> -</span><span style='color: #BB0000;'>0.910</span><span> -</span><span style='color: #BB0000;'>0.614</span><span> 0.099</span>
+#&gt; <span style='color: #949494;'># … with 2 more variables: p2 &lt;dbl&gt;, geometry &lt;POINT&gt;</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 7</span>
+#&gt;   name  survey survey_sensitivity survey_specificity model_sensitivity
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.965              0.821             0.701</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.960              0.814             0.701</span>
+#&gt; <span style='color: #949494;'># … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='va'>total_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>management_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.5</span>
 
@@ -341,8 +346,8 @@ to very small problems.</p>
 
 <span class='co'># print exact value</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>ev_current</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 1.999758</div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+</div><div class='co'>#&gt; [1] 1.999758</div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -354,11 +359,11 @@ to very small problems.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -366,6 +371,8 @@ to very small problems.</p>
 
   
 
+
+  
 
   </body>
 </html>

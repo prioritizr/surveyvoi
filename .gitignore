@@ -43,3 +43,5 @@ Meta/*
 .build.timestamp
 .DS_Store
 *.tmp
+/doc/
+/Meta/

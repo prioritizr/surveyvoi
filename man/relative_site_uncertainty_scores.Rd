@@ -37,7 +37,7 @@ site and then sum together the statistics for species in the same site:
 \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
 \eqn{I} denote the set of features (indexed by \eqn{i}), and
 \eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
-occurring in planning units \eqn{j \in J}.
+occurring in sites \eqn{j \in J}.
 
 \item Next, we will calculate the Shannon's entropy statistic for each
 species in each site:
