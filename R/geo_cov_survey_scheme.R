@@ -16,6 +16,8 @@ NULL
 #' @details The integer programming formulation of the *p*-Median
 #'   problem (Daskin & Maass 2015) is used to generate survey schemes.
 #'
+#' @inheritSection env_div_survey_scheme Solver
+#'
 #' @references
 #' Daskin MS & Maass KL (2015) The p-median problem. In *Location Science*
 #' (pp. 21-45). Springer, Cham.
@@ -49,7 +51,8 @@ NULL
 #' @export
 geo_cov_survey_scheme <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,
-  locked_out_column = NULL, exclude_locked_out = FALSE, verbose = FALSE) {
+  locked_out_column = NULL, exclude_locked_out = FALSE,
+  solver = "auto", verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -125,8 +128,10 @@ geo_cov_survey_scheme <- function(
   geo_dists[] <- scales::rescale(geo_dists[], to = c(0, 1e+4))
 
   # run optimization
-  result <- distance_based_prioritizations(geo_dists, survey_budget,
-    cand_site_data[[cost_column]], cand_locked_in, cand_locked_out, verbose)
+  result <- distance_based_prioritizations(
+    geo_dists, survey_budget, cand_site_data[[cost_column]],
+    cand_locked_in, cand_locked_out,
+    solver, verbose)
 
   # prepare output
   if (isTRUE(exclude_locked_out)) {

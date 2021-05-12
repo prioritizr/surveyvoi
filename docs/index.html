@@ -83,7 +83,7 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#surveyvoi-survey-value-of-information" class="anchor" aria-hidden="true"></a>surveyvoi: Survey Value of Information</h1></div>
 
-<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and maximizing value of information using optimization algorithms. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>).</p>
+<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can b generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmenta conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>).</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
@@ -102,21 +102,24 @@
 <div id="ubuntu" class="section level4">
 <h4 class="hasAnchor">
 <a href="#ubuntu" class="anchor" aria-hidden="true"></a>Ubuntu</h4>
-<p>The <code>gmp</code> and <code>mpfr</code> libraries need to be installed to install the <em>surveyvoi R</em> package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update <span class="sc">&amp;&amp;</span> apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev</span></code></pre></div>
+<p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
 </div>
 <div id="linux" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linux" class="anchor" aria-hidden="true"></a>Linux</h4>
-<p>For Unix-alikes, <code>gmp</code> (&gt;= 4.2.3) and <code>mpfr</code> (&gt;= 3.0.0) are required.</p>
+<p>For Unix-alikes, <code>gmp</code> (&gt;= 4.2.3), <code>mpfr</code> (&gt;= 3.0.0), and <code>symphony</code> (&gt;= 5.6.16) are required.</p>
 </div>
 <div id="macos" class="section level4">
 <h4 class="hasAnchor">
 <a href="#macos" class="anchor" aria-hidden="true"></a>MacOS</h4>
-<p>The <code>gmp</code> and <code>mpfr</code> libraries need to be installed to install the <em>surveyvoi R</em> package. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>brew install pkg<span class="sc">-</span>config</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>brew install gmp</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
+<p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>brew tap coin<span class="sc">-</span>or<span class="sc">-</span>tools<span class="sc">/</span>coinor</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>brew install symphony</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>brew install pkg<span class="sc">-</span>config</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>brew install gmp</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
 </div>
 </div>
 <div id="citation" class="section level2">
@@ -329,7 +332,6 @@
 <li><a href="https://github.com/jeffreyhanson/surveyvoi/actions" class="external-link"><img src="https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows" alt="R-CMD-check-Windows"></a></li>
 <li><a href="https://github.com/jeffreyhanson/surveyvoi/actions" class="external-link"><img src="https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Mac%20OSX/master.svg?label=Mac%20OSX" alt="R-CMD-check-Mac-OSX"></a></li>
 <li><a href="https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master" class="external-link"><img src="https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master" alt="Coverage Status"></a></li>
-<li><a href="https://CRAN.R-project.org/package=surveyvoi" class="external-link"><img src="http://www.r-pkg.org/badges/version/surveyvoi" alt="CRAN_Status_Badge"></a></li>
 </ul>
 </div>
 

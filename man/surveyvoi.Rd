@@ -14,15 +14,17 @@ wherein some sites have previously been surveyed and other sites have not
 additional surveys. Specifically, plans for ecological surveys can be
 generated using various conventional approaches (e.g. maximizing expected
 species richness, geographic coverage, diversity of sampled environmental
-conditions) and maximizing value of information. After generating
+conditions) and by maximizing value of information. After generating
 plans for surveys, they can also be evaluated using
 value of information analysis.
-
+}
+\details{
 Please note that several functions depend on
 the 'Gurobi' optimization software (available from \url{https://www.gurobi.com})
 and the \pkg{gurobi} R package (installation instructions available for
 \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
-
-See the package vignette for a tutorial
+}
+\seealso{
+The package vignette provides a tutorial
 (accessible using the code \code{vignettes("surveyvoi")}).
 }

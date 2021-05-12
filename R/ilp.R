@@ -1,7 +1,7 @@
 #' @include internal.R
 NULL
 
-#' Space based prioritizations
+#' Distance based prioritizations
 #'
 #' This function generates space-based prioritizations by solving the
 #' *p*-median problem to optimality.
@@ -13,19 +13,23 @@ NULL
 #'   each solution. The values must be between one and
 #'   the number of planning units (i.e. length of `x`).
 #'
-#' @param costs `numeric` cost values for each planning units. Defaults
-#'   to a vector assigning a cost of one for each planning unit.
+#' @param costs `numeric` cost values for each planning units.
 #'
 #' @param locked_in `logical` vector indicating if each planning unit
-#'   is (`TRUE`) locked into the solution or (`FALSE`) not. Defaults
-#'   to a vector of `FALSE` for each planning unit.
+#'   is (`TRUE`) locked into the solution or (`FALSE`) not.
 #'
 #' @param locked_out `logical` vector indicating if each planning unit
-#'   is (`TRUE`) locked out of the solution or (`FALSE`) not. Defaults
-#'   to a vector of `FALSE` for each planning unit.
+#'   is (`TRUE`) locked out of the solution or (`FALSE`) not.
+#'
+#' @param solver `character` name of the optimization solver to use
+#'   for generating survey schemes.
+#'   Available options include: `"Rsymphony"`, `"gurobi"` and `"auto"`.
+#'   The `"auto"` method will use the Gurobi optimization software if
+#'   it is available; otherwise, it will use the SYMPHONY software
+#'   via the \pkg{Rsymphony} package.
 #'
 #' @param verbose `logical` indicating if information should be
-#'   printed while generating prioritization. Defaults to `FALSE`.
+#'   printed while generating prioritization.
 #'
 #' @return `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
@@ -36,8 +40,8 @@ NULL
 #'   see <http://www.hyuan.com/java/how.html>.
 #'
 #' @noRd
-distance_based_prioritizations <- function(x, budget, costs, locked_in,
-                                           locked_out, verbose) {
+distance_based_prioritizations <- function(
+  x, budget, costs, locked_in, locked_out, solver, verbose) {
   # assert that data are valid
   assertthat::assert_that(
     ## x
@@ -54,7 +58,16 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
     ## locked_in
     is.logical(locked_out), assertthat::noNA(locked_out),
     identical(length(locked_out), ncol(x)),
-    !any(locked_in & locked_out))
+    !any(locked_in & locked_out),
+    ## solver
+    assertthat::is.string(solver),
+    assertthat::noNA(solver))
+  assertthat::assert_that(
+    solver %in% c("auto", "Rsymphony", "gurobi"))
+  # identify solver
+  if (identical(solver, "auto")) {
+    solver <- ifelse(requireNamespace("gurobi"), "gurobi", "Rsymphony")
+  }
   # prepare data for optimization
   ## initialization
   n <- nrow(x)
@@ -77,8 +90,16 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
   ## create gurobi input model object
   m <- list(modelsense = "min", obj = obj, sense = sense, rhs = rhs,
             lb = lb, ub = ub, vtype = vtype, A = A)
-  ## create gurobi parameters list
-  p <- list(Presolve = 2, MIPGap = 0, LogToConsole = as.integer(verbose))
+  ## if using Rsymphony, then convert to Rsymphony model format
+  if (identical(solver, "Rsymphony")) {
+    m <- rsymphony_model(m)
+  }
+  ## create parameters list
+  if (identical(solver, "gurobi")) {
+    p <- list(Presolve = 2, MIPGap = 0, LogToConsole = as.integer(verbose))
+  } else {
+    p <- list(gap_limit = -1, verbosity = ifelse(verbose, 1, -2))
+  }
   # prepare output matrix
   out <- matrix(NA, ncol = nrow(x), nrow = length(budget))
   # iterate over each budget and obtain the solution
@@ -86,10 +107,17 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
     ## update budget
     m$rhs[1] <- budget[b]
     ## solve problem
-    withr::with_locale(
-      c(LC_CTYPE = "C"), {
-      s <- gurobi::gurobi(m, p)$x[seq_len(n)]
-    })
+    if (identical(solver, "gurobi")) {
+      withr::with_locale(
+        c(LC_CTYPE = "C"), {
+        s <- gurobi::gurobi(m, p)$x
+      })
+    } else {
+      s <- rsymphony_solve(m, p)$x
+    }
+    ## extract relevant values from solution
+    s <- round(s[seq_len(n)])
+    ## verify that solution is feasible
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
       isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),
@@ -114,15 +142,20 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
 #'   the number of planning units (i.e. length of `x`).
 #'
 #' @param locked_in `logical` vector indicating if each planning unit
-#'   is (`TRUE`) locked into the solution or (`FALSE`) not. Defaults
-#'   to a vector of `FALSE` for each planning unit.
+#'   is (`TRUE`) locked into the solution or (`FALSE`) not.
 #'
 #' @param locked_out `logical` vector indicating if each planning unit
-#'   is (`TRUE`) locked out of the solution or (`FALSE`) not. Defaults
-#'   to a vector of `FALSE` for each planning unit.
+#'   is (`TRUE`) locked out of the solution or (`FALSE`) not.
 #'
 #' @param verbose `logical` indicating if information should be
-#'   printed while generating prioritization. Defaults to `FALSE`.
+#'   printed while generating prioritization.
+#'
+#' @param solver `character` name of the optimization solver to use
+#'   for generating survey schemes.
+#'   Available options include: `"Rsymphony"`, `"gurobi"` and `"auto"`.
+#'   The `"auto"` method will use the Gurobi optimization software if
+#'   it is available; otherwise, it will use the SYMPHONY software
+#'   via the \pkg{Rsymphony} package.
 #'
 #' @return `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
@@ -130,8 +163,8 @@ distance_based_prioritizations <- function(x, budget, costs, locked_in,
 #'   given solution.
 #'
 #' @noRd
-weight_based_prioritizations <- function(x, budget, costs, locked_in,
-                                         locked_out, verbose) {
+weight_based_prioritizations <- function(
+  x, budget, costs, locked_in, locked_out, solver, verbose) {
   # assert that data are valid
   assertthat::assert_that(
     ## x
@@ -148,10 +181,19 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
     ## locked_out
     is.logical(locked_out), assertthat::noNA(locked_out),
     identical(length(locked_out), length(x)),
-    !any(locked_in & locked_out))
+    !any(locked_in & locked_out),
+    ## solver
+    assertthat::is.string(solver),
+    assertthat::noNA(solver))
   assertthat::assert_that(
     all(sum(locked_in * costs) <= budget),
     msg = "locked in sites exceed one or more budgets")
+  assertthat::assert_that(
+    solver %in% c("auto", "Rsymphony", "gurobi"))
+  # identify solver
+  if (identical(solver, "auto")) {
+    solver <- ifelse(requireNamespace("gurobi"), "gurobi", "Rsymphony")
+  }
   ## create objective function
   obj <- c(x)
   ## create constraints
@@ -170,8 +212,16 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
   ## create gurobi input model object
   m <- list(modelsense = "max", obj = obj, sense = sense, rhs = rhs,
             lb = lb, ub = ub, vtype = vtype, A = A)
-  ## create gurobi parameters list
-  p <- list(Presolve = 2, MIPGap = 0, LogToConsole = as.integer(verbose))
+  ## if using Rsymphony, then convert to Rsymphony model format
+  if (identical(solver, "Rsymphony")) {
+    m <- rsymphony_model(m)
+  }
+  ## create parameters list
+  if (identical(solver, "gurobi")) {
+    p <- list(Presolve = 2, MIPGap = 0, LogToConsole = as.integer(verbose))
+  } else {
+    p <- list(gap_limit = 0, verbosity = ifelse(verbose, 1, -2))
+  }
   # prepare output matrix
   out <- matrix(NA, ncol = length(x), nrow = length(budget))
   # iterate over each budget and obtain the solution
@@ -179,11 +229,15 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
     ## update budget
     m$rhs[1] <- budget[b]
     ## solve problem
-    withr::with_locale(
-      c(LC_CTYPE = "C"), {
-      s <- gurobi::gurobi(m, p)$x
-    })
-    ## assert valid solution
+    if (solver == "gurobi") {
+      withr::with_locale(
+        c(LC_CTYPE = "C"), {
+        s <- gurobi::gurobi(m, p)$x
+      })
+    } else {
+      s <- rsymphony_solve(m, p)$x
+    }
+    ## verify that solution is feasible
     assertthat::assert_that(
       isTRUE(sum(s * costs) <= budget[b]) ||
       isTRUE(abs((sum(s * costs) - budget[b])) <= 1e-5),
@@ -193,4 +247,74 @@ weight_based_prioritizations <- function(x, budget, costs, locked_in,
   }
   # return matrix
   out
+}
+
+#' Rsymphony model
+#'
+#' This function converts an optimization problem
+#' prepared for the [Gurobi](https://wwww.gurobi.com) optimization software
+#' so that it can be used with the \pkg{Rsymphony} package.
+#'
+#' @param model `list` object.
+#'
+#' @details
+#' Note that only a small set of parameters and model specification
+#' methods are supported.
+#'
+#' @return `list` object.
+#'
+#' @noRd
+rsymphony_model <- function(model) {
+  # assert arguments are valid
+  assertthat::assert_that(is.list(model))
+  # define recognized model components
+  mn <- c("modelsense", "obj", "sense", "rhs", "lb", "ub", "vtype", "A")
+  assertthat::assert_that(
+    setequal(names(model), mn),
+    msg = "argument to model contains unsupported components")
+
+  # prepare model
+  ## constraint matrix
+  names(model)[names(model) == "A"] <- "mat"
+  ## variables types
+  names(model)[names(model) == "vtype"] <- "types"
+  model$types[model$types == "S"] <- "C"
+  ## model sense
+  model$max <- model$modelsense == "max"
+  model$modelsense <- NULL
+  ## constraint sense
+  names(model)[names(model) == "sense"] <- "dir"
+  model$dir[model$dir == "="] <- "=="
+  ## variable bounds
+  model$bounds <- list(
+    lower = list(ind = seq_along(model$lb), val = model$lb),
+    upper = list(ind = seq_along(model$ub), val = model$ub))
+    model$lb <- NULL
+    model$ub <- NULL
+
+  # return result
+  model
+}
+
+#' Rsymphony solve
+#'
+#' This function is a wrapper to solve an optimization problem using the
+#' the \pkg{Rsymphony} package.
+#'
+#' @param model `list` object.
+#'
+#' @param parameters `list` object.
+#'
+#' @return `list` object.
+#'
+#' @noRd
+rsymphony_solve <- function(model, parameters) {
+  # assert arguments are valid
+  assertthat::assert_that(is.list(model), is.list(parameters))
+  # return solution
+  list(
+    x = do.call(
+      Rsymphony::Rsymphony_solve_LP,
+      append(model, parameters))$solution
+  )
 }

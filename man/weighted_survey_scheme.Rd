@@ -11,6 +11,7 @@ weighted_survey_scheme(
   weight_column,
   locked_in_column = NULL,
   locked_out_column = NULL,
+  solver = "auto",
   verbose = FALSE
 )
 }
@@ -41,6 +42,14 @@ the argument to \code{site_data} that contains \code{logical}
 locked out of the survey scheme.
 No missing (\code{NA}) values are permitted.
 Defaults to \code{NULL} such that no sites are locked out.}
+
+\item{solver}{\code{character} name of the optimization solver to use
+for generating survey schemes.
+Available options include: \code{"Rsymphony"}, \code{"gurobi"} and \code{"auto"}.
+The \code{"auto"} method will use the Gurobi optimization software if
+it is available; otherwise, it will use the SYMPHONY software
+via the \pkg{Rsymphony} package.
+Defaults to \code{"auto"}.}
 
 \item{verbose}{\code{logical} indicating if information should be
 printed while generating survey scheme(s). Defaults to \code{FALSE}.}
@@ -73,6 +82,19 @@ is selected in the survey scheme or not.
   \sum_{j \in J} x_j c_j \leq b}{
   Minimize sum_j^J (xi * wi) subject to sum_j^J (xi * ci) <= b}
 }
+\section{Solver}{
+
+This function can use the \pkg{Rsymphony} package and
+the \href{https://www.gurobi.com/}{Gurobi optimization software} to generate
+to generate survey schemes. Although the \pkg{Rsymphony} package
+is easier to install because it is freely available on the
+The Comprehensive R Archive Network (CRAN), it is strongly recommended to
+install the \href{https://www.gurobi.com/}{Gurobi optimization software} and the
+\pkg{gurobi} R package because it is much faster.
+Note that special academic licenses are available at no cost.
+Installation instructions are available online for \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
+}
+
 \examples{
 \dontrun{
 # set seed for reproducibility

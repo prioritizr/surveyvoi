@@ -87,7 +87,7 @@ Please note that this function requires the Gurobi optimization software
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -143,6 +143,7 @@ Please note that this function requires the Gurobi optimization software
   <span class='va'>weight_column</span>,
   locked_in_column <span class='op'>=</span> <span class='cn'>NULL</span>,
   locked_out_column <span class='op'>=</span> <span class='cn'>NULL</span>,
+  solver <span class='op'>=</span> <span class='st'>"auto"</span>,
   verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -189,6 +190,16 @@ No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
     </tr>
     <tr>
+      <th>solver</th>
+      <td><p><code>character</code> name of the optimization solver to use
+for generating survey schemes.
+Available options include: <code>"Rsymphony"</code>, <code>"gurobi"</code> and <code>"auto"</code>.
+The <code>"auto"</code> method will use the Gurobi optimization software if
+it is available; otherwise, it will use the SYMPHONY software
+via the <span class="pkg">Rsymphony</span> package.
+Defaults to <code>"auto"</code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating if information should be
 printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></td>
@@ -214,6 +225,19 @@ is selected in the survey scheme or not.</p>
 <p>$$\mathit{Maximize} \space \sum_{j \in J} x_j w_i \\
   \mathit{subject \space to} \\
   \sum_{j \in J} x_j c_j \leq b$$</p>
+    <h2 class="hasAnchor" id="solver"><a class="anchor" href="#solver"></a>Solver</h2>
+
+    
+
+<p>This function can use the <span class="pkg">Rsymphony</span> package and
+the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> to generate
+to generate survey schemes. Although the <span class="pkg">Rsymphony</span> package
+is easier to install because it is freely available on the
+The Comprehensive R Archive Network (CRAN), it is strongly recommended to
+install the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> and the
+<span class="pkg">gurobi</span> R package because it is much faster.
+Note that special academic licenses are available at no cost.
+Installation instructions are available online for <a href='https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html'>Linux</a>, <a href='https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html'>Windows</a>, and <a href='https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html'>Mac OS</a>).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>

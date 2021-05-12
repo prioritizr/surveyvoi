@@ -9,7 +9,6 @@
 [![R-CMD-check-Mac-OSX](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Mac%20OSX/master.svg?label=Mac%20OSX)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![Coverage
 Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 The *surveyvoi* package is a decision support tool for prioritizing
 sites for ecological surveys based on their potential to improve plans
@@ -17,12 +16,14 @@ for conserving biodiversity (e.g. plans for establishing protected
 areas). Given a set of sites that could potentially be acquired for
 conservation management – wherein some sites have previously been
 surveyed and other sites have not – this package provides functionality
-to generate and evaluate plans for additional surveys. It provides
-functionality to generate plans using various conventional approaches
-(e.g. expected species richness) and maximizing value of information
-using optimization algorithms. Please note that several functions depend
-on the ‘Gurobi’ optimization software (available from
-<https://www.gurobi.com>).
+to generate and evaluate plans for additional surveys. Specifically,
+plans for ecological surveys can b generated using various conventional
+approaches (e.g. maximizing expected species richness, geographic
+coverage, diversity of sampled environmenta conditions) and by
+maximizing value of information. After generating plans for surveys,
+they can also be evaluated using value of information analysis. Please
+note that several functions depend on the ‘Gurobi’ optimization software
+(available from <https://www.gurobi.com>).
 
 ## Installation
 
@@ -54,26 +55,29 @@ This software provides system requirements from
 
 #### Ubuntu
 
-The `gmp` and `mpfr` libraries need to be installed to install the
-*surveyvoi R* package. For recent versions of Ubuntu (18.04 and later),
-these libraries are available through official repositories. They can be
-installed using the following system commands:
+The `gmp`, `mpfr`, and `symphony` libraries need to be installed to
+install the *surveyvoi R* package. For recent versions of Ubuntu (18.04
+and later), these libraries are available through official repositories.
+They can be installed using the following system commands:
 
-    apt-get -y update && apt-get install -y libgmp3-dev libmpfr-dev
+    apt-get -y update
+    apt-get install -y libgmp3-dev libmpfr-dev coinor-libsymphony-dev
 
 #### Linux
 
-For Unix-alikes, `gmp` (&gt;= 4.2.3) and `mpfr` (&gt;= 3.0.0) are
-required.
+For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), and
+`symphony` (&gt;= 5.6.16) are required.
 
 #### MacOS
 
-The `gmp` and `mpfr` libraries need to be installed to install the
-*surveyvoi R* package. The easiest way to install these libraries is
-using [HomeBrew](https://brew.sh/). After installing HomeBrew, these
-libraries can be installed using the following commands in the system
-terminal:
+The `gmp`, `mpfr`, and `symphony` libraries need to be installed to
+install the *surveyvoi R* package. The easiest way to install these
+libraries is using [HomeBrew](https://brew.sh/). After installing
+HomeBrew, these libraries can be installed using the following commands
+in the system terminal:
 
+    brew tap coin-or-tools/coinor
+    brew install symphony
     brew install pkg-config
     brew install gmp
     brew install mpfr
