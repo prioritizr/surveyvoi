@@ -16,10 +16,6 @@
 
     **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation files contain information for installing the gurobi R package.**
 
-* README.md:12:73 404: Not Found [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
-
-  **The README contains a link to the CRAN web page where the package will be available once the package is published on CRAN. Since the package is not yet available on CRAN, this link does not yet work. However, once the package is available on CRAN, the link will work successfully.**
-
 ## Test environments
 
 * [Ubuntu 20.04, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AUbuntu)
