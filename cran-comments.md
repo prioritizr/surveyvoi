@@ -14,7 +14,7 @@
 * checking package dependencies ... NOTE
   Packages suggested but not available for checking: 'gurobi'
 
-    **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation files contain information for installing the gurobi R package.**
+    **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation contain information for installing the gurobi R package.**
 
 ## Test environments
 
