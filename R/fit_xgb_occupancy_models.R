@@ -76,7 +76,8 @@ NULL
 #'
 #' @details
 #'  This function (i) prepares the data for model fitting, (ii) calibrates
-#'  the tuning parameters for model fitting, (iii) generate predictions using
+#'  the tuning parameters for model fitting (see [xgboost::xgb.train()]
+#'  for details on tuning parameters), (iii) generate predictions using
 #'  the best found tuning parameters, and (iv) assess the performance of the
 #'  best supported models. These analyses are performed separately for each
 #'  feature. For a given feature:

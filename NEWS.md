@@ -1,6 +1,7 @@
 # surveyvoi 1.0.1
 
-- CRAN release.
+-  Fix typos in documentation (#38).
+-  Add details for tuning xgboost models to documentation (#39).
 
 # surveyvoi 1.0.0
 

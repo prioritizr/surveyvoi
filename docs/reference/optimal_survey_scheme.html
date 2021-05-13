@@ -362,91 +362,95 @@ that share this greatest expected value are returned. Due to the nature of
 this algorithm, it can take a very long time to complete.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
-<span class='co'># set seeds for reproducibility</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span>
-
-<span class='co'># simulate data</span>
-<span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-<span class='va'>feature_data</span><span class='op'>$</span><span class='va'>target</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>10</span><span class='op'>)</span>
-
-<span class='co'># preview simulated data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Simple feature collection with 30 features and 11 fields
-#&gt; Geometry type: POINT
-#&gt; Dimension:     XY
-#&gt; Bounding box:  xmin: 0.04205953 ymin: 0.02461368 xmax: 0.9942698 ymax: 0.9630242
-#&gt; CRS:           NA
-#&gt; <span style='color: #949494;'># A tibble: 30 x 12</span>
-#&gt;    survey_cost management_cost    f1    f2    n1    n2      e1     e2     e3
-#&gt;          <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'> 1</span><span>        7.60            65.0   0.8     1     5     5 -</span><span style='color: #BB0000;'>1.59</span><span>   -</span><span style='color: #BB0000;'>0.335</span><span> -</span><span style='color: #BB0000;'>1.01</span><span> </span>
-#&gt; <span style='color: #BCBCBC;'> 2</span><span>        7.87            67.8   0       1     5     5 -</span><span style='color: #BB0000;'>1.63</span><span>   -</span><span style='color: #BB0000;'>2.04</span><span>  -</span><span style='color: #BB0000;'>1.92</span><span> </span>
-#&gt; <span style='color: #BCBCBC;'> 3</span><span>        7.14            64.5   1       1     2     2 -</span><span style='color: #BB0000;'>0.576</span><span>   0.794 -</span><span style='color: #BB0000;'>0.516</span>
-#&gt; <span style='color: #BCBCBC;'> 4</span><span>        6.90            67.6   0       1     2     2 -</span><span style='color: #BB0000;'>1.30</span><span>   -</span><span style='color: #BB0000;'>2.44</span><span>  -</span><span style='color: #BB0000;'>1.41</span><span> </span>
-#&gt; <span style='color: #BCBCBC;'> 5</span><span>        5.03            68.6   1       1     4     4  0.485   0.686  1.46 </span>
-#&gt; <span style='color: #BCBCBC;'> 6</span><span>        5.24            72.4   0       0     3     3  1.39   -</span><span style='color: #BB0000;'>0.181</span><span> -</span><span style='color: #BB0000;'>0.329</span>
-#&gt; <span style='color: #BCBCBC;'> 7</span><span>        8.07            68.7   0       0     0     0 -</span><span style='color: #BB0000;'>1.06</span><span>    0.193 -</span><span style='color: #BB0000;'>0.880</span>
-#&gt; <span style='color: #BCBCBC;'> 8</span><span>        3.43            69.8   0.4     1     5     5  0.077</span><span style='text-decoration: underline;'>8</span><span> -</span><span style='color: #BB0000;'>0.443</span><span>  1.27 </span>
-#&gt; <span style='color: #BCBCBC;'> 9</span><span>        3.62            65.0   1       1     1     1  0.270   0.835  0.497</span>
-#&gt; <span style='color: #BCBCBC;'>10</span><span>        3.68            63.1   1       0     3     3  0.657   1.18   0.366</span>
-#&gt; <span style='color: #949494;'># … with 20 more rows, and 3 more variables: p1 &lt;dbl&gt;, p2 &lt;dbl&gt;,</span>
-#&gt; <span style='color: #949494;'>#   geometry &lt;POINT&gt;</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
-</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 7</span>
-#&gt;   name  survey survey_sensitivity survey_specificity model_sensitivity
-#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.950              0.867             0.745</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.960              0.820             0.791</span>
-#&gt; <span style='color: #949494;'># … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</span></div><div class='input'>
-<span class='co'># set total budget for managing sites for conservation</span>
-<span class='co'># (i.e. 50% of the cost of managing all sites)</span>
-<span class='va'>total_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>management_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.5</span>
-
-<span class='co'># set total budget for surveying sites for conservation</span>
-<span class='co'># (i.e. 10% of the cost of managing all sites)</span>
-<span class='va'>survey_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>survey_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.1</span>
-
-<span class='co'># find optimal survey scheme using exact method</span>
-<span class='va'>opt_survey</span> <span class='op'>&lt;-</span> <span class='fu'>optimal_survey_scheme</span><span class='op'>(</span>
-  <span class='va'>site_data</span>, <span class='va'>feature_data</span>,
-  <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span><span class='op'>)</span>,
-  <span class='st'>"management_cost"</span>, <span class='st'>"survey_cost"</span>,
-  <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,
-  <span class='st'>"target"</span>, <span class='va'>total_budget</span>, <span class='va'>survey_budget</span><span class='op'>)</span>
-
-<span class='co'># print result</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>opt_survey</span><span class='op'>)</span>
-</div><div class='co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11] [,12]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [2,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
-#&gt; [3,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [4,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
-#&gt; [5,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [6,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
-#&gt; [7,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt;      [,13] [,14] [,15] [,16] [,17] [,18] [,19] [,20] [,21] [,22] [,23] [,24]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [2,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [3,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
-#&gt; [4,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
-#&gt; [5,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [6,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [7,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
-#&gt;      [,25] [,26] [,27] [,28] [,29] [,30]
-#&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [2,] FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [3,] FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [4,] FALSE FALSE FALSE FALSE FALSE FALSE
-#&gt; [5,] FALSE FALSE FALSE  TRUE FALSE FALSE
-#&gt; [6,] FALSE FALSE FALSE  TRUE FALSE FALSE
-#&gt; [7,] FALSE FALSE FALSE  TRUE FALSE FALSE
-#&gt; attr(,"ev")
-#&gt; [1] 1.387088 1.387088 1.387088 1.387088 1.387088 1.387088 1.387088</div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># set seeds for reproducibility</span></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># simulate data</span></span>
+<span class='r-in'><span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ...</span>
+<span class='r-in'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>feature_data</span><span class='op'>$</span><span class='va'>target</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># preview simulated data</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simple feature collection with 30 features and 11 fields</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Geometry type: POINT</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Dimension:     XY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Bounding box:  xmin: 0.04205953 ymin: 0.02461368 xmax: 0.9942698 ymax: 0.9630242</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> CRS:           NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 30 x 12</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>    survey_cost management_cost    f1    f2    n1    n2      e1     e2     e3</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>          <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span><span>        7.60            65.0   0.8     1     5     5 -</span><span style='color: #BB0000;'>1.59</span><span>   -</span><span style='color: #BB0000;'>0.335</span><span> -</span><span style='color: #BB0000;'>1.01</span><span> </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span><span>        7.87            67.8   0       1     5     5 -</span><span style='color: #BB0000;'>1.63</span><span>   -</span><span style='color: #BB0000;'>2.04</span><span>  -</span><span style='color: #BB0000;'>1.92</span><span> </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span><span>        7.14            64.5   1       1     2     2 -</span><span style='color: #BB0000;'>0.576</span><span>   0.794 -</span><span style='color: #BB0000;'>0.516</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span><span>        6.90            67.6   0       1     2     2 -</span><span style='color: #BB0000;'>1.30</span><span>   -</span><span style='color: #BB0000;'>2.44</span><span>  -</span><span style='color: #BB0000;'>1.41</span><span> </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span><span>        5.03            68.6   1       1     4     4  0.485   0.686  1.46 </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span><span>        5.24            72.4   0       0     3     3  1.39   -</span><span style='color: #BB0000;'>0.181</span><span> -</span><span style='color: #BB0000;'>0.329</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span><span>        8.07            68.7   0       0     0     0 -</span><span style='color: #BB0000;'>1.06</span><span>    0.193 -</span><span style='color: #BB0000;'>0.880</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span><span>        3.43            69.8   0.4     1     5     5  0.077</span><span style='text-decoration: underline;'>8</span><span> -</span><span style='color: #BB0000;'>0.443</span><span>  1.27 </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span><span>        3.62            65.0   1       1     1     1  0.270   0.835  0.497</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span><span>        3.68            63.1   1       0     3     3  0.657   1.18   0.366</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with 20 more rows, and 3 more variables: p1 &lt;dbl&gt;, p2 &lt;dbl&gt;,</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'>#   geometry &lt;POINT&gt;</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 2 x 7</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   name  survey survey_sensitivity survey_specificity model_sensitivity</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.950              0.867             0.745</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.960              0.820             0.791</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># set total budget for managing sites for conservation</span></span>
+<span class='r-in'><span class='co'># (i.e. 50% of the cost of managing all sites)</span></span>
+<span class='r-in'><span class='va'>total_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>management_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.5</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># set total budget for surveying sites for conservation</span></span>
+<span class='r-in'><span class='co'># (i.e. 10% of the cost of managing all sites)</span></span>
+<span class='r-in'><span class='va'>survey_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>survey_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.1</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># find optimal survey scheme using exact method</span></span>
+<span class='r-in'><span class='va'>opt_survey</span> <span class='op'>&lt;-</span> <span class='fu'>optimal_survey_scheme</span><span class='op'>(</span></span>
+<span class='r-in'>  <span class='va'>site_data</span>, <span class='va'>feature_data</span>,</span>
+<span class='r-in'>  <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span><span class='op'>)</span>,</span>
+<span class='r-in'>  <span class='st'>"management_cost"</span>, <span class='st'>"survey_cost"</span>,</span>
+<span class='r-in'>  <span class='st'>"survey"</span>, <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,</span>
+<span class='r-in'>  <span class='st'>"model_sensitivity"</span>, <span class='st'>"model_specificity"</span>,</span>
+<span class='r-in'>  <span class='st'>"target"</span>, <span class='va'>total_budget</span>, <span class='va'>survey_budget</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># print result</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>opt_survey</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11] [,12]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [6,] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [7,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [,13] [,14] [,15] [,16] [,17] [,18] [,19] [,20] [,21] [,22] [,23] [,24]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [6,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [7,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      [,25] [,26] [,27] [,28] [,29] [,30]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [2,] FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [3,] FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [4,] FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [5,] FALSE FALSE FALSE  TRUE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [6,] FALSE FALSE FALSE  TRUE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [7,] FALSE FALSE FALSE  TRUE FALSE FALSE</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> attr(,"ev")</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 1.387088 1.387088 1.387088 1.387088 1.387088 1.387088 1.387088</span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

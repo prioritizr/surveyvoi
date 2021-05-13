@@ -356,437 +356,444 @@ is calculated.</p></li>
 false positive and false negative errors. <em>Ecology</em>, 87: 835--841.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># set seeds for reproducibility</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span>
-
-<span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span>
-<span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-
-<span class='co'># print JAGS model code</span>
-<span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"jags"</span>, <span class='st'>"model.jags"</span>, package <span class='op'>=</span> <span class='st'>"surveyvoi"</span><span class='op'>)</span><span class='op'>)</span>,
-    sep <span class='op'>=</span> <span class='st'>"\n"</span><span class='op'>)</span>
-</div><div class='co'>#&gt; model {
-#&gt;   # data
-#&gt;   ## int&lt;lower=1&gt; n_vars
-#&gt;   ## int&lt;lower=1&gt; train_n_sites
-#&gt;   ## real sens
-#&gt;   ## real spec
-#&gt;   ## real[train_n_sites, n_vars] train_model_matrix
-#&gt;   ## real[train_n_sites] train_n_obs
-#&gt;   ## matrix[train_n_sites, max(train_n_obs)] train_obs
-#&gt; 
-#&gt;   # priors
-#&gt;   lambda ~ dunif(0.001, 10)     # regularization parameter
-#&gt;   coefs[1] ~ dnorm(0, 0.001)    # intercept parameter
-#&gt;   for (i in 2:n_vars) {
-#&gt;     coefs[i] ~ ddexp(0, lambda) # covariate parameters
-#&gt;   }
-#&gt; 
-#&gt;   # transformed parameters
-#&gt;   for (i in 1:train_n_sites) {
-#&gt;     logit(yhat[i]) &lt;- coefs %*% train_model_matrix[i, ]
-#&gt;   }
-#&gt; 
-#&gt;   # likelihood
-#&gt;   for (i in 1:train_n_sites) {
-#&gt;     occ[i] ~ dbern(yhat[i])
-#&gt;     for (j in 1:train_n_obs[i]) {
-#&gt;       train_obs[i, j] ~ dbern((occ[i] * sens) + ((1 - occ[i]) * spec))
-#&gt;     }
-#&gt;   }
-#&gt; }</div><div class='input'>
-<span class='co'># \dontrun{</span>
-<span class='co'># fit models</span>
-<span class='co'># note that we use a small number of MCMC iterations so that the example</span>
-<span class='co'># finishes quickly, you probably want to use the defaults for real work</span>
-<span class='va'>results</span> <span class='op'>&lt;-</span> <span class='fu'>fit_hglm_occupancy_models</span><span class='op'>(</span>
-   <span class='va'>site_data</span>, <span class='va'>feature_data</span>,
-   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span>,
-   <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,
-   n_folds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,
-   jags_n_samples <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_burnin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>,
-   jags_n_thin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_adapt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>2</span><span class='op'>)</span>,
-   n_threads <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='co'>#&gt; Loading required namespace: rjags</div><div class='co'>#&gt; Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==                                                                    |   2%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |====                                                                  |   5%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=====                                                                 |   8%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=======                                                               |  10%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=========                                                             |  12%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==========                                                            |  15%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |============                                                          |  18%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==============                                                        |  20%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |================                                                      |  22%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==================                                                    |  25%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |===================                                                   |  28%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=====================                                                 |  30%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=======================                                               |  32%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |========================                                              |  35%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==========================                                            |  38%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |============================                                          |  40%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==============================                                        |  42%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |================================                                      |  45%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=================================                                     |  48%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |===================================                                   |  50%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=====================================                                 |  52%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |======================================                                |  55%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |========================================                              |  58%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==========================================                            |  60%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |============================================                          |  62%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==============================================                        |  65%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |===============================================                       |  68%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=================================================                     |  70%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |===================================================                   |  72%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |====================================================                  |  75%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |======================================================                |  78%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |========================================================              |  80%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==========================================================            |  82%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |============================================================          |  85%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=============================================================         |  88%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |===============================================================       |  90%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |=================================================================     |  92%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |==================================================================    |  95%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |====================================================================  |  98%Compiling rjags model...
-#&gt; Calling the simulation using the rjags method...
-#&gt; Adapting the model for 100 iterations...
-#&gt; Burning in the model for 250 iterations...
-#&gt; Running the model for 250 iterations...
-#&gt; Simulation complete
-#&gt; Calculating summary statistics...
-#&gt; Finished running the simulation
-#&gt;   |                                                                              |======================================================================| 100%
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....
-#&gt; Calculating summary statistics...
-#&gt; Calculating the Gelman-Rubin statistic for 3 variables....</div><div class='input'>
-<span class='co'># print model predictions</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>predictions</span><span class='op'>)</span>
-</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 30 x 2</span>
-#&gt;        f1          f2
-#&gt;     <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'> 1</span><span> 0.868  1.00       </span>
-#&gt; <span style='color: #BCBCBC;'> 2</span><span> 0.405  1.00       </span>
-#&gt; <span style='color: #BCBCBC;'> 3</span><span> 0.933  0.999      </span>
-#&gt; <span style='color: #BCBCBC;'> 4</span><span> 0.275  1.00       </span>
-#&gt; <span style='color: #BCBCBC;'> 5</span><span> 0.634  0.002</span><span style='text-decoration: underline;'>30</span><span>    </span>
-#&gt; <span style='color: #BCBCBC;'> 6</span><span> 0.020</span><span style='text-decoration: underline;'>5</span><span> 0.000</span><span style='text-decoration: underline;'>000</span><span>117</span>
-#&gt; <span style='color: #BCBCBC;'> 7</span><span> 0.903  1.00       </span>
-#&gt; <span style='color: #BCBCBC;'> 8</span><span> 0.447  0.251      </span>
-#&gt; <span style='color: #BCBCBC;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     </span>
-#&gt; <span style='color: #BCBCBC;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   </span>
-#&gt; <span style='color: #949494;'># … with 20 more rows</span></div><div class='input'>
-<span class='co'># print model performance</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>performance</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 14</span>
-#&gt;   feature max_mpsrf train_tss_mean train_tss_std train_sensitivity_mean
-#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span> f1           3.17          0.716        0.320                   0.859</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span> f2           1.15          0.432        0.089</span><span style='text-decoration: underline;'>5</span><span>                  0.555</span>
-#&gt;   train_sensitivity_std train_specificity_mean train_specificity_std
-#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span>                0.249                   0.857                0.091</span><span style='text-decoration: underline;'>5</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span>                0.087</span><span style='text-decoration: underline;'>5</span><span>                  0.877                0.063</span><span style='text-decoration: underline;'>3</span>
-#&gt;   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
-#&gt;           <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span>         0.393        0.729                 0.717                0.439</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span>         0.519        0.310                 0.613                0.341</span>
-#&gt;   test_specificity_mean test_specificity_std
-#&gt;                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span>                 0.675                0.351</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span>                 0.905                0.155</span></div><div class='input'><span class='co'># }</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># set seeds for reproducibility</span></span>
+<span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># simulate data for 200 sites, 2 features, and 3 environmental variables</span></span>
+<span class='r-in'><span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> ...</span>
+<span class='r-in'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># print JAGS model code</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/readLines.html'>readLines</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"jags"</span>, <span class='st'>"model.jags"</span>, package <span class='op'>=</span> <span class='st'>"surveyvoi"</span><span class='op'>)</span><span class='op'>)</span>,</span>
+<span class='r-in'>    sep <span class='op'>=</span> <span class='st'>"\n"</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> model {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   # data</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## int&lt;lower=1&gt; n_vars</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## int&lt;lower=1&gt; train_n_sites</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## real sens</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## real spec</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## real[train_n_sites, n_vars] train_model_matrix</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## real[train_n_sites] train_n_obs</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   ## matrix[train_n_sites, max(train_n_obs)] train_obs</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   # priors</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   lambda ~ dunif(0.001, 10)     # regularization parameter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   coefs[1] ~ dnorm(0, 0.001)    # intercept parameter</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   for (i in 2:n_vars) {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     coefs[i] ~ ddexp(0, lambda) # covariate parameters</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   }</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   # transformed parameters</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   for (i in 1:train_n_sites) {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     logit(yhat[i]) &lt;- coefs %*% train_model_matrix[i, ]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   }</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   # likelihood</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   for (i in 1:train_n_sites) {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     occ[i] ~ dbern(yhat[i])</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     for (j in 1:train_n_obs[i]) {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>       train_obs[i, j] ~ dbern((occ[i] * sens) + ((1 - occ[i]) * spec))</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     }</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   }</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> }</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># \dontrun{</span></span>
+<span class='r-in'><span class='co'># fit models</span></span>
+<span class='r-in'><span class='co'># note that we use a small number of MCMC iterations so that the example</span></span>
+<span class='r-in'><span class='co'># finishes quickly, you probably want to use the defaults for real work</span></span>
+<span class='r-in'><span class='va'>results</span> <span class='op'>&lt;-</span> <span class='fu'>fit_hglm_occupancy_models</span><span class='op'>(</span></span>
+<span class='r-in'>   <span class='va'>site_data</span>, <span class='va'>feature_data</span>,</span>
+<span class='r-in'>   <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span>,</span>
+<span class='r-in'>   <span class='st'>"survey_sensitivity"</span>, <span class='st'>"survey_specificity"</span>,</span>
+<span class='r-in'>   n_folds <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>5</span>, <span class='fl'>2</span><span class='op'>)</span>,</span>
+<span class='r-in'>   jags_n_samples <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_burnin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>250</span>, <span class='fl'>2</span><span class='op'>)</span>,</span>
+<span class='r-in'>   jags_n_thin <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>2</span><span class='op'>)</span>, jags_n_adapt <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>2</span><span class='op'>)</span>,</span>
+<span class='r-in'>   n_threads <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |                                                                      |   0%</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span> Loading required namespace: rjags</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==                                                                    |   2%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |====                                                                  |   5%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=====                                                                 |   8%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=======                                                               |  10%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=========                                                             |  12%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==========                                                            |  15%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |============                                                          |  18%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==============                                                        |  20%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |================                                                      |  22%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==================                                                    |  25%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |===================                                                   |  28%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=====================                                                 |  30%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=======================                                               |  32%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |========================                                              |  35%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==========================                                            |  38%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |============================                                          |  40%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==============================                                        |  42%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |================================                                      |  45%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=================================                                     |  48%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |===================================                                   |  50%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=====================================                                 |  52%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |======================================                                |  55%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |========================================                              |  58%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==========================================                            |  60%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |============================================                          |  62%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==============================================                        |  65%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |===============================================                       |  68%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=================================================                     |  70%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |===================================================                   |  72%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |====================================================                  |  75%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |======================================================                |  78%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |========================================================              |  80%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==========================================================            |  82%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |============================================================          |  85%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=============================================================         |  88%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |===============================================================       |  90%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |=================================================================     |  92%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |==================================================================    |  95%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |====================================================================  |  98%Compiling rjags model...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calling the simulation using the rjags method...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Adapting the model for 100 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Burning in the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Running the model for 250 iterations...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simulation complete</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Finished running the simulation</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   |                                                                              |======================================================================| 100%</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating summary statistics...</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Calculating the Gelman-Rubin statistic for 3 variables....</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># print model predictions</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>predictions</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 30 x 2</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>        f1          f2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 1</span><span> 0.868  1.00       </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 2</span><span> 0.405  1.00       </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 3</span><span> 0.933  0.999      </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 4</span><span> 0.275  1.00       </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 5</span><span> 0.634  0.002</span><span style='text-decoration: underline;'>30</span><span>    </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 6</span><span> 0.020</span><span style='text-decoration: underline;'>5</span><span> 0.000</span><span style='text-decoration: underline;'>000</span><span>117</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 7</span><span> 0.903  1.00       </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 8</span><span> 0.447  0.251      </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'> 9</span><span> 0.672  0.026</span><span style='text-decoration: underline;'>8</span><span>     </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>10</span><span> 0.602  0.000</span><span style='text-decoration: underline;'>325</span><span>   </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with 20 more rows</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># print model performance</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>results</span><span class='op'>$</span><span class='va'>performance</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 2 x 14</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   feature max_mpsrf train_tss_mean train_tss_std train_sensitivity_mean</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>       </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span> f1           3.17          0.716        0.320                   0.859</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span> f2           1.15          0.432        0.089</span><span style='text-decoration: underline;'>5</span><span>                  0.555</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   train_sensitivity_std train_specificity_mean train_specificity_std</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span>                0.249                   0.857                0.091</span><span style='text-decoration: underline;'>5</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span>                0.087</span><span style='text-decoration: underline;'>5</span><span>                  0.877                0.063</span><span style='text-decoration: underline;'>3</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>           <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>        </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span>         0.393        0.729                 0.717                0.439</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span>         0.519        0.310                 0.613                0.341</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   test_specificity_mean test_specificity_std</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>                   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span>                 0.675                0.351</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span>                 0.905                0.155</span></span>
+<span class='r-in'><span class='co'># }</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

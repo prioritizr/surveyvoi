@@ -178,46 +178,48 @@ and the representation target thresholds for each feature
 and <code><a href='simulate_site_data.html'>simulate_site_data()</a></code>.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># load data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_sites</span>, <span class='va'>sim_features</span><span class='op'>)</span>
-
-<span class='co'># print feature data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_features</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 3 x 7</span>
-#&gt;   name  survey survey_sensitivity survey_specificity model_sensitivity
-#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.954              0.886             0.718</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.974              0.875             0.705</span>
-#&gt; <span style='color: #BCBCBC;'>3</span><span> f3    TRUE                0.956              0.823             0.768</span>
-#&gt;   model_specificity target
-#&gt;               <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span>             0.811      1</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span>             0.860      1</span>
-#&gt; <span style='color: #BCBCBC;'>3</span><span>             0.887      1</span></div><div class='input'><span class='co'># print site data</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_sites</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Simple feature collection with 6 features and 13 fields
-#&gt; Geometry type: POINT
-#&gt; Dimension:     XY
-#&gt; Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
-#&gt; CRS:           NA
-#&gt; <span style='color: #949494;'># A tibble: 6 x 14</span>
-#&gt;   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
-#&gt;         <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span>        3.43            43.8     1 1     0         5     5     5 -</span><span style='color: #BB0000;'>1.38</span><span>   0.425</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span>        6.07            59.0     0 0     0         0     0     0  0.736 -</span><span style='color: #BB0000;'>1.01</span><span> </span>
-#&gt; <span style='color: #BCBCBC;'>3</span><span>        7.09            46.7     0 0     0         0     0     0  0.754 -</span><span style='color: #BB0000;'>0.959</span>
-#&gt; <span style='color: #BCBCBC;'>4</span><span>        6.50            49.6     0 0     0         0     0     0  0.530  1.51 </span>
-#&gt; <span style='color: #BCBCBC;'>5</span><span>        5.37            48.1     0 0     0         0     0     0  0.546 -</span><span style='color: #BB0000;'>0.525</span>
-#&gt; <span style='color: #BCBCBC;'>6</span><span>        3.35            48.9     1 0.667 0.333     3     3     3 -</span><span style='color: #BB0000;'>1.18</span><span>   0.557</span>
-#&gt;      p1    p2    p3               geometry
-#&gt;   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span>
-#&gt; <span style='color: #BCBCBC;'>1</span><span> 0.941 0.999 0.057  (0.1589075 0.8637977)</span>
-#&gt; <span style='color: #BCBCBC;'>2</span><span> 0.36  0.006 0.259  (0.9764926 0.7485368)</span>
-#&gt; <span style='color: #BCBCBC;'>3</span><span> 0.337 0.006 0.305  (0.8362375 0.2282762)</span>
-#&gt; <span style='color: #BCBCBC;'>4</span><span> 0.048 0.579 0.998     (0.10513 0.179855)</span>
-#&gt; <span style='color: #BCBCBC;'>5</span><span> 0.335 0.032 0.488 (0.5985786 0.04556193)</span>
-#&gt; <span style='color: #BCBCBC;'>6</span><span> 0.896 0.998 0.145  (0.1504241 0.6821156)</span></div><div class='input'>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># load data</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span><span class='op'>(</span><span class='va'>sim_sites</span>, <span class='va'>sim_features</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># print feature data</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_features</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 3 x 7</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   name  survey survey_sensitivity survey_specificity model_sensitivity</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.954              0.886             0.718</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.974              0.875             0.705</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span><span> f3    TRUE                0.956              0.823             0.768</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   model_specificity target</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>               <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span>             0.811      1</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span>             0.860      1</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span><span>             0.887      1</span></span>
+<span class='r-in'><span class='co'># print site data</span></span>
+<span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>sim_sites</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Simple feature collection with 6 features and 13 fields</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Geometry type: POINT</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Dimension:     XY</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> CRS:           NA</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 6 x 14</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span>        3.43            43.8     1 1     0         5     5     5 -</span><span style='color: #BB0000;'>1.38</span><span>   0.425</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span>        6.07            59.0     0 0     0         0     0     0  0.736 -</span><span style='color: #BB0000;'>1.01</span><span> </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span><span>        7.09            46.7     0 0     0         0     0     0  0.754 -</span><span style='color: #BB0000;'>0.959</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>4</span><span>        6.50            49.6     0 0     0         0     0     0  0.530  1.51 </span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>5</span><span>        5.37            48.1     0 0     0         0     0     0  0.546 -</span><span style='color: #BB0000;'>0.525</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>6</span><span>        3.35            48.9     1 0.667 0.333     3     3     3 -</span><span style='color: #BB0000;'>1.18</span><span>   0.557</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>      p1    p2    p3               geometry</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span><span> 0.941 0.999 0.057  (0.1589075 0.8637977)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>2</span><span> 0.36  0.006 0.259  (0.9764926 0.7485368)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>3</span><span> 0.337 0.006 0.305  (0.8362375 0.2282762)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>4</span><span> 0.048 0.579 0.998     (0.10513 0.179855)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>5</span><span> 0.335 0.032 0.488 (0.5985786 0.04556193)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>6</span><span> 0.896 0.998 0.145  (0.1504241 0.6821156)</span></span>
+<span class='r-in'></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

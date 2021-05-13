@@ -17,7 +17,7 @@ areas). Given a set of sites that could potentially be acquired for
 conservation management – wherein some sites have previously been
 surveyed and other sites have not – this package provides functionality
 to generate and evaluate plans for additional surveys. Specifically,
-plans for ecological surveys can b generated using various conventional
+plans for ecological surveys can be generated using various conventional
 approaches (e.g. maximizing expected species richness, geographic
 coverage, diversity of sampled environmental conditions) and by
 maximizing value of information. After generating plans for surveys,
@@ -98,7 +98,7 @@ package to prioritize funds for ecological surveys. In this example, we
 will generate plans for conducting ecological surveys (termed “survey
 schemes”) using simulated data for six sites and three conservation
 features (e.g. bird species). To start off, we will set the seed for the
-random number generator for reproducibility load some R packages.
+random number generator for reproducibility and load some R packages.
 
 ``` r
 set.seed(500)      # set RNG for reproducibility
@@ -117,22 +117,23 @@ have already been protected, and (iv) candidate sites that could be
 protected in the future. Each row corresponds to a different site, and
 each column describes different properties associated with each site. In
 this table, the `"management_cost"` column indicates the cost of
-protecting each site; `"survey_cost"` column the cost of conducting an
-ecological survey within each site; and `"e1"` and `"e2"` columns
-contain environmental data for each site (not used in this example). The
-remaining columns describe the existing survey data and the spatial
-distribution of the features across the sites. The `"n1"`, `"n2"`, and
-`"n3"` columns indicate the number of surveys conducted within each site
-that looked for each of the three features (respectively); and `"f1"`,
-`"f2"`, and `"f3"` columns describe the proportion of surveys within
-each site that looked for each feature where the feature was detected
-(respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a
-value of 0.5 for a given site, then the feature `"f1"` was detected in
-only one of the two surveys conducted in this site that looked for the
-feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain
-modelled probability estimates of each species being present in each
-site (see `fit_hglm_occupancy_models()` and `fit_xgb_occupancy_models()`
-to generate such estimates for your own data).
+protecting each site; `"survey_cost"` column indicates the cost of
+conducting an ecological survey within each site; and `"e1"` and `"e2"`
+columns contain environmental data for each site (not used in this
+example). The remaining columns describe the existing survey data and
+the spatial distribution of the features across the sites. The `"n1"`,
+`"n2"`, and `"n3"` columns indicate the number of surveys conducted
+within each site that looked for each of the three features
+(respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the
+proportion of surveys within each site that looked for each feature
+where the feature was detected (respectively). For example, if `"n1"`
+has a value of 2 and `"f1"` has a value of 0.5 for a given site, then
+the feature `"f1"` was detected in only one of the two surveys conducted
+in this site that looked for the feature. Finally, the `"p1"`, `"p2"`,
+and `"p3"` columns contain modelled probability estimates of each
+species being present in each site (see `fit_hglm_occupancy_models()`
+and `fit_xgb_occupancy_models()` to generate such estimates for your own
+data).
 
 ``` r
 # load data
