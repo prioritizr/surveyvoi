@@ -19,7 +19,7 @@ surveyed and other sites have not – this package provides functionality
 to generate and evaluate plans for additional surveys. Specifically,
 plans for ecological surveys can b generated using various conventional
 approaches (e.g. maximizing expected species richness, geographic
-coverage, diversity of sampled environmenta conditions) and by
+coverage, diversity of sampled environmental conditions) and by
 maximizing value of information. After generating plans for surveys,
 they can also be evaluated using value of information analysis. Please
 note that several functions depend on the ‘Gurobi’ optimization software
