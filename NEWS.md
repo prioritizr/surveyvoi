@@ -5,7 +5,7 @@
 # surveyvoi 1.0.0
 
 - Refactor for official release.
-- Add support for generating 
+- Add support for generating surveys with the Rsymphony package.
 
 # surveyvoi 0.0.76
 
