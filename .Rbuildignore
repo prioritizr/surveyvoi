@@ -27,3 +27,4 @@ inst/extdata/dictionary.txt
 ^simulation.R$
 ^\.github$
 .covrignore
+^CRAN-RELEASE$
