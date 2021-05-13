@@ -8,12 +8,11 @@ output:
 
 # surveyvoi: Survey Value of Information
 
-[![lifecycle](https://img.shields.io/badge/Lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![R-CMD-check-Mac-OSX](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Mac%20OSX/master.svg?label=Mac%20OSX)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
@@ -26,11 +25,19 @@ w = 3.0
 ow = "400"
 ```
 
-The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. It provides functionality to generate plans using various conventional approaches (e.g. expected species richness) and directly maximizing return on investment using optimization algorithms. Plans for conducting ecological surveys are evaluated using value of information analysis, which explicitly accounts for the cost of conducting additional surveys when evaluating their return on investment.
+The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can b generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmenta conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several
+functions depend on the 'Gurobi' optimization software (available from
+https://www.gurobi.com).
 
 ## Installation
 
-The _surveyvoi R_ package is still in an experimental phase of the development cycle and so it is not yet available on [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/). To install latest developmental version from [GitHub](https://github.com/jeffreyhanson/surveyvoi), please use the following R code. Note that developmental versions may contain coding errors.
+The latest official version of the _surveyvoi R_ package can be installed from the [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) using the following _R_ code.
+
+```{r, eval = FALSE}
+install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
+```
+
+Alternatively, the latest development version can be installed from [GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following code. Please note that while developmental versions may contain additional features not present in the official version, they may also contain coding errors.
 
 ```{r, eval = FALSE}
 if (!require(remotes)) install.packages("remotes")
@@ -43,21 +50,24 @@ The [Rtools](https://cran.r-project.org/bin/windows/Rtools/) software needs to b
 
 #### Ubuntu
 
-The `gmp` and `mpfr` libraries need to be installed to install the _surveyvoi R_ package from source. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
+The `gmp`, `mpfr`, and `symphony` libraries need to be installed to install the _surveyvoi R_ package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
 
 ```
-apt-get -y update && apt-get install -y libgmp3-dev libmpfr-dev
+apt-get -y update
+apt-get install -y libgmp3-dev libmpfr-dev coinor-libsymphony-dev
 ```
 
 #### Linux
 
-For Unix-alikes, `gmp` (>= 4.2.3) and `mpfr` (>= 3.0.0) are required.
+For Unix-alikes, `gmp` (>= 4.2.3), `mpfr` (>= 3.0.0), and `symphony` (>= 5.6.16) are required.
 
 #### MacOS
 
-The `gmp` and `mpfr` libraries need to be installed to install the _surveyvoi R_ package from source. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
+The `gmp`, `mpfr`, and `symphony` libraries need to be installed to install the _surveyvoi R_ package. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
 
 ```
+brew tap coin-or-tools/coinor
+brew install symphony
 brew install pkg-config
 brew install gmp
 brew install mpfr
@@ -65,11 +75,12 @@ brew install mpfr
 
 ## Citation
 
-This package is still under active development so we do not yet encourage using it. To cite the latest development version, please use:
+Please cite the _surveyvoi R_ package when using it in publications. To cite the latest official version, please use:
 
 ```{r, echo = FALSE, results = "asis", comment = ""}
-dev_version <- as.character(packageVersion("surveyvoi"))
-cat(paste0("> Hanson JO, Hudgins EJ, Bennett J (",format(Sys.time(), "%Y"),"). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
+off_version <- "1.0.1"
+off_year <- "2021"
+cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", off_year, "). surveyvoi: Survey Value of Information. R package version ", off_version, ". Available at https://CRAN.R-project.org/package=surveyvoi.\n"))
 ```
 
 ## Usage
@@ -84,7 +95,7 @@ library(tidyr)     # package for preparing data
 library(ggplot2)   # package for plotting data
 ```
 
-Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf` object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models` and `fit_xgb_occupancy_models` to generate such estimates for your own data).
+Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf` object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models()` and `fit_xgb_occupancy_models()` to generate such estimates for your own data).
 
 
 ```{r, fig.height = h, fig.width = w}
@@ -153,7 +164,7 @@ data(sim_features)
 print(sim_features, width = Inf)
 ```
 
-After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme` function. This function uses a greedy heuristic algorithm to maximize return on investment. Although other functions can return solutions that are guarantee to be optimal (i.e. `optimal_survey_scheme`), they can take a very long time to complete because they use a brute-force approach. This function also uses an approximation routine to reduce computational burden.
+After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use `approx_optimal_survey_scheme()` function. This function uses a greedy heuristic algorithm to maximize value of information. Although other functions can return solutions that are guaranteed to be optimal (i.e. `optimal_survey_scheme()`), they can take a very long time to complete because they use a brute-force approach. This function also uses an approximation routine to reduce computational burden.
 
 To perform the optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different plans depending on available funds. For instance, if you have near infinite funds then you wouldn't bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you wouldn't survey any sites to ensure that at least one site could be protected. Generally, conservation planning problems occur somewhere between these two extremes---but the optimization process can't take that into account if you don't specify a budget. For brevity, here we will set the total budget as 80% of the total costs for protecting sites.
 

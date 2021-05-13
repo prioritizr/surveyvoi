@@ -45,6 +45,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -56,9 +58,18 @@
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -72,19 +83,13 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -97,7 +102,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -226,56 +231,56 @@ simulations.</p>
 
 <span class='co'># simulate data</span>
 <span class='va'>d</span> <span class='op'>&lt;-</span> <span class='fu'>simulate_site_data</span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>10</span>, n_features <span class='op'>=</span> <span class='fl'>4</span>, prop <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ...</div><div class='input'>
+</div><div class='co'>#&gt; ...</div><div class='input'>
 <span class='co'># print data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>d</span>, width <span class='op'>=</span> <span class='cn'>Inf</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 10 features and 17 fields
-#&gt; geometry type:  POINT
-#&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9404673 ymax: 0.9568333
-#&gt; CRS:            NA
-#&gt; <span style='color: #555555;'># A tibble: 10 x 18</span><span>
+</div><div class='co'>#&gt; Simple feature collection with 10 features and 17 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: 0.0455565 ymin: 0.04205953 xmax: 0.9404673 ymax: 0.9568333
+#&gt; CRS:           NA
+#&gt; <span style='color: #949494;'># A tibble: 10 x 18</span>
 #&gt;    survey_cost management_cost    f1    f2    f3    f4    n1    n2    n3    n4
-#&gt;          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span>        6.63            64.0     1     0     0     1     1     1     1     1
-#&gt; </span><span style='color: #555555;'> 2</span><span>        4.34            69.0     0     1     1     1     5     5     5     5
-#&gt; </span><span style='color: #555555;'> 3</span><span>        7.01            62.8     0     0     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'> 4</span><span>        3.64            70.7     0     0     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'> 5</span><span>        3.42            70.1     0     1     0     0     1     1     1     1
-#&gt; </span><span style='color: #555555;'> 6</span><span>        6.20            60.2     1     0     1     1     5     5     5     5
-#&gt; </span><span style='color: #555555;'> 7</span><span>        3.65            66.9     0     1     0     0     5     5     5     5
-#&gt; </span><span style='color: #555555;'> 8</span><span>        5.06            68.7     0     0     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'> 9</span><span>        3.64            66.8     0     0     0     0     0     0     0     0
-#&gt; </span><span style='color: #555555;'>10</span><span>        7.38            61.8     0     0     0     0     0     0     0     0
+#&gt;          <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'> 1</span><span>        6.63            64.0     1     0     0     1     1     1     1     1</span>
+#&gt; <span style='color: #BCBCBC;'> 2</span><span>        4.34            69.0     0     1     1     1     5     5     5     5</span>
+#&gt; <span style='color: #BCBCBC;'> 3</span><span>        7.01            62.8     0     0     0     0     0     0     0     0</span>
+#&gt; <span style='color: #BCBCBC;'> 4</span><span>        3.64            70.7     0     0     0     0     0     0     0     0</span>
+#&gt; <span style='color: #BCBCBC;'> 5</span><span>        3.42            70.1     0     1     0     0     1     1     1     1</span>
+#&gt; <span style='color: #BCBCBC;'> 6</span><span>        6.20            60.2     1     0     1     1     5     5     5     5</span>
+#&gt; <span style='color: #BCBCBC;'> 7</span><span>        3.65            66.9     0     1     0     0     5     5     5     5</span>
+#&gt; <span style='color: #BCBCBC;'> 8</span><span>        5.06            68.7     0     0     0     0     0     0     0     0</span>
+#&gt; <span style='color: #BCBCBC;'> 9</span><span>        3.64            66.8     0     0     0     0     0     0     0     0</span>
+#&gt; <span style='color: #BCBCBC;'>10</span><span>        7.38            61.8     0     0     0     0     0     0     0     0</span>
 #&gt;        e1      e2     e3    p1    p2    p3    p4              geometry
-#&gt;     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>               </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span> -</span><span style='color: #BB0000;'>0.474</span><span>  0.555   0.948 1     0     0.007 1     (0.2875775 0.9568333)
-#&gt; </span><span style='color: #555555;'> 2</span><span> -</span><span style='color: #BB0000;'>0.360</span><span> -</span><span style='color: #BB0000;'>1.21</span><span>   -</span><span style='color: #BB0000;'>0.151</span><span> 0.047 0.517 1     1     (0.7883051 0.4533342)
-#&gt; </span><span style='color: #555555;'> 3</span><span>  0.493  0.632   1.01  1     0     0.04  0.999 (0.4089769 0.6775706)
-#&gt; </span><span style='color: #555555;'> 4</span><span> -</span><span style='color: #BB0000;'>0.801</span><span> -</span><span style='color: #BB0000;'>2.30</span><span>    0.304 0.765 0     1     1     (0.8830174 0.5726334)
-#&gt; </span><span style='color: #555555;'> 5</span><span> -</span><span style='color: #BB0000;'>0.586</span><span> -</span><span style='color: #BB0000;'>0.024</span><span style='color: #BB0000;text-decoration: underline;'>9</span><span> -</span><span style='color: #BB0000;'>1.49</span><span>  0     1     0     0     (0.9404673 0.1029247)
-#&gt; </span><span style='color: #555555;'> 6</span><span>  1.48   0.287   0.705 0.993 0     0.991 0.993  (0.0455565 0.899825)
-#&gt; </span><span style='color: #555555;'> 7</span><span>  1.30   0.960  -</span><span style='color: #BB0000;'>0.554</span><span> 0.001 0.997 0     0     (0.5281055 0.2460877)
-#&gt; </span><span style='color: #555555;'> 8</span><span> -</span><span style='color: #BB0000;'>0.607</span><span>  0.236  -</span><span style='color: #BB0000;'>1.60</span><span>  0     1     0     0     (0.892419 0.04205953)
-#&gt; </span><span style='color: #555555;'> 9</span><span>  1.01   0.655  -</span><span style='color: #BB0000;'>0.310</span><span> 0.009 0.919 0     0      (0.551435 0.3279207)
-#&gt; </span><span style='color: #555555;'>10</span><span> -</span><span style='color: #BB0000;'>1.46</span><span>   0.213   1.14  1     0     0.832 1     (0.4566147 0.9545036)</div><div class='input'>
+#&gt;     <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span>
+#&gt; <span style='color: #BCBCBC;'> 1</span><span> -</span><span style='color: #BB0000;'>0.474</span><span>  0.555   0.948 1     0     0.007 1     (0.2875775 0.9568333)</span>
+#&gt; <span style='color: #BCBCBC;'> 2</span><span> -</span><span style='color: #BB0000;'>0.360</span><span> -</span><span style='color: #BB0000;'>1.21</span><span>   -</span><span style='color: #BB0000;'>0.151</span><span> 0.047 0.517 1     1     (0.7883051 0.4533342)</span>
+#&gt; <span style='color: #BCBCBC;'> 3</span><span>  0.493  0.632   1.01  1     0     0.04  0.999 (0.4089769 0.6775706)</span>
+#&gt; <span style='color: #BCBCBC;'> 4</span><span> -</span><span style='color: #BB0000;'>0.801</span><span> -</span><span style='color: #BB0000;'>2.30</span><span>    0.304 0.765 0     1     1     (0.8830174 0.5726334)</span>
+#&gt; <span style='color: #BCBCBC;'> 5</span><span> -</span><span style='color: #BB0000;'>0.586</span><span> -</span><span style='color: #BB0000;'>0.024</span><span style='color: #BB0000;text-decoration: underline;'>9</span><span> -</span><span style='color: #BB0000;'>1.49</span><span>  0     1     0     0     (0.9404673 0.1029247)</span>
+#&gt; <span style='color: #BCBCBC;'> 6</span><span>  1.48   0.287   0.705 0.993 0     0.991 0.993  (0.0455565 0.899825)</span>
+#&gt; <span style='color: #BCBCBC;'> 7</span><span>  1.30   0.960  -</span><span style='color: #BB0000;'>0.554</span><span> 0.001 0.997 0     0     (0.5281055 0.2460877)</span>
+#&gt; <span style='color: #BCBCBC;'> 8</span><span> -</span><span style='color: #BB0000;'>0.607</span><span>  0.236  -</span><span style='color: #BB0000;'>1.60</span><span>  0     1     0     0     (0.892419 0.04205953)</span>
+#&gt; <span style='color: #BCBCBC;'> 9</span><span>  1.01   0.655  -</span><span style='color: #BB0000;'>0.310</span><span> 0.009 0.919 0     0      (0.551435 0.3279207)</span>
+#&gt; <span style='color: #BCBCBC;'>10</span><span> -</span><span style='color: #BB0000;'>1.46</span><span>   0.213   1.14  1     0     0.832 1     (0.4566147 0.9545036)</span></div><div class='input'>
 <span class='co'># plot cost data</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"survey_cost"</span>, <span class='st'>"management_cost"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>,
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"survey_cost"</span>, <span class='st'>"management_cost"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>,
      cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='simulate_site_data-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot environmental data</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"e1"</span>, <span class='st'>"e2"</span>, <span class='st'>"e3"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='simulate_site_data-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature detection data</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span>, <span class='st'>"f3"</span>, <span class='st'>"f4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"f1"</span>, <span class='st'>"f2"</span>, <span class='st'>"f3"</span>, <span class='st'>"f4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='simulate_site_data-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature survey effort</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span>, <span class='st'>"n3"</span>, <span class='st'>"n4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"n1"</span>, <span class='st'>"n2"</span>, <span class='st'>"n3"</span>, <span class='st'>"n4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='simulate_site_data-4.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># plot feature prior probability data</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span>, <span class='st'>"p4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span>, <span class='st'>"p4"</span><span class='op'>)</span><span class='op'>]</span>, axes <span class='op'>=</span> <span class='cn'>TRUE</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 </div><div class='img'><img src='simulate_site_data-5.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -287,11 +292,11 @@ simulations.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -299,6 +304,8 @@ simulations.</p>
 
   
 
+
+  
 
   </body>
 </html>

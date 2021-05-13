@@ -48,6 +48,8 @@ matrices cannot be compared to each other." />
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -59,9 +61,18 @@ matrices cannot be compared to each other." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -75,19 +86,13 @@ matrices cannot be compared to each other." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -100,7 +105,7 @@ matrices cannot be compared to each other." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -161,7 +166,7 @@ procedure:</p>
 <li><p>Let \(J\) denote the set of sites (indexed by \(j\)),
 \(I\) denote the set of features (indexed by \(i\)), and
 \(x_{ij}\) denote the modelled probability of feature \(i \in I\)
-occurring in planning units \(j \in J\).</p></li>
+occurring in sites \(j \in J\).</p></li>
 <li><p>Next, we will sum the values for each site:
 \(y_j = \sum_{i \in I} x_{ij}\).</p></li>
 <li><p>Finally, we will linearly rescale the \(y_j\) values between 0.01
@@ -184,20 +189,20 @@ and 1 to produce the scores.</p></li>
 <span class='co'># we can see that the fourth site has the highest modelled probabilities of</span>
 <span class='co'># occupancy across all species</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 4 features and 3 fields
-#&gt; geometry type:  POINT
-#&gt; dimension:      XY
-#&gt; bbox:           xmin: -0.5604756 ymin: -1.265061 xmax: 1.558708 ymax: 1.715065
-#&gt; CRS:            NA
-#&gt; <span style='color: #555555;'># A tibble: 4 x 4</span><span>
+</div><div class='co'>#&gt; Simple feature collection with 4 features and 3 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: -0.5604756 ymin: -1.265061 xmax: 1.558708 ymax: 1.715065
+#&gt; CRS:           NA
+#&gt; <span style='color: #949494;'># A tibble: 4 x 4</span>
 #&gt;      p1    p2    p3               geometry
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> 0.095 0.023 0.075 (-0.5604756 0.1292877)
-#&gt; </span><span style='color: #555555;'>2</span><span> 0.032 0.014 0.046  (-0.2301775 1.715065)
-#&gt; </span><span style='color: #555555;'>3</span><span> 0.5   0.4   0.9     (1.558708 0.4609162)
-#&gt; </span><span style='color: #555555;'>4</span><span> 0.924 0.919 0.977 (0.07050839 -1.265061)</div><div class='input'>
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                </span><span style='color: #949494;font-style: italic;'>&lt;POINT&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> 0.095 0.023 0.075 (-0.5604756 0.1292877)</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> 0.032 0.014 0.046  (-0.2301775 1.715065)</span>
+#&gt; <span style='color: #BCBCBC;'>3</span><span> 0.5   0.4   0.9     (1.558708 0.4609162)</span>
+#&gt; <span style='color: #BCBCBC;'>4</span><span> 0.924 0.919 0.977 (0.07050839 -1.265061)</span></div><div class='input'>
 <span class='co'># plot sites' occupancy probabilities</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span><span class='op'>)</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span><span class='op'>)</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='relative_site_richness_scores-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># calculate scores</span>
 <span class='va'>s</span> <span class='op'>&lt;-</span> <span class='fu'>relative_site_richness_scores</span><span class='op'>(</span><span class='va'>x</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"p1"</span>, <span class='st'>"p2"</span>, <span class='st'>"p3"</span><span class='op'>)</span><span class='op'>)</span>
@@ -205,12 +210,12 @@ and 1 to produce the scores.</p></li>
 <span class='co'># print scores,</span>
 <span class='co'># we can see that site 4 has the highest richness score</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>s</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0.04665323 0.01000000 0.62983871 1.00000000</div><div class='input'>
+</div><div class='co'>#&gt; [1] 0.04665323 0.01000000 0.62983871 1.00000000</div><div class='input'>
 <span class='co'># plot sites' richness scores</span>
 <span class='va'>x</span><span class='op'>$</span><span class='va'>s</span> <span class='op'>&lt;-</span> <span class='va'>s</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"s"</span><span class='op'>)</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"s"</span><span class='op'>)</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='relative_site_richness_scores-2.png' alt='' width='700' height='433' /></div><div class='input'>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -222,11 +227,11 @@ and 1 to produce the scores.</p></li>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -234,6 +239,8 @@ and 1 to produce the scores.</p></li>
 
   
 
+
+  
 
   </body>
 </html>

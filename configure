@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # This configure script is based on Anticonf (tm) by Jeroen Ooms (2020)
 # It handles the automatic setup of gmp, gmpxx, and mpfr C/C++ libraries
 # for package compilation (based on the openssl R package)

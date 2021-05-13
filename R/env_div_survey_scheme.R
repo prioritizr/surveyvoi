@@ -5,9 +5,6 @@ NULL
 #'
 #' Generate a survey scheme by maximizing the diversity of environmental
 #' conditions that are surveyed.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @param site_data [sf::sf()] object containing the candidate survey
 #'   sites.
@@ -48,12 +45,32 @@ NULL
 #'  be entirely excluded from the optimization process?
 #'  Defaults to `FALSE`.
 #'
+#' @param solver `character` name of the optimization solver to use
+#'   for generating survey schemes.
+#'   Available options include: `"Rsymphony"`, `"gurobi"` and `"auto"`.
+#'   The `"auto"` method will use the Gurobi optimization software if
+#'   it is available; otherwise, it will use the SYMPHONY software
+#'   via the \pkg{Rsymphony} package.
+#'   Defaults to `"auto"`.
+#'
 #' @param verbose `logical` indicating if information should be
 #'   printed while generating survey scheme(s). Defaults to `FALSE`.
 #'
 #' @details The integer programming formulation of the environmental diversity
 #'   reserve selection problem (Faith & Walker 1996) is used to generate survey
 #'   schemes.
+#'
+#' @section Solver:
+#'   This function can use the \pkg{Rsymphony} package and
+#'   the [Gurobi optimization software](https://www.gurobi.com/) to generate
+#'   to generate survey schemes. Although the \pkg{Rsymphony} package
+#'   is easier to install because it is freely available on the
+#'   The Comprehensive R Archive Network (CRAN), it is strongly recommended to
+#'   install the [Gurobi optimization software](https://www.gurobi.com/) and the
+#'  \pkg{gurobi} R package because it is much faster.
+#'   Note that special academic licenses are available at no cost.
+#'   Installation instructions are available online for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
+#'
 #'
 #' @references
 #' Faith DP & Walker PA (1996) Environmental diversity: on the best-possible
@@ -94,7 +111,7 @@ NULL
 env_div_survey_scheme <- function(
   site_data, cost_column, survey_budget, env_vars_columns,
   method = "mahalanobis", locked_in_column = NULL, locked_out_column = NULL,
-  exclude_locked_out = FALSE, verbose = FALSE) {
+  exclude_locked_out = FALSE, solver = "auto", verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -169,8 +186,11 @@ env_div_survey_scheme <- function(
       method = method))
 
   # run optimization
-  result <- distance_based_prioritizations(env_dists, survey_budget,
-    cand_site_data[[cost_column]], cand_locked_in, cand_locked_out, verbose)
+  result <- distance_based_prioritizations(
+    env_dists, survey_budget,
+    cand_site_data[[cost_column]],
+    cand_locked_in, cand_locked_out,
+    solver, verbose)
 
   # prepare output
   if (isTRUE(exclude_locked_out)) {

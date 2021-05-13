@@ -49,6 +49,8 @@ Please note that this function requires the Gurobi optimization software
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -60,9 +62,18 @@ Please note that this function requires the Gurobi optimization software
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -76,19 +87,13 @@ Please note that this function requires the Gurobi optimization software
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -101,7 +106,7 @@ Please note that this function requires the Gurobi optimization software
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -138,6 +143,7 @@ Please note that this function requires the Gurobi optimization software
   <span class='va'>weight_column</span>,
   locked_in_column <span class='op'>=</span> <span class='cn'>NULL</span>,
   locked_out_column <span class='op'>=</span> <span class='cn'>NULL</span>,
+  solver <span class='op'>=</span> <span class='st'>"auto"</span>,
   verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
@@ -184,6 +190,16 @@ No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></td>
     </tr>
     <tr>
+      <th>solver</th>
+      <td><p><code>character</code> name of the optimization solver to use
+for generating survey schemes.
+Available options include: <code>"Rsymphony"</code>, <code>"gurobi"</code> and <code>"auto"</code>.
+The <code>"auto"</code> method will use the Gurobi optimization software if
+it is available; otherwise, it will use the SYMPHONY software
+via the <span class="pkg">Rsymphony</span> package.
+Defaults to <code>"auto"</code>.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p><code>logical</code> indicating if information should be
 printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></td>
@@ -209,6 +225,19 @@ is selected in the survey scheme or not.</p>
 <p>$$\mathit{Maximize} \space \sum_{j \in J} x_j w_i \\
   \mathit{subject \space to} \\
   \sum_{j \in J} x_j c_j \leq b$$</p>
+    <h2 class="hasAnchor" id="solver"><a class="anchor" href="#solver"></a>Solver</h2>
+
+    
+
+<p>This function can use the <span class="pkg">Rsymphony</span> package and
+the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> to generate
+to generate survey schemes. Although the <span class="pkg">Rsymphony</span> package
+is easier to install because it is freely available on the
+The Comprehensive R Archive Network (CRAN), it is strongly recommended to
+install the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> and the
+<span class="pkg">gurobi</span> R package because it is much faster.
+Note that special academic licenses are available at no cost.
+Installation instructions are available online for <a href='https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html'>Linux</a>, <a href='https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html'>Windows</a>, and <a href='https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html'>Mac OS</a>).</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \dontrun{</span>
@@ -223,7 +252,7 @@ is selected in the survey scheme or not.</p>
   coords <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>)</span>
 
 <span class='co'># plot site' locations and color by weight values</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='st'>"w"</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='st'>"w"</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='weighted_survey_scheme-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># generate scheme without any sites locked in</span>
 <span class='va'>s</span> <span class='op'>&lt;-</span> <span class='fu'>weighted_survey_scheme</span><span class='op'>(</span><span class='va'>x</span>, cost_column <span class='op'>=</span> <span class='st'>"cost"</span>, survey_budget <span class='op'>=</span> <span class='fl'>2</span>,
@@ -231,11 +260,11 @@ is selected in the survey scheme or not.</p>
 
 <span class='co'># print solution</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>s</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;       [,1] [,2] [,3]  [,4]
+</div><div class='co'>#&gt;       [,1] [,2] [,3]  [,4]
 #&gt; [1,] FALSE TRUE TRUE FALSE</div><div class='input'>
 <span class='co'># plot solution</span>
 <span class='va'>x</span><span class='op'>$</span><span class='va'>s</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='va'>s</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='st'>"s"</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='st'>"s"</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>
 </div><div class='img'><img src='weighted_survey_scheme-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># }</span>
 </div></pre>
   </div>
@@ -249,11 +278,11 @@ is selected in the survey scheme or not.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -261,6 +290,8 @@ is selected in the survey scheme or not.</p>
 
   
 
+
+  
 
   </body>
 </html>

@@ -11,6 +11,7 @@ geo_cov_survey_scheme(
   locked_in_column = NULL,
   locked_out_column = NULL,
   exclude_locked_out = FALSE,
+  solver = "auto",
   verbose = FALSE
 )
 }
@@ -43,6 +44,14 @@ Defaults to \code{NULL} such that no sites are locked out.}
 be entirely excluded from the optimization process?
 Defaults to \code{FALSE}.}
 
+\item{solver}{\code{character} name of the optimization solver to use
+for generating survey schemes.
+Available options include: \code{"Rsymphony"}, \code{"gurobi"} and \code{"auto"}.
+The \code{"auto"} method will use the Gurobi optimization software if
+it is available; otherwise, it will use the SYMPHONY software
+via the \pkg{Rsymphony} package.
+Defaults to \code{"auto"}.}
+
 \item{verbose}{\code{logical} indicating if information should be
 printed while generating survey scheme(s). Defaults to \code{FALSE}.}
 }
@@ -62,6 +71,19 @@ Please note that this function requires the Gurobi optimization software
 The integer programming formulation of the \emph{p}-Median
 problem (Daskin & Maass 2015) is used to generate survey schemes.
 }
+\section{Solver}{
+
+This function can use the \pkg{Rsymphony} package and
+the \href{https://www.gurobi.com/}{Gurobi optimization software} to generate
+to generate survey schemes. Although the \pkg{Rsymphony} package
+is easier to install because it is freely available on the
+The Comprehensive R Archive Network (CRAN), it is strongly recommended to
+install the \href{https://www.gurobi.com/}{Gurobi optimization software} and the
+\pkg{gurobi} R package because it is much faster.
+Note that special academic licenses are available at no cost.
+Installation instructions are available online for \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
+}
+
 \examples{
 \dontrun{
 # set seed for reproducibility

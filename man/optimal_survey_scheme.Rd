@@ -170,8 +170,8 @@ contain a single row. This matrix also has a \code{numeric} \code{"ev"}
 attribute that contains the expected value of each scheme.
 }
 \description{
-Find the optimal survey scheme that maximizes return on investment using
-value of information analyses. This function uses the exact method for
+Find the optimal survey scheme that maximizes value of information.
+This function uses the exact method for
 calculating the expected value of the decision given a survey scheme.
 Please note that this function requires the Gurobi optimization software
 (\url{https://www.gurobi.com/}) and the \pkg{gurobi} R package

@@ -40,10 +40,12 @@
 
 
 <meta property="og:title" content="Approximately near optimal survey scheme — approx_near_optimal_survey_scheme" />
-<meta property="og:description" content="Find a near optimal survey scheme that maximizes return on investment using
-value of information analyses. This function uses the approximation method
+<meta property="og:description" content="Find a near optimal survey scheme that maximizes value of information.
+This function uses the approximation method
 for calculating the expected value of the decision given a survey scheme,
 and a greedy heuristic algorithm to maximize this metric." />
+
+
 
 
 
@@ -59,9 +61,18 @@ and a greedy heuristic algorithm to maximize this metric." />
 
 
 
+<!-- dependencies from examples -->
+
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -75,19 +86,13 @@ and a greedy heuristic algorithm to maximize this metric." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../articles/surveyvoi.html">Get started</a>
 </li>
 <li>
@@ -100,7 +105,7 @@ and a greedy heuristic algorithm to maximize this metric." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jeffreyhanson/surveyvoi/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -123,8 +128,8 @@ and a greedy heuristic algorithm to maximize this metric." />
     </div>
 
     <div class="ref-description">
-    <p>Find a near optimal survey scheme that maximizes return on investment using
-value of information analyses. This function uses the approximation method
+    <p>Find a near optimal survey scheme that maximizes value of information.
+This function uses the approximation method
 for calculating the expected value of the decision given a survey scheme,
 and a greedy heuristic algorithm to maximize this metric.</p>
     </div>
@@ -419,37 +424,37 @@ has the highest expected value in the
 
 <span class='co'># simulate data</span>
 <span class='va'>site_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_site_data.html'>simulate_site_data</a></span><span class='op'>(</span>n_sites <span class='op'>=</span> <span class='fl'>30</span>, n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>0.1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+</div><div class='co'>#&gt; ...</div><div class='input'><span class='va'>feature_data</span> <span class='op'>&lt;-</span> <span class='fu'><a href='simulate_feature_data.html'>simulate_feature_data</a></span><span class='op'>(</span>n_features <span class='op'>=</span> <span class='fl'>2</span>, prop <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
 <span class='va'>feature_data</span><span class='op'>$</span><span class='va'>target</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>10</span>, <span class='fl'>10</span><span class='op'>)</span>
 
 <span class='co'># preview simulated data</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Simple feature collection with 30 features and 11 fields
-#&gt; geometry type:  POINT
-#&gt; dimension:      XY
-#&gt; bbox:           xmin: 0.04205953 ymin: 0.02461368 xmax: 0.9942698 ymax: 0.9630242
-#&gt; CRS:            NA
-#&gt; <span style='color: #555555;'># A tibble: 30 x 12</span><span>
+</div><div class='co'>#&gt; Simple feature collection with 30 features and 11 fields
+#&gt; Geometry type: POINT
+#&gt; Dimension:     XY
+#&gt; Bounding box:  xmin: 0.04205953 ymin: 0.02461368 xmax: 0.9942698 ymax: 0.9630242
+#&gt; CRS:           NA
+#&gt; <span style='color: #949494;'># A tibble: 30 x 12</span>
 #&gt;    survey_cost management_cost    f1    f2    n1    n2     e1     e2     e3
-#&gt;          </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'> 1</span><span>        6.93            65.6   0.2   0       5     5  1.13  -</span><span style='color: #BB0000;'>1.55</span><span>   0.470
-#&gt; </span><span style='color: #555555;'> 2</span><span>       10.8             71.3   0     0.2     5     5  0.648 -</span><span style='color: #BB0000;'>0.890</span><span> -</span><span style='color: #BB0000;'>0.187</span><span>
-#&gt; </span><span style='color: #555555;'> 3</span><span>       11.8             65.2   0     0       2     2  1.18  -</span><span style='color: #BB0000;'>1.08</span><span>   1.12 
-#&gt; </span><span style='color: #555555;'> 4</span><span>       11.7             67.2   0     0       2     2  0.226 -</span><span style='color: #BB0000;'>0.666</span><span> -</span><span style='color: #BB0000;'>0.474</span><span>
-#&gt; </span><span style='color: #555555;'> 5</span><span>        8.04            76.4   1     0       4     4 -</span><span style='color: #BB0000;'>1.75</span><span>   1.71  -</span><span style='color: #BB0000;'>2.13</span><span> 
-#&gt; </span><span style='color: #555555;'> 6</span><span>        9.81            66.4   0     0       0     0  1.34  -</span><span style='color: #BB0000;'>1.14</span><span>   0.533
-#&gt; </span><span style='color: #555555;'> 7</span><span>       12.6             67.5   0     0       1     1  1.04  -</span><span style='color: #BB0000;'>1.01</span><span>   0.810
-#&gt; </span><span style='color: #555555;'> 8</span><span>       10.3             77.9   0.8   0.4     5     5 -</span><span style='color: #BB0000;'>1.25</span><span>   1.06  -</span><span style='color: #BB0000;'>1.25</span><span> 
-#&gt; </span><span style='color: #555555;'> 9</span><span>       12.1             74.0   1     1       1     1 -</span><span style='color: #BB0000;'>0.259</span><span>  0.441  0.590
-#&gt; </span><span style='color: #555555;'>10</span><span>        9.73            72.2   1     1       3     3 -</span><span style='color: #BB0000;'>0.387</span><span>  0.631  0.690
-#&gt; </span><span style='color: #555555;'># … with 20 more rows, and 3 more variables: p1 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, p2 </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>,</span><span>
-#&gt; </span><span style='color: #555555;'>#   geometry </span><span style='color: #555555;font-style: italic;'>&lt;POINT&gt;</span><span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #555555;'># A tibble: 2 x 7</span><span>
-#&gt;   name  survey survey_sensitiv… survey_specific… model_sensitivi…
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;lgl&gt;</span><span>             </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>            </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #555555;'>1</span><span> f1    TRUE              0.977            0.835            0.777
-#&gt; </span><span style='color: #555555;'>2</span><span> f2    TRUE              0.975            0.835            0.731
-#&gt; </span><span style='color: #555555;'># … with 2 more variables: model_specificity </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span style='color: #555555;'>, target </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span></div><div class='input'>
+#&gt;          <span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'> 1</span><span>        6.93            65.6   0.2   0       5     5  1.13  -</span><span style='color: #BB0000;'>1.55</span><span>   0.470</span>
+#&gt; <span style='color: #BCBCBC;'> 2</span><span>       10.8             71.3   0     0.2     5     5  0.648 -</span><span style='color: #BB0000;'>0.890</span><span> -</span><span style='color: #BB0000;'>0.187</span>
+#&gt; <span style='color: #BCBCBC;'> 3</span><span>       11.8             65.2   0     0       2     2  1.18  -</span><span style='color: #BB0000;'>1.08</span><span>   1.12 </span>
+#&gt; <span style='color: #BCBCBC;'> 4</span><span>       11.7             67.2   0     0       2     2  0.226 -</span><span style='color: #BB0000;'>0.666</span><span> -</span><span style='color: #BB0000;'>0.474</span>
+#&gt; <span style='color: #BCBCBC;'> 5</span><span>        8.04            76.4   1     0       4     4 -</span><span style='color: #BB0000;'>1.75</span><span>   1.71  -</span><span style='color: #BB0000;'>2.13</span><span> </span>
+#&gt; <span style='color: #BCBCBC;'> 6</span><span>        9.81            66.4   0     0       0     0  1.34  -</span><span style='color: #BB0000;'>1.14</span><span>   0.533</span>
+#&gt; <span style='color: #BCBCBC;'> 7</span><span>       12.6             67.5   0     0       1     1  1.04  -</span><span style='color: #BB0000;'>1.01</span><span>   0.810</span>
+#&gt; <span style='color: #BCBCBC;'> 8</span><span>       10.3             77.9   0.8   0.4     5     5 -</span><span style='color: #BB0000;'>1.25</span><span>   1.06  -</span><span style='color: #BB0000;'>1.25</span><span> </span>
+#&gt; <span style='color: #BCBCBC;'> 9</span><span>       12.1             74.0   1     1       1     1 -</span><span style='color: #BB0000;'>0.259</span><span>  0.441  0.590</span>
+#&gt; <span style='color: #BCBCBC;'>10</span><span>        9.73            72.2   1     1       3     3 -</span><span style='color: #BB0000;'>0.387</span><span>  0.631  0.690</span>
+#&gt; <span style='color: #949494;'># … with 20 more rows, and 3 more variables: p1 &lt;dbl&gt;, p2 &lt;dbl&gt;,</span>
+#&gt; <span style='color: #949494;'>#   geometry &lt;POINT&gt;</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span>
+</div><div class='co'>#&gt; <span style='color: #949494;'># A tibble: 2 x 7</span>
+#&gt;   name  survey survey_sensitivity survey_specificity model_sensitivity
+#&gt;   <span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;lgl&gt;</span><span>               </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>              </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span>
+#&gt; <span style='color: #BCBCBC;'>1</span><span> f1    TRUE                0.977              0.835             0.777</span>
+#&gt; <span style='color: #BCBCBC;'>2</span><span> f2    TRUE                0.975              0.835             0.731</span>
+#&gt; <span style='color: #949494;'># … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</span></div><div class='input'>
 <span class='co'># set total budget for managing sites for conservation</span>
 <span class='co'># (i.e. 50% of the cost of managing all sites)</span>
 <span class='va'>total_budget</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>site_data</span><span class='op'>$</span><span class='va'>management_cost</span><span class='op'>)</span> <span class='op'>*</span> <span class='fl'>0.5</span>
@@ -470,7 +475,7 @@ has the highest expected value in the
 
 <span class='co'># print result</span>
 <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>approx_near_optimal_survey</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11] [,12]
+</div><div class='co'>#&gt;       [,1]  [,2]  [,3]  [,4]  [,5]  [,6]  [,7]  [,8]  [,9] [,10] [,11] [,12]
 #&gt; [1,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 #&gt; [2,] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 #&gt; [3,] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE
@@ -487,7 +492,7 @@ has the highest expected value in the
 #&gt; [4,] FALSE  TRUE FALSE FALSE FALSE FALSE
 #&gt; attr(,"ev")
 #&gt; [1] 1.89231e-10 1.89231e-10 1.89231e-10 1.89231e-10</div><div class='input'><span class='co'># }</span>
-</div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -499,11 +504,11 @@ has the highest expected value in the
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://jeffrey-hanson.com'>Jeffrey O Hanson</a>, <a href='https://ejhudgins.com'>Emma J Hudgins</a>, Joseph R Bennett.</p>
+  <p><p>Developed by <a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a>, <a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a>, <a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a>, Joseph R Bennett.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -511,6 +516,8 @@ has the highest expected value in the
 
   
 
+
+  
 
   </body>
 </html>

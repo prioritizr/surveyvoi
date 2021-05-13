@@ -32,6 +32,8 @@ NULL
 #'   \sum_{j \in J} x_j c_j \leq b}{
 #'   Minimize sum_j^J (xi * wi) subject to sum_j^J (xi * ci) <= b}
 #'
+#' @inheritSection env_div_survey_scheme Solver
+#'
 #' @examples
 #' \dontrun{
 #' # set seed for reproducibility
@@ -61,7 +63,7 @@ NULL
 #' @export
 weighted_survey_scheme <- function(
   site_data, cost_column, survey_budget, weight_column, locked_in_column = NULL,
-  locked_out_column = NULL, verbose = FALSE) {
+  locked_out_column = NULL, solver = "auto", verbose = FALSE) {
   # assert that arguments are valid
   assertthat::assert_that(
     ## site_data
@@ -115,5 +117,6 @@ weighted_survey_scheme <- function(
   # return survey schemes
   weight_based_prioritizations(
     site_data[[weight_column]], survey_budget, site_data[[cost_column]],
-    locked_in, locked_out, verbose)
+    locked_in, locked_out,
+    solver, verbose)
 }
