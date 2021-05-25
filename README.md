@@ -89,7 +89,7 @@ cite the latest official version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey
 > Value of Information. R package version 1.0.1. Available at
-> https://CRAN.R-project.org/package=surveyvoi.
+> <https://CRAN.R-project.org/package=surveyvoi>.
 
 ## Usage
 
@@ -152,9 +152,9 @@ print(sim_sites, width = Inf)
     ##   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
     ##         <dbl>           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl>
     ## 1        3.43            43.8     1 1     0         5     5     5 -1.38   0.425
-    ## 2        6.07            59.0     0 0     0         0     0     0  0.736 -1.01
+    ## 2        6.07            59.0     0 0     0         0     0     0  0.736 -1.01 
     ## 3        7.09            46.7     0 0     0         0     0     0  0.754 -0.959
-    ## 4        6.50            49.6     0 0     0         0     0     0  0.530  1.51
+    ## 4        6.50            49.6     0 0     0         0     0     0  0.530  1.51 
     ## 5        5.37            48.1     0 0     0         0     0     0  0.546 -0.525
     ## 6        3.35            48.9     1 0.667 0.333     3     3     3 -1.18   0.557
     ##      p1    p2    p3               geometry

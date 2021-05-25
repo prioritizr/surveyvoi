@@ -5,9 +5,6 @@ NULL
 #'
 #' Generate a `matrix` representing all possible different
 #' survey schemes given survey costs and a fixed budget.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @inheritParams env_div_survey_scheme
 #'
@@ -21,6 +18,12 @@ NULL
 #'   survey scheme, and each column corresponds to a different planning unit.
 #'   Cell values are `logical` (`TRUE` / `FALSE`) indicating
 #'   if a given site is selected in a given survey scheme.
+#'
+#' @section Dependencies:
+#' Please note that this function requires the Gurobi optimization software
+#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package if different
+#' sites have different survey costs. Installation instruction are available
+#' online for for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html).
 #'
 #' @examples
 #' \dontrun{
@@ -97,8 +100,8 @@ feasible_survey_schemes <- function(
 
   # generate feasible survey scheme
   if (abs(diff(range(site_data[[cost_column]]))) < 1e-10) {
-    ## if all the sites have identical costs, no sites are locked in, and
-    ## no sites are locked out, then generate the schemes using combinations
+    ## if all the sites have identical costs then generate the schemes using
+    ## combinations
     out <- manual_feasible_survey_schemes(
       site_data[[cost_column]], survey_budget, locked_in, locked_out, verbose)
   } else {

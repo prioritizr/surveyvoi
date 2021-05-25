@@ -63,14 +63,13 @@ NULL
 #' @section Solver:
 #'   This function can use the \pkg{Rsymphony} package and
 #'   the [Gurobi optimization software](https://www.gurobi.com/) to generate
-#'   to generate survey schemes. Although the \pkg{Rsymphony} package
+#'   survey schemes. Although the \pkg{Rsymphony} package
 #'   is easier to install because it is freely available on the
 #'   The Comprehensive R Archive Network (CRAN), it is strongly recommended to
 #'   install the [Gurobi optimization software](https://www.gurobi.com/) and the
-#'  \pkg{gurobi} R package because it is much faster.
+#'   \pkg{gurobi} R package because it can generate survey schemes much faster.
 #'   Note that special academic licenses are available at no cost.
-#'   Installation instructions are available online for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
-#'
+#'   Installation instructions are available online for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html) operating systems.
 #'
 #' @references
 #' Faith DP & Walker PA (1996) Environmental diversity: on the best-possible
@@ -82,7 +81,6 @@ NULL
 #'   correspond to sites, and rows correspond to different schemes.
 #'
 #' @examples
-#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -106,7 +104,6 @@ NULL
 #' # plot scheme
 #' x$scheme <- c(s)
 #' plot(x[, "scheme"], pch = 16, cex = 3)
-#' }
 #' @export
 env_div_survey_scheme <- function(
   site_data, cost_column, survey_budget, env_vars_columns,

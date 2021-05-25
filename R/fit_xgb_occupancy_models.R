@@ -194,7 +194,7 @@ NULL
 #'                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
 #'                    objective = "binary:logistic")
 #'
-#' \dontrun{
+#' \donttest{
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
 #' # finishes quickly, you would probably want something like 1000+

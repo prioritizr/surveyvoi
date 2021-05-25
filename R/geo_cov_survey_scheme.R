@@ -5,9 +5,6 @@ NULL
 #'
 #' Generate a survey scheme by maximizing the geographic coverage
 #' of surveys.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @inheritParams env_div_survey_scheme
 #'
@@ -23,7 +20,6 @@ NULL
 #' (pp. 21-45). Springer, Cham.
 #'
 #' @examples
-#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -47,7 +43,6 @@ NULL
 #' # plot scheme
 #' x$scheme <- c(s)
 #' plot(x[, "scheme"], pch = 16, cex = 3)
-#' }
 #' @export
 geo_cov_survey_scheme <- function(
   site_data, cost_column, survey_budget, locked_in_column = NULL,

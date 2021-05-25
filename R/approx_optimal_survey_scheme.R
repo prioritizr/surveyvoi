@@ -6,9 +6,6 @@ NULL
 #' Find the optimal survey scheme that maximizes value of information. This
 #' function uses the approximation method
 #' for calculating the expected value of the decision given a survey scheme.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @inheritParams approx_evdsi
 #'
@@ -41,6 +38,8 @@ NULL
 #' Finally, the greatest expected value is identified, and all survey schemes
 #' that share this greatest expected value are returned. Due to the nature of
 #' this algorithm, it can take a very long time to complete.
+#'
+#' @inheritSection feasible_survey_schemes Dependencies
 #'
 #' @return
 #' `matrix` of `logical` (`TRUE`/ `FALSE`)
@@ -75,7 +74,7 @@ NULL
 #' total_budget <- sum(site_data$management_cost) * 0.5
 #'
 #' # set total budget for surveying sites for conservation
-#' # (i.e. 10% of the cost of managing all sites)
+#' # (i.e. 10% of the cost of surveying all sites)
 #' survey_budget <- sum(site_data$survey_cost) * 0.1
 #'
 #' # find optimal survey scheme using approximate method

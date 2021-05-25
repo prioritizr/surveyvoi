@@ -138,7 +138,6 @@ use approximation methods. As such, this function can only be applied
 to very small problems.
 }
 \examples{
-\dontrun{
 # set seeds for reproducibility
 library(RandomFields)
 set.seed(123)
@@ -166,7 +165,6 @@ ev_current <- evdci(
 
 # print exact value
 print(ev_current)
-}
 }
 \seealso{
 \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.

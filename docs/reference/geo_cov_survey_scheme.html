@@ -41,10 +41,7 @@
 
 <meta property="og:title" content="Geographic coverage survey scheme — geo_cov_survey_scheme" />
 <meta property="og:description" content="Generate a survey scheme by maximizing the geographic coverage
-of surveys.
-Please note that this function requires the Gurobi optimization software
-(https://www.gurobi.com/) and the gurobi R package
-(installation instructions available for Linux, Windows, and Mac OS)." />
+of surveys." />
 
 
 
@@ -87,7 +84,7 @@ Please note that this function requires the Gurobi optimization software
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -130,10 +127,7 @@ Please note that this function requires the Gurobi optimization software
 
     <div class="ref-description">
     <p>Generate a survey scheme by maximizing the geographic coverage
-of surveys.
-Please note that this function requires the Gurobi optimization software
-(<a href='https://www.gurobi.com/'>https://www.gurobi.com/</a>) and the <span class="pkg">gurobi</span> R package
-(installation instructions available for <a href='https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html'>Linux</a>, <a href='https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html'>Windows</a>, and <a href='https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html'>Mac OS</a>).</p>
+of surveys.</p>
     </div>
 
     <pre class="usage"><span class='fu'>geo_cov_survey_scheme</span><span class='op'>(</span>
@@ -222,30 +216,29 @@ problem (Daskin &amp; Maass 2015) is used to generate survey schemes.</p>
 
 <p>This function can use the <span class="pkg">Rsymphony</span> package and
 the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> to generate
-to generate survey schemes. Although the <span class="pkg">Rsymphony</span> package
+survey schemes. Although the <span class="pkg">Rsymphony</span> package
 is easier to install because it is freely available on the
 The Comprehensive R Archive Network (CRAN), it is strongly recommended to
 install the <a href='https://www.gurobi.com/'>Gurobi optimization software</a> and the
-<span class="pkg">gurobi</span> R package because it is much faster.
+<span class="pkg">gurobi</span> R package because it can generate survey schemes much faster.
 Note that special academic licenses are available at no cost.
-Installation instructions are available online for <a href='https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html'>Linux</a>, <a href='https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html'>Windows</a>, and <a href='https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html'>Mac OS</a>).</p>
+Installation instructions are available online for <a href='https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html'>Linux</a>, <a href='https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html'>Windows</a>, and <a href='https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html'>Mac OS</a> operating systems.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Daskin MS &amp; Maass KL (2015) The p-median problem. In <em>Location Science</em>
 (pp. 21-45). Springer, Cham.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># \dontrun{</span></span>
-<span class='r-in'><span class='co'># set seed for reproducibility</span></span>
+    <pre class="examples"><span class='r-in'><span class='co'># set seed for reproducibility</span></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># simulate data</span></span>
 <span class='r-in'> <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_as_sf.html'>st_as_sf</a></span><span class='op'>(</span></span>
 <span class='r-in'>   <span class='fu'>tibble</span><span class='fu'>::</span><span class='fu'><a href='https://tibble.tidyverse.org/reference/tibble.html'>tibble</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>4</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Normal.html'>rnorm</a></span><span class='op'>(</span><span class='fl'>4</span><span class='op'>)</span>,</span>
-<span class='r-in'>                  v1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span><span class='op'>)</span>, <span class='co'># environmental axis 1</span></span>
-<span class='r-in'>                  v2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span><span class='op'>)</span>, <span class='co'># environmental axis 2</span></span>
+<span class='r-in'>                  v1 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span><span class='op'>)</span>, <span class='co'># environmental axis 1</span></span>
+<span class='r-in'>                  v2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span>, <span class='fl'>0.3</span>, <span class='fl'>10</span><span class='op'>)</span>, <span class='co'># environmental axis 2</span></span>
 <span class='r-in'>                  cost <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>4</span><span class='op'>)</span><span class='op'>)</span>,</span>
-<span class='r-in'>    coords <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    coords <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span><span class='op'>)</span><span class='op'>)</span></span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># plot the sites' locations</span></span>
 <span class='r-in'><span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_geometry.html'>st_geometry</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
@@ -260,10 +253,9 @@ Installation instructions are available online for <a href='https://www.gurobi.c
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [1,] TRUE FALSE TRUE FALSE</span>
 <span class='r-in'></span>
 <span class='r-in'><span class='co'># plot scheme</span></span>
-<span class='r-in'><span class='va'>x</span><span class='op'>$</span><span class='va'>scheme</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/QMath.html'>c</a></span><span class='op'>(</span><span class='va'>s</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>x</span><span class='op'>$</span><span class='va'>scheme</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>s</span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>[</span>, <span class='st'>"scheme"</span><span class='op'>]</span>, pch <span class='op'>=</span> <span class='fl'>16</span>, cex <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span></span>
 <span class='r-plt'><img src='geo_cov_survey_scheme-2.png' alt='' width='700' height='433' /></span>
-<span class='r-in'><span class='co'># }</span></span>
 </pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

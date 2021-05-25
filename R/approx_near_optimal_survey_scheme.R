@@ -100,7 +100,6 @@ NULL
 #' will only contain a single row.
 #'
 #' @examples
-#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
@@ -135,7 +134,6 @@ NULL
 #'
 #' # print result
 #' print(approx_near_optimal_survey)
-#' }
 #' @export
 approx_near_optimal_survey_scheme <- function(
   site_data, feature_data,

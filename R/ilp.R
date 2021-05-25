@@ -66,7 +66,8 @@ distance_based_prioritizations <- function(
     solver %in% c("auto", "Rsymphony", "gurobi"))
   # identify solver
   if (identical(solver, "auto")) {
-    solver <- ifelse(requireNamespace("gurobi"), "gurobi", "Rsymphony")
+    solver <- ifelse(
+      requireNamespace("gurobi", quietly = TRUE), "gurobi", "Rsymphony")
   }
   # prepare data for optimization
   ## initialization
@@ -192,7 +193,8 @@ weight_based_prioritizations <- function(
     solver %in% c("auto", "Rsymphony", "gurobi"))
   # identify solver
   if (identical(solver, "auto")) {
-    solver <- ifelse(requireNamespace("gurobi"), "gurobi", "Rsymphony")
+    solver <- ifelse(
+      requireNamespace("gurobi", quietly = TRUE), "gurobi", "Rsymphony")
   }
   ## create objective function
   obj <- c(x)

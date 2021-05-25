@@ -179,7 +179,6 @@ calculations depend on the arguments to
 so you may need to increase these parameters for large problems.
 }
 \examples{
-\dontrun{
 # set seeds for reproducibility
 library(RandomFields)
 set.seed(123)
@@ -215,7 +214,6 @@ approx_ev_survey <- approx_evdsi(
 
 # print mean value
 print(mean(approx_ev_survey))
-}
 }
 \seealso{
 \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.

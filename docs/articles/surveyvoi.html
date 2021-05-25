@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
                         <h4 data-toc-skip class="author">Jeffrey O. Hanson</h4>
             
-            <h4 data-toc-skip class="date">2021-05-14</h4>
+            <h4 data-toc-skip class="date">2021-05-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/master/vignettes/surveyvoi.Rmd" class="external-link"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
@@ -386,10 +386,9 @@
 <code class="sourceCode R"><span class="co"># (i) generate survey scheme to increase geographic coverage</span>
 <span class="va">geo_scheme</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="../reference/geo_cov_survey_scheme.html">geo_cov_survey_scheme</a></span><span class="op">(</span>
-    <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, locked_out <span class="op">=</span> <span class="st">"surveyed"</span><span class="op">)</span></code></pre></div>
-<pre><code>## Loading required namespace: gurobi</code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># (ii) generate survey scheme to increase environmental diversity,</span>
+    <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, locked_out <span class="op">=</span> <span class="st">"surveyed"</span><span class="op">)</span>
+
+<span class="co"># (ii) generate survey scheme to increase environmental diversity,</span>
 <span class="co"># environmental distances are calculated using Euclidean distances here,</span>
 <span class="co"># though we might consider something like Mahalanobis distances for a</span>
 <span class="co"># real dataset to account for correlations among environmental variables)</span>
@@ -426,7 +425,7 @@
     <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, <span class="st">"richness_score"</span>,
     locked_out <span class="op">=</span> <span class="st">"surveyed"</span><span class="op">)</span></code></pre></div>
 <p>Let’s visualize the different survey schemes.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># add schemes to site_data</span>
 <span class="va">site_data</span><span class="op">$</span><span class="va">geo_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">geo_scheme</span><span class="op">)</span>
 <span class="va">site_data</span><span class="op">$</span><span class="va">env_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">env_scheme</span><span class="op">)</span>
@@ -452,7 +451,7 @@
 <h2 class="hasAnchor">
 <a href="#expected-value-of-the-decision-given-sample-information" class="anchor" aria-hidden="true"></a>Expected value of the decision given sample information</h2>
 <p>Now that we’ve generated the survey schemes, let’s calculate the <em>expected value of the decision given sample information</em> for each survey scheme.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># create table to store results</span>
 <span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span>
   <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,
@@ -490,7 +489,7 @@
 ## 4 cheap_scheme 0.894194
 ## 5 rich_scheme  0.918878</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>expected value of sample information (EVSI)</em> for each survey scheme.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># estimate expected value of sample information for each survey scheme</span>
 <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span> <span class="op">&lt;-</span>
   <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">value</span> <span class="op">-</span> <span class="va">evd_current</span>
@@ -505,7 +504,7 @@
 ## 3 unc_scheme   0.931152  0.0105629 
 ## 4 cheap_scheme 0.894194 -0.0263951 
 ## 5 rich_scheme  0.918878 -0.00171063</code></pre>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># visualize the expected value of sample information for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="va">evd_survey_schemes</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -526,7 +525,7 @@
 <h2 class="hasAnchor">
 <a href="#optimized-survey-scheme" class="anchor" aria-hidden="true"></a>Optimized survey scheme</h2>
 <p>Now let’s generate an optimized survey scheme by directly maximizing the <em>expected value of the decision given a survey scheme</em>.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># generate optimized survey scheme(s)</span>
 <span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/approx_near_optimal_survey_scheme.html">approx_near_optimal_survey_scheme</a></span><span class="op">(</span>
     site_data <span class="op">=</span> <span class="va">site_data</span>,
@@ -547,14 +546,14 @@
     n_approx_replicates <span class="op">=</span> <span class="fl">5</span>,
     n_approx_outcomes_per_replicate <span class="op">=</span> <span class="fl">10000</span>,
     verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># print number of optimized survey schemes</span>
 <span class="co"># if there are multiple optimized survey schemes,</span>
 <span class="co"># this means that multiple different survey schemes are likely to deliver</span>
 <span class="co"># similar results (even if they select different sites for surveys)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 4</code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># add first optimized scheme to site data</span>
 <span class="va">site_data</span><span class="op">$</span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span>
 
@@ -568,7 +567,7 @@
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate expected value of sample information for the optimized scheme</span>
 <span class="va">evd_opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span><span class="op">(</span>
     site_data <span class="op">=</span> <span class="va">site_data</span>,
@@ -590,7 +589,7 @@
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></code></pre></div>
 <pre><code>## [1] 0.9341498</code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># append optimized results to results table</span>
 <span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
   <span class="va">evd_survey_schemes</span>,
@@ -607,7 +606,7 @@
 ## 4 cheap_scheme 0.894194 -0.0263951 
 ## 5 rich_scheme  0.918878 -0.00171063
 ## 6 opt_scheme   0.934150  0.0135607</code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># visualize expected value of sample information</span>
 <span class="co"># color the best survey scheme in blue</span>
 <span class="va">evd_survey_schemes</span> <span class="op"><a href="https://tidyr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -623,7 +622,7 @@
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme has the highest <em>expected value of sample information</em> of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let’s compute their relative performance and visualize them.</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># express values in terms of relative performance</span>
 <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">relative_performance</span> <span class="op">&lt;-</span>
   <span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">max</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">-</span> <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">/</span>

@@ -55,7 +55,7 @@ install:
 
 examples:
 	rm -f examples.log
-	R --slave -e "devtools::run_examples(test = TRUE);warnings()"  >> examples.log
+	R --slave -e "devtools::run_examples(run_donttest = TRUE, run_dontrun = TRUE);warnings()"  >> examples.log
 	rm -f Rplots.pdf
 
 wbcheck:

@@ -6,9 +6,6 @@ NULL
 #' Find the optimal survey scheme that maximizes value of information.
 #' This function uses the exact method for
 #' calculating the expected value of the decision given a survey scheme.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @inheritParams evdsi
 #'
@@ -40,6 +37,8 @@ NULL
 #' Finally, the greatest expected value is identified, and all survey schemes
 #' that share this greatest expected value are returned. Due to the nature of
 #' this algorithm, it can take a very long time to complete.
+#'
+#' @inheritSection feasible_survey_schemes Dependencies
 #'
 #' @return `matrix` of `logical` (`TRUE`/ `FALSE`)
 #'   values indicating if a site is selected in the scheme or not. Columns

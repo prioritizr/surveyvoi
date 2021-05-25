@@ -5,9 +5,6 @@ NULL
 #'
 #' Generate a survey scheme by selecting the set of sites with the greatest
 #' overall weight value, a maximum budget for the survey scheme.
-#' Please note that this function requires the Gurobi optimization software
-#' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package
-#' (installation instructions available for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
 #'
 #' @param weight_column `character` name of the column in the argument
 #'   to `site_data` with the weights for each site.
@@ -35,7 +32,6 @@ NULL
 #' @inheritSection env_div_survey_scheme Solver
 #'
 #' @examples
-#' \dontrun{
 #' # set seed for reproducibility
 #' set.seed(123)
 #'
@@ -59,7 +55,6 @@ NULL
 #' # plot solution
 #' x$s <- c(s)
 #' plot(x[, "s"], pch = 16, cex = 3)
-#' }
 #' @export
 weighted_survey_scheme <- function(
   site_data, cost_column, survey_budget, weight_column, locked_in_column = NULL,

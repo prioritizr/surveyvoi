@@ -71,6 +71,12 @@ NULL
 #'
 #' }
 #'
+#' @section Dependencies:
+#' This function requires the
+#' [JAGS software](https://mcmc-jags.sourceforge.io/) to be installed.
+#' For information on installing the JAGS software, please consult
+#' the documentation for the \pkg{rjags} package.
+#'
 #' @references
 #' Park T & Casella G (2008) The Bayesian lasso.
 #' *Journal of the American Statistical Association*, 103: 681--686.

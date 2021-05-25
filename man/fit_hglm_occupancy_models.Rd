@@ -203,6 +203,14 @@ is calculated.
 
 }
 }
+\section{Dependencies}{
+
+This function requires the
+\href{https://mcmc-jags.sourceforge.io/}{JAGS software} to be installed.
+For information on installing the JAGS software, please consult
+the documentation for the \pkg{rjags} package.
+}
+
 \examples{
 # set seeds for reproducibility
 library(RandomFields)
