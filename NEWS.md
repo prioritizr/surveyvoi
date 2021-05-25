@@ -1,9 +1,7 @@
 # surveyvoi 1.0.2
 
-- Update CRAN comments with author information.
-- Update CRAN comments with \dontrun{} and \donttest{} information.
-- Remove \dontrun{} from examples where they are not needed.
-- Replace \dontrun{} with \donttest{} for examples that exceed 5 seconds.
+- Update CRAN comments.
+- Update examples.
 - Improve documentation for functions that depend on external software.
 
 # surveyvoi 1.0.1
