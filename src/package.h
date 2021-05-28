@@ -28,11 +28,10 @@
 // GMP library for large integers
 #include <gmp.h>
 // GMPXXX header for C++ for convinence
-#ifndef WINDOWS
-#include <gmpxx.h> // use system version if not on Winddows
+#ifndef MISSING_GMPXX
+#include <gmpxx.h> // use system version if not missing gmpxx.h
 #else
-#include "gmp/gmpxx.h" // use custom version since WinBuilder has incompatible
-                       // versions of gmpxx.h and gmp.h installed
+#include "gmp/gmpxx.h" // otherwise use custom version
 #endif
 
 // MPFR library for large and small floats (used in maximum likelihood calc)

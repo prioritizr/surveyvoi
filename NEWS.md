@@ -1,3 +1,7 @@
+# surveyvoi 1.0.3
+
+- Fix issue with missing gmpxx file.
+
 # surveyvoi 1.0.2
 
 - Update CRAN comments.

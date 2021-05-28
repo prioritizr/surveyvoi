@@ -29,18 +29,6 @@
 
 ## Comments from CRAN maintainers
 
-* Please unwrap the examples if they are executable in < 5 sec, or replace
-  \dontrun{} with \donttest{}. Examples which depend on 'Gurobi' should be left
-  in \dontrun{}.
-
-    Thank you for this suggestion. I have removed \dontrun{} from several
-    examples based on this feedback. For reference, the following functions
-    depend on external software (i.e. Gurobi or JAGS) and so have examples
-    containing \dontrun{}: feasible_survey_scheme, optimal_survey_scheme, and
-    approx_optimal_survey_scheme. Additionally, the following
-    funcitons have examples that are not executable within less than 5 seconds
-    and so contain in \donttest{}: fit_xgb_occupancy_models.
-
 * Please always add all authors, contributors and copyright holders in the
   Authors@R field with the appropriate roles.
   e.g.: Free Software Foundation, Inc
