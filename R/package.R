@@ -28,7 +28,10 @@ NULL
 #' Please note that several functions depend on
 #' the 'Gurobi' optimization software (available from <https://www.gurobi.com>)
 #' and the \pkg{gurobi} R package (installation instructions available for
-#' [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html).
+#' [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
+#' Additionally, the JAGS software
+#' (available from <https://mcmc-jags.sourceforge.io/>) is required to fit
+#' hierarchical generalized linear models.
 #'
 #' @seealso
 #' The package vignette provides a tutorial

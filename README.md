@@ -24,7 +24,9 @@ coverage, diversity of sampled environmental conditions) and by
 maximizing value of information. After generating plans for surveys,
 they can also be evaluated using value of information analysis. Please
 note that several functions depend on the ‘Gurobi’ optimization software
-(available from <https://www.gurobi.com>).
+(available from <https://www.gurobi.com>). Additionally, the JAGS
+software (available from <https://mcmc-jags.sourceforge.io/>) is
+required to fit hierarchical generalized linear models.
 
 ## Installation
 

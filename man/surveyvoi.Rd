@@ -22,7 +22,10 @@ value of information analysis.
 Please note that several functions depend on
 the 'Gurobi' optimization software (available from \url{https://www.gurobi.com})
 and the \pkg{gurobi} R package (installation instructions available for
-\href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}.
+\href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}).
+Additionally, the JAGS software
+(available from \url{https://mcmc-jags.sourceforge.io/}) is required to fit
+hierarchical generalized linear models.
 }
 \seealso{
 The package vignette provides a tutorial
