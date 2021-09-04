@@ -77,11 +77,11 @@ following commands in the system terminal:
 ## Citation
 
 Please cite the *surveyvoi R* package when using it in publications. To
-cite the latest official version, please use:
+cite the developmental version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey
-> Value of Information. R package version 1.0.1. Available at
-> <https://CRAN.R-project.org/package=surveyvoi>.
+> Value of Information. R package version 1.0.3.1. Available at
+> <https://github.com/jeffreyhanson/surveyvoi>.
 
 ## Usage
 

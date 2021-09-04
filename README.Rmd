@@ -68,12 +68,12 @@ brew install mpfr
 
 ## Citation
 
-Please cite the _surveyvoi R_ package when using it in publications. To cite the latest official version, please use:
+Please cite the _surveyvoi R_ package when using it in publications. To cite the developmental version, please use:
 
 ```{r, echo = FALSE, results = "asis", comment = ""}
-off_version <- "1.0.1"
-off_year <- "2021"
-cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", off_year, "). surveyvoi: Survey Value of Information. R package version ", off_version, ". Available at https://CRAN.R-project.org/package=surveyvoi.\n"))
+dev_version <- as.character(packageVersion("surveyvoi"))
+dev_year <- "2021"
+cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", dev_year, "). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
 ```
 
 ## Usage
