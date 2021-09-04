@@ -8,8 +8,9 @@ CXX_STD = CXX11
 
 PKG_CPPFLAGS = -I$(RWINLIB)/include
 
-PKG_LIBS = -L$(RWINLIB)/lib$(BUILD)$(R_ARCH)$(CRT) \
-  -L$(RWINLIB)/lib$(R_ARCH) \
+PKG_LIBS = \
+  -L$(RWINLIB)/lib$(BUILD) \
+  -L$(RWINLIB)/lib$(R_ARCH)$(CRT) \
   $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) \
   -lmpfr -lgmp -lgmpxx
 
@@ -19,6 +20,6 @@ clean:
 	rm -f $(SHLIB) $(OBJECTS)
 
 winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" $(VERSION)
 
 .PHONY: all winlibs clean
