@@ -30,13 +30,7 @@ The _surveyvoi_ package is a decision support tool for prioritizing sites for ec
 
 ## Installation
 
-The latest official version of the _surveyvoi R_ package can be installed from the [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org/) using the following _R_ code.
-
-```{r, eval = FALSE}
-install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
-```
-
-Alternatively, the latest development version can be installed from [GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following code. Please note that while developmental versions may contain additional features not present in the official version, they may also contain coding errors.
+The development version can be installed from [GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following code.
 
 ```{r, eval = FALSE}
 if (!require(remotes)) install.packages("remotes")
@@ -62,7 +56,7 @@ For Unix-alikes, `gmp` (>= 4.2.3), `mpfr` (>= 3.0.0), and `symphony` (>= 5.6.16)
 
 #### MacOS
 
-The `gmp`, `mpfr`, and `symphony` libraries need to be installed to install the _surveyvoi R_ package. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
+The `gmp`, `mpfr`, and `symphony` libraries are required. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
 
 ```
 brew tap coin-or-tools/coinor

@@ -58,9 +58,6 @@
 
 
 
-<!-- dependencies from examples -->
-
-
   
 
   
@@ -83,7 +80,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3.1</span>
       </span>
     </div>
 
@@ -128,7 +125,7 @@
     <p>Create prior probability matrix for the value of information analysis.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>prior_probability_matrix</span><span class='op'>(</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>prior_probability_matrix</span><span class='op'>(</span>
   <span class='va'>site_data</span>,
   <span class='va'>feature_data</span>,
   <span class='va'>site_detection_columns</span>,
@@ -138,7 +135,7 @@
   <span class='va'>feature_survey_specificity_column</span>,
   <span class='va'>feature_model_sensitivity_column</span>,
   <span class='va'>feature_model_specificity_column</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -229,7 +226,7 @@ feature occupying each site. Each row corresponds to a different
 feature and each column corresponds to a different site.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='r-in'><span class='co'># set seeds for reproducibility</span></span>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='co'># set seeds for reproducibility</span></span>
 <span class='r-in'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ms.math.uni-mannheim.de/de/publications/software/randomfields'>RandomFields</a></span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/pkg/RandomFields/man/RFoptions.html'>RFoptions</a></span><span class='op'>(</span>seed <span class='op'>=</span> <span class='fl'>123</span><span class='op'>)</span></span>
@@ -246,7 +243,7 @@ feature and each column corresponds to a different site.</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Dimension:     XY</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> Bounding box:  xmin: 0.2875775 ymin: 0.0455565 xmax: 0.9404673 ymax: 0.892419</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> CRS:           NA</span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 5 x 12</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 5 × 12</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   survey_cost management_cost    f1    f2    n1    n2     e1     e2     e3    p1</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>         <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>           <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>  <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span>        8.13            73.9   1       1     5     5 -<span style='color: #BB0000;'>0.365</span>  0.642  1.08  0.991</span>
@@ -256,7 +253,7 @@ feature and each column corresponds to a different site.</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>5</span>        5.22            70.7   0       0     0     0 -<span style='color: #BB0000;'>0.697</span> -<span style='color: #BB0000;'>0.910</span> -<span style='color: #BB0000;'>0.614</span> 0.099</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># … with 2 more variables: p2 &lt;dbl&gt;, geometry &lt;POINT&gt;</span></span>
 <span class='r-in'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>feature_data</span><span class='op'>)</span></span>
-<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 2 x 7</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #949494;'># A tibble: 2 × 7</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   name  survey survey_sensitivity survey_specificity model_sensitivity</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>   <span style='color: #949494; font-style: italic;'>&lt;chr&gt;</span> <span style='color: #949494; font-style: italic;'>&lt;lgl&gt;</span>               <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>              <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span>             <span style='color: #949494; font-style: italic;'>&lt;dbl&gt;</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> <span style='color: #BCBCBC;'>1</span> f1    TRUE                0.965              0.821             0.701</span>
@@ -275,7 +272,7 @@ feature and each column corresponds to a different site.</p>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>         [,1]         [,2]      [,3]        [,4]      [,5]</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> f1 0.9997838 1.724126e-05 0.8108543 0.001782446 0.2636165</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> f2 0.9997304 2.757199e-07 0.2523413 0.002372225 0.8597336</span>
-</pre>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

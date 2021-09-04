@@ -53,7 +53,7 @@ library(tibble)
 library(RandomFields)
 
 # set RNG seeds for reproducibility
-seed <- 722
+seed <- 53
 set.seed(seed)
 RFoptions(seed = seed)
 
@@ -81,7 +81,7 @@ print(site_data)
 ggplot(site_data) +
   geom_sf() +
   ggtitle("Sites") +
-  labs(xlab="X coordinate", ylab="Y coordinate")
+  labs(x = "X coordinate", y = "Y coordinate")
 ```
 
 The `site_data` object is a spatially explicit dataset (i.e. `sf` object) that contains information on the site locations and additional site attributes. Here, each row corresponds to a different site, and each column contains a different site attribute. The `f1` column contains the  results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site has had at most a single previous survey, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The `n1` column contains the number of previous surveys conducted within each site. Thus, sites with zeros in this column have not previously been surveyed. The `e1`, `e2`, and `e3` columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The `survey_cost` column contains the cost of surveying each site, and the `management_cost` column contains the cost of managing each site for conservation.
@@ -100,7 +100,8 @@ site_data %>%
   geom_sf(aes(color = value)) +
     scale_color_manual(values = c("1" = "red", "0" = "black")) +
     facet_wrap(~ name) +
-    labs(title = "Detection/non-detection data", xlab="X coordinate", ylab="Y coordinate")
+    labs(title = "Detection/non-detection data",
+         x = "X coordinate", y = "Y coordinate")
 ```
 
 ```{r, fig.height = h, fig.width = w}
@@ -113,7 +114,8 @@ site_data %>%
   geom_sf(aes(color = value)) +
     scale_color_manual(values = c("1" = "blue", "0" = "black")) +
     facet_wrap(~ name) +
-    labs(title = "Number of previous surveys", xlab="X coordinate", ylab="Y coordinate")
+    labs(title = "Number of previous surveys",
+         x = "X coordinate", y = "Y coordinate")
 ```
 
 ```{r, fig.height = h, fig.width = w * 2.0}
@@ -122,12 +124,12 @@ site_data %>%
 p1 <- ggplot(site_data) +
       geom_sf(aes(color = survey_cost)) +
       scale_color_viridis() +
-      labs(title = "Survey cost", xlab="X coordinate", ylab="Y coordinate") +
+      labs(title = "Survey cost", x = "X coordinate", y = "Y coordinate") +
       theme(legend.title = element_blank())
 p2 <- ggplot(site_data) +
       geom_sf(aes(color = management_cost)) +
       scale_color_viridis() +
-      labs(title = "Management cost", xlab="X coordinate", ylab="X coordinate") +
+      labs(title = "Management cost", x = "X coordinate", y = "Y coordinate") +
       theme(legend.title = element_blank())
 grid.arrange(p1, p2, nrow = 1)
 ```
@@ -141,7 +143,8 @@ site_data %>%
   geom_sf(aes(color = value)) +
     facet_wrap(~ var) +
     scale_color_viridis() +
-    labs(title = "Environmental conditions", xlab="X coordinate", ylab="Y coordinate")
+    labs(title = "Environmental conditions",
+         x = "X coordinate", y = "Y coordinate")
 ```
 
 After simulating data for the sites, we will simulate data for the conservation feature. We set `proportion_of_survey_features = 1` to indicate that this feature will be examined in future surveys.
@@ -211,7 +214,7 @@ site_data %>%
   geom_sf(aes(color = value)) +
   facet_wrap(~name) +
   scale_color_viridis() +
-  labs(title = "Modelled probabilities", xlab="X coordinate", ylab="Y coordinate")
+  labs(title = "Modelled probabilities", x = "X coordinate", y = "Y coordinate")
 ```
 
 ```{r, include = FALSE}
@@ -336,7 +339,16 @@ rich_scheme <-
 ```
 
 ```{r, include = FALSE}
-assertthat::assert_that(!all(c(env_scheme) == c(geo_scheme)))
+assertthat::assert_that(
+  anyDuplicated(c(
+    paste(c(geo_scheme), collapse = ""),
+    paste(c(env_scheme), collapse = ""),
+    paste(c(unc_scheme), collapse = ""),
+    paste(c(cheap_scheme), collapse = ""),
+    paste(c(rich_scheme), collapse = "")
+  )) == 0L,
+  msg = "some different methods give duplicate results"
+)
 ```
 
 Let's visualize the different survey schemes.
@@ -359,7 +371,7 @@ site_data %>%
     geom_sf(aes(color = value)) +
     facet_wrap(~ name, nrow = 2) +
     scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black")) +
-  labs(xlab="X coordinate", ylab="Y coordinate")
+  labs(x = "X coordinate", y = "Y coordinate")
 ```
 
 We can see that different approaches yield different survey schemes -- but how well do they perform?
@@ -424,7 +436,27 @@ evd_survey_schemes %>%
           legend.position = "none")
 ```
 
-In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy -- in this particular situation -- because it has the highest expected value of sample information, but can we do even better with a different scheme?
+```{r, include = FALSE}
+assertthat::assert_that(
+  all(evd_survey_schemes$evsi >= 0),
+  msg = "not all survey schemes have positive EVSI"
+)
+```
+
+```{r, include = FALSE}
+best_conventional_approach <-
+  as.character(evd_survey_schemes$name[which.max(evd_survey_schemes$evsi)])
+best_conventional_approach <- switch(
+  best_conventional_approach,
+  "geo_scheme" = "with the greatest geographic coverage",
+  "env_scheme" =  "with the greatest diversity of environmental conditions",
+  "unc_scheme" = "with the highest uncertainty",
+  "cheap_scheme" = "with the cheapest management costs",
+  "rich_scheme" = "with the highest occupancy probability for the species"
+)
+```
+
+In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. If the survey schemes had negative values, then this means that they would be expected to poorer conservation outcomes than simply using existing information. We can see that surveying sites `r best_conventional_approach` is the best strategy -- in this particular situation -- because it has the highest expected value of sample information, but can we do even better with a different scheme?
 
 ## Optimized survey scheme
 
@@ -470,7 +502,7 @@ ggplot() +
 geom_sf(aes(color = opt_scheme)) +
 facet_wrap(~ name, nrow = 1) +
 scale_color_manual(values = c("TRUE" = "red", "FALSE" = "black")) +
-labs(xlab="X coordinate", ylab="Y coordinate")
+labs(x = "X coordinate", y = "Y coordinate")
 ```
 
 ```{r, include = FALSE}
@@ -561,6 +593,14 @@ evd_survey_schemes %>%
     scale_fill_manual(values = c("TRUE" = "#3366FF", "FALSE" = "black")) +
     theme(axis.text.x = element_text(angle = 30, vjust = 0.65),
           legend.position = "none")
+```
+
+```{r, include = FALSE}
+assertthat::assert_that(
+  evd_survey_schemes$relative_performance[
+    evd_survey_schemes$name == "opt_scheme"] ==
+      min(evd_survey_schemes$relative_performance),
+  msg = "optimized scheme is not best")
 ```
 
 We can see that the optimized survey scheme performs better than the other survey schemes. Although the optimized survey scheme doesn't provide a substantial improvement in this particular situation, we can see how value of information analysis can potentially improve management decisions by strategically allocating funds to surveys and conservation management. Indeed, since we only considered a single species and a handful of sites -- to keep the tutorial simple and reduce computational burden -- it was unlikely that an optimized survey scheme would perform substantially better than simply using current information. If you want to try something more complex, try adapting the code in this tutorial to simulate a larger number of sites and multiple species?

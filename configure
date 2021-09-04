@@ -5,110 +5,106 @@
 PKGCONFIG_DEB_NAME="pkg-config"
 PKGCONFIG_RPM_NAME="pkgconfig"
 
-GMP_CONFIG_NAME="gmp"
+GMP_NAME="gmp"
+GMP_CONFIG_NAME="gmpxx"
 GMP_DEB_NAME="libgmp3-dev"
 GMP_RPM_NAME="gmp-devel"
 GMP_CSW_NAME=""
 GMP_BREW_NAME="gmp"
-GMP_TEST_HEADER="<gmp.h>"
+GMP_TEST_C_HEADER="<gmp.h>"
+GMP_TEST_CXX_HEADER="<gmpxx.h>"
 
-GMPXX_CONFIG_NAME="gmpxx"
-GMPXX_DEB_NAME="libgmp3-dev"
-GMPXX_RPM_NAME="gmp-devel"
-GMPXX_CSW_NAME=""
-GMPXX_BREW_NAME="gmp"
-GMPXX_TEST_HEADER="<gmpxx.h>"
-
-MPRF_CONFIG_NAME="mpfr"
-MPRF_DEB_NAME="libmpfr-dev"
-MPRF_RPM_NAME="mpfr-devel"
-MPRF_CSW_NAME=""
-MPRF_BREW_NAME="mpfr"
-MPRF_TEST_HEADER="<mpfr.h>"
+MPFR_NAME="mpfr"
+MPFR_CONFIG_NAME="mpfr"
+MPFR_DEB_NAME="libmpfr-dev"
+MPFR_RPM_NAME="mpfr-devel"
+MPFR_CSW_NAME=""
+MPFR_BREW_NAME="mpfr"
+MPFR_TEST_HEADER="<mpfr.h>"
 
 # initialize variables
-PKG_CXXFLAGS=""
+PKG_CPPFLAGS="-I/usr/include"
+PKG_LIBS="-lmpfr -lgmp -lgmpxx"
+PKG_CXXFLAGS=""                                    # uncomment for CRAN
+#PKG_CXXFLAGS="-Wno-ignored-attributes"            # uncomment for debugging
 
 # Use pkg-config if available
 pkg-config --version >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-  GMP_LIBS="-lgmp"
-  GMPXX_LIBS="-lgmpxx"
-  MPRF_LIBS="-lmpfr"
-else
-  echo "------------------------- ANTICONF ERROR ----------------------------"
-  echo "Configuration failed because pkg-config is not installed. Try installing: "
-  echo " * deb: $PKGCONFIG_DEB_NAME (Debian, Ubuntu)"
-  echo " * rpm: $PKGCONFIG_RPM_NAME (Fedora, EPEL)"
-  echo "---------------------------------------------------------------------"
-  exit 1;
+  PKGCONFIG_CFLAGS=`pkg-config --cflags --silence-errors ${GMP_CONFIG_NAME} ${MPFR_CONFIG_NAME}`
+  PKGCONFIG_LIBS=`pkg-config --libs --silence-errors ${GMP_CONFIG_NAME} ${MPFR_CONFIG_NAME}`
 fi
 
 # Note that cflags may be empty in case of success
-if [ "$INCLUDE_DIR" ] || [ "$LIB_DIR" ]; then
-  echo "Found INCLUDE_DIR and/or LIB_DIR!"
-  PKG_CFLAGS="-I$INCLUDE_DIR $PKG_CFLAGS"
-  PKG_LIBS="-L$LIB_DIR $PKG_LIBS"
+if [ "$GMP_INCLUDE_DIR" ] || \
+   [ "$GMP_LIB_DIR" ] || \
+   [ "$MPFR_INCLUDE_DIR" ] || \
+   [ "$MPFR_LIB_DIR" ]; then
+  echo "Found GMP_INCLUDE_DIR, GMP_LIB_DIR, MPFR_INCLUDE_DIR, and/or MPFR_LIB_DIR!"
+  PKG_CPPFLAGS="-I$GMP_INCLUDE_DIR -I$MPFR_INCLUDE_DIR $PKG_CPPFLAGS"
+  PKG_LIBS="-L$GMP_LIB_DIR -L$MPFR_LIB_DIR $PKG_LIBS"
 elif [ "$PKGCONFIG_CFLAGS" ] || [ "$PKGCONFIG_LIBS" ]; then
   echo "Found pkg-config cflags and libs!"
-  PKG_CFLAGS=${PKGCONFIG_CFLAGS}
+  PKG_CPPFLAGS=${PKGCONFIG_CFLAGS}
   PKG_LIBS=${PKGCONFIG_LIBS}
 fi
+
+# Report variables for debugging
+echo "Using PKG_CPPFLAGS=$PKG_CPPFLAGS"
+echo "Using PKG_CXXFLAGS=$PKG_CXXFLAGS"
+echo "Using PKG_LIBS=$PKG_LIBS"
 
 # Find compiler
 CXX=$(${R_HOME}/bin/R CMD config CXX)
 CXXFLAGS=$(${R_HOME}/bin/R CMD config CXXFLAGS)
 CPPFLAGS=$(${R_HOME}/bin/R CMD config CPPFLAGS)
 
-# Test for gmp
-echo "#include $GMP_TEST_HEADER" | ${CXX} -E ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -xc++ - >/dev/null 2>&1
+# Test configuration for gmp
+echo "
+#include $GMP_TEST_C_HEADER
+#include $GMP_TEST_CXX_HEADER
+" | ${CXX} -E ${CPPFLAGS} ${PKG_CPPFLAGS} ${CXXFLAGS} -xc++ - >/dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "------------------------- ANTICONF ERROR ------------------------------"
-  echo "Configuration failed because $GMP_CONFIG_NAME was not found. Try installing:"
+  echo "Configuration failed because $GMP_NAME was not found. Try installing:"
   echo " * deb: $GMP_DEB_NAME (Debian, Ubuntu)"
   echo " * rpm: $GMP_RPM_NAME (Fedora, EPEL)"
   echo " * brew: $GMP_BREW_NAME (Mac OSX)"
+  echo ""
+  echo "If $GMP_NAME is already installed, check that 'pkg-config' is in"
+  echo "your PATH and PKG_CONFIG_PATH contains a $GMP_CONFIG_NAME.pc file."
+  echo "If pkg-config is unavailable you can set GMP_INCLUDE_DIR, GMP_LIB_DIR,"
+  echo "MPFR_INCLUDE_DIR, and MPFR_LIB_DIR manually via:"
+  echo "R CMD INSTALL --configure-vars='GMP_INCLUDE_DIR=... GMP_LIB_DIR=... MPFR_INCLUDE_DIR=... MPFR_LIB_DIR=...'"
+  echo ""
   echo "------------------------- [BEGIN ERROR MESSAGE] -----------------------"
   cat configure.log
   echo "------------------------- [END ERROR MESSAGE] -------------------------"
   exit 1;
 fi
 
-# Test for gmpxx
-echo "#include $GMPXX_TEST_HEADER" | ${CXX} -E ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -xc++ - >/dev/null 2>&1
-if [ $? -ne 0 ]; then
-  echo "------------------------- [ANTICONF WARNING] --------------------------"
-  echo "Configuration might fail because $GMPXX_CONFIG_NAME was not found."
-  echo "Configuration will use internal $GMPXX_CONFIG_NAME files. If installation fails, try installing:"
-  echo " * deb: $GMPXX_DEB_NAME (Debian, Ubuntu)"
-  echo " * rpm: $GMPXX_RPM_NAME (Fedora, EPEL)"
-  echo " * brew: $GMPXX_BREW_NAME (Mac OSX)"
-  # add missing gmpxx compiler flag
-  PKG_CXXFLAGS="${PKG_CXXFLAGS} -DMISSING_GMPXX"
-fi
-
-# Test for mprf
-echo "#include $MPRF_TEST_HEADER" | ${CXX} -E ${CPPFLAGS} ${PKG_CFLAGS} ${CXXFLAGS} -xc++ - >/dev/null 2>&1
+# Test configuration for MPFR
+echo "#include $MPFR_TEST_HEADER" | ${CXX} -E ${CPPFLAGS} ${PKG_CPPFLAGS} ${CXXFLAGS} -xc++ - >/dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "------------------------- [ANTICONF ERROR] ----------------------------"
-  echo "Configuration failed because $MPRF_CONFIG_NAME was not found. Try installing:"
-  echo " * deb: $MPRF_DEB_NAME (Debian, Ubuntu)"
-  echo " * rpm: $MPRF_RPM_NAME (Fedora, EPEL)"
-  echo " * brew: $MPRF_BREW_NAME (Mac OSX)"
+  echo "Configuration failed because $MPFR_NAME was not found. Try installing:"
+  echo " * deb: $MPFR_DEB_NAME (Debian, Ubuntu)"
+  echo " * rpm: $MPFR_RPM_NAME (Fedora, EPEL)"
+  echo " * brew: $MPFR_BREW_NAME (Mac OSX)"
+  echo ""
+  echo "If $MPFR_NAME is already installed, check that 'pkg-config' is in"
+  echo "your PATH and PKG_CONFIG_PATH contains a $MPFR_CONFIG_NAME.pc file."
+  echo "If pkg-config is unavailable you can set GMP_INCLUDE_DIR, GMP_LIB_DIR,"
+  echo "MPFR_INCLUDE_DIR, and MPFR_LIB_DIR manually via:"
+  echo "R CMD INSTALL --configure-vars='GMP_INCLUDE_DIR=... GMP_LIB_DIR=... MPFR_INCLUDE_DIR=... MPFR_LIB_DIR=...'"
+  echo ""
   echo "------------------------- [BEGIN ERROR MESSAGE] -----------------------"
   cat configure.log
   echo "------------------------- [END ERROR MESSAGE] -------------------------"
 fi
 
-# Store all variables
-PKG_LIBS="${MPRF_LIBS} ${GMPXX_LIBS} ${GMP_LIBS}"
-
-# Report variables
-echo "Using PKG_CXXFLAGS=$PKG_CXXFLAGS"
-echo "Using PKG_LIBS=$PKG_LIBS"
-
 # Write to Makevars
-sed -e "s|@PKG_CXXFLAGS@|$PKG_CXXFLAGS|" -e "s|@PKG_LIBS@|$PKG_LIBS|" src/Makevars.in > src/Makevars
+sed -e "s|@PKG_CPPFLAGS@|$PKG_CPPFLAGS|" -e "s|@PKG_CXXFLAGS@|$PKG_CXXFLAGS|" -e "s|@PKG_LIBS@|$PKG_LIBS|" src/Makevars.in > src/Makevars
 
 # Success
 exit 0

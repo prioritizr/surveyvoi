@@ -1,4 +1,12 @@
-## Test environments
+Dear CRAN volunteers,
+
+TODO.
+
+Cheers,
+
+Jeff
+
+# Test environments
 
 * [Ubuntu 20.04, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AUbuntu)
 * [Ubuntu 20.04, R-devel](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AUbuntu)
@@ -6,11 +14,11 @@
 * [Windows Server 2019, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AWindows)
 * Windows Server 2008 (x64), R-devel (win-builder)
 
-## R CMD check results
+# R CMD check results
 
 0 errors | 0 warnings | 2 notes
 
-## Notes
+# Notes
 
 * checking installed package size ... NOTE
   installed size is 14.4Mb
@@ -27,22 +35,10 @@
     package documentation contain information for installing the gurobi R
     package.
 
-## Comments from CRAN maintainers
-
-* Please always add all authors, contributors and copyright holders in the
-  Authors@R field with the appropriate roles.
-  e.g.: Free Software Foundation, Inc
-  Please explain in the submission comments what you did about this issue.
-
-    I have added all authors, contributors, and copyright holders in the
-    Authors@R field with the appropriate roles. With regards to the Free
-    Software Foundation, the surveyvoi package is distributed with a file (i.e.
-    the src/gmp/gmpxx.h file) for which the Free Software Foundation owns the
-    copyright. As such, I have listed Free Software Foundation in the Authors@R
-    field with a contributor and copyright role following R package conventions
-    (e.g. see conventions in the leaflet R package). This information is
-    detailed in the LICENSE.note file per CRAN policies.
-
-## Downstream dependencies
+# Downstream dependencies
 
 There are no existing packages that depend on this package.
+
+# Previous comments from CRAN volunteers
+
+* TODO

@@ -57,7 +57,6 @@
 
 
 
-
   
 
   
@@ -80,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3.1</span>
       </span>
     </div>
 
@@ -120,16 +119,29 @@
       <small>Source: <a href='https://github.com/jeffreyhanson/surveyvoi/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="surveyvoi-1031" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.3.1">
+<a href="#surveyvoi-1031" class="anchor" aria-hidden="true"></a>surveyvoi 1.0.3.1<small> Unreleased </small></h1>
+<ul><li><p>GMP dependencies on Windows systems are now handled using RWinLib (see <a href="https://github.com/rwinlib/gmp" class="external-link uri">https://github.com/rwinlib/gmp</a>).</p></li>
+<li><p>Package configuration now reports compilation variables (i.e. PKG_CPPFLAGS and PKG_LIBS variables).</p></li>
+<li><p>The Free Software Foundation is no longer listed as a contributor and copyright holder because GMP source files are no longer distributed with the package (because GMP dependencies are obtained via RWinLib).</p></li>
+<li>
+<p>Configuration variables can now (optionally) be used to specify location of GMP and MPFR dependencies for package installation (i.e. GMP_INCLUDE_DIR, GMP_LIB_DIR, MPFR_INCLUDE_DIR and MPFR_LIB_DIR). Although the package configuration routine attempts to deduce these variables automatically, the variables can be used if installation with default settings fails. For example, the variables can be set using the following system command:</p>
+<pre><code>R CMD INSTALL --configure-vars='GMP_INCLUDE_DIR=... GMP_LIB_DIR=... MPFR_INCLUDE_DIR=... MPFR_LIB_DIR=...'</code></pre>
+</li>
+</ul></div>
     <div id="surveyvoi-103" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.3">
-<a href="#surveyvoi-103" class="anchor" aria-hidden="true"></a>surveyvoi 1.0.3<small> Unreleased </small></h1>
-<ul><li>Fix issue with missing gmpxx file.</li>
+<a href="#surveyvoi-103" class="anchor" aria-hidden="true"></a>surveyvoi 1.0.3<small> 2021-05-31 </small></h1>
+<ul><li>CRAN release.</li>
+<li>Fix issue with missing gmpxx file.</li>
 <li>Remove unused dependencies.</li>
 </ul></div>
     <div id="surveyvoi-102" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.2">
 <a href="#surveyvoi-102" class="anchor" aria-hidden="true"></a>surveyvoi 1.0.2<small> 2021-05-27 </small></h1>
-<ul><li>Update CRAN comments.</li>
+<ul><li>CRAN release.</li>
+<li>Update CRAN comments.</li>
 <li>Update examples.</li>
 <li>Improve documentation for functions that depend on external software.</li>
 </ul></div>

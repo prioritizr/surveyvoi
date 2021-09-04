@@ -1,10 +1,31 @@
+# surveyvoi 1.0.3.1
+
+- GMP dependencies on Windows systems are now handled using RWinLib
+  (see https://github.com/rwinlib/gmp).
+- Package configuration now reports compilation variables
+  (i.e. PKG_CPPFLAGS and PKG_LIBS variables).
+- The Free Software Foundation is no longer listed as a contributor and
+  copyright holder because GMP source files are no longer distributed
+  with the package (because GMP dependencies are obtained via RWinLib).
+- Configuration variables can now (optionally) be used to specify location of
+  GMP and MPFR dependencies for package installation (i.e. GMP_INCLUDE_DIR,
+  GMP_LIB_DIR, MPFR_INCLUDE_DIR and MPFR_LIB_DIR). Although the package
+  configuration routine attempts to deduce these variables automatically,
+  the variables can be used if installation with default settings fails.
+  For example, the variables can be set using the following system command:
+  ```
+  R CMD INSTALL --configure-vars='GMP_INCLUDE_DIR=... GMP_LIB_DIR=... MPFR_INCLUDE_DIR=... MPFR_LIB_DIR=...'
+  ```
+
 # surveyvoi 1.0.3
 
+- CRAN release.
 - Fix issue with missing gmpxx file.
 - Remove unused dependencies.
 
 # surveyvoi 1.0.2
 
+- CRAN release.
 - Update CRAN comments.
 - Update examples.
 - Improve documentation for functions that depend on external software.

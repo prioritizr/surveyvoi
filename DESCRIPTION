@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.3
+Version: 1.0.3.1
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -27,9 +27,7 @@ Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
                comment = c(ORCID = '0000-0002-8402-5111')),
              person(c('Joseph', 'R'), 'Bennett',
                email='joseph.bennett@carleton.ca', role = c('aut'),
-               comment = c(ORCID = '0000-0002-3901-9513')),
-             person('Free Software Foundation, Inc', role = c('ctb', 'cph'),
-               comment = 'gmp'))
+               comment = c(ORCID = '0000-0002-3901-9513')))
 Imports:
     utils,
     methods,

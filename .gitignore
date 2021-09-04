@@ -9,6 +9,7 @@ doc
 approximation.R
 simulation.R
 vignettes/simulation_files/figure-html/*png
+src/Makevars
 
 # R profile files
 *.Rproj.user

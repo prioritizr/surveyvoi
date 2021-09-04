@@ -30,19 +30,9 @@ required to fit hierarchical generalized linear models.
 
 ## Installation
 
-The latest official version of the *surveyvoi R* package can be
-installed from the [Comprehensive R Archive Network
-(CRAN)](https://cran.r-project.org/) using the following *R* code.
-
-``` r
-install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
-```
-
-Alternatively, the latest development version can be installed from
+The development version can be installed from
 [GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following
-code. Please note that while developmental versions may contain
-additional features not present in the official version, they may also
-contain coding errors.
+code.
 
 ``` r
 if (!require(remotes)) install.packages("remotes")
@@ -73,11 +63,10 @@ For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), and
 
 #### MacOS
 
-The `gmp`, `mpfr`, and `symphony` libraries need to be installed to
-install the *surveyvoi R* package. The easiest way to install these
-libraries is using [HomeBrew](https://brew.sh/). After installing
-HomeBrew, these libraries can be installed using the following commands
-in the system terminal:
+The `gmp`, `mpfr`, and `symphony` libraries are required. The easiest
+way to install these libraries is using [HomeBrew](https://brew.sh/).
+After installing HomeBrew, these libraries can be installed using the
+following commands in the system terminal:
 
     brew tap coin-or-tools/coinor
     brew install symphony
@@ -151,7 +140,7 @@ print(sim_sites, width = Inf)
     ## Dimension:     XY
     ## Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
     ## CRS:           NA
-    ## # A tibble: 6 x 14
+    ## # A tibble: 6 × 14
     ##   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
     ##         <dbl>           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl>
     ## 1        3.43            43.8     1 1     0         5     5     5 -1.38   0.425
@@ -177,7 +166,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -188,7 +177,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -255,7 +244,7 @@ data(sim_features)
 print(sim_features, width = Inf)
 ```
 
-    ## # A tibble: 3 x 7
+    ## # A tibble: 3 × 7
     ##   name  survey survey_sensitivity survey_specificity model_sensitivity
     ##   <chr> <lgl>               <dbl>              <dbl>             <dbl>
     ## 1 f1    TRUE                0.954              0.886             0.718
@@ -340,7 +329,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using

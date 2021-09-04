@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3.1</span>
       </span>
     </div>
 
@@ -66,13 +66,13 @@
 
       
 
-      </header><script src="surveyvoi_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
+      </header><script src="surveyvoi_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
                         <h4 data-toc-skip class="author">Jeffrey O. Hanson</h4>
             
-            <h4 data-toc-skip class="date">2021-05-28</h4>
+            <h4 data-toc-skip class="date">2021-09-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/master/vignettes/surveyvoi.Rmd" class="external-link"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
@@ -104,7 +104,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://ms.math.uni-mannheim.de/de/publications/software/randomfields" class="external-link">RandomFields</a></span><span class="op">)</span>
 
 <span class="co"># set RNG seeds for reproducibility</span>
-<span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">722</span>
+<span class="va">seed</span> <span class="op">&lt;-</span> <span class="fl">53</span>
 <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="va">seed</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html" class="external-link">RFoptions</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="va">seed</span><span class="op">)</span>
 
@@ -128,40 +128,40 @@
 <pre><code>## Simple feature collection with 30 features and 7 fields
 ## Geometry type: POINT
 ## Dimension:     XY
-## Bounding box:  xmin: 0.1270337 ymin: 0.008288463 xmax: 0.987045 ymax: 0.9969118
+## Bounding box:  xmin: 0.04184454 ymin: 0.03718441 xmax: 0.9484172 ymax: 0.8772699
 ## CRS:           NA
-## # A tibble: 30 x 8
-##    survey_cost management_cost    f1    n1         e1        e2        e3
-##          &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-##  1     2.76212         1729.81     1     1 -0.120662  -0.952959  1.72033 
-##  2     3.49194         1713.38     0     0 -1.54589   -1.48326  -0.292258
-##  3     5.34569         1715.35     0     1 -0.568181   1.20463   0.218325
-##  4     3.46821         1741.26     0     0  0.574658   0.482337 -0.896162
-##  5     2.56933         1726.25     0     0  0.0762019 -0.972519  0.282810
-##  6     3.61397         1735.28     1     1 -2.27319   -1.41646  -1.11172 
-##  7     3.44942         1741.17     1     1 -0.141574  -1.07482   0.941937
-##  8     4.42756         1762.69     0     0  0.230319   1.42230  -0.524478
-##  9     3.46739         1736.27     0     0  1.56396   -0.108771  0.173746
-## 10     1.75203         1721.21     0     1  1.25681   -0.123240 -0.590079
+## # A tibble: 30 × 8
+##    survey_cost management_cost    f1    n1        e1         e2         e3
+##          &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+##  1    3.51562          1781.31     0     1  1.19692   0.641372  -0.0196411
+##  2    6.02627          1708.69     0     0 -0.919670 -1.88366   -0.886010 
+##  3    1.71110          1829.55     0     1  1.54661   2.32423   -1.75121  
+##  4    2.64293          1732.83     0     0 -0.884708 -0.789118   0.717795 
+##  5    2.82818          1743.39     0     0 -0.501589 -0.202913   0.991116 
+##  6    3.64440          1788.70     0     1  1.90262   0.787104   0.0837322
+##  7    1.71388          1820.21     0     1  1.52022   2.44442   -1.82226  
+##  8    1.67676          1710.19     0     0 -0.914941 -1.21443   -0.242782 
+##  9    0.880309         1758.33     0     0 -0.126906  0.0487618 -0.896685 
+## 10    2.60745          1711.43     1     1 -1.05925  -1.12405    0.891123 
 ##                 geometry
 ##                  &lt;POINT&gt;
-##  1   (0.915251 0.608119)
-##  2   (0.947728 0.197243)
-##  3   (0.269343 0.128106)
-##  4   (0.454803 0.334248)
-##  5     (0.81507 0.44203)
-##  6 (0.927857 0.00828846)
-##  7   (0.882196 0.495865)
-##  8   (0.127034 0.822017)
-##  9     (0.67577 0.81784)
-## 10   (0.611484 0.551849)
+##  1    (0.579189 0.25732)
+##  2    (0.116819 0.87727)
+##  3 (0.0908513 0.0690675)
+##  4   (0.611993 0.682421)
+##  5    (0.739817 0.56324)
+##  6   (0.657339 0.137968)
+##  7 (0.0660939 0.0639527)
+##  8   (0.334605 0.713754)
+##  9    (0.212267 0.50751)
+## 10   (0.656931 0.797149)
 ## # … with 20 more rows</code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot the spatial location of the sites</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Sites"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-5-1.png" width="336" style="display: block; margin: auto;"></p>
 <p>The <code>site_data</code> object is a spatially explicit dataset (i.e. <code>sf</code> object) that contains information on the site locations and additional site attributes. Here, each row corresponds to a different site, and each column contains a different site attribute. The <code>f1</code> column contains the results from previous surveys, where values describe the proportion of previous surveys where species were previously detected at each site. Since each site has had at most a single previous survey, these data contain zeros (indicating that the species has not been detected) and ones (indicating that the species has been detected). The <code>n1</code> column contains the number of previous surveys conducted within each site. Thus, sites with zeros in this column have not previously been surveyed. The <code>e1</code>, <code>e2</code>, and <code>e3</code> columns contain environmental information for each site (e.g. normalized temperature and rainfall data). The <code>survey_cost</code> column contains the cost of surveying each site, and the <code>management_cost</code> column contains the cost of managing each site for conservation.</p>
 <p>To help understand the simulated data, let’s create some visualizations.</p>
@@ -177,7 +177,8 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Detection/non-detection data"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Detection/non-detection data"</span>,
+         x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-6-1.png" width="336" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot number of previous surveys within each site</span>
@@ -189,7 +190,8 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"0"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Number of previous surveys"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Number of previous surveys"</span>,
+         x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-7-1.png" width="336" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># plot site cost data</span>
@@ -197,12 +199,12 @@
 <span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">survey_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Survey cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Survey cost"</span>, x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">management_cost</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Management cost"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"X coordinate"</span><span class="op">)</span> <span class="op">+</span>
+      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Management cost"</span>, x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span> <span class="op">+</span>
       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">grid.arrange</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;"></p>
@@ -215,7 +217,8 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">var</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Environmental conditions"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Environmental conditions"</span>,
+         x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-9-1.png" width="756" style="display: block; margin: auto;"></p>
 <p>After simulating data for the sites, we will simulate data for the conservation feature. We set <code>proportion_of_survey_features = 1</code> to indicate that this feature will be examined in future surveys.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -232,7 +235,7 @@
 
 <span class="co"># print feature data</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">feature_data</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 1 x 5
+<pre><code>## # A tibble: 1 × 5
 ##   name  survey survey_sensitivity survey_specificity target
 ##   &lt;chr&gt; &lt;lgl&gt;               &lt;dbl&gt;              &lt;dbl&gt;  &lt;dbl&gt;
 ## 1 f1    TRUE             0.957543           0.864061      2</code></pre>
@@ -280,9 +283,9 @@
 ##   train_sensitivity_std train_specificity_mean train_specificity_std
 ## 1                     0                      1                     0
 ##   test_tss_mean test_tss_std test_sensitivity_mean test_sensitivity_std
-## 1     0.5384635    0.4318228             0.9219042            0.1104442
+## 1     0.6764074     0.172432             0.7772398            0.3150305
 ##   test_specificity_mean test_specificity_std
-## 1             0.6165593             0.542267</code></pre>
+## 1             0.8991676            0.1425986</code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># store the model sensitivities and specificities in the feature_data object</span>
 <span class="va">feature_data</span><span class="op">$</span><span class="va">model_sensitivity</span> <span class="op">&lt;-</span> <span class="va">xgb_performance</span><span class="op">$</span><span class="va">test_sensitivity_mean</span>
@@ -291,19 +294,19 @@
 <span class="co"># store predicted probabilities in the site_data object</span>
 <span class="va">xgb_predictions</span> <span class="op">&lt;-</span> <span class="va">xgb_results</span><span class="op">$</span><span class="va">predictions</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">xgb_predictions</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 30 x 1
+<pre><code>## # A tibble: 30 × 1
 ##          f1
 ##       &lt;dbl&gt;
-##  1 0.537460
-##  2 0.537460
-##  3 0.454860
-##  4 0.454860
-##  5 0.537460
-##  6 0.537460
-##  7 0.537460
-##  8 0.454860
-##  9 0.496156
-## 10 0.496156
+##  1 0.454855
+##  2 0.537454
+##  3 0.454855
+##  4 0.537454
+##  5 0.496152
+##  6 0.454855
+##  7 0.454855
+##  8 0.537454
+##  9 0.454855
+## 10 0.537454
 ## # … with 20 more rows</code></pre>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">site_data</span><span class="op">$</span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">xgb_predictions</span><span class="op">$</span><span class="va">f1</span></code></pre></div>
@@ -316,7 +319,7 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_color_viridis</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modelled probabilities"</span>, xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Modelled probabilities"</span>, x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-13-1.png" width="336" style="display: block; margin: auto;"></p>
 </div>
 <div id="expected-value-given-current-information" class="section level2">
@@ -329,7 +332,7 @@
 
 <span class="co"># print total budget</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 5215.122</code></pre>
+<pre><code>## [1] 5249.697</code></pre>
 <p>Given the total budget, we can now calculate the <em>expected value of the decision given current information</em>.</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># expected value of the decision given current information</span>
@@ -349,7 +352,7 @@
 
 <span class="co"># print value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_current</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 0.9205891</code></pre>
+<pre><code>## [1] 0.9615402</code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div id="survey-schemes" class="section level2">
@@ -377,10 +380,10 @@
 
 <span class="co"># print budgets</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survey_budget</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 14.80791</code></pre>
+<pre><code>## [1] 11.42262</code></pre>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 5215.122</code></pre>
+<pre><code>## [1] 5249.697</code></pre>
 <p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites <span class="citation">(Yates 1948)</span>, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; <span class="citation">Faith &amp; Walker (1996)</span>], (iii) increase coverage of sites with highly uncertain information <span class="citation">(Guisan <em>et al.</em> 2006)</span>, (iv) increase coverage of sites where species are predicted to occur <span class="citation">(Le Lay <em>et al.</em> 2010)</span>, and (v) increase coverage of sites that have low management costs.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># (i) generate survey scheme to increase geographic coverage</span>
@@ -443,7 +446,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-21-1.png" width="604.8" style="display: block; margin: auto;"></p>
 <p>We can see that different approaches yield different survey schemes – but how well do they perform?</p>
 </div>
@@ -480,14 +483,14 @@
 
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 5 x 2
+<pre><code>## # A tibble: 5 × 2
 ##   name            value
 ##   &lt;chr&gt;           &lt;dbl&gt;
-## 1 geo_scheme   0.917786
-## 2 env_scheme   0.917786
-## 3 unc_scheme   0.931152
-## 4 cheap_scheme 0.894194
-## 5 rich_scheme  0.918878</code></pre>
+## 1 geo_scheme   0.961540
+## 2 env_scheme   0.981534
+## 3 unc_scheme   0.979128
+## 4 cheap_scheme 0.981858
+## 5 rich_scheme  0.981863</code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>expected value of sample information (EVSI)</em> for each survey scheme.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># estimate expected value of sample information for each survey scheme</span>
@@ -496,14 +499,14 @@
 
 <span class="co"># print values</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 5 x 3
-##   name            value        evsi
-##   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;
-## 1 geo_scheme   0.917786 -0.00280285
-## 2 env_scheme   0.917786 -0.00280285
-## 3 unc_scheme   0.931152  0.0105629 
-## 4 cheap_scheme 0.894194 -0.0263951 
-## 5 rich_scheme  0.918878 -0.00171063</code></pre>
+<pre><code>## # A tibble: 5 × 3
+##   name            value      evsi
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;
+## 1 geo_scheme   0.961540 0        
+## 2 env_scheme   0.981534 0.0199941
+## 3 unc_scheme   0.979128 0.0175879
+## 4 cheap_scheme 0.981858 0.0203181
+## 5 rich_scheme  0.981863 0.0203232</code></pre>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># visualize the expected value of sample information for each survey scheme</span>
 <span class="co"># color the best survey scheme in blue</span>
@@ -519,7 +522,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-23-1.png" width="504" style="display: block; margin: auto;"></p>
-<p>In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. Indeed, some of these survey schemes are expected to lead to poorer conservation outcomes (i.e. those associated with negative values). We can see that surveying sites with the highest uncertainty is the best strategy – in this particular situation – because it has the highest expected value of sample information, but can we do even better with a different scheme?</p>
+<p>In this particular simulation, we can see that all of the survey schemes have a low expected value of sample information (i.e. most values are close to zero). This means that none of these survey schemes would likely lead to a substantially better conservation outcome when considering the funds spent on conducting them. If the survey schemes had negative values, then this means that they would be expected to poorer conservation outcomes than simply using existing information. We can see that surveying sites with the highest occupancy probability for the species is the best strategy – in this particular situation – because it has the highest expected value of sample information, but can we do even better with a different scheme?</p>
 </div>
 <div id="optimized-survey-scheme" class="section level2">
 <h2 class="hasAnchor">
@@ -552,7 +555,7 @@
 <span class="co"># this means that multiple different survey schemes are likely to deliver</span>
 <span class="co"># similar results (even if they select different sites for surveys)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 4</code></pre>
+<pre><code>## [1] 1</code></pre>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># add first optimized scheme to site data</span>
 <span class="va">site_data</span><span class="op">$</span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span>
@@ -564,8 +567,8 @@
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span>
 <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>xlab<span class="op">=</span><span class="st">"X coordinate"</span>, ylab<span class="op">=</span><span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
-<p><img src="surveyvoi_files/figure-html/unnamed-chunk-25-1.png" width="504" style="display: block; margin: auto;"></p>
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></code></pre></div>
+<p><img src="surveyvoi_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes.</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># calculate expected value of sample information for the optimized scheme</span>
@@ -588,7 +591,7 @@
 
 <span class="co"># calculate value</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] 0.9341498</code></pre>
+<pre><code>## [1] 0.9819145</code></pre>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># append optimized results to results table</span>
 <span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span>
@@ -597,15 +600,15 @@
 
 <span class="co"># print updated results table</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 6 x 3
-##   name            value        evsi
-##   &lt;chr&gt;           &lt;dbl&gt;       &lt;dbl&gt;
-## 1 geo_scheme   0.917786 -0.00280285
-## 2 env_scheme   0.917786 -0.00280285
-## 3 unc_scheme   0.931152  0.0105629 
-## 4 cheap_scheme 0.894194 -0.0263951 
-## 5 rich_scheme  0.918878 -0.00171063
-## 6 opt_scheme   0.934150  0.0135607</code></pre>
+<pre><code>## # A tibble: 6 × 3
+##   name            value      evsi
+##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;
+## 1 geo_scheme   0.961540 0        
+## 2 env_scheme   0.981534 0.0199941
+## 3 unc_scheme   0.979128 0.0175879
+## 4 cheap_scheme 0.981858 0.0203181
+## 5 rich_scheme  0.981863 0.0203232
+## 6 opt_scheme   0.981914 0.0203743</code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># visualize expected value of sample information</span>
 <span class="co"># color the best survey scheme in blue</span>
@@ -620,7 +623,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
-<p><img src="surveyvoi_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="surveyvoi_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme has the highest <em>expected value of sample information</em> of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let’s compute their relative performance and visualize them.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># express values in terms of relative performance</span>
@@ -643,7 +646,7 @@
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TRUE"</span> <span class="op">=</span> <span class="st">"#3366FF"</span>, <span class="st">"FALSE"</span> <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
     <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span>,
           legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></code></pre></div>
-<p><img src="surveyvoi_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;"></p>
+<p><img src="surveyvoi_files/figure-html/unnamed-chunk-31-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme performs better than the other survey schemes. Although the optimized survey scheme doesn’t provide a substantial improvement in this particular situation, we can see how value of information analysis can potentially improve management decisions by strategically allocating funds to surveys and conservation management. Indeed, since we only considered a single species and a handful of sites – to keep the tutorial simple and reduce computational burden – it was unlikely that an optimized survey scheme would perform substantially better than simply using current information. If you want to try something more complex, try adapting the code in this tutorial to simulate a larger number of sites and multiple species?</p>
 </div>
 <div id="conclusion" class="section level2">
