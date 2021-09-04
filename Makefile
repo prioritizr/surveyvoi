@@ -28,7 +28,7 @@ purl_vigns:
 	R --slave -e "lapply(dir('vignettes', '^.*\\\\.Rmd$$'), function(x) knitr::purl(file.path('vignettes', x), gsub('.Rmd', '.R', x, fixed = TRUE)))"
 
 vign_seed:
-	R --slave -e "source('inst/scripts/find_vignette_seed.R')"
+	R --slave -e "source('inst/extdata/find_vignette_seed.R')"
 
 quicksite:
 	R --slave -e "options(rmarkdown.html_vignette.check_title = FALSE);pkgdown::build_site(run_dont_run = TRUE, lazy = TRUE)"
