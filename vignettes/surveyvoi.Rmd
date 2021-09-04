@@ -18,11 +18,19 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+# figure sizes
 h <- 3.5
 w <- 3.5
+
+# detect if vignette being built under package check
 is_check <- ("CheckExEnv" %in% search()) || any(c("_R_CHECK_TIMINGS_",
              "_R_CHECK_LICENSE_") %in% names(Sys.getenv()))
+
+# set default chunk settings
 knitr::opts_chunk$set(fig.align = "center", eval = !is_check)
+
+# define variables
+best_conventional_approach <- "ERROR"
 ```
 
 ```{r, include = FALSE}
