@@ -28,4 +28,3 @@ inst/extdata/dictionary.txt
 ^\.github$
 .covrignore
 ^CRAN-RELEASE$
-src/Makevars

@@ -27,8 +27,7 @@
 #include <stdarg.h>
 // GMP library for large integers
 #include <gmp.h>
-#include <gmpxx.h> // use system version if not missing gmpxx.h
-
+#include <gmpxx.h>
 // MPFR library for large and small floats (used in maximum likelihood calc)
 #include <mpfr.h>
 
