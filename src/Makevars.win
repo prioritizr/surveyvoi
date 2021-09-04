@@ -1,24 +1,7 @@
-VERSION = 6.1.2
-RWINLIB = ../windows/gmp-$(VERSION)
-BUILD = ${subst gcc ,-,${R_COMPILED_BY}}
-
 CXX_STD = CXX11
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -lmpfr -lgmp -lgmpxx
 
-# PKG_CXXFLAGS = -Wno-ignored-attributes              # uncomment for debugging
-
-PKG_CPPFLAGS = -I$(RWINLIB)/include
-
-PKG_LIBS = -L$(RWINLIB)/lib$(BUILD)$(R_ARCH)$(CRT) \
-  -L$(RWINLIB)/lib$(R_ARCH) \
-  $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) \
-  -lmpfr -lgmp -lgmpxx
-
-all: clean winlibs
+all:
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
-
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
-
-.PHONY: all winlibs clean
