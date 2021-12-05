@@ -30,6 +30,9 @@ examples.log
 
 # debugging files
 debug*R
+config.status
+config.log
+autom4te.cache/*
 
 # do not ignore the following files
 !.gitkeep
