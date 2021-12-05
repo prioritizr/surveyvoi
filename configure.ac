@@ -29,13 +29,31 @@ if test -z "${R_HOME}"; then
     AC_MSG_ERROR([Could not determine R_HOME.])
 fi
 
-## define compiler flasgs
-CXX=`"${R_HOME}/bin/R" CMD config CXX`
-CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXXFLAGS`
-AC_LANG(C++)
-AC_REQUIRE_CPP
-AC_PROG_CC
-AC_PROG_CXX
+## define compiler flags
+if test [$RVER_MAJOR = "development"]; then
+    CXX11=`"${RBIN}" CMD config CXX11`
+    CXX11STD=`"${RBIN}" CMD config CXX11STD`
+else
+    if test [$RVER_MAJOR -lt 3] -o [$RVER_MAJOR -eq 3 -a $RVER_MINOR -lt 3]; then
+        AC_MSG_ERROR([surveyvoi is not compatible with R versions before 3.3.0])
+    else
+        if test [$RVER_MAJOR -eq 3 -a $RVER_MINOR -eq 3]; then
+            CXX11=`"${RBIN}" CMD config CXX1X`
+            CXX11STD=`"${RBIN}" CMD config CXX1XSTD`
+        else
+            CXX11=`"${RBIN}" CMD config CXX11`
+            CXX11STD=`"${RBIN}" CMD config CXX11STD`
+        fi
+    fi
+fi
+
+# pick all flags for testing from R
+: ${CC=`"${RBIN}" CMD config CC`}
+: ${CXX=${CXX11} ${CXX11STD}}
+: ${CFLAGS=`"${RBIN}" CMD config CFLAGS`}
+: ${CPPFLAGS=`"${RBIN}" CMD config CPPFLAGS`}
+: ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
+: ${LDFLAGS=`"${RBIN}" CMD config LDFLAGS`}
 
 ### provide compiler information
 AC_MSG_NOTICE([CC: ${CC}])
