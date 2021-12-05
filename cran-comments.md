@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-TODO.
+Thank you very much for reviewing this submission. I recognize that there were many issues with the previous submission of this package (back in May 2021), and I apologize for my carelessness. I am extremely grateful to CRAN volunteers for providing advice on addressing these issues. I have verified that the package passes CRAN checks on both the Win-Builder and macOS platforms, along with several other environments using GitHub Actions.
 
 Cheers,
 
@@ -11,8 +11,9 @@ Jeff
 * [Ubuntu 20.04, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AUbuntu)
 * [Ubuntu 20.04, R-devel](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AUbuntu)
 * [Mac OSX 10.15, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3A%22Mac+OSX%22)
+* [macOS 11.5.2 (arm64), R-release (macOS builder)](https://mac.r-project.org/macbuilder/submit.html)
 * [Windows Server 2019, R-release](https://github.com/jeffreyhanson/surveyvoi/actions?query=workflow%3AWindows)
-* Windows Server 2008 (x64), R-devel (win-builder)
+* [Windows Server 2008 (x64), R-devel (Win-Builder)](https://win-builder.r-project.org/)
 
 # R CMD check results
 
@@ -51,8 +52,8 @@ requirement on external software. It seems the macOS ones are not built
 with C++ bindings (and you could and should have checked for yourself
 from the published 'recipes' at https://github.com/R-macos/recipes).
 
-  **Thank you very much for this advice. I am sorry that I did not check these requirements prior to my previous submission. After submitting a pull request to the maintainer of the macOS binary package (https://github.com/R-macos/recipes/pull/19), the macOS libraries now include C++ bindings for GMP. I have also confirmed with the maintainer of the Windows binary packages that the C++ bindings for GMP are available via Rtools (https://github.com/rwinlib/utils/issues/1#issuecomment-912371834). Additionally, to ensure that outdated versions of GMP on Windows systems do not cause issues, the package now uses the RWinLib infrastructure to obtain recent versions of GMP and GMPXX (https://github.com/rwinlib/gmp, see `tools/winlibs.R`). Since the package passes checks on the WinBuilder and macOS builder platforms, I am hopeful that I have resolved these issues.**
+  **Thank you very much for this advice. I am sorry that I did not check these requirements prior to my previous submission. After submitting a pull request to the maintainer of the macOS binary package (https://github.com/R-macos/recipes/pull/19), the macOS libraries now include C++ bindings for GMP. I have also confirmed with the maintainer of the Windows binary packages that the C++ bindings for GMP are available via Rtools (https://github.com/rwinlib/utils/issues/1#issuecomment-912371834). Additionally, to ensure that outdated versions of GMP do not cause issues on Windows systems, the package now uses the RWinLib infrastructure to obtain recent versions of GMP and GMPXX (https://github.com/rwinlib/gmp), see `tools/winlibs.R`). Since the package passes checks on the WinBuilder and macOS builder platforms, I am hopeful that these issues have been resolved.**
 
 * Please always add all authors, contributors and copyright holders in the Authors@R field with the appropriate roles. e.g.: Free Software Foundation, Inc. Please explain in the submission comments what you did about this issue.
 
-  **This comment was raised on a previous submission where the Free Software Foundation was listed as a copyright holder. I had previously listed the foundation as a copyright holder because the package contained a header file copied from the GMPXX library. Since the package now uses the RWinLib infrastructure to handle GMPXX dependencies, the header file has been removed from package and the Free Software Foundation removed as a copyright holder.**
+  **This comment was raised on a previous submission wherein the Free Software Foundation was listed as a copyright holder. I had previously listed the foundation as a copyright holder because the package contained a header file copied from the GMPXX library. Since the package now uses the RWinLib infrastructure to handle GMPXX dependencies (https://github.com/rwinlib/gmp), the header file has been removed from package and the Free Software Foundation removed as a copyright holder.**
