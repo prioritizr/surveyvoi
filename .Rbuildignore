@@ -31,3 +31,4 @@ inst/extdata/dictionary.txt
 config.status
 config.log
 ^autom4te.cache*
+^windows$
