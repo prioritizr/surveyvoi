@@ -57,10 +57,6 @@ fi
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 : ${LDFLAGS=`"${RBIN}" CMD config LDFLAGS`}
 
-### provide compiler information
-AC_MSG_NOTICE([CC: ${CC}])
-AC_MSG_NOTICE([CXX: ${CXX}])
-
 # Specify settings
 ## set up pkgconfig
 AC_DEFUN([AC_PROG_PKGCONFIG], [AC_CHECK_PROG(PKGCONFIG,pkg-config,yes)])
