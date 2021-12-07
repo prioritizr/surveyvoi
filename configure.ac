@@ -103,7 +103,7 @@ LIBS="${PKG_LIBS}"
 AC_MSG_CHECKING([if ${GMP_NAME} compiles])
 
 ## try compiling file with settings
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+[cat > gmp_test.cpp <<_EOCONF
 #include ${GMP_TEST_C_HEADER}
 #include ${GMP_TEST_CXX_HEADER}
 #if defined(__GNU_MP_VERSION)
@@ -112,20 +112,17 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #define SUCCESS 0
 #endif
 int main() {
-  return SUCCESS;
+  exit(SUCCESS);
 }
-]])],
-[gmp_ok=yes],
-[gmp_ok=no],
-[gmp_ok=yes])
-if test x"${gmp_ok}" == x"no"; then
-    AC_MSG_RESULT([no])
+_EOCONF]
+${CXX} ${CPPFLAGS} -o gdal_test gdal_test.cpp ${LIBS} 2> errors.txt
+if test `echo $?` -ne 0 ; then
+  gmp_ok=yes
+  AC_MSG_RESULT([yes])
 else
-    AC_MSG_RESULT([yes])
+  gmp_ok=no
+  AC_MSG_RESULT([no])
 fi
-
-AC_MSG_NOTICE([Package CPPFLAGS: ${PKG_CPPFLAGS}])
-AC_MSG_NOTICE([Package LIBS:     ${PKG_LIBS}])
 
 ## throw error if needed
 if test x"${gmp_ok}" == x"no"; then
@@ -145,7 +142,7 @@ fi
 AC_MSG_CHECKING([if ${MPFR_NAME} compiles])
 
 ## try compiling file with settings
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
+[cat > mpfr_test.cpp <<_EOCONF
 #include ${MPFR_TEST_HEADER}
 #if defined(MPFR_VERSION_MAJOR)
 #define SUCCESS 1
@@ -153,16 +150,16 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #define SUCCESS 0
 #endif
 int main() {
-  return SUCCESS;
+  exit(SUCCESS);
 }
-]])],
-[mpfr_ok=yes],
-[mpfr_ok=no],
-[mpfr_ok=yes])
-if test x"${mpfr_ok}" == x"no"; then
-    AC_MSG_RESULT([no])
+_EOCONF]
+${CXX} ${CPPFLAGS} -o mpfr_test mfr_test.cpp ${LIBS} 2> errors.txt
+if test `echo $?` -ne 0 ; then
+  mpfr_ok=yes
+  AC_MSG_RESULT([yes])
 else
-    AC_MSG_RESULT([yes])
+  mpfr_ok=no
+  AC_MSG_RESULT([no])
 fi
 
 ## throw error if needed
