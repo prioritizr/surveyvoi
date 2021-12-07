@@ -28,6 +28,7 @@ MPFR_TEST_HEADER="<mpfr.h>"
 if test -z "${R_HOME}"; then
     AC_MSG_ERROR([Could not determine R_HOME.])
 fi
+RBIN="${R_HOME}/bin/R"
 
 ## define compiler flags
 if test [$RVER_MAJOR = "development"]; then
