@@ -104,7 +104,6 @@ AC_MSG_CHECKING([if ${GMP_NAME} compiles])
 
 ## try compiling file with settings
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #include ${GMP_TEST_C_HEADER}
 #include ${GMP_TEST_CXX_HEADER}
 #if defined(__GNU_MP_VERSION)
@@ -113,11 +112,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #define SUCCESS 0
 #endif
 int main() {
-  if (SUCCESS > 0) {
-    exit(0);
-  } else {
-    exit(1);
-  }
+  return SUCCESS;
 }
 ]])],
 [gmp_ok=yes],
@@ -151,7 +146,6 @@ AC_MSG_CHECKING([if ${MPFR_NAME} compiles])
 
 ## try compiling file with settings
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
-#include <stdlib.h>
 #include ${MPFR_TEST_HEADER}
 #if defined(MPFR_VERSION_MAJOR)
 #define SUCCESS 1
@@ -159,11 +153,7 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #define SUCCESS 0
 #endif
 int main() {
-  if (SUCCESS > 0) {
-    exit(0);
-  } else {
-    exit(1);
-  }
+  return SUCCESS;
 }
 ]])],
 [mpfr_ok=yes],

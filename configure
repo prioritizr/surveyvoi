@@ -2719,7 +2719,6 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-#include <stdlib.h>
 #include ${GMP_TEST_C_HEADER}
 #include ${GMP_TEST_CXX_HEADER}
 #if defined(__GNU_MP_VERSION)
@@ -2728,11 +2727,7 @@ else
 #define SUCCESS 0
 #endif
 int main() {
-  if (SUCCESS > 0) {
-    exit(0);
-  } else {
-    exit(1);
-  }
+  return SUCCESS;
 }
 
 _ACEOF
@@ -2791,7 +2786,6 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-#include <stdlib.h>
 #include ${MPFR_TEST_HEADER}
 #if defined(MPFR_VERSION_MAJOR)
 #define SUCCESS 1
@@ -2799,11 +2793,7 @@ else
 #define SUCCESS 0
 #endif
 int main() {
-  if (SUCCESS > 0) {
-    exit(0);
-  } else {
-    exit(1);
-  }
+  return SUCCESS;
 }
 
 _ACEOF
