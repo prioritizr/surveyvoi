@@ -112,7 +112,7 @@ AC_MSG_CHECKING([if ${GMP_NAME} compiles])
 #define SUCCESS 0
 #endif
 int main() {
-  exit(SUCCESS);
+  return SUCCESS;
 }
 _EOCONF]
 ${CXX} ${CPPFLAGS} -o gdal_test gdal_test.cpp ${LIBS} 2> errors.txt
@@ -150,7 +150,7 @@ AC_MSG_CHECKING([if ${MPFR_NAME} compiles])
 #define SUCCESS 0
 #endif
 int main() {
-  exit(SUCCESS);
+  return SUCCESS;
 }
 _EOCONF]
 ${CXX} ${CPPFLAGS} -o mpfr_test mfr_test.cpp ${LIBS} 2> errors.txt

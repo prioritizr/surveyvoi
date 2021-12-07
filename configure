@@ -1828,7 +1828,7 @@ cat > gmp_test.cpp <<_EOCONF
 #define SUCCESS 0
 #endif
 int main() {
-  exit(SUCCESS);
+  return SUCCESS;
 }
 _EOCONF
 ${CXX} ${CPPFLAGS} -o gdal_test gdal_test.cpp ${LIBS} 2> errors.txt
@@ -1877,7 +1877,7 @@ cat > mpfr_test.cpp <<_EOCONF
 #define SUCCESS 0
 #endif
 int main() {
-  exit(SUCCESS);
+  return SUCCESS;
 }
 _EOCONF
 ${CXX} ${CPPFLAGS} -o mpfr_test mfr_test.cpp ${LIBS} 2> errors.txt
