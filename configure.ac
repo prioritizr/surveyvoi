@@ -28,23 +28,24 @@ MPFR_TEST_HEADER="<mpfr.h>"
 if test -z "${R_HOME}"; then
     AC_MSG_ERROR([Could not determine R_HOME.])
 fi
-RBIN="${R_HOME}/bin/R"
 
-## define compiler flags
+## verify suitable R version
+RBIN="${R_HOME}/bin/R"
+RSCRIPT="${R_HOME}/bin/Rscript"
+RVER=`"${RSCRIPT}" -e 'writeLines(paste(sep=".", base::version$major, base::version$minor))'`
+RVER_MAJOR=`echo ${RVER} | cut  -f1 -d"."`
+RVER_MINOR=`echo ${RVER} | cut  -f2 -d"."`
+RVER_PATCH=`echo ${RVER} | cut  -f3 -d"."`
+
 if test [$RVER_MAJOR = "development"]; then
     CXX11=`"${RBIN}" CMD config CXX11`
     CXX11STD=`"${RBIN}" CMD config CXX11STD`
 else
-    if test [$RVER_MAJOR -lt 3] -o [$RVER_MAJOR -eq 3 -a $RVER_MINOR -lt 3]; then
-        AC_MSG_ERROR([surveyvoi is not compatible with R versions before 3.3.0])
+    if test [$RVER_MAJOR -lt 4]; then
+        AC_MSG_ERROR([surveyvoi is not compatible with R versions before 4.0.0])
     else
-        if test [$RVER_MAJOR -eq 3 -a $RVER_MINOR -eq 3]; then
-            CXX11=`"${RBIN}" CMD config CXX1X`
-            CXX11STD=`"${RBIN}" CMD config CXX1XSTD`
-        else
-            CXX11=`"${RBIN}" CMD config CXX11`
-            CXX11STD=`"${RBIN}" CMD config CXX11STD`
-        fi
+      CXX11=`"${RBIN}" CMD config CXX11`
+      CXX11STD=`"${RBIN}" CMD config CXX11STD`
     fi
 fi
 
