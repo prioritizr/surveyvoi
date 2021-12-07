@@ -129,11 +129,14 @@ else
     AC_MSG_RESULT([yes])
 fi
 
+AC_MSG_NOTICE([Package CPPFLAGS: ${PKG_CPPFLAGS}])
+AC_MSG_NOTICE([Package LIBS:     ${PKG_LIBS}])
+
 ## throw error if needed
 if test x"${gmp_ok}" == x"no"; then
   AC_MSG_NOTICE([Configuration failed because ${GMP_NAME} was not found. Try installing:])
-  AC_MSG_NOTICE([  * deb: ${GMP_DEB_NAME} (Debian, Ubuntu)])
-  AC_MSG_NOTICE([  * rpm: ${GMP_RPM_NAME} (Fedora, EPEL)])
+  AC_MSG_NOTICE([  * deb:  ${GMP_DEB_NAME} (Debian, Ubuntu)])
+  AC_MSG_NOTICE([  * rpm:  ${GMP_RPM_NAME} (Fedora, EPEL)])
   AC_MSG_NOTICE([  * brew: ${GMP_BREW_NAME} (Mac OSX)])
   AC_MSG_NOTICE([])
   AC_MSG_NOTICE([If ${GMP_NAME} is already installed, check that 'pkg-config' is in])
@@ -175,8 +178,8 @@ fi
 ## throw error if needed
 if test x"${mpfr_ok}" == x"no"; then
   AC_MSG_NOTICE([Configuration failed because ${MPFR_NAME} was not found. Try installing:])
-  AC_MSG_NOTICE([  * deb: ${MPFR_DEB_NAME} (Debian, Ubuntu)])
-  AC_MSG_NOTICE([  * rpm: ${MPFR_RPM_NAME} (Fedora, EPEL)])
+  AC_MSG_NOTICE([  * deb:  ${MPFR_DEB_NAME} (Debian, Ubuntu)])
+  AC_MSG_NOTICE([  * rpm:  ${MPFR_RPM_NAME} (Fedora, EPEL)])
   AC_MSG_NOTICE([  * brew: ${MPFR_BREW_NAME} (Mac OSX)])
   AC_MSG_NOTICE([])
   AC_MSG_NOTICE([If ${MPFR_NAME} is already installed, check that 'pkg-config' is in])

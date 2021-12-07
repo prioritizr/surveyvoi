@@ -1823,7 +1823,7 @@ if test $RVER_MAJOR = "development"; then
     CXX11STD=`"${RBIN}" CMD config CXX11STD`
 else
     if test $RVER_MAJOR -lt 4; then
-        as_fn_error $? "surveyvoi is not compatible with R versions before 3.3.0" "$LINENO" 5
+        as_fn_error $? "surveyvoi is not compatible with R versions before 4.0.0" "$LINENO" 5
     else
       CXX11=`"${RBIN}" CMD config CXX11`
       CXX11STD=`"${RBIN}" CMD config CXX11STD`
@@ -2753,14 +2753,19 @@ else
 $as_echo "yes" >&6; }
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Package CPPFLAGS: ${PKG_CPPFLAGS}" >&5
+$as_echo "$as_me: Package CPPFLAGS: ${PKG_CPPFLAGS}" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Package LIBS:     ${PKG_LIBS}" >&5
+$as_echo "$as_me: Package LIBS:     ${PKG_LIBS}" >&6;}
+
 ## throw error if needed
 if test x"${gmp_ok}" == x"no"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: Configuration failed because ${GMP_NAME} was not found. Try installing:" >&5
 $as_echo "$as_me: Configuration failed because ${GMP_NAME} was not found. Try installing:" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}:   * deb: ${GMP_DEB_NAME} (Debian, Ubuntu)" >&5
-$as_echo "$as_me:   * deb: ${GMP_DEB_NAME} (Debian, Ubuntu)" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}:   * rpm: ${GMP_RPM_NAME} (Fedora, EPEL)" >&5
-$as_echo "$as_me:   * rpm: ${GMP_RPM_NAME} (Fedora, EPEL)" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}:   * deb:  ${GMP_DEB_NAME} (Debian, Ubuntu)" >&5
+$as_echo "$as_me:   * deb:  ${GMP_DEB_NAME} (Debian, Ubuntu)" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}:   * rpm:  ${GMP_RPM_NAME} (Fedora, EPEL)" >&5
+$as_echo "$as_me:   * rpm:  ${GMP_RPM_NAME} (Fedora, EPEL)" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}:   * brew: ${GMP_BREW_NAME} (Mac OSX)" >&5
 $as_echo "$as_me:   * brew: ${GMP_BREW_NAME} (Mac OSX)" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
@@ -2823,10 +2828,10 @@ fi
 if test x"${mpfr_ok}" == x"no"; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: Configuration failed because ${MPFR_NAME} was not found. Try installing:" >&5
 $as_echo "$as_me: Configuration failed because ${MPFR_NAME} was not found. Try installing:" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}:   * deb: ${MPFR_DEB_NAME} (Debian, Ubuntu)" >&5
-$as_echo "$as_me:   * deb: ${MPFR_DEB_NAME} (Debian, Ubuntu)" >&6;}
-  { $as_echo "$as_me:${as_lineno-$LINENO}:   * rpm: ${MPFR_RPM_NAME} (Fedora, EPEL)" >&5
-$as_echo "$as_me:   * rpm: ${MPFR_RPM_NAME} (Fedora, EPEL)" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}:   * deb:  ${MPFR_DEB_NAME} (Debian, Ubuntu)" >&5
+$as_echo "$as_me:   * deb:  ${MPFR_DEB_NAME} (Debian, Ubuntu)" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}:   * rpm:  ${MPFR_RPM_NAME} (Fedora, EPEL)" >&5
+$as_echo "$as_me:   * rpm:  ${MPFR_RPM_NAME} (Fedora, EPEL)" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}:   * brew: ${MPFR_BREW_NAME} (Mac OSX)" >&5
 $as_echo "$as_me:   * brew: ${MPFR_BREW_NAME} (Mac OSX)" >&6;}
   { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
