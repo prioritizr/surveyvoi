@@ -53,8 +53,12 @@ check:
 	R --slave -e "devtools::check(build_args = '--no-build-vignettes', args = '--no-build-vignettes', run_dont_test = TRUE, vignettes = FALSE)" >> check.log 2>&1
 	cp -Rf doc inst/
 
+build:
+	R --slave -e "devtools::build()"
+	cp -R doc inst/
+
 install:
-	R --slave -e "devtools::install_local('../surveyvoi', force = TRUE, upgrade = 'never')"
+	R --slave -e "devtools::install_local('.', force = TRUE, upgrade = 'never')"
 
 examples:
 	rm -f examples.log
