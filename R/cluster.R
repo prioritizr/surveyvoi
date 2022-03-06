@@ -20,8 +20,7 @@ NULL
 #' @return `cluster` object.
 #'
 #' @noRd
-start_cluster <- function(
-  n, names, type = NULL) {
+start_cluster <- function(n, names, type = NULL) {
   # assert arguments are valid
   assertthat::assert_that(
     assertthat::is.count(n),
@@ -32,6 +31,10 @@ start_cluster <- function(
   # determine cluster type
   if (is.null(type)) {
     type <- ifelse(.Platform$OS.type == "unix", "FORK", "PSOCK")
+  }
+  if (nchar(Sys.getenv("TESTTHAT")) > 0) {
+    # this function only works with PSOCK clusters when tested in testthat v3+
+    type <- "PSOCK"
   }
   # validate cluster type
   assertthat::assert_that(

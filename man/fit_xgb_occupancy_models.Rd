@@ -201,13 +201,15 @@ the models' training and evaluation folds.
 }
 }
 \examples{
+\dontrun{
 # set seeds for reproducibility
 library(RandomFields)
 set.seed(123)
 RFoptions(seed = 123)
 
-# simulate data for 200 sites, 2 features, and 3 environmental variables
-site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
+# simulate data for 30 sites, 2 features, and 3 environmental variables
+site_data <- simulate_site_data(
+  n_sites = 30, n_features = 2, n_env_vars = 3, prop = 0.1)
 feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 
 # create list of possible tuning parameters for modelling
@@ -215,7 +217,6 @@ parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
                    objective = "binary:logistic")
 
-\donttest{
 # fit models
 # note that we use 10 random search iterations here so that the example
 # finishes quickly, you would probably want something like 1000+

@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.2</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/jeffreyhanson/surveyvoi/">
+  <a href="https://github.com/jeffreyhanson/surveyvoi/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -81,38 +81,38 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="surveyvoi-survey-value-of-information" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#surveyvoi-survey-value-of-information" class="anchor" aria-hidden="true"></a>surveyvoi: Survey Value of Information</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="surveyvoi-survey-value-of-information">surveyvoi: Survey Value of Information<a class="anchor" aria-label="anchor" href="#surveyvoi-survey-value-of-information"></a>
+</h1></div>
 
 <p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>). Additionally, the JAGS software (available from <a href="https://mcmc-jags.sourceforge.io/" class="external-link uri">https://mcmc-jags.sourceforge.io/</a>) is required to fit hierarchical generalized linear models.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>The development version can be installed from <a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link">GitHub</a> using the following code.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jeffreyhanson/surveyvoi"</span><span class="op">)</span></code></pre></div>
-<div id="windows" class="section level4">
-<h4 class="hasAnchor">
-<a href="#windows" class="anchor" aria-hidden="true"></a>Windows</h4>
+<div class="section level4">
+<h4 id="windows">Windows<a class="anchor" aria-label="anchor" href="#windows"></a>
+</h4>
 <p>The <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a> software needs to be installed to install the <em>surveyvoi R</em> package from source. This software provides system requirements from <a href="https://github.com/rwinlib/" class="external-link">rwinlib</a>.</p>
 </div>
-<div id="ubuntu" class="section level4">
-<h4 class="hasAnchor">
-<a href="#ubuntu" class="anchor" aria-hidden="true"></a>Ubuntu</h4>
+<div class="section level4">
+<h4 id="ubuntu">Ubuntu<a class="anchor" aria-label="anchor" href="#ubuntu"></a>
+</h4>
 <p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
 </div>
-<div id="linux" class="section level4">
-<h4 class="hasAnchor">
-<a href="#linux" class="anchor" aria-hidden="true"></a>Linux</h4>
+<div class="section level4">
+<h4 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
+</h4>
 <p>For Unix-alikes, <code>gmp</code> (&gt;= 4.2.3), <code>mpfr</code> (&gt;= 3.0.0), and <code>symphony</code> (&gt;= 5.6.16) are required.</p>
 </div>
-<div id="macos" class="section level4">
-<h4 class="hasAnchor">
-<a href="#macos" class="anchor" aria-hidden="true"></a>MacOS</h4>
+<div class="section level4">
+<h4 id="macos">MacOS<a class="anchor" aria-label="anchor" href="#macos"></a>
+</h4>
 <p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries are required. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>brew tap coin<span class="sc">-</span>or<span class="sc">-</span>tools<span class="sc">/</span>coinor</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>brew install symphony</span>
@@ -121,17 +121,17 @@
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
 </div>
 </div>
-<div id="citation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#citation" class="anchor" aria-hidden="true"></a>Citation</h2>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
 <p>Please cite the <em>surveyvoi R</em> package when using it in publications. To cite the developmental version, please use:</p>
 <blockquote>
-<p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey Value of Information. R package version 1.0.3.1. Available at <a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link uri">https://github.com/jeffreyhanson/surveyvoi</a>.</p>
+<p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey Value of Information. R package version 1.0.3.2. Available at <a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link uri">https://github.com/jeffreyhanson/surveyvoi</a>.</p>
 </blockquote>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor" aria-hidden="true"></a>Usage</h2>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
 <p>Here we provide a short example showing how to use the <em>surveyvoi R</em> package to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (termed “survey schemes”) using simulated data for six sites and three conservation features (e.g. bird species). To start off, we will set the seed for the random number generator for reproducibility and load some R packages.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">500</span><span class="op">)</span>      <span class="co"># set RNG for reproducibility</span>
@@ -282,9 +282,9 @@
 <p><img src="reference/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;"></p>
 <p>This has just been a taster of the <em>surveyvoi R</em> package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the <a href="http://jeffrey-hanson.com/surveyvoi/articles/surveyvoi.html" class="external-link">package vignette</a>.</p>
 </div>
-<div id="getting-help" class="section level2">
-<h2 class="hasAnchor">
-<a href="#getting-help" class="anchor" aria-hidden="true"></a>Getting help</h2>
+<div class="section level2">
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
 <p>If you have any questions about using the <em>surveyvoi R</em> package or suggestions for improving it, please <a href="https://github.com/jeffreyhanson/surveyvoi/issues/new" class="external-link">file an issue at the package’s online code repository</a>.</p>
 </div>
 </div>
@@ -294,33 +294,37 @@
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=surveyvoi">https://​cloud.r-project.org/​package=surveyvoi</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/jeffreyhanson/surveyvoi/">https://​github.com/​jeffreyhanson/​surveyvoi/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/jeffreyhanson/surveyvoi/issues">https://​github.com/​jeffreyhanson/​surveyvoi/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=surveyvoi" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/jeffreyhanson/surveyvoi/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/jeffreyhanson/surveyvoi/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
 <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
 
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing surveyvoi</a></li>
+</ul>
+</div>
 
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://jeffrey-hanson.com">Jeffrey O Hanson</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4716-6134" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<a href="https://jeffrey-hanson.com" class="external-link">Jeffrey O Hanson</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-4716-6134" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>
-<a href="http://www.iadine-chades.org">Iadine Chadès</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7442-2850" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<a href="http://www.iadine-chades.org" class="external-link">Iadine Chadès</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7442-2850" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>
-<a href="https://ejhudgins.com">Emma J Hudgins</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8402-5111" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Joseph R Bennett <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3901-9513" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<a href="https://ejhudgins.com" class="external-link">Emma J Hudgins</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8402-5111" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Joseph R Bennett <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3901-9513" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
@@ -347,7 +351,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>

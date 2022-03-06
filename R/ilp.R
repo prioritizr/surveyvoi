@@ -64,11 +64,13 @@ distance_based_prioritizations <- function(
     assertthat::noNA(solver))
   assertthat::assert_that(
     solver %in% c("auto", "Rsymphony", "gurobi"))
+
   # identify solver
   if (identical(solver, "auto")) {
     solver <- ifelse(
       requireNamespace("gurobi", quietly = TRUE), "gurobi", "Rsymphony")
   }
+
   # prepare data for optimization
   ## initialization
   n <- nrow(x)
@@ -101,6 +103,7 @@ distance_based_prioritizations <- function(
   } else {
     p <- list(gap_limit = -1, verbosity = ifelse(verbose, 1, -2))
   }
+
   # prepare output matrix
   out <- matrix(NA, ncol = nrow(x), nrow = length(budget))
   # iterate over each budget and obtain the solution
@@ -126,6 +129,7 @@ distance_based_prioritizations <- function(
     ## store solution
     out[b, ] <- as.logical(s)
   }
+
   # return matrix
   out
 }
@@ -314,9 +318,6 @@ rsymphony_solve <- function(model, parameters) {
   # assert arguments are valid
   assertthat::assert_that(is.list(model), is.list(parameters))
   # return solution
-  list(
-    x = do.call(
-      Rsymphony::Rsymphony_solve_LP,
-      append(model, parameters))$solution
-  )
+  s <- do.call(Rsymphony::Rsymphony_solve_LP, append(model, parameters))
+  list(x = s$solution, objval = s$objval)
 }

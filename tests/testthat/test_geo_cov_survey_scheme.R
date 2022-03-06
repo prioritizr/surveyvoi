@@ -10,8 +10,7 @@ test_that("single solution (gurobi)", {
                    cost = rep(1, 4)),
     coords = c("x", "y"))
   # generate prioritisation
-  r <- geo_cov_survey_scheme(
-    x, "cost", 2, solver = "gurobi", verb= T)
+  r <- geo_cov_survey_scheme(x, "cost", 2, solver = "gurobi")
   # tests
   expect_is(r, "matrix")
   expect_equal(nrow(r), 1)
@@ -24,10 +23,10 @@ test_that("multiple solutions (gurobi)", {
   skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = c(0.1, 0.2, 0.21, 10),
-                   y = c(0.1, 0.2, 0.21, 10),
-                   locked_in = rep(FALSE, 4),
-                   cost = rep(1, 4)),
+    tibble::tibble(x = c(0.1, 0.21, 0.22, 0.23, 10),
+                   y = c(0.1, 0.21, 0.22, 0.23, 10),
+                   locked_in = rep(FALSE, 5),
+                   cost = rep(1, 5)),
     coords = c("x", "y"))
   # generate prioritisation
   r <- geo_cov_survey_scheme(
@@ -37,8 +36,8 @@ test_that("multiple solutions (gurobi)", {
   expect_equal(nrow(r), 2)
   expect_equal(ncol(r), nrow(x))
   expect_is(r[1], "logical")
-  expect_equal(c(r[1, ]), c(FALSE, TRUE, FALSE, TRUE))
-  expect_equal(c(r[2, ]), c(TRUE, FALSE, TRUE, TRUE))
+  expect_equal(c(r[1, ]), c(FALSE, FALSE, TRUE, FALSE, TRUE))
+  expect_equal(c(r[2, ]), c(TRUE, FALSE, TRUE, FALSE, TRUE))
 })
 
 test_that("variable costs (gurobi)", {
@@ -85,10 +84,11 @@ test_that("locked out (gurobi)", {
   skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
-                   y = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
-                   cost = c(1, 1, 1, 1)),
+    tibble::tibble(x = c(0.1, 0.21, 0.22, 0.23, 10),
+                   y = c(0.1, 0.21, 0.22, 0.23, 10),
+                   locked_in = rep(FALSE, 5),
+                   locked_out = c(rep(FALSE, 4), TRUE),
+                   cost = rep(1, 5)),
     coords = c("x", "y"))
   # generate prioritisation
   r <- geo_cov_survey_scheme(
@@ -98,7 +98,7 @@ test_that("locked out (gurobi)", {
   expect_equal(nrow(r), 1)
   expect_equal(ncol(r), nrow(x))
   expect_is(r[1], "logical")
-  expect_equal(c(r), c(FALSE, TRUE, TRUE, FALSE))
+  expect_equal(c(r), c(TRUE, FALSE, FALSE, TRUE, FALSE))
 })
 
 test_that("locked out, exclude = TRUE (gurobi)", {

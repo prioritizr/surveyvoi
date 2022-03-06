@@ -180,13 +180,15 @@ NULL
 #' }
 #'
 #' @examples
+#' \dontrun{
 #' # set seeds for reproducibility
 #' library(RandomFields)
 #' set.seed(123)
 #' RFoptions(seed = 123)
 #'
-#' # simulate data for 200 sites, 2 features, and 3 environmental variables
-#' site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
+#' # simulate data for 30 sites, 2 features, and 3 environmental variables
+#' site_data <- simulate_site_data(
+#'   n_sites = 30, n_features = 2, n_env_vars = 3, prop = 0.1)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #'
 #' # create list of possible tuning parameters for modelling
@@ -194,7 +196,6 @@ NULL
 #'                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
 #'                    objective = "binary:logistic")
 #'
-#' \donttest{
 #' # fit models
 #' # note that we use 10 random search iterations here so that the example
 #' # finishes quickly, you would probably want something like 1000+
@@ -391,9 +392,9 @@ fit_xgb_occupancy_models <- function(
       survey_spec <- feature_data[[feature_survey_specificity_column]][[i]]
       ## make predictions
       p_train_k <- c(withr::with_package("xgboost",
-        stats::predict(m_k, x_train_k, ntreelimit = nround_k)))
+        stats::predict(m_k, x_train_k, iterationrange = c(1, nround_k + 1))))
       p_test_k <- c(withr::with_package("xgboost",
-        stats::predict(m_k, x_test_k, ntreelimit = nround_k)))
+        stats::predict(m_k, x_test_k, iterationrange = c(1, nround_k + 1))))
       ## validate predictions
       assertthat::assert_that(all(p_train_k >= 0), all(p_train_k <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -439,7 +440,7 @@ fit_xgb_occupancy_models <- function(
              function(x) {
       ## generate predictions
       out <- c(withr::with_package("xgboost", stats::predict(
-        x, site_env_data, ntreelimit = x$best_iteration)))
+        x, site_env_data, iterationrange = c(1, x$best_iteration + 1))))
       ## validate predictions
       assertthat::assert_that(all(out >= 0), all(out <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -506,7 +507,8 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
   ## fit models using all parameters combinations
   is_parallel <- (n_threads > 1) && (nrow(full_parameters) > 1)
   if (is_parallel) {
-    cl <- start_cluster(n_threads,
+    cl <- start_cluster(
+      n_threads,
       c("full_parameters", "data", "survey_sensitivity", "survey_specificity",
         "spw", "n_rounds", "early_stopping_rounds", "seed",
         "rcpp_model_performance", "make_feval_tss"))
@@ -540,7 +542,9 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       ### generate predictions
       yhat_test <- c(withr::with_package("xgboost",
           stats::predict(
-            model, data[[k]]$test$x, ntreelimit = model$best_iteration)))
+            model, data[[k]]$test$x,
+            iterationrange = c(1, model$best_iteration + 1)
+          )))
       ### validate predictions
       assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
         msg = "xgboost predictions are not between zero and one")

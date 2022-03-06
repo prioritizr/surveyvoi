@@ -1,3 +1,11 @@
+# surveyvoi 1.0.3.2
+
+- Fix compatibility issues with updates to the xgboost package (version 1.5.0).
+- Fix parallel processing tests given updates to the testthat package
+  (version 3.1.2).
+- Fix tests for environmental and geographic survey schemes given updates to
+  the gurobi package (version 9.5.0).
+
 # surveyvoi 1.0.3.1
 
 - GMP dependencies on Windows systems are now handled using RWinLib

@@ -26,12 +26,12 @@ test_that("multiple solutions (gurobi)", {
   skip_if_not_installed("gurobi")
   # data
   x <- sf::st_as_sf(
-    tibble::tibble(x = rnorm(4),
-                   y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.21, 10),
-                   v2 = c(0.1, 0.2, 0.21, 10),
-                   locked_in = rep(FALSE, 4),
-                   cost = rep(1, 4)),
+    tibble::tibble(x = rnorm(5),
+                   y = rnorm(5),
+                   v1 = c(0.1, 0.21, 0.22, 0.23, 10),
+                   v2 = c(0.1, 0.21, 0.22, 0.23, 10),
+                   locked_in = rep(FALSE, 5),
+                   cost = rep(1, 5)),
     coords = c("x", "y"))
   # generate prioritisation
   r <- env_div_survey_scheme(
@@ -41,8 +41,8 @@ test_that("multiple solutions (gurobi)", {
   expect_equal(nrow(r), 2)
   expect_equal(ncol(r), nrow(x))
   expect_is(r[1], "logical")
-  expect_equal(c(r[1, ]), c(FALSE, TRUE, FALSE, TRUE))
-  expect_equal(c(r[2, ]), c(TRUE, FALSE, TRUE, TRUE))
+  expect_equal(c(r[1, ]), c(FALSE, FALSE, TRUE, FALSE, TRUE))
+  expect_equal(c(r[2, ]), c(TRUE, FALSE, TRUE, FALSE, TRUE))
 })
 
 test_that("variable costs (gurobi)", {
@@ -95,8 +95,8 @@ test_that("locked out (gurobi)", {
   x <- sf::st_as_sf(
     tibble::tibble(x = rnorm(4),
                    y = rnorm(4),
-                   v1 = c(0.1, 0.2, 0.5, 10),
-                   v2 = c(0.1, 0.2, 0.5, 10),
+                   v1 = c(0.1, 0.21, 0.5, 10),
+                   v2 = c(0.1, 0.21, 0.5, 10),
                    locked_out = c(FALSE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
@@ -109,7 +109,7 @@ test_that("locked out (gurobi)", {
   expect_equal(nrow(r), 1)
   expect_equal(ncol(r), nrow(x))
   expect_is(r[1], "logical")
-  expect_equal(c(r), c(FALSE, TRUE, TRUE, FALSE))
+  expect_equal(c(r), c(TRUE, FALSE, TRUE, FALSE))
 })
 
 test_that("locked out, exclude = TRUE (gurobi)", {

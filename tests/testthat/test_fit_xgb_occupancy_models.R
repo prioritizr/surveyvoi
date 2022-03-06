@@ -151,7 +151,6 @@ test_that("multiple species (sparse, multiple threads)", {
   # skip if using PSOCK cluster and package not installed
   skip_if(!requireNamespace("surveyvoi") &&
           !identical(.Platform$OS.type, "unix"))
-  # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 2000
@@ -162,7 +161,7 @@ test_that("multiple species (sparse, multiple threads)", {
   tuning_parameters <-
     list(eta = c(0.1, 0.5), lambda = c(0.01, 0.05),
          objective = "binary:logistic")
-  # randomly set sites to hvae 0 surveys for certain species
+  # randomly set sites to have 0 surveys for certain species
   x2 <- x
   for (i in seq_len(n_f)) {
     fn <- paste0("f", i)
