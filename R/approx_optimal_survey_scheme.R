@@ -339,22 +339,23 @@ approx_optimal_survey_scheme <- function(
   # calculate expected value of decision given schemes that survey sites
   ## initialize cluster
   if (n_threads > 1) {
-      cl <- start_cluster(n_threads,
-        c("pij", "all_feasible_schemes", "new_info_idx",
-          "site_data", "feature_data",
-          "feature_survey_column",
-          "feature_survey_sensitivity_column",
-          "feature_survey_specificity_column",
-          "site_survey_cost_column",
-          "site_management_cost_column",
-          "site_management_locked_in",
-          "site_management_locked_out",
-          "feature_target_column",
-          "n_approx_replicates",
-          "n_approx_outcomes_per_replicate",
-          "total_budget",
-          "seed",
-          "rcpp_approx_expected_value_of_decision_given_survey_scheme"))
+    cl <- start_cluster(n_threads,
+      c("pij", "all_feasible_schemes", "new_info_idx",
+        "site_data", "feature_data",
+        "feature_survey_column",
+        "feature_survey_sensitivity_column",
+        "feature_survey_specificity_column",
+        "site_survey_cost_column",
+        "site_management_cost_column",
+        "site_management_locked_in",
+        "site_management_locked_out",
+        "feature_target_column",
+        "n_approx_replicates",
+        "n_approx_outcomes_per_replicate",
+        "total_budget",
+        "seed",
+        "rcpp_approx_expected_value_of_decision_given_survey_scheme"))
+    on.exit(try(stop_cluster(cl), silent = TRUE), add = TRUE)
   }
   ## run calculations
   evd_new_info <- plyr::laply(

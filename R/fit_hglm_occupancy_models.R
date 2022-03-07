@@ -333,6 +333,7 @@ fit_hglm_occupancy_models <- function(
       c("model_cmbs", "d", "feature_data", "seed",
         "jags_n_samples", "jags_n_burnin", "jags_n_thin", "jags_n_adapt",
         "fit_hglm_model"))
+    on.exit(try(stop_cluster(cl), silent = TRUE), add = TRUE)
   }
   ## main processing
   m_raw <- plyr::llply(

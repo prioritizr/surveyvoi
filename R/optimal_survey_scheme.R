@@ -332,6 +332,7 @@ optimal_survey_scheme <- function(
         "feature_target_column",
         "total_budget",
         "rcpp_expected_value_of_decision_given_survey_scheme"))
+    on.exit(try(stop_cluster(cl), silent = TRUE), add = TRUE)
   }
   ## run calculations
   evd_new_info <- plyr::laply(

@@ -412,6 +412,7 @@ approx_near_optimal_survey_scheme <- function(
           "n_approx_replicates",
           "n_approx_outcomes_per_replicate",
           "rcpp_approx_expected_value_of_decision_given_survey_scheme"))
+      on.exit(try(stop_cluster(cl), silent = TRUE), add = TRUE)
     }
     ## run calculations
     curr_sites_approx_evsdi <- plyr::laply(

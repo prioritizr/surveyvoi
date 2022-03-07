@@ -1,3 +1,10 @@
+# surveyvoi 1.0.3.3
+
+- Fix issue with `fit_xgb_occupancy_models()` using more than specified number
+  of threads for parallel processing.
+- Ensure that PSOCK and FORK clusters used for parallel processing are
+  terminated correctly, even when processing is interrupted.
+
 # surveyvoi 1.0.3.2
 
 - Fix compatibility issues with updates to the xgboost package (version 1.5.0).

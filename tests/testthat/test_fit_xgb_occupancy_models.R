@@ -1,6 +1,7 @@
 context("fit_xgb_occupancy_models")
 
 test_that("single species", {
+  skip_on_cran()
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -75,6 +76,7 @@ test_that("single species", {
 })
 
 test_that("multiple species", {
+  skip_on_cran()
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -148,8 +150,9 @@ test_that("multiple species", {
 })
 
 test_that("multiple species (sparse, multiple threads)", {
-  # skip if using PSOCK cluster and package not installed
-  skip_if(!requireNamespace("surveyvoi") &&
+  skip_on_cran()
+  # skip if not on Linux or package not installed
+  skip_if(!requireNamespace("surveyvoi") ||
           !identical(.Platform$OS.type, "unix"))
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
