@@ -151,9 +151,6 @@ test_that("multiple species", {
 
 test_that("multiple species (sparse, multiple threads)", {
   skip_on_cran()
-  # skip if not on Linux or package not installed
-  skip_if(!requireNamespace("surveyvoi") ||
-          !identical(.Platform$OS.type, "unix"))
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
   n_pu <- 2000

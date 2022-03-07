@@ -400,14 +400,12 @@ fit_xgb_occupancy_models <- function(
       ## make predictions
       p_train_k <- c(withr::with_package("xgboost",
         stats::predict(
-          m_k, xgboost::xgb.DMatrix(x_train_k, nthread = 1),
-          iterationrange = c(1, nround_k + 1),
-          nthread = 1)))
+          m_k, xgboost::xgb.DMatrix(x_train_k, nthread = n_threads),
+          iterationrange = c(1, nround_k + 1))))
       p_test_k <- c(withr::with_package("xgboost",
         stats::predict(
-          m_k, xgboost::xgb.DMatrix(x_test_k, nthread = 1),
-          iterationrange = c(1, nround_k + 1),
-          nthread = 1)))
+          m_k, xgboost::xgb.DMatrix(x_test_k, nthread = n_threads),
+          iterationrange = c(1, nround_k + 1))))
       ## validate predictions
       assertthat::assert_that(all(p_train_k >= 0), all(p_train_k <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -452,9 +450,8 @@ fit_xgb_occupancy_models <- function(
              function(x) {
       ## generate predictions
       out <- c(withr::with_package("xgboost", stats::predict(
-        x, xgboost::xgb.DMatrix(site_env_data, nthread = 1),
-        iterationrange = c(1, x$best_iteration + 1),
-        nthread = 1
+        x, xgboost::xgb.DMatrix(site_env_data, nthread = n_threads),
+        iterationrange = c(1, x$best_iteration + 1)
       )))
       ## validate predictions
       assertthat::assert_that(
@@ -519,77 +516,39 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
   assertthat::assert_that(all(is.finite(spw)))
 
   # precompute xgboost matrices
-  # N.B. this is because xgboost has a bug when creating DMatrix objects
-  # from R matrix objects, wherein it will use all available threads
-  # on the system, if done within a child R process
-  dtrain_paths <- vapply(
-    seq_len(n_folds), FUN.VALUE = character(1), function(k) {
-    f <- tempfile(fileext = ".dmat")
-    xgboost::xgb.DMatrix.save(
-      xgboost::xgb.DMatrix(
-        data[[k]]$fit$x,
-        label = data[[k]]$fit$y,
-        weight = data[[k]]$fit$w,
-        nthread = 1
-      ),
-      f
-    )
-    f
+  dtrain <- lapply(seq_len(n_folds), function(k) {
+    xgboost::xgb.DMatrix(
+      data[[k]]$fit$x,
+      label = data[[k]]$fit$y,
+      weight = data[[k]]$fit$w,
+      nthread = n_threads)
   })
-  dtest_paths <- vapply(
-    seq_len(n_folds), FUN.VALUE = character(1), function(k) {
-    f <- tempfile(fileext = ".dmat")
-    xgboost::xgb.DMatrix.save(
-      xgboost::xgb.DMatrix(
-        data[[k]]$test$x,
-        label = data[[k]]$test$y,
-        weight = data[[k]]$test$w,
-        nthread = 1
-      ),
-      f
-    )
-    f
+  dtest <- lapply(seq_len(n_folds), function(k) {
+    xgboost::xgb.DMatrix(
+      data[[k]]$test$x,
+      label = data[[k]]$test$y,
+      weight = data[[k]]$test$w,
+      nthread = n_threads)
   })
-  assertthat::assert_that(
-    all(file.exists(dtrain_paths)),
-    all(file.exists(dtest_paths)),
-    msg = "could not save data to temporary directory to faciliate analysis")
 
   # find best tuning parameters using k-fold cross validation
   ## fit models using all parameters combinations
-  is_parallel <- (n_threads > 1) && (nrow(full_parameters) > 1)
-  if (is_parallel) {
-    cl <- start_cluster(
-      n_threads,
-      c("full_parameters", "data", "dtest_paths", "dtest_paths",
-        "survey_sensitivity", "survey_specificity",
-        "spw", "n_rounds", "early_stopping_rounds", "seed",
-        "rcpp_model_performance", "make_feval_tss"))
-    on.exit(try(stop_cluster(cl), silent = TRUE), add = TRUE)
-  }
-  cv <- plyr::ldply(
-    seq_len(nrow(full_parameters)), .parallel = is_parallel,
-   .paropts = list(.packages = "surveyvoi"), function(i)  {
+  cv <- plyr::ldply(seq_len(nrow(full_parameters)), function(i)  {
     ## extract tuning parameters
     p <- as.list(full_parameters[i, , drop = FALSE])
     ## run cross-validation
     cv <- lapply(seq_len(n_folds), function(k) {
-      ### prepare data for xgboost (note we use the fit data not the train data)
-      dtrain <- xgboost::xgb.DMatrix(
-        dtrain_paths[k], nthread = 1, silent = TRUE)
-      dtest <- xgboost::xgb.DMatrix(
-        dtest_paths[k], nthread = 1, silent = TRUE)
       ### prepare evaluation function
       curr_feval_tss <- make_feval_tss(survey_sensitivity, survey_specificity)
       ### prepare arguments for xgboost call
-      args <- list(data = dtrain,
+      args <- list(data = dtrain[[k]],
                    verbose = FALSE,
                    scale_pos_weight = spw[k],
-                   watchlist = list(test = dtest),
+                   watchlist = list(test = dtest[[k]]),
                    eval_metric = curr_feval_tss,
                    maximize = TRUE,
                    nrounds = n_rounds,
-                   nthread = 1,
+                   nthread = n_threads,
                    early_stopping_rounds = early_stopping_rounds)
       args <- append(args, p)
       ### fit model
@@ -599,9 +558,8 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       ### generate predictions
       yhat_test <- c(withr::with_package("xgboost",
         stats::predict(
-          model, dtest,
-          iterationrange = c(1, model$best_iteration + 1),
-          nthread = 1
+          model, dtest[[k]],
+          iterationrange = c(1, model$best_iteration + 1)
         )))
       ### validate predictions
       assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
@@ -620,13 +578,6 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       eval = mean(vapply(cv, `[[`, numeric(1), "eval")),
       models = list(lapply(cv, `[[`, "model")))
   })
-  if (is_parallel) {
-    cl <- stop_cluster(cl)
-  }
-
-  # cleanup
-  unlink(dtest_paths, force = TRUE)
-  unlink(dtrain_paths, force = TRUE)
 
   # determine best parameters for i'th species
   cv <- tibble::as_tibble(cv)
