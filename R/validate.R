@@ -1,4 +1,5 @@
-validate_site_detection_data <- function(site_data, column_names) {
+validate_site_detection_data <- function(site_data, column_names,
+                                         check_zeros = TRUE) {
   ## check that data are numeric
   is_valid <- sapply(column_names, function(x) is.numeric(site_data[[x]]))
   assertthat::assert_that(
@@ -20,16 +21,19 @@ validate_site_detection_data <- function(site_data, column_names) {
     msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
          " columns in site_data must have values >= 0 and <= 1"))
   ## check that each species has been detected at least once
-  is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
-  assertthat::assert_that(
-    all(is_valid),
-    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
-       " columns in site_data need a maximum value > 0",
-       "(i.e. it needs to be detected at least once)"))
+  if (isTRUE(check_zeros)) {
+    is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
+    assertthat::assert_that(
+      all(is_valid),
+      msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data need a maximum value > 0",
+         " (i.e. it needs to be detected at least once)"))
+  }
   invisible(TRUE)
 }
 
-validate_site_n_surveys_data <- function(site_data, column_names) {
+validate_site_n_surveys_data <- function(site_data, column_names,
+                                         check_zeros = TRUE) {
   ## check that data are integer
   is_valid <- sapply(column_names, function(x) {
     max(abs(round(site_data[[x]]) - site_data[[x]])) < 1e-10
@@ -51,12 +55,14 @@ validate_site_n_surveys_data <- function(site_data, column_names) {
     msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
          " columns in site_data have values < 0"))
   ## check that each species has been detected at least once
-  is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
-  assertthat::assert_that(
-    all(is_valid),
-    msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
-       " columns in site_data need a maximum value > 0",
-       "(i.e. it needs to be surveyed at least in one site)"))
+  if (isTRUE(check_zeros)) {
+    is_valid <- sapply(column_names, function(x) max(site_data[[x]]) > 0)
+    assertthat::assert_that(
+      all(is_valid),
+      msg = paste0(paste_list(paste0("\"", column_names[!is_valid], "\"")),
+         " columns in site_data need a maximum value > 0",
+         " (i.e. it needs to be surveyed at least in one site)"))
+  }
   invisible(TRUE)
 }
 

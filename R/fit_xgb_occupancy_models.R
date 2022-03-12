@@ -304,7 +304,8 @@ fit_xgb_occupancy_models <- function(
     create_site_folds(
       prop_detected = site_data[[site_detection_columns[i]]][n_surveys > 0],
       n_total = n_surveys[n_surveys > 0],
-      n = n_folds[i], idx[n_surveys > 0], seed = seed)
+      n = n_folds[i], idx[n_surveys > 0],
+      seed = seed)
   })
 
   # prepare data
@@ -349,7 +350,7 @@ fit_xgb_occupancy_models <- function(
       x_train <- site_env_data[c(train_data$idx, train_data$idx), ,
                                drop = FALSE]
       w_train <- c(train_data$n_det / train_data$n_surveys,
-                  train_data$n_nondet / train_data$n_surveys)
+                   train_data$n_nondet / train_data$n_surveys)
       # prepare test fold data (for model evaluation + performance stats)
       test_data <- site_data[f[[i]]$test[[k]], , drop = FALSE]
       y_test <- c(rep(1, nrow(test_data)), rep(0, nrow(test_data)))
@@ -600,7 +601,7 @@ make_feval_tss <- function(sens, spec) {
       any(labels >= 0.5), any(labels < 0.5),
       msg = "test labels need at least one presence and one absence")
     assertthat::assert_that(all(preds >= 0), all(preds <= 1),
-      msg = "xgboost predictions are not between zero and one (eval_matric)")
+      msg = "xgboost predictions are not between zero and one (eval_metric)")
     value <- rcpp_model_performance(labels, preds, wts, sens, spec)
     list(metric = "tss", value = value[[1]])
   }

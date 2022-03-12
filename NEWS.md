@@ -1,3 +1,8 @@
+# surveyvoi 1.0.3.4
+
+- Update `prior_probability_matrix()` to compute prior probabilities when
+  no existing survey data are available.
+
 # surveyvoi 1.0.3.3
 
 - Fix issue with `fit_xgb_occupancy_models()` using more than specified number

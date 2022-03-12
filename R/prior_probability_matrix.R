@@ -91,8 +91,10 @@ prior_probability_matrix <- function(
     all(feature_data[[feature_model_specificity_column]] >= 0),
     all(feature_data[[feature_model_specificity_column]] <= 1))
   ## validate survey data
-  validate_site_detection_data(site_data, site_detection_columns)
-  validate_site_n_surveys_data(site_data, site_n_surveys_columns)
+  validate_site_detection_data(
+    site_data, site_detection_columns, check_zeros = FALSE)
+  validate_site_n_surveys_data(
+    site_data, site_n_surveys_columns, check_zeros = FALSE)
 
   # calculate prior matrix
   prior <- internal_prior_probability_matrix(

@@ -80,7 +80,7 @@ Please cite the *surveyvoi R* package when using it in publications. To
 cite the developmental version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey
-> Value of Information. R package version 1.0.3.3. Available at
+> Value of Information. R package version 1.0.3.4. Available at
 > <https://github.com/jeffreyhanson/surveyvoi>.
 
 ## Usage
