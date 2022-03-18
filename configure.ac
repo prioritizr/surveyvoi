@@ -113,21 +113,21 @@ AC_MSG_CHECKING([if ${GMP_NAME} compiles])
 #include ${GMP_TEST_C_HEADER}
 #include ${GMP_TEST_CXX_HEADER}
 #if defined(__GNU_MP_VERSION)
-#define SUCCESS 1
-#else
 #define SUCCESS 0
+#else
+#define SUCCESS 1
 #endif
 int main() {
   return SUCCESS;
 }
 _EOCONF]
-${CXX} ${CPPFLAGS} -o gdal_test gdal_test.cpp ${LIBS} 2> errors.txt
+${CXX} ${CPPFLAGS} -o gmp_test gmp_test.cpp ${LIBS} 2> errors.txt
 if test `echo $?` -ne 0 ; then
-  gmp_ok=yes
-  AC_MSG_RESULT([yes])
-else
   gmp_ok=no
   AC_MSG_RESULT([no])
+else
+  gmp_ok=yes
+  AC_MSG_RESULT([yes])
 fi
 
 ## throw error if needed
@@ -143,6 +143,9 @@ if test x"${gmp_ok}" == x"no"; then
   AC_MSG_ERROR([ERROR: Installation failed])
 fi
 
+## clean up
+rm -f gmp_test errors.txt gmp_test.cpp
+
 # Verify MFPR settings work
 ## display message
 AC_MSG_CHECKING([if ${MPFR_NAME} compiles])
@@ -151,21 +154,21 @@ AC_MSG_CHECKING([if ${MPFR_NAME} compiles])
 [cat > mpfr_test.cpp <<_EOCONF
 #include ${MPFR_TEST_HEADER}
 #if defined(MPFR_VERSION_MAJOR)
-#define SUCCESS 1
-#else
 #define SUCCESS 0
+#else
+#define SUCCESS 1
 #endif
 int main() {
   return SUCCESS;
 }
 _EOCONF]
-${CXX} ${CPPFLAGS} -o mpfr_test mfr_test.cpp ${LIBS} 2> errors.txt
+${CXX} ${CPPFLAGS} -o mpfr_test mpfr_test.cpp ${LIBS} 2> errors.txt
 if test `echo $?` -ne 0 ; then
-  mpfr_ok=yes
-  AC_MSG_RESULT([yes])
-else
   mpfr_ok=no
   AC_MSG_RESULT([no])
+else
+  mpfr_ok=yes
+  AC_MSG_RESULT([yes])
 fi
 
 ## throw error if needed
@@ -180,6 +183,9 @@ if test x"${mpfr_ok}" == x"no"; then
   AC_MSG_NOTICE([])
   AC_MSG_ERROR([ERROR: Installation failed])
 fi
+
+## clean up
+rm -f mpfr_test errors.txt mpfr_test.cpp
 
 # Export settings
 ## save settings to Makevars
