@@ -192,4 +192,9 @@ rm -f mpfr_test errors.txt mpfr_test.cpp
 AC_SUBST([PKG_CPPFLAGS],["${PKG_CPPFLAGS}"])
 AC_SUBST([PKG_LIBS],["${PKG_LIBS}"])
 AC_CONFIG_FILES([src/Makevars])
+
+# print message indicating success
+AC_MSG_NOTICE([configuration successful!])
+
+## finish
 AC_OUTPUT

@@ -1937,6 +1937,12 @@ PKG_LIBS="${PKG_LIBS}"
 
 ac_config_files="$ac_config_files src/Makevars"
 
+
+# print message indicating success
+{ $as_echo "$as_me:${as_lineno-$LINENO}: configuration successful!" >&5
+$as_echo "$as_me: configuration successful!" >&6;}
+
+## finish
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
