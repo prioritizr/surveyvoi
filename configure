@@ -1700,11 +1700,18 @@ MPFR_BREW_NAME="mpfr"
 MPFR_TEST_HEADER="<mpfr.h>"
 
 # Preliminary processing
+## print status message
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if R found" >&5
+$as_echo_n "checking if R found... " >&6; }
 ## ensure C++ is set up as R expects
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
-    as_fn_error $? "Could not determine R_HOME." "$LINENO" 5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  as_fn_error $? "Could not determine R_HOME." "$LINENO" 5
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
 
 ## verify suitable R version
 RBIN="${R_HOME}/bin/R"
@@ -1715,15 +1722,19 @@ RVER_MINOR=`echo ${RVER} | cut  -f2 -d"."`
 RVER_PATCH=`echo ${RVER} | cut  -f3 -d"."`
 
 if test $RVER_MAJOR = "development"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: R version: development" >&5
+$as_echo "$as_me: R version: development" >&6;}
+  CXX11=`"${RBIN}" CMD config CXX11`
+  CXX11STD=`"${RBIN}" CMD config CXX11STD`
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: R version: ${RVER_MAJOR}.${RVER_MINOR}.${RVER_PATCH}" >&5
+$as_echo "$as_me: R version: ${RVER_MAJOR}.${RVER_MINOR}.${RVER_PATCH}" >&6;}
+  if test $RVER_MAJOR -lt 4; then
+      as_fn_error $? "surveyvoi is not compatible with R versions before 4.0.0" "$LINENO" 5
+  else
     CXX11=`"${RBIN}" CMD config CXX11`
     CXX11STD=`"${RBIN}" CMD config CXX11STD`
-else
-    if test $RVER_MAJOR -lt 4; then
-        as_fn_error $? "surveyvoi is not compatible with R versions before 4.0.0" "$LINENO" 5
-    else
-      CXX11=`"${RBIN}" CMD config CXX11`
-      CXX11STD=`"${RBIN}" CMD config CXX11STD`
-    fi
+  fi
 fi
 
 # pick all flags for testing from R
@@ -1806,6 +1817,12 @@ PKG_CPPFLAGS="${CPPFLAGS} ${GMP_CFLAGS} ${MPFR_CFLAGS}"
 PKG_LIBS="${LIBS} ${GMP_LIBS} ${MPFR_LIBS}"
 CPPFLAGS="${PKG_CPPFLAGS}"
 LIBS="${PKG_LIBS}"
+
+## display compiler flags
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Package PKG_CPPFLAGS: ${CPPFLAGS}" >&5
+$as_echo "$as_me: Package PKG_CPPFLAGS: ${CPPFLAGS}" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Package PKG_LIBS:     ${LIBS}" >&5
+$as_echo "$as_me: Package PKG_LIBS:     ${LIBS}" >&6;}
 
 # Verify GMP settings work
 ## display message
@@ -3069,9 +3086,3 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
-
-## display settings
-{ $as_echo "$as_me:${as_lineno-$LINENO}: Package CPPFLAGS: ${PKG_CPPFLAGS}" >&5
-$as_echo "$as_me: Package CPPFLAGS: ${PKG_CPPFLAGS}" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: Package LIBS:     ${PKG_LIBS}" >&5
-$as_echo "$as_me: Package LIBS:     ${PKG_LIBS}" >&6;}

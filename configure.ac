@@ -23,11 +23,15 @@ MPFR_BREW_NAME="mpfr"
 MPFR_TEST_HEADER="<mpfr.h>"
 
 # Preliminary processing
+## print status message
+AC_MSG_CHECKING([if R found])
 ## ensure C++ is set up as R expects
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
-    AC_MSG_ERROR([Could not determine R_HOME.])
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([Could not determine R_HOME.])
 fi
+AC_MSG_RESULT([yes])
 
 ## verify suitable R version
 RBIN="${R_HOME}/bin/R"
@@ -38,15 +42,17 @@ RVER_MINOR=`echo ${RVER} | cut  -f2 -d"."`
 RVER_PATCH=`echo ${RVER} | cut  -f3 -d"."`
 
 if test [$RVER_MAJOR = "development"]; then
+  AC_MSG_NOTICE([R version: development])
+  CXX11=`"${RBIN}" CMD config CXX11`
+  CXX11STD=`"${RBIN}" CMD config CXX11STD`
+else
+  AC_MSG_NOTICE([R version: ${RVER_MAJOR}.${RVER_MINOR}.${RVER_PATCH}])
+  if test [$RVER_MAJOR -lt 4]; then
+      AC_MSG_ERROR([surveyvoi is not compatible with R versions before 4.0.0])
+  else
     CXX11=`"${RBIN}" CMD config CXX11`
     CXX11STD=`"${RBIN}" CMD config CXX11STD`
-else
-    if test [$RVER_MAJOR -lt 4]; then
-        AC_MSG_ERROR([surveyvoi is not compatible with R versions before 4.0.0])
-    else
-      CXX11=`"${RBIN}" CMD config CXX11`
-      CXX11STD=`"${RBIN}" CMD config CXX11STD`
-    fi
+  fi
 fi
 
 # pick all flags for testing from R
@@ -93,6 +99,10 @@ PKG_CPPFLAGS="${CPPFLAGS} ${GMP_CFLAGS} ${MPFR_CFLAGS}"
 PKG_LIBS="${LIBS} ${GMP_LIBS} ${MPFR_LIBS}"
 CPPFLAGS="${PKG_CPPFLAGS}"
 LIBS="${PKG_LIBS}"
+
+## display compiler flags
+AC_MSG_NOTICE([Package PKG_CPPFLAGS: ${CPPFLAGS}])
+AC_MSG_NOTICE([Package PKG_LIBS:     ${LIBS}])
 
 # Verify GMP settings work
 ## display message
@@ -177,7 +187,3 @@ AC_SUBST([PKG_CPPFLAGS],["${PKG_CPPFLAGS}"])
 AC_SUBST([PKG_LIBS],["${PKG_LIBS}"])
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
-
-## display settings
-AC_MSG_NOTICE([Package CPPFLAGS: ${PKG_CPPFLAGS}])
-AC_MSG_NOTICE([Package LIBS:     ${PKG_LIBS}])

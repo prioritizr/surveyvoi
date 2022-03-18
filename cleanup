@@ -1,5 +1,4 @@
 #!/bin/sh
-
 rm -rf config.* \
        src/Makevars \
        config.log \
@@ -7,5 +6,6 @@ rm -rf config.* \
        autom4te.cache \
        gdal_test.cpp \
        gdal_test \
+       gmp_test.cpp \
        mpfr_test.cpp \
-       mpfr_test.cpp
+       errors.txt

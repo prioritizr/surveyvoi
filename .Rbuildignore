@@ -32,3 +32,6 @@ config.status
 config.log
 ^autom4te.cache*
 ^windows$
+gmp_test.cpp
+mpfr_test.cpp
+errors.txt
