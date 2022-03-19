@@ -10,6 +10,11 @@ approximation.R
 simulation.R
 vignettes/simulation_files/figure-html/*png
 src/Makevars
+gmp_test
+gmp_test.cpp
+mpfr_test
+mpfr_test.cpp
+errors.txt
 
 # R profile files
 *.Rproj.user
@@ -30,6 +35,9 @@ examples.log
 
 # debugging files
 debug*R
+config.status
+config.log
+autom4te.cache/*
 
 # do not ignore the following files
 !.gitkeep
