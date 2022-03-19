@@ -1,3 +1,7 @@
+# surveyvoi 1.0.3.5
+
+- Autoconf is used for installation on Linux and macOS operating systems.
+
 # surveyvoi 1.0.3.4
 
 - Update `prior_probability_matrix()` to compute prior probabilities when
