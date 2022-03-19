@@ -33,6 +33,20 @@ Jeff
 
     **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation provide instructions for installing the gurobi R package.**
 
+# System requirements
+
+The package has system requirements. Some of these requirements are mandatory -- and are required for successful installation -- and others are optional. To help verify that these requirements are available on CRAN systems, I have also provided links to relevant files in the Windows and macOS toolchains (i.e., [RTools](https://cran.r-project.org/bin/windows/Rtools/rtools40.html) and [macOS recipes](https://github.com/R-macos/recipes), respectively).
+
+| Software | Windows | macOS |
+|:--------|:--------:|:------:|
+| JAGS (>= 4.3.0) | Optional | Optional |
+| gmp (>= 6.2.1) | [Mandatory](https://github.com/r-windows/rtools-packages/blob/master/mingw-w64-gmp/PKGBUILD) | [Mandatory](https://github.com/R-macos/recipes/blob/master/recipes/gmp) |
+| gmpxx (>= 6.2.1) | [Mandatory](https://github.com/r-windows/rtools-packages/blob/master/mingw-w64-gmp/PKGBUILD) () | [Mandatory](https://github.com/R-macos/recipes/blob/master/recipes/gmp) |
+| mpfr (>= 4.1.0) | [Mandatory](https://github.com/r-windows/rtools-packages/blob/master/mingw-w64-mpfr/PKGBUILD) | [Mandatory](https://github.com/R-macos/recipes/blob/master/recipes/mpfr) |
+| pkgconfig (>= 0.29.2) | [Optional](https://github.com/r-windows/rtools-packages/blob/master/mingw-w64-mpfr/PKGBUILD) | [Optional](https://github.com/R-macos/recipes/blob/master/recipes/pkgconfig) |
+| autoconf (>= 2.69) | Optional | [Mandatory](https://github.com/R-macos/recipes/blob/master/recipes/autoconf) |
+| automake (>= 1.16.5) | Optional | [Mandatory](https://github.com/R-macos/recipes/blob/master/recipes/automake) |
+
 # Downstream dependencies
 
 There are no existing packages that depend on this package.

@@ -80,7 +80,8 @@ SystemRequirements:
     gmpxx (>= 6.2.1),
     mpfr (>= 4.1.0),
     pkg-config (>= 0.29.2),
-    autoconf (>= 2.69)
+    autoconf (>= 2.69),
+    automake (>= 1.16.5)
 URL: https://github.com/jeffreyhanson/surveyvoi
 BugReports: https://github.com/jeffreyhanson/surveyvoi/issues
 VignetteBuilder: knitr

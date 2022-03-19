@@ -1,4 +1,5 @@
 #!/bin/sh
+
 rm -rf config.* \
        src/Makevars \
        config.log \
