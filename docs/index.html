@@ -101,24 +101,25 @@
 <div class="section level4">
 <h4 id="ubuntu">Ubuntu<a class="anchor" aria-label="anchor" href="#ubuntu"></a>
 </h4>
-<p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
+<p>The <code>gmp</code>, <code>fftw3</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. Although the <code>fftw3</code> and <code>symphony</code> libraries are not used directly, they are needed to successfully install dependencies. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libfftw3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
 </h4>
-<p>For Unix-alikes, <code>gmp</code> (&gt;= 4.2.3), <code>mpfr</code> (&gt;= 3.0.0), and <code>symphony</code> (&gt;= 5.6.16) are required.</p>
+<p>For Unix-alikes, <code>gmp</code> (&gt;= 4.2.3), <code>mpfr</code> (&gt;= 3.0.0), <code>fftw3</code> (&gt;= 3.3), and <code>symphony</code> (&gt;= 5.6.16) are required.</p>
 </div>
 <div class="section level4">
 <h4 id="macos">MacOS<a class="anchor" aria-label="anchor" href="#macos"></a>
 </h4>
-<p>The <code>gmp</code>, <code>mpfr</code>, and <code>symphony</code> libraries are required. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
+<p>The <code>gmp</code>, <code>fftw</code>, <code>mpfr</code>, and <code>symphony</code> libraries are required. Although the <code>fftw3</code> and <code>symphony</code> libraries are not used directly, they are needed to successfully install dependencies. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>brew tap coin<span class="sc">-</span>or<span class="sc">-</span>tools<span class="sc">/</span>coinor</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>brew install symphony</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>brew install pkg<span class="sc">-</span>config</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>brew install gmp</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>brew install fftw</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -126,7 +127,7 @@
 </h2>
 <p>Please cite the <em>surveyvoi R</em> package when using it in publications. To cite the developmental version, please use:</p>
 <blockquote>
-<p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey Value of Information. R package version 1.0.3.5. Available at <a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link uri">https://github.com/jeffreyhanson/surveyvoi</a>.</p>
+<p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey Value of Information. R package version 1.0.3.5. Available at <a href="https://github.com/jeffreyhanson/surveyvoi" class="external-link uri">https://github.com/jeffreyhanson/surveyvoi</a>.</p>
 </blockquote>
 </div>
 <div class="section level2">

@@ -48,30 +48,35 @@ This software provides system requirements from
 
 #### Ubuntu
 
-The `gmp`, `mpfr`, and `symphony` libraries need to be installed to
-install the *surveyvoi R* package. For recent versions of Ubuntu (18.04
+The `gmp`, `fftw3`, `mpfr`, and `symphony` libraries need to be
+installed to install the *surveyvoi R* package. Although the `fftw3` and
+`symphony` libraries are not used directly, they are needed to
+successfully install dependencies. For recent versions of Ubuntu (18.04
 and later), these libraries are available through official repositories.
 They can be installed using the following system commands:
 
     apt-get -y update
-    apt-get install -y libgmp3-dev libmpfr-dev coinor-libsymphony-dev
+    apt-get install -y libgmp3-dev libfftw3-dev libmpfr-dev coinor-libsymphony-dev
 
 #### Linux
 
-For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), and
-`symphony` (&gt;= 5.6.16) are required.
+For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), `fftw3`
+(&gt;= 3.3), and `symphony` (&gt;= 5.6.16) are required.
 
 #### MacOS
 
-The `gmp`, `mpfr`, and `symphony` libraries are required. The easiest
-way to install these libraries is using [HomeBrew](https://brew.sh/).
-After installing HomeBrew, these libraries can be installed using the
+The `gmp`, `fftw`, `mpfr`, and `symphony` libraries are required.
+Although the `fftw3` and `symphony` libraries are not used directly,
+they are needed to successfully install dependencies. The easiest way to
+install these libraries is using [HomeBrew](https://brew.sh/). After
+installing HomeBrew, these libraries can be installed using the
 following commands in the system terminal:
 
     brew tap coin-or-tools/coinor
     brew install symphony
     brew install pkg-config
     brew install gmp
+    brew install fftw
     brew install mpfr
 
 ## Citation
@@ -79,7 +84,7 @@ following commands in the system terminal:
 Please cite the *surveyvoi R* package when using it in publications. To
 cite the developmental version, please use:
 
-> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2021). surveyvoi: Survey
+> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
 > Value of Information. R package version 1.0.3.5. Available at
 > <https://github.com/jeffreyhanson/surveyvoi>.
 

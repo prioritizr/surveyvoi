@@ -1,3 +1,7 @@
+# surveyvoi 1.0.3.6
+
+- Update README with system requirements for PoissonBinomial package (#42).
+
 # surveyvoi 1.0.3.5
 
 - Autoconf is used for installation on Linux and macOS operating systems.

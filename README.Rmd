@@ -43,26 +43,27 @@ The [Rtools](https://cran.r-project.org/bin/windows/Rtools/) software needs to b
 
 #### Ubuntu
 
-The `gmp`, `mpfr`, and `symphony` libraries need to be installed to install the _surveyvoi R_ package. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
+The `gmp`, `fftw3`, `mpfr`, and `symphony` libraries need to be installed to install the _surveyvoi R_ package. Although the `fftw3` and `symphony` libraries are not used directly, they are needed to successfully install dependencies. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:
 
 ```
 apt-get -y update
-apt-get install -y libgmp3-dev libmpfr-dev coinor-libsymphony-dev
+apt-get install -y libgmp3-dev libfftw3-dev libmpfr-dev coinor-libsymphony-dev
 ```
 
 #### Linux
 
-For Unix-alikes, `gmp` (>= 4.2.3), `mpfr` (>= 3.0.0), and `symphony` (>= 5.6.16) are required.
+For Unix-alikes, `gmp` (>= 4.2.3), `mpfr` (>= 3.0.0), `fftw3` (>= 3.3), and `symphony` (>= 5.6.16) are required.
 
 #### MacOS
 
-The `gmp`, `mpfr`, and `symphony` libraries are required. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
+The `gmp`, `fftw`, `mpfr`, and `symphony` libraries are required. Although the `fftw3` and `symphony` libraries are not used directly, they are needed to successfully install dependencies. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
 
 ```
 brew tap coin-or-tools/coinor
 brew install symphony
 brew install pkg-config
 brew install gmp
+brew install fftw
 brew install mpfr
 ```
 
@@ -72,7 +73,7 @@ Please cite the _surveyvoi R_ package when using it in publications. To cite the
 
 ```{r, echo = FALSE, results = "asis", comment = ""}
 dev_version <- as.character(packageVersion("surveyvoi"))
-dev_year <- "2021"
+dev_year <- "2022"
 cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", dev_year, "). surveyvoi: Survey Value of Information. R package version ", dev_version, ". Available at https://github.com/jeffreyhanson/surveyvoi.\n"))
 ```
 
