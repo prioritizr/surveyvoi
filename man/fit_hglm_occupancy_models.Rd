@@ -212,8 +212,13 @@ the documentation for the \pkg{rjags} package.
 }
 
 \examples{
-# set seeds for reproducibility
+\dontshow{if (requireNamespace("RandomFields", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontrun{
+# load RandomFields package
+## N.B. the RandomFields package must be installed to run the example
 library(RandomFields)
+
+# set seeds for reproducibility
 set.seed(123)
 RFoptions(seed = 123)
 
@@ -225,7 +230,6 @@ feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 cat(readLines(system.file("jags", "model.jags", package = "surveyvoi")),
     sep = "\n")
 
-\dontrun{
 # fit models
 # note that we use a small number of MCMC iterations so that the example
 # finishes quickly, you probably want to use the defaults for real work
@@ -244,6 +248,7 @@ print(results$predictions)
 # print model performance
 print(results$performance, width = Inf)
 }
+\dontshow{\}) # examplesIf}
 }
 \references{
 Park T & Casella G (2008) The Bayesian lasso.

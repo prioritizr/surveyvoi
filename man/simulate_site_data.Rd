@@ -72,10 +72,13 @@ Simulate site data for developing simulated survey schemes.
 }
 \details{
 The data are simulated using random fields
-(\code{\link[RandomFields:RFsimulate]{RandomFields::RFsimulate()}}) to provide spatially auto-correlated
-simulations.
+(i.e., \code{RandomFields::RFsimulate()}) to provide spatially auto-correlated
+simulations. Note the \pkg{RandomFields} must be installed.
 }
 \examples{
+# please install the RandomFields package to run this example
+
+\dontshow{if (requireNamespace("RandomFields", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # set seed for reproducibility
 set.seed(123)
 RandomFields::RFoptions(seed = 123)
@@ -101,7 +104,7 @@ plot(d[, c("n1", "n2", "n3", "n4")], axes = TRUE, pch = 16, cex = 2)
 
 # plot feature prior probability data
 plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link[=simulate_feature_data]{simulate_feature_data()}}

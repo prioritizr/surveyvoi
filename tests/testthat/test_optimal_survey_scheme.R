@@ -2,6 +2,7 @@ context("optimal_survey_scheme")
 
 test_that("single species", {
   skip_if_not_installed("gurobi")
+  skip_if_not_installed("RandomFields")
   # data
   set.seed(500)
   site_data <- sf::st_as_sf(
@@ -172,6 +173,7 @@ test_that("multiple species (sparse)", {
 
 test_that("consistent results", {
   skip_if_not_installed("gurobi")
+  skip_if_not_installed("RandomFields")
   # seeds
   set.seed(505)
   RandomFields::RFoptions(seed = 505)
@@ -219,6 +221,7 @@ test_that("consistent results", {
 
 test_that("consistent results (multiple threads)", {
   skip_if_not_installed("gurobi")
+  skip_if_not_installed("RandomFields")
   # skip if using PSOCK cluster and package not installed
   skip_if(!requireNamespace("surveyvoi") &&
           !identical(.Platform$OS.type, "unix"))

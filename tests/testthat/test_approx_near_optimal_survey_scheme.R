@@ -168,6 +168,7 @@ test_that("multiple species (sparse)", {
 })
 
 test_that("consistent results", {
+  skip_if_not_installed("RandomFields")
   # seeds
   set.seed(505)
   RandomFields::RFoptions(seed = 505)
@@ -215,6 +216,7 @@ test_that("consistent results", {
 
 test_that("consistent results (multiple threads)", {
   # skip if using PSOCK cluster and package not installed
+  skip_if_not_installed("RandomFields")
   skip_if(!requireNamespace("surveyvoi") &&
           !identical(.Platform$OS.type, "unix"))
   # seeds

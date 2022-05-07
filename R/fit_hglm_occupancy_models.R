@@ -143,9 +143,13 @@ NULL
 #'
 #' }
 #'
-#' @examples
-#' # set seeds for reproducibility
+#' @examplesIf requireNamespace("RandomFields", quietly = TRUE)
+#' \dontrun{
+#' # load RandomFields package
+#' ## N.B. the RandomFields package must be installed to run the example
 #' library(RandomFields)
+#'
+#' # set seeds for reproducibility
 #' set.seed(123)
 #' RFoptions(seed = 123)
 #'
@@ -157,7 +161,6 @@ NULL
 #' cat(readLines(system.file("jags", "model.jags", package = "surveyvoi")),
 #'     sep = "\n")
 #'
-#' \dontrun{
 #' # fit models
 #' # note that we use a small number of MCMC iterations so that the example
 #' # finishes quickly, you probably want to use the defaults for real work

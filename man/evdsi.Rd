@@ -163,33 +163,30 @@ to very small problems.
 }
 \examples{
 # set seeds for reproducibility
-library(RandomFields)
 set.seed(123)
-RFoptions(seed = 123)
 
-# simulate data
-site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
-feature_data <- simulate_feature_data(n_features = 2, prop = 1)
-feature_data$target <- c(10, 10)
+# load example site data
+data(sim_sites)
+print(sim_sites)
 
-# preview simulated data
-print(site_data)
-print(feature_data)
+# load example feature data
+data(sim_features)
+print(sim_features)
 
 # set total budget for managing sites for conservation
  # (i.e. 50\% of the cost of managing all sites)
-total_budget <- sum(site_data$management_cost) * 0.5
+total_budget <- sum(sim_sites$management_cost) * 0.5
 
 # create a survey scheme that samples the first two sites that
 # are missing data
-site_data$survey_site <- FALSE
-site_data$survey_site[which(site_data$n1 < 0.5)[1:2]] <- TRUE
+sim_sites$survey_site <- FALSE
+sim_sites$survey_site[which(sim_sites$n1 < 0.5)[1:2]] <- TRUE
 
 # calculate expected value of management decision given the survey
 # information using exact method
 ev_survey <- evdsi(
-  site_data, feature_data,
-  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
+  sim_sites, sim_features,
+  c("f1", "f2", "f3"), c("n1", "n2", "n3"), c("p1", "p2", "p3"),
   "management_cost", "survey_site",
   "survey_cost", "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",

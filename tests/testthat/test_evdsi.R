@@ -1,6 +1,7 @@
 context("evdsi")
 
 test_that("single species", {
+  skip_if_not_installed("RandomFields")
   # data
   ## set seeds
   set.seed(123)
@@ -60,6 +61,7 @@ test_that("single species", {
 })
 
 test_that("multiple species", {
+  skip_if_not_installed("RandomFields")
   # data
   ## set seeds
   set.seed(123)

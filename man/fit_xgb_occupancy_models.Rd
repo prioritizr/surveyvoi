@@ -201,9 +201,13 @@ the models' training and evaluation folds.
 }
 }
 \examples{
+\dontshow{if (requireNamespace("RandomFields", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
-# set seeds for reproducibility
+# load RandomFields package
+## N.B. the RandomFields package must be installed to run the example
 library(RandomFields)
+
+# set seeds for reproducibility
 set.seed(123)
 RFoptions(seed = 123)
 
@@ -236,4 +240,5 @@ print(results$predictions)
 # print model performance
 print(results$performance, width = Inf)
 }
+\dontshow{\}) # examplesIf}
 }

@@ -38,8 +38,8 @@ NULL
 #'
 #' @details
 #' The data are simulated using random fields
-#' ([RandomFields::RFsimulate()]) to provide spatially auto-correlated
-#' simulations.
+#' (i.e., `RandomFields::RFsimulate()`) to provide spatially auto-correlated
+#' simulations. Note the \pkg{RandomFields} must be installed.
 #'
 #' @return [sf::sf()] object with site data.
 #'  The `"management_cost"` column contains the site protection costs,
@@ -59,6 +59,9 @@ NULL
 #'  to the same feature).
 #'
 #' @examples
+#' # please install the RandomFields package to run this example
+#'
+#' @examplesIf requireNamespace("RandomFields", quietly = TRUE)
 #' # set seed for reproducibility
 #' set.seed(123)
 #' RandomFields::RFoptions(seed = 123)
@@ -98,6 +101,9 @@ simulate_site_data <- function(n_sites, n_features,
                                max_number_surveys_per_site = 5,
                                output_probabilities = TRUE) {
   # assert arguments are valid
+  if (!requireNamespace("RandomFields", quietly = TRUE)) {
+    stop("please install the \"RandomFields\" package")
+  }
   assertthat::assert_that(
     ## n_sites
     assertthat::is.count(n_sites), assertthat::noNA(n_sites),

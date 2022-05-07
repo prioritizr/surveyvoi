@@ -253,32 +253,29 @@ has the highest expected value in the
 }
 \examples{
 # set seeds for reproducibility
-library(RandomFields)
 set.seed(123)
-RFoptions(seed = 201)
 
-# simulate data
-site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
-feature_data <- simulate_feature_data(n_features = 2, prop = 1)
-feature_data$target <- c(10, 10)
+# load example site data
+data(sim_sites)
+print(sim_sites)
 
-# preview simulated data
-print(site_data)
-print(feature_data)
+# load example feature data
+data(sim_features)
+print(sim_features)
 
 # set total budget for managing sites for conservation
-# (i.e. 50\% of the cost of managing all sites)
-total_budget <- sum(site_data$management_cost) * 0.5
+ # (i.e. 50\% of the cost of managing all sites)
+total_budget <- sum(sim_sites$management_cost) * 0.5
 
 # set total budget for surveying sites for conservation
-# (i.e. 10\% of the cost of managing all sites)
-survey_budget <- sum(site_data$survey_cost) * 0.1
+# (i.e. 40\% of the cost of managing all sites)
+survey_budget <- sum(sim_sites$survey_cost) * 0.4
 
 # find survey scheme using approximate method and greedy heuristic algorithm
 # (using 10 replicates so that this example completes relatively quickly)
 approx_near_optimal_survey <- approx_near_optimal_survey_scheme(
-  site_data, feature_data,
-  c("f1", "f2"), c("n1", "n2"), c("p1", "p2"),
+  sim_sites, sim_features,
+  c("f1", "f2", "f3"), c("n1", "n2", "n3"), c("p1", "p2", "p3"),
   "management_cost", "survey_cost",
   "survey", "survey_sensitivity", "survey_specificity",
   "model_sensitivity", "model_specificity",

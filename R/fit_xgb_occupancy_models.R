@@ -179,10 +179,13 @@ NULL
 #'
 #' }
 #'
-#' @examples
+#' @examplesIf requireNamespace("RandomFields", quietly = TRUE)
 #' \dontrun{
-#' # set seeds for reproducibility
+#' # load RandomFields package
+#' ## N.B. the RandomFields package must be installed to run the example
 #' library(RandomFields)
+#'
+#' # set seeds for reproducibility
 #' set.seed(123)
 #' RFoptions(seed = 123)
 #'
