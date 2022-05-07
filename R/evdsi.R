@@ -8,7 +8,7 @@
 #' @inheritParams fit_xgb_occupancy_models
 #'
 #' @param site_probability_columns `character` names of `numeric`
-#'   columns in the argument to `site_data` that contain modelled
+#'   columns in the argument to `site_data` that contain modeled
 #'   probabilities of occupancy for each feature in each site.
 #'   Each column should correspond to a different feature, and contain
 #'   probability data (values between zero and one). No missing (`NA`)

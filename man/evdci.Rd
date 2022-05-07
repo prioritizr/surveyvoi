@@ -42,7 +42,7 @@ a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
 not previously been surveyed, a value of zero should be used.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain modelled
+columns in the argument to \code{site_data} that contain modeled
 probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (\code{NA})

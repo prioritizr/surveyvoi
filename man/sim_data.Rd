@@ -35,7 +35,7 @@ cost of acquiring sites for conservation (\code{management_cost} column),
 results from previous ecological surveys (\code{f1}, \code{f2}, \code{f3} columns),
 previous survey effort (\code{n1}, \code{n2}, \code{n3} columns),
 environmental conditions of the sites (\code{e1}, \code{e2} columns),
-and modelled probability of the features occupying the sites
+and modeled probability of the features occupying the sites
 (\code{p1}, \code{p2}, \code{p3} columns).}
 
 \item{\code{sim_features}}{This object describes the features and contains

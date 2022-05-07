@@ -175,9 +175,9 @@ print(feature_data)
 
 The `feature_data` object is a table (i.e. `tibble` object) that contains information on the conservation feature. Here, each row corresponds to a different feature -- and so it only has one row because we only have one feature -- and each column contains different information about the feature(s). The `name` column contains the name of the feature. The `survey` column indicates if the feature will be examined in future surveys. The `survey_sensitivity` and `survey_specificity` columns denote the sensitivity (probability of correctly recording a presence) and specificity (probability of correctly recording an absence) of the survey methodology. Finally, the `target` column specifies the number of occupied sites for each species that should ideally be represented in the prioritization.
 
-## Modelling probability of occupancy
+## Modeling probability of occupancy
 
-After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the potential benefits of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to conduct any additional surveys. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modelling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).
+After simulating the data, we need to estimate the probability of the feature occurring in the unsurveyed sites. This is important for calculating the potential benefits of surveying sites, because if we can reliably predict the probability of the feature(s) occurring in unsurveyed sites using models, then we may not need to conduct any additional surveys. Specifically, we will fit gradient boosted regression trees -- via the [xgboost R package](https://xgboost.readthedocs.io/en/latest/). These models are well-suited for modeling species distributions because they can accommodate high order interactions among different predictor variables that are needed to effectively model species' environmental niches, even in the case of limited data. Furthermore, they can incorporate knowledge of the sensitivity and specificity of previous surveys during model fitting (using weights).
 
 ```{r}
 # create list of candidate parameter values for calibration procedure
@@ -193,7 +193,7 @@ xgb_results <- fit_xgb_occupancy_models(
   n_folds = c(2), xgb_tuning_parameters = xgb_parameters)
 ```
 
-After fitting the models, we can examine the tuning parameters used to fit the models, extract the modelled probability of occupancy, and evaluate the performance of the models.
+After fitting the models, we can examine the tuning parameters used to fit the models, extract the modeled probability of occupancy, and evaluate the performance of the models.
 
 ```{r}
 # print best parameters
@@ -222,7 +222,7 @@ site_data %>%
   geom_sf(aes(color = value)) +
   facet_wrap(~name) +
   scale_color_viridis() +
-  labs(title = "Modelled probabilities", x = "X coordinate", y = "Y coordinate")
+  labs(title = "Modeled probabilities", x = "X coordinate", y = "Y coordinate")
 ```
 
 ```{r, include = FALSE}
@@ -233,7 +233,7 @@ stopifnot(all(feature_data$model_specificity > 0.5))
 
 ## Expected value given current information
 
-After simulating and modelling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation value of a near-optimal prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set at 10% of the total site management costs.
+After simulating and modeling the data, we will now examine the _expected value of the decision given current information_. This value represents the conservation value of a near-optimal prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, "current information" refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. `total_budget`). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set at 10% of the total site management costs.
 
 ```{r}
 # calculate total budget for surveying and managing sites

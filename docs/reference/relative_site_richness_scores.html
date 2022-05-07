@@ -20,7 +20,7 @@ matrices cannot be compared to each other."><!-- mathjax --><script src="https:/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.8</span>
       </span>
     </div>
 
@@ -71,7 +71,7 @@ matrices cannot be compared to each other.</p>
 <dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object with site data.</p></dd>
 <dt>site_probability_columns</dt>
 <dd><p><code>character</code> names of <code>numeric</code>
-columns in the argument to <code>site_data</code> that contain modelled
+columns in the argument to <code>site_data</code> that contain modeled
 probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (<code>NA</code>)
@@ -88,7 +88,7 @@ these values are automatically rescaled between 0.01 and 1.</p>
 procedure:</p>
 <ol><li><p>Let \(J\) denote the set of sites (indexed by \(j\)),
 \(I\) denote the set of features (indexed by \(i\)), and
-\(x_{ij}\) denote the modelled probability of feature \(i \in I\)
+\(x_{ij}\) denote the modeled probability of feature \(i \in I\)
 occurring in sites \(j \in J\).</p></li>
 <li><p>Next, we will sum the values for each site:
 \(y_j = \sum_{i \in I} x_{ij}\).</p></li>
@@ -109,7 +109,7 @@ and 1 to produce the scores.</p></li>
 <span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">x</span>, coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># print data,</span></span>
-<span class="r-in"><span class="co"># we can see that the fourth site has the highest modelled probabilities of</span></span>
+<span class="r-in"><span class="co"># we can see that the fourth site has the highest modeled probabilities of</span></span>
 <span class="r-in"><span class="co"># occupancy across all species</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 4 features and 3 fields</span>

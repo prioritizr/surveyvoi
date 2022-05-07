@@ -10,7 +10,7 @@ relative_site_uncertainty_scores(site_data, site_probability_columns)
 \item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain modelled
+columns in the argument to \code{site_data} that contain modeled
 probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (\code{NA})
@@ -21,7 +21,7 @@ A \code{numeric} vector of uncertainty scores. Note that
 these values are automatically rescaled between 0.01 and 1.
 }
 \description{
-Calculate scores to describe the overall uncertainty of modelled species'
+Calculate scores to describe the overall uncertainty of modeled species'
 occupancy predictions for each site. Sites with greater scores are associated
 with greater uncertainty. Note that these scores are relative to each other
 and uncertainty values calculated using different matrices cannot be
@@ -36,7 +36,7 @@ site and then sum together the statistics for species in the same site:
 \enumerate{
 \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
 \eqn{I} denote the set of features (indexed by \eqn{i}), and
-\eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+\eqn{x_{ij}} denote the modeled probability of feature \eqn{i \in I}
 occurring in sites \eqn{j \in J}.
 
 \item Next, we will calculate the Shannon's entropy statistic for each

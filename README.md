@@ -7,6 +7,7 @@
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/jeffreyhanson/surveyvoi/actions)
+[![Documentation](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![Coverage
 Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
@@ -63,7 +64,7 @@ They can be installed using the following system commands:
 For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), `fftw3`
 (&gt;= 3.3), and `symphony` (&gt;= 5.6.16) are required.
 
-#### MacOS
+#### macOS
 
 The `gmp`, `fftw`, `mpfr`, and `symphony` libraries are required.
 Although the `fftw3` and `symphony` libraries are not used directly,
@@ -85,7 +86,7 @@ Please cite the *surveyvoi R* package when using it in publications. To
 cite the developmental version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.3.7. Available at
+> Value of Information. R package version 1.0.3.8. Available at
 > <https://github.com/jeffreyhanson/surveyvoi>.
 
 ## Usage
@@ -127,9 +128,9 @@ where the feature was detected (respectively). For example, if `"n1"`
 has a value of 2 and `"f1"` has a value of 0.5 for a given site, then
 the feature `"f1"` was detected in only one of the two surveys conducted
 in this site that looked for the feature. Finally, the `"p1"`, `"p2"`,
-and `"p3"` columns contain modelled probability estimates of each
-species being present in each site (see `fit_hglm_occupancy_models()`
-and `fit_xgb_occupancy_models()` to generate such estimates for your own
+and `"p3"` columns contain modeled probability estimates of each species
+being present in each site (see `fit_hglm_occupancy_models()` and
+`fit_xgb_occupancy_models()` to generate such estimates for your own
 data).
 
 ``` r
@@ -213,7 +214,7 @@ scale_color_continuous(limits = c(0, 1))
 <img src="man/figures/README-f_plot-1.png" style="display: block; margin: auto;" />
 
 ``` r
-# plot modelled probability of occupancy data
+# plot modeled probability of occupancy data
 sim_sites %>%
 select(p1, p2, p3) %>%
 gather(name, value, -geometry) %>%
