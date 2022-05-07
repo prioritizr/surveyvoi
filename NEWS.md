@@ -1,3 +1,8 @@
+# surveyvoi 1.0.3.7
+
+- Tweak package documentation.
+- The RandomFields package is now an optional dependency.
+
 # surveyvoi 1.0.3.6
 
 - Update README with system requirements for PoissonBinomial package (#42).
