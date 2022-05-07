@@ -55,7 +55,7 @@ Defaults to \code{"auto"}.}
 printed while generating survey scheme(s). Defaults to \code{FALSE}.}
 }
 \value{
-\code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+A \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
 values indicating if a site is selected in a scheme or not. Columns
 correspond to sites, and rows correspond to different schemes.
 }

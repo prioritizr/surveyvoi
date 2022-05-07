@@ -76,7 +76,7 @@ NULL
 #' use of surrogate data for assessing the relative biodiversity of sets of
 #' areas. *Biodiversity & Conservation*, **5**, 399--415.
 #'
-#' @return `matrix` of `logical` (`TRUE`/ `FALSE`)
+#' @return A `matrix` of `logical` (`TRUE`/ `FALSE`)
 #'   values indicating if a site is selected in a scheme or not. Columns
 #'   correspond to sites, and rows correspond to different schemes.
 #'

@@ -106,7 +106,7 @@ to <code>TRUE</code>.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object with site data.
+    <p>A <code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object with site data.
 The <code>"management_cost"</code> column contains the site protection costs,
 and the <code>"survey_cost"</code> column contains the costs for surveying
 each site.
@@ -126,8 +126,8 @@ to the same feature).</p>
     <div id="details">
     <h2>Details</h2>
     <p>The data are simulated using random fields
-(<code><a href="https://rdrr.io/pkg/RandomFields/man/RFsimulate.html" class="external-link">RandomFields::RFsimulate()</a></code>) to provide spatially auto-correlated
-simulations.</p>
+(i.e., <code><a href="https://rdrr.io/pkg/RandomFields/man/RFsimulate.html" class="external-link">RandomFields::RFsimulate()</a></code>) to provide spatially auto-correlated
+simulations. Note the <span class="pkg">RandomFields</span> must be installed.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -136,7 +136,9 @@ simulations.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># set seed for reproducibility</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># please install the RandomFields package to run this example</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># set seed for reproducibility</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu">RandomFields</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/RFoptions.html" class="external-link">RFoptions</a></span><span class="op">(</span>seed <span class="op">=</span> <span class="fl">123</span><span class="op">)</span></span>
 <span class="r-in"></span>
@@ -197,7 +199,6 @@ simulations.</p>
 <span class="r-in"><span class="co"># plot feature prior probability data</span></span>
 <span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">d</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span><span class="op">]</span>, axes <span class="op">=</span> <span class="cn">TRUE</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="simulate_site_data-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
 </code></pre></div>
     </div>
   </div>

@@ -124,7 +124,7 @@ NULL
 #'
 #' }
 #'
-#' @return `list` object containing:
+#' @return A `list` object containing:
 #' \describe{
 #'
 #' \item{parameters}{`list` of `list` objects containing the best

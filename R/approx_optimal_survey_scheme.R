@@ -42,7 +42,7 @@ NULL
 #' @inheritSection feasible_survey_schemes Dependencies
 #'
 #' @return
-#' `matrix` of `logical` (`TRUE`/ `FALSE`)
+#' A `matrix` of `logical` (`TRUE`/ `FALSE`)
 #' values indicating if a site is selected in the scheme or not. Columns
 #' correspond to sites, and rows correspond to different schemes. If
 #' there is only one optimal survey scheme then the `matrix` will only

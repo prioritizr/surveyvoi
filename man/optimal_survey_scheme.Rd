@@ -162,7 +162,7 @@ using \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.}
 printed during processing. Defaults to \code{FALSE}.}
 }
 \value{
-\code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+A \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
 values indicating if a site is selected in the scheme or not. Columns
 correspond to sites, and rows correspond to different schemes. If
 there is only one optimal survey scheme then the \code{matrix} will only

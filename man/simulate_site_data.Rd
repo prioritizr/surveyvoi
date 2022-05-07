@@ -50,7 +50,7 @@ probability values of occupancy should be output or not. Defaults
 to \code{TRUE}.}
 }
 \value{
-\code{\link[sf:sf]{sf::sf()}} object with site data.
+A \code{\link[sf:sf]{sf::sf()}} object with site data.
 The \code{"management_cost"} column contains the site protection costs,
 and the \code{"survey_cost"} column contains the costs for surveying
 each site.

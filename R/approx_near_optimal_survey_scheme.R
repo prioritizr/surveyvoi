@@ -93,7 +93,7 @@ NULL
 #' }
 #'
 #' @return
-#' `matrix` of `logical` (`TRUE`/ `FALSE`)
+#' A `matrix` of `logical` (`TRUE`/ `FALSE`)
 #' values indicating if a site is selected in the scheme or not. Columns
 #' correspond to sites, and rows correspond to different schemes. If there
 #' are no ties for the best identified solution, then the the `matrix`

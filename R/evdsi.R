@@ -100,7 +100,7 @@
 #'  use approximation methods. As such, this function can only be applied
 #'  to very small problems.
 #'
-#' @return `numeric` value.
+#' @return A `numeric` value.
 #'
 #' @seealso [prior_probability_matrix()].
 #'

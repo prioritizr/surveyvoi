@@ -31,7 +31,7 @@ NULL
 #' @param verbose `logical` indicating if information should be
 #'   printed while generating prioritization.
 #'
-#' @return `matrix` containing the solution. Each column corresponds
+#' @return A `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
 #'   solution. Cell values indicate if a given planning unit was selected in a
 #'   given solution.
@@ -162,7 +162,7 @@ distance_based_prioritizations <- function(
 #'   it is available; otherwise, it will use the SYMPHONY software
 #'   via the \pkg{Rsymphony} package.
 #'
-#' @return `matrix` containing the solution. Each column corresponds
+#' @return A `matrix` containing the solution. Each column corresponds
 #'   to a different planning unit and each row corresponds to a different
 #'   row. Cell values indicate if a given planning unit was selected in a
 #'   given solution.
@@ -267,7 +267,7 @@ weight_based_prioritizations <- function(
 #' Note that only a small set of parameters and model specification
 #' methods are supported.
 #'
-#' @return `list` object.
+#' @return A `list` object.
 #'
 #' @noRd
 rsymphony_model <- function(model) {
@@ -311,7 +311,7 @@ rsymphony_model <- function(model) {
 #'
 #' @param parameters `list` object.
 #'
-#' @return `list` object.
+#' @return A `list` object.
 #'
 #' @noRd
 rsymphony_solve <- function(model, parameters) {

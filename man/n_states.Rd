@@ -12,7 +12,7 @@ n_states(n_sites, n_features)
 \item{n_features}{\code{numeric} number of features.}
 }
 \value{
-\code{numeric} value.
+A \code{numeric} value.
 }
 \description{
 Calculate the total number of presence/absence states for a given

@@ -90,7 +90,7 @@ fitting. Defaults to 500.}
 printed during computations. Defaults to \code{FALSE}.}
 }
 \value{
-\code{list} object containing:
+A \code{list} object containing:
 \describe{
 
 \item{parameters}{\code{list} of \code{list} objects containing the best

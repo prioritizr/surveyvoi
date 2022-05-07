@@ -32,7 +32,7 @@
 #'  sites with have zero detections and zero non-detections are
 #'  randomly allocated to folds.
 #'
-#' @return `list` of `list` objects containing the
+#' @return A `list` of `list` objects containing the
 #'  indices excluded from each fold.
 #'
 #' @noRd
@@ -135,7 +135,7 @@ create_site_folds <- function(
 #'
 #' Check if JAGS is installed.
 #'
-#' @return `logical` indicating if JAGS is installed.
+#' @return A `logical` indicating if JAGS is installed.
 #'
 #' @noRd
 is_jags_installed <- function() {

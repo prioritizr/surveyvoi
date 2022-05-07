@@ -124,7 +124,7 @@ Defaults to \code{NULL} such that prior data is calculated automatically
 using \code{\link[=prior_probability_matrix]{prior_probability_matrix()}}.}
 }
 \value{
-\code{numeric} value.
+A \code{numeric} value.
 }
 \description{
 Calculate the \emph{expected value of the management decision

@@ -24,7 +24,7 @@
 #'   `n_approx_replicates` and `n_approx_outcomes_per_replicate`, and
 #'   so you may need to increase these parameters for large problems.
 #'
-#' @return `numeric` vector containing the expected values for each
+#' @return A `numeric` vector containing the expected values for each
 #' replicate.
 #'
 #' @inherit evdci seealso

@@ -7,7 +7,7 @@
 #'
 #' @param n_features `numeric` number of features.
 #'
-#' @return `numeric` value.
+#' @return A `numeric` value.
 #'
 #' @examples
 #' # calculate number of states for 3 sites and 2 features

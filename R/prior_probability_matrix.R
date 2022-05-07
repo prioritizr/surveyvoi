@@ -4,7 +4,7 @@
 #'
 #' @inheritParams evdci
 #'
-#' @return `matrix` object containing the prior probabilities of each
+#' @return A `matrix` object containing the prior probabilities of each
 #'   feature occupying each site. Each row corresponds to a different
 #'   feature and each column corresponds to a different site.
 #'
@@ -223,7 +223,7 @@ internal_prior_probability_matrix <- function(
 #'   and 1-1e10 to avoid issues with probabilities that are exactly equal to
 #'   zero and one.
 #'
-#' @return `numeric` probability value.
+#' @return A `numeric` probability value.
 #'
 #' @noRd
 prior_probability_of_occupancy <- function(

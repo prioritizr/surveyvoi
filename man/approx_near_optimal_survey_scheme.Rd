@@ -175,7 +175,7 @@ Defaults to 500.}
 printed during processing. Defaults to \code{FALSE}.}
 }
 \value{
-\code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
+A \code{matrix} of \code{logical} (\code{TRUE}/ \code{FALSE})
 values indicating if a site is selected in the scheme or not. Columns
 correspond to sites, and rows correspond to different schemes. If there
 are no ties for the best identified solution, then the the \code{matrix}

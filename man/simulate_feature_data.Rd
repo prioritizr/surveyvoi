@@ -14,7 +14,7 @@ that will be examined in the new surveys. Values must be between
 zero and one. Defaults to 1 such that all features should be surveyed.}
 }
 \value{
-\code{\link[tibble:tibble]{tibble::tibble()}} object. It contains the following
+A \code{\link[tibble:tibble]{tibble::tibble()}} object. It contains the following
 data:
 \describe{
 \item{\code{name}}{\code{character} name of each feature.}

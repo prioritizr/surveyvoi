@@ -17,7 +17,7 @@ probability data (values between zero and one). No missing (\code{NA})
 values are permitted in these columns.}
 }
 \value{
-\code{numeric} \code{vector} of uncertainty scores. Note that
+A \code{numeric} vector of uncertainty scores. Note that
 these values are automatically rescaled between 0.01 and 1.
 }
 \description{

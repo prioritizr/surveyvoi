@@ -17,7 +17,7 @@ NULL
 #' @param envir `environment` with objects. Defaults to parent environment
 #'  (`parent.env()`).
 #'
-#' @return `cluster` object.
+#' @return A `cluster` object.
 #'
 #' @noRd
 start_cluster <- function(n, names, type = NULL) {
@@ -64,7 +64,7 @@ start_cluster <- function(n, names, type = NULL) {
 #'
 #' @param x `cluster` object.
 #'
-#' @return `cluster` object.
+#' @return A `cluster` object.
 #'
 #' @noRd
 stop_cluster <- function(x) {

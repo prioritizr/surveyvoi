@@ -84,7 +84,7 @@ NULL
 #' Royle JA & Link WA (2006) Generalized site occupancy models allowing for
 #' false positive and false negative errors. *Ecology*, 87: 835--841.
 #'
-#' @return `list` object containing:
+#' @return A `list` object containing:
 #' \describe{
 #'
 #' \item{models}{`list` of `list` objects containing the models.}

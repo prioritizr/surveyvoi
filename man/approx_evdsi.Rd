@@ -161,7 +161,7 @@ simulating outcomes when conducting the value of information analyses.
 Defaults to 500.}
 }
 \value{
-\code{numeric} vector containing the expected values for each
+A \code{numeric} vector containing the expected values for each
 replicate.
 }
 \description{

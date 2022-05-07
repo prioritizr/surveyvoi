@@ -77,7 +77,7 @@ This should ideally be calculated using
 \code{\link[=fit_hglm_occupancy_models]{fit_hglm_occupancy_models()}}.}
 }
 \value{
-\code{matrix} object containing the prior probabilities of each
+A \code{matrix} object containing the prior probabilities of each
 feature occupying each site. Each row corresponds to a different
 feature and each column corresponds to a different site.
 }

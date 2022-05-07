@@ -41,7 +41,7 @@ NULL
 #' (i.e., `RandomFields::RFsimulate()`) to provide spatially auto-correlated
 #' simulations. Note the \pkg{RandomFields} must be installed.
 #'
-#' @return [sf::sf()] object with site data.
+#' @return A [sf::sf()] object with site data.
 #'  The `"management_cost"` column contains the site protection costs,
 #'  and the `"survey_cost"` column contains the costs for surveying
 #'  each site.
