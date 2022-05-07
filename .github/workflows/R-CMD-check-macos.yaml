@@ -12,7 +12,7 @@ on:
       - main
       - master
 
-name: Mac OSX
+name: macOS
 
 jobs:
   R-CMD-check:
@@ -70,6 +70,8 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("covr")
+          options("install.packages.compile.from.source" = "yes")
+          remotes::install_cran("RcppAlgos")
         shell: Rscript {0}
 
       - name: Session information
