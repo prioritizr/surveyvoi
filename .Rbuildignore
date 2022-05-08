@@ -37,3 +37,4 @@ gmp_test.cpp
 mpfr_test
 mpfr_test.cpp
 errors.txt
+inst/WORDLIST

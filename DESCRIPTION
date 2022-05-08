@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.3.7
+Version: 1.0.3.8
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -73,6 +73,7 @@ LinkingTo:
     nloptr (>= 1.2.2.2),
 License: GPL-3
 LazyData: true
+Language: en-US
 SystemRequirements:
     C++11,
     JAGS (>= 4.3.0),

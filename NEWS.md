@@ -1,3 +1,7 @@
+# surveyvoi 1.0.3.8
+
+- Standardize spelling (en-US).
+
 # surveyvoi 1.0.3.7
 
 - Tweak package documentation.

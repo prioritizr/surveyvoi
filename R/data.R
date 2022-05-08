@@ -29,7 +29,7 @@ NULL
 #'     results from previous ecological surveys (`f1`, `f2`, `f3` columns),
 #'     previous survey effort (`n1`, `n2`, `n3` columns),
 #'     environmental conditions of the sites (`e1`, `e2` columns),
-#'     and modelled probability of the features occupying the sites
+#'     and modeled probability of the features occupying the sites
 #'     (`p1`, `p2`, `p3` columns).}
 #'
 #'   \item{`sim_features`}{This object describes the features and contains

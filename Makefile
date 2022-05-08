@@ -69,6 +69,12 @@ wbcheck:
 	R --slave -e "devtools::check_win_devel()"
 	cp -Rf doc inst/
 
+urlcheck:
+	R --slave -e "devtools::document();urlchecker::url_check()"
+
+spellcheck:
+	R --slave -e "devtools::document();devtools::spell_check()"
+
 solarischeck:
 	R --slave -e "rhub::check(platform = 'solaris-x86-patched', email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
 

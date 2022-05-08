@@ -10,7 +10,7 @@ relative_site_richness_scores(site_data, site_probability_columns)
 \item{site_data}{\code{\link[sf:sf]{sf::sf()}} object with site data.}
 
 \item{site_probability_columns}{\code{character} names of \code{numeric}
-columns in the argument to \code{site_data} that contain modelled
+columns in the argument to \code{site_data} that contain modeled
 probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (\code{NA})
@@ -33,7 +33,7 @@ procedure:
 \enumerate{
 \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
 \eqn{I} denote the set of features (indexed by \eqn{i}), and
-\eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+\eqn{x_{ij}} denote the modeled probability of feature \eqn{i \in I}
 occurring in sites \eqn{j \in J}.
 
 \item Next, we will sum the values for each site:
@@ -56,7 +56,7 @@ x <- tibble::tibble(x = rnorm(4), y = rnorm(4),
 x <- sf::st_as_sf(x, coords = c("x", "y"))
 
 # print data,
-# we can see that the fourth site has the highest modelled probabilities of
+# we can see that the fourth site has the highest modeled probabilities of
 # occupancy across all species
 print(x)
 

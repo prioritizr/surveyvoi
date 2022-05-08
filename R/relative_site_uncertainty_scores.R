@@ -3,7 +3,7 @@ NULL
 
 #' Relative site uncertainty scores
 #'
-#' Calculate scores to describe the overall uncertainty of modelled species'
+#' Calculate scores to describe the overall uncertainty of modeled species'
 #' occupancy predictions for each site. Sites with greater scores are associated
 #' with greater uncertainty. Note that these scores are relative to each other
 #' and uncertainty values calculated using different matrices cannot be
@@ -20,7 +20,7 @@ NULL
 #' \enumerate{
 #' \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
 #'   \eqn{I} denote the set of features (indexed by \eqn{i}), and
-#'   \eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+#'   \eqn{x_{ij}} denote the modeled probability of feature \eqn{i \in I}
 #'   occurring in sites \eqn{j \in J}.
 #'
 #' \item Next, we will calculate the Shannon's entropy statistic for each

@@ -17,7 +17,7 @@ NULL
 #' \enumerate{
 #' \item Let \eqn{J} denote the set of sites (indexed by \eqn{j}),
 #'   \eqn{I} denote the set of features (indexed by \eqn{i}), and
-#'   \eqn{x_{ij}} denote the modelled probability of feature \eqn{i \in I}
+#'   \eqn{x_{ij}} denote the modeled probability of feature \eqn{i \in I}
 #'   occurring in sites \eqn{j \in J}.
 #'
 #' \item Next, we will sum the values for each site:
@@ -43,7 +43,7 @@ NULL
 #' x <- sf::st_as_sf(x, coords = c("x", "y"))
 #'
 #' # print data,
-#' # we can see that the fourth site has the highest modelled probabilities of
+#' # we can see that the fourth site has the highest modeled probabilities of
 #' # occupancy across all species
 #' print(x)
 #'

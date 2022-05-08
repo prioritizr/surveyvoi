@@ -11,7 +11,8 @@ output:
 [![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/jeffreyhanson/surveyvoi/actions)
-[![R-CMD-check-Mac-OSX](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Mac%20OSX/master.svg?label=Mac%20OSX)](https://github.com/jeffreyhanson/surveyvoi/actions)
+[![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/jeffreyhanson/surveyvoi/actions)
+[![Documentation](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/jeffreyhanson/surveyvoi/actions)
 [![Coverage Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
@@ -54,7 +55,7 @@ apt-get install -y libgmp3-dev libfftw3-dev libmpfr-dev coinor-libsymphony-dev
 
 For Unix-alikes, `gmp` (>= 4.2.3), `mpfr` (>= 3.0.0), `fftw3` (>= 3.3), and `symphony` (>= 5.6.16) are required.
 
-#### MacOS
+#### macOS
 
 The `gmp`, `fftw`, `mpfr`, and `symphony` libraries are required. Although the `fftw3` and `symphony` libraries are not used directly, they are needed to successfully install dependencies. The easiest way to install these libraries is using [HomeBrew](https://brew.sh/). After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:
 
@@ -89,7 +90,7 @@ library(tidyr)     # package for preparing data
 library(ggplot2)   # package for plotting data
 ```
 
-Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf` object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column indicates the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modelled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models()` and `fit_xgb_occupancy_models()` to generate such estimates for your own data).
+Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf` object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column indicates the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modeled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models()` and `fit_xgb_occupancy_models()` to generate such estimates for your own data).
 
 
 ```{r, fig.height = h, fig.width = w}
@@ -138,7 +139,7 @@ scale_color_continuous(limits = c(0, 1))
 ```
 
 ```{r "p_plot", fig.height = h, fig.width = w * 2.25}
-# plot modelled probability of occupancy data
+# plot modeled probability of occupancy data
 sim_sites %>%
 select(p1, p2, p3) %>%
 gather(name, value, -geometry) %>%

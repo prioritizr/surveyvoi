@@ -194,7 +194,7 @@ NULL
 #'   n_sites = 30, n_features = 2, n_env_vars = 3, prop = 0.1)
 #' feature_data <- simulate_feature_data(n_features = 2, prop = 1)
 #'
-#' # create list of possible tuning parameters for modelling
+#' # create list of possible tuning parameters for modeling
 #' parameters <- list(eta = seq(0.1, 0.5, length.out = 3),
 #'                    lambda = 10 ^ seq(-1.0, 0.0, length.out = 3),
 #'                    objective = "binary:logistic")
