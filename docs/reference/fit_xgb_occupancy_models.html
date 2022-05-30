@@ -19,7 +19,7 @@ xgboost::xgb.train())."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.3.9</span>
       </span>
     </div>
 
@@ -34,7 +34,7 @@ xgboost::xgb.train())."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
   <a href="../news/index.html">Changelog</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/jeffreyhanson/surveyvoi/" class="external-link">
+  <a href="https://github.com/prioritizr/surveyvoi/">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -49,7 +49,7 @@ xgboost::xgb.train())."><!-- mathjax --><script src="https://cdnjs.cloudflare.co
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fit boosted regression tree models to predict occupancy</h1>
-    <small class="dont-index">Source: <a href="https://github.com/jeffreyhanson/surveyvoi/blob/HEAD/R/fit_xgb_occupancy_models.R" class="external-link"><code>R/fit_xgb_occupancy_models.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/prioritizr/surveyvoi/blob/HEAD/R/fit_xgb_occupancy_models.R"><code>R/fit_xgb_occupancy_models.R</code></a></small>
     <div class="hidden name"><code>fit_xgb_occupancy_models.Rd</code></div>
     </div>
 
@@ -296,126 +296,6 @@ the models' training and evaluation folds.</p></li>
 <span class="r-in">   <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,</span>
 <span class="r-in">   n_folds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span><span class="op">)</span>, xgb_early_stopping_rounds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span>,</span>
 <span class="r-in">   xgb_tuning_parameters <span class="op">=</span> <span class="va">parameters</span>, n_threads <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:17] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:18] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:19] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:19] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:19] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:19] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:20] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:20] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:21] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:21] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:21] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:22] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:22] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:22] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:23] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:23] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:23] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:24] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:24] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:25] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:25] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:25] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:26] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:26] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:26] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:27] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:27] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:27] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:28] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:28] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:28] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:28] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:29] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:30] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:30] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:30] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:30] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:31] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:31] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:32] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:32] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:32] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:33] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:34] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:35] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:36] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:37] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:38] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:39] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11:27:40] WARNING: amalgamation/../src/c_api/c_api.cc:785: `ntree_limit` is deprecated, use `iteration_range` instead.</span>
 <span class="r-in"></span>
 <span class="r-in"><span class="co"># print best found model parameters</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span></span>

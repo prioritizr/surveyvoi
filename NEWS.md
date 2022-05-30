@@ -1,3 +1,8 @@
+# surveyvoi 1.0.3.9
+
+- Update documentation for new code repository location.
+- Add remote for RandomFields package to facilitate installation.
+
 # surveyvoi 1.0.3.8
 
 - Standardize spelling (en-US).

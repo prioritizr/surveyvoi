@@ -1,7 +1,7 @@
 # Initialization
 ## setup configure
 AC_PREREQ([2.69])
-AC_INIT([surveyvoi], [see.DESCRIPTION], [https://github.com/jeffreyhanson/surveyvoi/issues])
+AC_INIT([surveyvoi], [see.DESCRIPTION], [https://github.com/prioritizr/surveyvoi/issues])
 
 ## set GMP variables
 GMP_NAME="gmp"

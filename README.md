@@ -4,12 +4,12 @@
 # surveyvoi: Survey Value of Information
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/jeffreyhanson/surveyvoi/actions)
-[![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/jeffreyhanson/surveyvoi/actions)
-[![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/jeffreyhanson/surveyvoi/actions)
-[![Documentation](https://img.shields.io/github/workflow/status/jeffreyhanson/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/jeffreyhanson/surveyvoi/actions)
+[![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage
-Status](https://codecov.io/github/jeffreyhanson/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/jeffreyhanson/surveyvoi?branch=master)
+Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 The *surveyvoi* package is a decision support tool for prioritizing
@@ -32,12 +32,12 @@ required to fit hierarchical generalized linear models.
 ## Installation
 
 The development version can be installed from
-[GitHub](https://github.com/jeffreyhanson/surveyvoi) using the following
+[GitHub](https://github.com/prioritizr/surveyvoi) using the following
 code.
 
 ``` r
 if (!require(remotes)) install.packages("remotes")
-remotes::install_github("jeffreyhanson/surveyvoi")
+remotes::install_github("prioritizr/surveyvoi")
 ```
 
 #### Windows
@@ -86,8 +86,8 @@ Please cite the *surveyvoi R* package when using it in publications. To
 cite the developmental version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.3.8. Available at
-> <https://github.com/jeffreyhanson/surveyvoi>.
+> Value of Information. R package version 1.0.3.9. Available at
+> <https://github.com/prioritizr/surveyvoi>.
 
 ## Usage
 
@@ -343,11 +343,11 @@ value of information analysis. Furthermore, it can be used to generate
 survey schemes using conventional approaches (e.g. sampling
 environmental gradients, and selecting places with highly uncertain
 information). For more information, see the [package
-vignette](http://jeffrey-hanson.com/surveyvoi/articles/surveyvoi.html).
+vignette](https://prioritizr.github.io/surveyvoi/articles/surveyvoi.html).
 
 ## Getting help
 
 If you have any questions about using the *surveyvoi R* package or
 suggestions for improving it, please [file an issue at the package’s
 online code
-repository](https://github.com/jeffreyhanson/surveyvoi/issues/new).
+repository](https://github.com/prioritizr/surveyvoi/issues/new).

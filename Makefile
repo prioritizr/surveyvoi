@@ -4,6 +4,9 @@ initc:
 	R --slave -e "Rcpp::compileAttributes()"
 	R --slave -e "tools::package_native_routine_registration_skeleton('.', 'src/init.c', character_only = FALSE)"
 
+conf:
+	autoconf
+
 docs: man readme vigns
 
 data:
@@ -84,4 +87,4 @@ sancheck:
 vgcheck:
 	R --slave -e "rhub::check(platform = 'ubuntu-gcc-devel', valgrind = TRUE, email = 'jeffrey.hanson@uqconnect.edu.au', show_status = FALSE)"
 
-.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples solarischeck wbcheck sancheck vgcheck
+.PHONY: initc docs data site test check checkwb build install man readme vigns site quicksite benchmark examples solarischeck wbcheck sancheck vgcheck conf
