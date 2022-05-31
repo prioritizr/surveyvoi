@@ -2,6 +2,7 @@ context("approx sensible values")
 
 test_that("lower voi when most of budget spent on surveys", {
   skip_if_not_installed("RandomFields")
+  skip_on_os("windows")
   # initialize rng
   set.seed(501)
   RandomFields::RFoptions(seed = 501)

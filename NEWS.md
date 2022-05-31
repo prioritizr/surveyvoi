@@ -1,3 +1,9 @@
+# surveyvoi 1.0.3.10
+
+- Fix CRAN note about utils package dependency.
+- Skip unit tests that require RandomFields package on Windows to avoid
+  spurious failures.
+
 # surveyvoi 1.0.3.9
 
 - Update documentation for new code repository location.

@@ -40,3 +40,6 @@ NULL
 #' @name surveyvoi
 #' @docType package
 NULL
+
+# ensure package checks pass
+#' @importFrom utils zip
