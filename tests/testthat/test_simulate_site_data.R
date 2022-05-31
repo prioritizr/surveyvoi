@@ -2,6 +2,7 @@ context("simulate_site_data")
 
 test_that("simulate_site_data", {
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   d <- simulate_site_data(n_sites = 1000, n_features = 2, prop = 0.5,
                           max_number_surveys_per_site = 10)

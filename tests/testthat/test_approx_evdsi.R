@@ -2,6 +2,7 @@ context("approx_evdsi")
 
 test_that("single species", {
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   ## set seeds
   set.seed(123)
@@ -70,6 +71,7 @@ test_that("single species", {
 
 test_that("multiple species", {
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   ## set seeds
   set.seed(123)

@@ -1,3 +1,7 @@
+# surveyvoi 1.0.3.10
+
+- Address CRAN note about utils package dependency.
+
 # surveyvoi 1.0.3.9
 
 - Update documentation for new code repository location.

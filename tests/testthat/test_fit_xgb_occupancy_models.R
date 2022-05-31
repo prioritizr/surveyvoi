@@ -3,6 +3,7 @@ context("fit_xgb_occupancy_models")
 test_that("single species", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -79,6 +80,7 @@ test_that("single species", {
 test_that("multiple species", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
@@ -154,6 +156,7 @@ test_that("multiple species", {
 test_that("multiple species (sparse, multiple threads)", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
+  skip_on_os("Windows")
   # data
   set.seed(123)
   RandomFields::RFoptions(seed = 123)
