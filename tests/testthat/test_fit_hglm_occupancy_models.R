@@ -3,7 +3,7 @@ context("fit_hglm_occupancy_models")
 test_that("single species", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
-  skip_on_os("Windows")
+  skip_on_os("windows")
   skip_if_not(suppressWarnings(is_jags_installed()))
   # data
   set.seed(123)
@@ -78,7 +78,7 @@ test_that("single species", {
 test_that("multiple species", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
-  skip_on_os("Windows")
+  skip_on_os("windows")
   skip_if_not(suppressWarnings(is_jags_installed()))
   # data
   set.seed(123)
@@ -153,7 +153,7 @@ test_that("multiple species", {
 test_that("multiple species (sparse, multiple threads)", {
   skip_on_cran()
   skip_if_not_installed("RandomFields")
-  skip_on_os("Windows")
+  skip_on_os("windows")
   skip_if_not(suppressWarnings(is_jags_installed()))
   # skip if using PSOCK cluster and package not installed
   skip_if(!requireNamespace("surveyvoi") &&
