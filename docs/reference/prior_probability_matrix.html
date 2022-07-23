@@ -56,25 +56,29 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">prior_probability_matrix</span><span class="op">(</span>
-  <span class="va">site_data</span>,
-  <span class="va">feature_data</span>,
-  <span class="va">site_detection_columns</span>,
-  <span class="va">site_n_surveys_columns</span>,
-  <span class="va">site_probability_columns</span>,
-  <span class="va">feature_survey_sensitivity_column</span>,
-  <span class="va">feature_survey_specificity_column</span>,
-  <span class="va">feature_model_sensitivity_column</span>,
-  <span class="va">feature_model_specificity_column</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prior_probability_matrix</span><span class="op">(</span></span>
+<span>  <span class="va">site_data</span>,</span>
+<span>  <span class="va">feature_data</span>,</span>
+<span>  <span class="va">site_detection_columns</span>,</span>
+<span>  <span class="va">site_n_surveys_columns</span>,</span>
+<span>  <span class="va">site_probability_columns</span>,</span>
+<span>  <span class="va">feature_survey_sensitivity_column</span>,</span>
+<span>  <span class="va">feature_survey_specificity_column</span>,</span>
+<span>  <span class="va">feature_model_sensitivity_column</span>,</span>
+<span>  <span class="va">feature_model_specificity_column</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>site_data</dt>
 <dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object with site data.</p></dd>
+
+
 <dt>feature_data</dt>
 <dd><p><code><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">base::data.frame()</a></code> object with feature data.</p></dd>
+
+
 <dt>site_detection_columns</dt>
 <dd><p><code>character</code> names of <code>numeric</code>
 columns in the argument to <code>site_data</code> that contain the proportion of
@@ -82,6 +86,8 @@ surveys conducted within each site that detected each feature.
 Each column should correspond to a different feature, and contain
 a proportion value (between zero and one). If a site has
 not previously been surveyed, a value of zero should be used.</p></dd>
+
+
 <dt>site_n_surveys_columns</dt>
 <dd><p><code>character</code> names of <code>numeric</code>
 columns in the argument to <code>site_data</code> that contain the total
@@ -89,6 +95,8 @@ number of surveys conducted for each each feature within each site.
 Each column should correspond to a different feature, and contain
 a non-negative integer number (e.g. 0, 1, 2, 3). If a site has
 not previously been surveyed, a value of zero should be used.</p></dd>
+
+
 <dt>site_probability_columns</dt>
 <dd><p><code>character</code> names of <code>numeric</code>
 columns in the argument to <code>site_data</code> that contain modeled
@@ -96,6 +104,8 @@ probabilities of occupancy for each feature in each site.
 Each column should correspond to a different feature, and contain
 probability data (values between zero and one). No missing (<code>NA</code>)
 values are permitted in these columns.</p></dd>
+
+
 <dt>feature_survey_sensitivity_column</dt>
 <dd><p><code>character</code> name of the
 column in the argument to <code>feature_data</code> that contains
@@ -103,6 +113,8 @@ probability of future surveys correctly detecting a presence of each
 feature in a given site (i.e. the sensitivity of the survey methodology).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.</p></dd>
+
+
 <dt>feature_survey_specificity_column</dt>
 <dd><p><code>character</code> name of the
 column in the argument to <code>feature_data</code> that contains
@@ -110,6 +122,8 @@ probability of future surveys correctly detecting an absence of each
 feature in a given site (i.e. the specificity of the survey methodology).
 This column should have <code>numeric</code> values that are between zero and
 one. No missing (<code>NA</code>) values are permitted in this column.</p></dd>
+
+
 <dt>feature_model_sensitivity_column</dt>
 <dd><p><code>character</code> name of the
 column in the argument to <code>feature_data</code> that contains
@@ -120,6 +134,8 @@ one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
 <code><a href="fit_xgb_occupancy_models.html">fit_xgb_occupancy_models()</a></code> or
 <code><a href="fit_hglm_occupancy_models.html">fit_hglm_occupancy_models()</a></code>.</p></dd>
+
+
 <dt>feature_model_specificity_column</dt>
 <dd><p><code>character</code> name of the
 column in the argument to <code>feature_data</code> that contains
@@ -130,58 +146,63 @@ one. No missing (<code>NA</code>) values are permitted in this column.
 This should ideally be calculated using
 <code><a href="fit_xgb_occupancy_models.html">fit_xgb_occupancy_models()</a></code> or
 <code><a href="fit_hglm_occupancy_models.html">fit_hglm_occupancy_models()</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>matrix</code> object containing the prior probabilities of each
+    
+
+<p>A <code>matrix</code> object containing the prior probabilities of each
 feature occupying each site. Each row corresponds to a different
 feature and each column corresponds to a different site.</p>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># set seeds for reproducibility</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># load example site data</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># set seeds for reproducibility</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># load example site data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 13 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POINT</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> CRS:           NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 14</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>        3.43            43.8     1 1     0         5     5     5 -<span style="color: #BB0000;">1.38</span>   0.425</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>        6.07            59.0     0 0     0         0     0     0  0.736 -<span style="color: #BB0000;">1.01</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>        7.09            46.7     0 0     0         0     0     0  0.754 -<span style="color: #BB0000;">0.959</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>        6.50            49.6     0 0     0         0     0     0  0.530  1.51 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>        5.37            48.1     0 0     0         0     0     0  0.546 -<span style="color: #BB0000;">0.525</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>        3.35            48.9     1 0.667 0.333     3     3     3 -<span style="color: #BB0000;">1.18</span>   0.557</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 4 more variables: p1 &lt;dbl&gt;, p2 &lt;dbl&gt;, p3 &lt;dbl&gt;, geometry &lt;POINT&gt;</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># load example feature data</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_features</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_features</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   survey…¹ manag…²    f1    f2    f3    n1    n2    n3     e1     e2    p1    p2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     3.43    43.8     1 1     0         5     5     5 -<span style="color: #BB0000;">1.38</span>   0.425 0.941 0.999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     6.07    59.0     0 0     0         0     0     0  0.736 -<span style="color: #BB0000;">1.01</span>  0.36  0.006</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     7.09    46.7     0 0     0         0     0     0  0.754 -<span style="color: #BB0000;">0.959</span> 0.337 0.006</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     6.50    49.6     0 0     0         0     0     0  0.530  1.51  0.048 0.579</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     5.37    48.1     0 0     0         0     0     0  0.546 -<span style="color: #BB0000;">0.525</span> 0.335 0.032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     3.35    48.9     1 0.667 0.333     3     3     3 -<span style="color: #BB0000;">1.18</span>   0.557 0.896 0.998</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 2 more variables: p3 &lt;dbl&gt;, geometry &lt;POINT&gt;, and abbreviated variable</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   names ¹​survey_cost, ²​management_cost</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ Use `colnames()` to see all variable names</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># load example feature data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_features</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_features</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   name  survey survey_sensitivity survey_specificity model_sensitivity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> f1    TRUE                0.954              0.886             0.718</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> f2    TRUE                0.974              0.875             0.705</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> f3    TRUE                0.956              0.823             0.768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 2 more variables: model_specificity &lt;dbl&gt;, target &lt;dbl&gt;</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># calculate prior probability matrix</span></span>
-<span class="r-in"><span class="va">prior_matrix</span> <span class="op">&lt;-</span> <span class="fu">prior_probability_matrix</span><span class="op">(</span></span>
-<span class="r-in">  <span class="va">sim_sites</span>, <span class="va">sim_features</span>,</span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span>, <span class="st">"f2"</span>, <span class="st">"f3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span>, <span class="st">"n2"</span>, <span class="st">"n3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/pkg/RandomFields/man/QMath.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span><span class="op">)</span>,</span>
-<span class="r-in">  <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,</span>
-<span class="r-in">  <span class="st">"model_sensitivity"</span>, <span class="st">"model_specificity"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># preview prior probability matrix</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">prior_matrix</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   name  survey survey_sensitivity survey_specificity model_sens…¹ model…² target</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> f1    TRUE                0.954              0.886        0.718   0.811      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> f2    TRUE                0.974              0.875        0.705   0.860      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> f3    TRUE                0.956              0.823        0.768   0.887      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with abbreviated variable names ¹​model_sensitivity, ²​model_specificity</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># calculate prior probability matrix</span></span></span>
+<span class="r-in"><span><span class="va">prior_matrix</span> <span class="op">&lt;-</span> <span class="fu">prior_probability_matrix</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">sim_sites</span>, <span class="va">sim_features</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span>, <span class="st">"f2"</span>, <span class="st">"f3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span>, <span class="st">"n2"</span>, <span class="st">"n3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"model_sensitivity"</span>, <span class="st">"model_specificity"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># preview prior probability matrix</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">prior_matrix</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f1 9.999761e-01 0.2580030 0.2580030 0.2580030 0.2580030 0.9983146</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> f2 9.999650e-01 0.2556825 0.2556825 0.8342984 0.2556825 0.6433566</span>
@@ -200,7 +221,7 @@ feature and each column corresponds to a different site.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

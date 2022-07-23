@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.3.10
+Version: 1.0.3.11
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -59,7 +59,6 @@ Suggests:
     PoissonBinomial (>= 1.1.1),
     gurobi (>= 8.1.0),
     Rmpfr (>= 0.8-1),
-    RandomFields (>= 3.3.7),
     runjags (>= 2.0.4.6)
 Depends:
     R (>= 4.0.0),
@@ -86,7 +85,7 @@ SystemRequirements:
 URL: https://prioritizr.github.io/surveyvoi/
 BugReports: https://github.com/prioritizr/surveyvoi/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8
 Biarch: true
 Collate:
@@ -116,5 +115,3 @@ Collate:
     'validate.R'
     'weighted_survey_scheme.R'
 Roxygen: list(markdown = TRUE)
-Remotes:
-  cran/RandomFields

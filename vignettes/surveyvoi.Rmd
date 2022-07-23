@@ -58,12 +58,9 @@ library(ggplot2)
 library(gridExtra)
 library(viridis)
 library(tibble)
-library(RandomFields)
 
-# set RNG seeds for reproducibility
-seed <- 53
-set.seed(seed)
-RFoptions(seed = seed)
+# set RNG seed for reproducibility
+set.seed(40)
 
 # set default table printing options
 options(pillar.sigfig = 6, tibble.width = Inf)
@@ -71,7 +68,7 @@ options(pillar.sigfig = 6, tibble.width = Inf)
 
 ## Simulate data
 
-Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites---meaning that 15 of the sites will not have survey data. We will also simulate three spatially-autocorrelated variables to characterize the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
+Let's simulate some data. To keep things simple, we will simulate data for 30 sites and one conservation feature (e.g. species). Of the 30 sites in total, we will simulate survey data for 15 sites---meaning that 15 of the sites will not have survey data. We will also simulate three spatially auto-correlated variables to characterize the environmental conditions within the sites. Although the simulation code (i.e. `simulate_site_data`) can output the probability that features are expected to inhabit the sites, we will disable this option to make our simulation study more realistic and instead predict these probabilities using statistical models.
 
 ```{r}
 # simulate site data

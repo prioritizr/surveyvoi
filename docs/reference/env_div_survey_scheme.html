@@ -58,18 +58,18 @@ conditions that are surveyed.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">env_div_survey_scheme</span><span class="op">(</span>
-  <span class="va">site_data</span>,
-  <span class="va">cost_column</span>,
-  <span class="va">survey_budget</span>,
-  <span class="va">env_vars_columns</span>,
-  method <span class="op">=</span> <span class="st">"mahalanobis"</span>,
-  locked_in_column <span class="op">=</span> <span class="cn">NULL</span>,
-  locked_out_column <span class="op">=</span> <span class="cn">NULL</span>,
-  exclude_locked_out <span class="op">=</span> <span class="cn">FALSE</span>,
-  solver <span class="op">=</span> <span class="st">"auto"</span>,
-  verbose <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">env_div_survey_scheme</span><span class="op">(</span></span>
+<span>  <span class="va">site_data</span>,</span>
+<span>  <span class="va">cost_column</span>,</span>
+<span>  <span class="va">survey_budget</span>,</span>
+<span>  <span class="va">env_vars_columns</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"mahalanobis"</span>,</span>
+<span>  locked_in_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  locked_out_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  exclude_locked_out <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  solver <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -77,17 +77,25 @@ conditions that are surveyed.</p>
     <dl><dt>site_data</dt>
 <dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object containing the candidate survey
 sites.</p></dd>
+
+
 <dt>cost_column</dt>
 <dd><p><code>character</code> name of the column in the argument to
 the argument to <code>site_data</code> that contains the cost for surveying each
 site. No missing (<code>NA</code>) values are permitted.</p></dd>
+
+
 <dt>survey_budget</dt>
 <dd><p><code>numeric</code> vector of maximum budgets for the survey
 schemes. No missing (<code>NA</code>) values are permitted.</p></dd>
+
+
 <dt>env_vars_columns</dt>
 <dd><p><code>character</code> vector names of the columns in
 the argument to <code>site_data</code> that contain <code>numeric</code> environmental
 variables. No missing (<code>NA</code>) values are permitted.</p></dd>
+
+
 <dt>method</dt>
 <dd><p><code>character</code> name of the distance metric to use for
 calculating environmental dissimilarity scores. See
@@ -95,6 +103,8 @@ calculating environmental dissimilarity scores. See
 for other available distance metrics and more information.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>"mahalanobis"</code> for Mahalanobis distances.</p></dd>
+
+
 <dt>locked_in_column</dt>
 <dd><p><code>character</code> (optional) name of the column in
 the argument to <code>site_data</code> that contains <code>logical</code>
@@ -102,6 +112,8 @@ the argument to <code>site_data</code> that contains <code>logical</code>
 locked into the survey scheme.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked in.</p></dd>
+
+
 <dt>locked_out_column</dt>
 <dd><p><code>character</code> (optional) name of the column in
 the argument to <code>site_data</code> that contains <code>logical</code>
@@ -109,10 +121,14 @@ the argument to <code>site_data</code> that contains <code>logical</code>
 locked out of the survey scheme.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></dd>
+
+
 <dt>exclude_locked_out</dt>
 <dd><p><code>logical</code> should locked out planning units
 be entirely excluded from the optimization process?
 Defaults to <code>FALSE</code>.</p></dd>
+
+
 <dt>solver</dt>
 <dd><p><code>character</code> name of the optimization solver to use
 for generating survey schemes.
@@ -121,13 +137,18 @@ The <code>"auto"</code> method will use the Gurobi optimization software if
 it is available; otherwise, it will use the SYMPHONY software
 via the <span class="pkg">Rsymphony</span> package.
 Defaults to <code>"auto"</code>.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating if information should be
 printed while generating survey scheme(s). Defaults to <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>matrix</code> of <code>logical</code> (<code>TRUE</code>/ <code>FALSE</code>)
+    
+
+<p>A <code>matrix</code> of <code>logical</code> (<code>TRUE</code>/ <code>FALSE</code>)
 values indicating if a site is selected in a scheme or not. Columns
 correspond to sites, and rows correspond to different schemes.</p>
     </div>
@@ -160,32 +181,32 @@ areas. <em>Biodiversity &amp; Conservation</em>, <strong>5</strong>, 399--415.</
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># set seed for reproducibility</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># simulate data</span></span>
-<span class="r-in"> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span></span>
-<span class="r-in">   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>,</span>
-<span class="r-in">                  v1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">10</span><span class="op">)</span>, <span class="co"># environmental axis 1</span></span>
-<span class="r-in">                  v2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">10</span><span class="op">)</span>, <span class="co"># environmental axis 2</span></span>
-<span class="r-in">                  cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">    coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot the sites' environmental conditions</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v1"</span>, <span class="st">"v2"</span><span class="op">)</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># set seed for reproducibility</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># simulate data</span></span></span>
+<span class="r-in"><span> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>   <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                  v1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">10</span><span class="op">)</span>, <span class="co"># environmental axis 1</span></span></span>
+<span class="r-in"><span>                  v2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">10</span><span class="op">)</span>, <span class="co"># environmental axis 2</span></span></span>
+<span class="r-in"><span>                  cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot the sites' environmental conditions</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v1"</span>, <span class="st">"v2"</span><span class="op">)</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="env_div_survey_scheme-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># generate scheme with a budget of 2</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">env_div_survey_scheme</span><span class="op">(</span><span class="va">x</span>, <span class="st">"cost"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v1"</span>, <span class="st">"v2"</span><span class="op">)</span>, <span class="st">"mahalanobis"</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># print scheme</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># generate scheme with a budget of 2</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">env_div_survey_scheme</span><span class="op">(</span><span class="va">x</span>, <span class="st">"cost"</span>, <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v1"</span>, <span class="st">"v2"</span><span class="op">)</span>, <span class="st">"mahalanobis"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># print scheme</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1] [,2]  [,3] [,4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] FALSE TRUE FALSE TRUE</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot scheme</span></span>
-<span class="r-in"><span class="va">x</span><span class="op">$</span><span class="va">scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="st">"scheme"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot scheme</span></span></span>
+<span class="r-in"><span><span class="va">x</span><span class="op">$</span><span class="va">scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="st">"scheme"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="env_div_survey_scheme-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
@@ -201,7 +222,7 @@ areas. <em>Biodiversity &amp; Conservation</em>, <strong>5</strong>, 399--415.</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

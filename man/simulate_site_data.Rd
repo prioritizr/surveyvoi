@@ -9,10 +9,10 @@ simulate_site_data(
   n_features,
   proportion_of_sites_missing_data,
   n_env_vars = 3,
-  survey_cost_intensity = 10,
-  survey_cost_radius = 0.5,
+  survey_cost_intensity = 20,
+  survey_cost_scale = 5,
   management_cost_intensity = 100,
-  management_cost_radius = 0.5,
+  management_cost_scale = 30,
   max_number_surveys_per_site = 5,
   output_probabilities = TRUE
 )
@@ -31,16 +31,16 @@ simulating feature distributions. Defaults to 3.}
 
 \item{survey_cost_intensity}{\code{numeric} intensity of the costs of
 surveying sites. Larger values correspond to larger costs on average.
-Defaults to 2.}
+Defaults to 20.}
 
-\item{survey_cost_radius}{\code{numeric} value corresponding to
-the spatial homogeneity of the survey costs. Defaults to 0.1.}
+\item{survey_cost_scale}{\code{numeric} value corresponding to
+the spatial homogeneity of the survey costs. Defaults to 5.}
 
 \item{management_cost_intensity}{\code{numeric} intensity of the costs of
 average cost of managing sites for conservation. Defaults to 100.}
 
-\item{management_cost_radius}{\code{numeric} value corresponding to
-the spatial homogeneity of the survey costs. Defaults to 0.1.}
+\item{management_cost_scale}{\code{numeric} value corresponding to
+the spatial homogeneity of the survey costs. Defaults to 30.}
 
 \item{max_number_surveys_per_site}{\code{integer} maximum number of
 surveys per site in the simulated data. Defaults to 5.}
@@ -70,18 +70,9 @@ to the same feature).
 \description{
 Simulate site data for developing simulated survey schemes.
 }
-\details{
-The data are simulated using random fields
-(i.e., \code{RandomFields::RFsimulate()}) to provide spatially auto-correlated
-simulations. Note the \pkg{RandomFields} must be installed.
-}
 \examples{
-# please install the RandomFields package to run this example
-
-\dontshow{if (requireNamespace("RandomFields", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # set seed for reproducibility
 set.seed(123)
-RandomFields::RFoptions(seed = 123)
 
 # simulate data
 d <- simulate_site_data(n_sites = 10, n_features = 4, prop = 0.5)
@@ -104,7 +95,7 @@ plot(d[, c("n1", "n2", "n3", "n4")], axes = TRUE, pch = 16, cex = 2)
 
 # plot feature prior probability data
 plot(d[, c("p1", "p2", "p3", "p4")], axes = TRUE, pch = 16, cex = 2)
-\dontshow{\}) # examplesIf}
+
 }
 \seealso{
 \code{\link[=simulate_feature_data]{simulate_feature_data()}}

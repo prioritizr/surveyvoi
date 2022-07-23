@@ -79,7 +79,6 @@ jobs:
           remotes::install_deps(dependencies = TRUE)
           remotes::install_cran("rcmdcheck")
           remotes::install_cran("covr")
-          remotes::install_github("prioritizr/surveyvoi")
         shell: Rscript {0}
 
       - name: Session information

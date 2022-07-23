@@ -58,14 +58,14 @@ survey schemes given survey costs and a fixed budget.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">feasible_survey_schemes</span><span class="op">(</span>
-  <span class="va">site_data</span>,
-  <span class="va">cost_column</span>,
-  <span class="va">survey_budget</span>,
-  locked_in_column <span class="op">=</span> <span class="cn">NULL</span>,
-  locked_out_column <span class="op">=</span> <span class="cn">NULL</span>,
-  verbose <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">feasible_survey_schemes</span><span class="op">(</span></span>
+<span>  <span class="va">site_data</span>,</span>
+<span>  <span class="va">cost_column</span>,</span>
+<span>  <span class="va">survey_budget</span>,</span>
+<span>  locked_in_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  locked_out_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -73,13 +73,19 @@ survey schemes given survey costs and a fixed budget.</p>
     <dl><dt>site_data</dt>
 <dd><p><code><a href="https://r-spatial.github.io/sf/reference/sf.html" class="external-link">sf::sf()</a></code> object containing the candidate survey
 sites.</p></dd>
+
+
 <dt>cost_column</dt>
 <dd><p><code>character</code> name of the column in the argument to
 the argument to <code>site_data</code> that contains the cost for surveying each
 site. No missing (<code>NA</code>) values are permitted.</p></dd>
+
+
 <dt>survey_budget</dt>
 <dd><p><code>numeric</code> the maximum possible expenditure
 permitted for conducting surveys.</p></dd>
+
+
 <dt>locked_in_column</dt>
 <dd><p><code>character</code> (optional) name of the column in
 the argument to <code>site_data</code> that contains <code>logical</code>
@@ -87,6 +93,8 @@ the argument to <code>site_data</code> that contains <code>logical</code>
 locked into the survey scheme.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked in.</p></dd>
+
+
 <dt>locked_out_column</dt>
 <dd><p><code>character</code> (optional) name of the column in
 the argument to <code>site_data</code> that contains <code>logical</code>
@@ -94,13 +102,18 @@ the argument to <code>site_data</code> that contains <code>logical</code>
 locked out of the survey scheme.
 No missing (<code>NA</code>) values are permitted.
 Defaults to <code>NULL</code> such that no sites are locked out.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p><code>logical</code> indicating if information should be
 printed while searching for feasible schemes. Defaults to <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>matrix</code> where each row corresponds to a different
+    
+
+<p>A <code>matrix</code> where each row corresponds to a different
 survey scheme, and each column corresponds to a different planning unit.
 Cell values are <code>logical</code> (<code>TRUE</code> / <code>FALSE</code>) indicating
 if a given site is selected in a given survey scheme.</p>
@@ -117,17 +130,17 @@ online for for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linu
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \dontrun{</span></span>
-<span class="r-in"><span class="co"># set seed for reproducibility</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># simulate data</span></span>
-<span class="r-in"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>,</span>
-<span class="r-in">                                 cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span>, <span class="fl">0.2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">                  coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># print data</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="co"># set seed for reproducibility</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># simulate data</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">200</span>, <span class="fl">0.2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                  coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># print data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 4 features and 1 field</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: POINT</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
@@ -140,27 +153,27 @@ online for for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linu
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 200    (-0.2301775 1.715065)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>   0.2   (1.558708 0.4609162)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>   1   (0.07050839 -1.265061)</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot site locations</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot site locations</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="feasible_survey_schemes-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># generate all feasible schemes given a budget of 4</span></span>
-<span class="r-in"><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">feasible_survey_schemes</span><span class="op">(</span><span class="va">x</span>, <span class="st">"cost"</span>, survey_budget <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># print schemes</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># generate all feasible schemes given a budget of 4</span></span></span>
+<span class="r-in"><span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu">feasible_survey_schemes</span><span class="op">(</span><span class="va">x</span>, <span class="st">"cost"</span>, survey_budget <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># print schemes</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       [,1]  [,2]  [,3]  [,4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1,] FALSE FALSE FALSE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2,] FALSE FALSE  TRUE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3,] FALSE FALSE FALSE  TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4,] FALSE FALSE  TRUE  TRUE</span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># plot first scheme</span></span>
-<span class="r-in"><span class="va">x</span><span class="op">$</span><span class="va">scheme_1</span> <span class="op">&lt;-</span> <span class="va">s</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
-<span class="r-in"><span class="fu"><a href="https://r-spatial.github.io/sf/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="st">"scheme_1"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># plot first scheme</span></span></span>
+<span class="r-in"><span><span class="va">x</span><span class="op">$</span><span class="va">scheme_1</span> <span class="op">&lt;-</span> <span class="va">s</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span>, <span class="st">"scheme_1"</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="feasible_survey_schemes-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -175,7 +188,7 @@ online for for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linu
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer></div>

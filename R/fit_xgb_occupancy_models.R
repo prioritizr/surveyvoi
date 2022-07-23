@@ -179,15 +179,10 @@ NULL
 #'
 #' }
 #'
-#' @examplesIf requireNamespace("RandomFields", quietly = TRUE)
+#' @examples
 #' \dontrun{
-#' # load RandomFields package
-#' ## N.B. the RandomFields package must be installed to run the example
-#' library(RandomFields)
-#'
 #' # set seeds for reproducibility
 #' set.seed(123)
-#' RFoptions(seed = 123)
 #'
 #' # simulate data for 30 sites, 2 features, and 3 environmental variables
 #' site_data <- simulate_site_data(
