@@ -1,12 +1,11 @@
 context("evdsi")
 
 test_that("single species", {
-  skip_if_not_installed("RandomFields")
+  skip_on_cran()
   skip_on_os("windows")
   # data
   ## set seeds
   set.seed(123)
-  RandomFields::RFoptions(seed = 123)
   ## set constants
   n_f <- 1
   n_sites <- 20
@@ -16,7 +15,6 @@ test_that("single species", {
   ## simulate data
   site_data <- simulate_site_data(n_sites, n_f, 0.1, n_vars)
   feature_data <- simulate_feature_data(n_f)
-  seed <- 123
   feature_data$target <- rep(7, n_f)
   total_budget <- sum(site_data$management_cost * 0.8)
   site_data$survey <- FALSE
@@ -62,12 +60,11 @@ test_that("single species", {
 })
 
 test_that("multiple species", {
-  skip_if_not_installed("RandomFields")
+  skip_on_cran()
   skip_on_os("windows")
   # data
   ## set seeds
   set.seed(123)
-  RandomFields::RFoptions(seed = 123)
   ## set constants
   n_f <- 3
   n_sites <- 20
@@ -77,7 +74,6 @@ test_that("multiple species", {
   ## simulate data
   site_data <- simulate_site_data(n_sites, n_f, 0.1, n_vars)
   feature_data <- simulate_feature_data(n_f)
-  seed <- 123
   feature_data$target <- rep(7, n_f)
   feature_data$survey <- c(TRUE, FALSE, TRUE)
   total_budget <- sum(site_data$management_cost * 0.8)
@@ -113,7 +109,7 @@ test_that("multiple species", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_costs  = site_data$survey_cost,
+    pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),

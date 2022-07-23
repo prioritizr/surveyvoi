@@ -171,20 +171,19 @@ test_that("multiple species (sparse)", {
 })
 
 test_that("consistent results", {
+  skip_on_cran()
   skip_if_not_installed("gurobi")
-  skip_if_not_installed("RandomFields")
   skip_on_os("windows")
   # seeds
   set.seed(505)
-  RandomFields::RFoptions(seed = 505)
   # data
   site_data <- simulate_site_data(
     n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 0.1,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
     n_features = 1, proportion_of_survey_features = 1)
-  total_budget <- 500.128863597055
-  survey_budget <- 26.4498218037885
+  total_budget <- sum(site_data$management_cost) * 0.2
+  survey_budget <- sum(site_data$survey_cost) * 0.2
   xgb_parameters <-
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),
@@ -220,23 +219,22 @@ test_that("consistent results", {
 })
 
 test_that("consistent results (multiple threads)", {
+  skip_on_cran()
   skip_if_not_installed("gurobi")
-  skip_if_not_installed("RandomFields")
   skip_on_os("windows")
   # skip if using PSOCK cluster and package not installed
   skip_if(!requireNamespace("surveyvoi") &&
           !identical(.Platform$OS.type, "unix"))
   # seeds
   set.seed(505)
-  RandomFields::RFoptions(seed = 505)
   # data
   site_data <- simulate_site_data(
     n_sites = 30, n_features = 1, proportion_of_sites_missing_data = 0.1,
     n_env_vars = 2, output_probabilities = FALSE)
   feature_data <- simulate_feature_data(
     n_features = 1, proportion_of_survey_features = 1)
-  total_budget <- 500.128863597055
-  survey_budget <- 26.4498218037885
+  total_budget <- sum(site_data$management_cost) * 0.2
+  survey_budget <- sum(site_data$survey_cost) * 0.2
   xgb_parameters <-
     list(eta = c(0.1, 0.3),
          lambda = c(0.01),

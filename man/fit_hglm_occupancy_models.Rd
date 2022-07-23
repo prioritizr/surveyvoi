@@ -212,15 +212,9 @@ the documentation for the \pkg{rjags} package.
 }
 
 \examples{
-\dontshow{if (requireNamespace("RandomFields", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
-# load RandomFields package
-## N.B. the RandomFields package must be installed to run the example
-library(RandomFields)
-
 # set seeds for reproducibility
 set.seed(123)
-RFoptions(seed = 123)
 
 # simulate data for 200 sites, 2 features, and 3 environmental variables
 site_data <- simulate_site_data(n_sites = 30, n_features = 2, prop = 0.1)
@@ -248,7 +242,6 @@ print(results$predictions)
 # print model performance
 print(results$performance, width = Inf)
 }
-\dontshow{\}) # examplesIf}
 }
 \references{
 Park T & Casella G (2008) The Bayesian lasso.

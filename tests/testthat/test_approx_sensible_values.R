@@ -1,11 +1,10 @@
 context("approx sensible values")
 
 test_that("lower voi when most of budget spent on surveys", {
-  skip_if_not_installed("RandomFields")
+  skip_on_cran()
   skip_on_os("windows")
   # initialize rng
   set.seed(501)
-  RandomFields::RFoptions(seed = 501)
   # data
   n_f <- 2
   site_data <- simulate_site_data(n_sites = 15, n_features = n_f, 0.1)

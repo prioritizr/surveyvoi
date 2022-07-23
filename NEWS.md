@@ -1,3 +1,8 @@
+# surveyvoi 1.0.3.11
+
+- Update `simulate_site_data()` function to remove RandomFields package
+  as a dependency.
+
 # surveyvoi 1.0.3.10
 
 - Fix CRAN note about utils package dependency.
