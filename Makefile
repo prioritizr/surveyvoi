@@ -72,6 +72,10 @@ wbcheck:
 	R --slave -e "devtools::check_win_devel()"
 	cp -Rf doc inst/
 
+maccheck:
+	R --slave -e "devtools::check_mac_release()"
+	cp -Rf doc inst/
+
 urlcheck:
 	R --slave -e "devtools::document();urlchecker::url_check()"
 

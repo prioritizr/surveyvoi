@@ -1,3 +1,12 @@
+# surveyvoi 1.0.4
+
+- CRAN release.
+
+# surveyvoi 1.0.3.12
+
+- Update CRAN comments document and remove pkg-config from system requirements.
+- Fix compiler warning thrown during installation.
+
 # surveyvoi 1.0.3.11
 
 - Update `simulate_site_data()` function to remove RandomFields package

@@ -24,11 +24,11 @@ void model_sensitivity_and_specificity(
   double total_negative = static_cast<double>(w.sum()) - total_positive;
   double true_positive = static_cast<double>(
     (w.array() *
-    ((yhat.array() >= 0.5f) * (y.array() >= 0.5f)).cast<float>()).sum()
+    ((yhat.array() >= 0.5f) && (y.array() >= 0.5f)).cast<float>()).sum()
   );
   double true_negative = static_cast<double>(
     (w.array() *
-     ((yhat.array() < 0.5f) * (y.array() < 0.5f)).cast<float>()).sum()
+     ((yhat.array() < 0.5f) && (y.array() < 0.5f)).cast<float>()).sum()
   );
   double false_negative = total_positive - true_positive;
   double false_positive = total_negative - true_negative;

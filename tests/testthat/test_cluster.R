@@ -3,6 +3,7 @@ context("cluster")
 test_that("FORK", {
   skip_on_cran()
   skip_on_os("windows")
+  skip_if_parallel_processing_not_available()
   # data
   x <- seq_len(3)
   f <- function(z) {
@@ -21,6 +22,7 @@ test_that("FORK", {
 
 test_that("PSOCK", {
   skip_on_cran()
+  skip_if_parallel_processing_not_available()
   # data
   x <- seq_len(3)
   f <- function(z) {
