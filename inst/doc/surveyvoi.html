@@ -12,7 +12,7 @@
 
 <meta name="author" content="Jeffrey O. Hanson" />
 
-<meta name="date" content="2022-07-23" />
+<meta name="date" content="2022-08-26" />
 
 <title>surveyvoi: Survey Value of Information</title>
 
@@ -110,13 +110,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -164,7 +171,7 @@ div.csl-indent {
 
 <h1 class="title toc-ignore">surveyvoi: Survey Value of Information</h1>
 <h4 class="author">Jeffrey O. Hanson</h4>
-<h4 class="date">2022-07-23</h4>
+<h4 class="date">2022-08-26</h4>
 
 
 <div id="TOC">
@@ -247,8 +254,7 @@ div.csl-indent {
 ##  8  (0.590849 0.748232)
 ##  9  (0.373888 0.150227)
 ## 10  (0.141298 0.307626)
-## # … with 20 more rows
-## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+## # … with 20 more rows</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the spatial location of the sites</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(site_data) <span class="sc">+</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>() <span class="sc">+</span></span>
@@ -389,8 +395,7 @@ div.csl-indent {
 ##  8 0.565847
 ##  9 0.452463
 ## 10 0.565847
-## # … with 20 more rows
-## # ℹ Use `print(n = ...)` to see more rows</code></pre>
+## # … with 20 more rows</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>site_data<span class="sc">$</span>p1 <span class="ot">&lt;-</span> xgb_predictions<span class="sc">$</span>f1</span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot site-level estimated occupancy probabilities</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>site_data <span class="sc">%&gt;%</span></span>
