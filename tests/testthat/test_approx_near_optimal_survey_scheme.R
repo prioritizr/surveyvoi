@@ -217,9 +217,7 @@ test_that("consistent results", {
 test_that("consistent results (multiple threads)", {
   skip_on_cran()
   skip_on_os("windows")
-  # skip if using PSOCK cluster and package not installed
-  skip_if(!requireNamespace("surveyvoi") &&
-          !identical(.Platform$OS.type, "unix"))
+  skip_if_parallel_processing_not_available()
   # seeds
   set.seed(505)
   # data
