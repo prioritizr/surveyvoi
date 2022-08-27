@@ -33,7 +33,6 @@ jobs:
         OMP_THREAD_LIMIT: 2
         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         CI: true
-        PATH: $PATH:/opt/R-devel/bin
 
     steps:
       - uses: actions/checkout@v2
