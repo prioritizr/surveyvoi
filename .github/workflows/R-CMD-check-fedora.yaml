@@ -39,9 +39,9 @@ jobs:
 
       - name: Setup R
         run: |
-          echo 'export PATH=$PATH:/opt/R-devel/bin' >> ~/.bashrc
-          source ~/.bashrc
-          cat ~/.bashrc
+          echo 'export PATH=$PATH:/opt/R-devel/bin' >> $HOME/.bashrc
+          source $HOME/.bashrc
+          cat $HOME/.bashrc
 
       - name: Install system dependencies
         run: |
