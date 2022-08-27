@@ -223,6 +223,7 @@ test_that("consistent results", {
 })
 
 test_that("consistent results (multiple threads)", {
+  skip_on_cran()
   skip_if_not_installed("gurobi")
   skip_on_os("windows")
   # skip if using PSOCK cluster and package not installed

@@ -7,6 +7,7 @@
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Fedora](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
 [![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage
 Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
@@ -86,7 +87,7 @@ Please cite the *surveyvoi R* package when using it in publications. To
 cite the developmental version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.4. Available at
+> Value of Information. R package version 1.0.5. Available at
 > <https://github.com/prioritizr/surveyvoi>.
 
 ## Usage

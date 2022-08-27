@@ -12,6 +12,7 @@ output:
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Fedora](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
 [![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)

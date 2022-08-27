@@ -1,3 +1,8 @@
+# surveyvoi 1.0.5
+
+- Skip tests on Fedora systems because unable to reproduce error on CRAN.
+- Fix compiler warning thrown during installation.
+
 # surveyvoi 1.0.4
 
 - CRAN release.
