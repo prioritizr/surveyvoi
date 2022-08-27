@@ -33,14 +33,9 @@ jobs:
         OMP_THREAD_LIMIT: 2
         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         CI: true
+        PATH: $PATH:/opt/R-devel/bin
 
     steps:
-      - name: Setup R
-        run: |
-          echo 'export PATH=$PATH:/opt/R-devel/bin' >> $HOME/.bashrc
-          source $HOME/.bashrc
-          echo $PATH
-
       - uses: actions/checkout@v2
 
       - name: Install system dependencies
