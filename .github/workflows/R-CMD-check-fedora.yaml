@@ -12,11 +12,11 @@ on:
       - main
       - master
 
-name: Fedora (devel)
+name: Fedora
 
 jobs:
   R-CMD-check:
-    name: Fedora
+    name: Fedora (devel)
 
     runs-on: ubuntu-latest
 

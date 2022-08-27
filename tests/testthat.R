@@ -14,13 +14,13 @@ if (identical(Sys.getenv("CI"), "true")) {
 
 # check if on Fedora
 os_name <- utils::sessionInfo()$running
-is_Fedora <- TRUE
+is_fedora <- TRUE
 if (
   is.character(os_name) &&
   identical(length(os_name), 1L) &&
   all(!is.na(os_name))
 ) {
-  is_Fedora <- any(grepl("fedora", os_name, ignore.case = TRUE, fixed = TRUE))
+  is_fedora <- any(grepl("fedora", tolower(os_name), fixed = TRUE))
 }
 
 # run tests (but not on Fedora systems)
