@@ -38,6 +38,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup path
+        run: |
+          echo "/opt/R-devel/bin" >> $GITHUB_PATH
+
       - name: Install system dependencies
         run: |
           echo $PATH
