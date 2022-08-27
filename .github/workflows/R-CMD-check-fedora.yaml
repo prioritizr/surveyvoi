@@ -45,6 +45,7 @@ jobs:
 
       - name: Install system dependencies
         run: |
+          echo $PATH
           dnf install -y \
             mpfr-devel \
             automake \
