@@ -39,9 +39,7 @@ jobs:
         run: |
           echo 'export PATH=$PATH:/opt/R-devel/bin' >> $HOME/.bashrc
           source $HOME/.bashrc
-          echo $HOME/.bashrc
-          cat $HOME/.bashrc
-          ls -la $HOME
+          echo $PATH
 
       - uses: actions/checkout@v2
 
