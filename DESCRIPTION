@@ -114,4 +114,5 @@ Collate:
     'simulate_site_data.R'
     'validate.R'
     'weighted_survey_scheme.R'
+    'zzz.R'
 Roxygen: list(markdown = TRUE)

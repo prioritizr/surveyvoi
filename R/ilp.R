@@ -203,7 +203,7 @@ weight_based_prioritizations <- function(
   ## create objective function
   obj <- c(x)
   ## create constraints
-  A <- methods::as(matrix(costs, nrow = 1, ncol = length(x)), "dgCMatrix")
+  A <- as_Matrix(matrix(costs, nrow = 1, ncol = length(x)), "dgCMatrix")
   ## create RHS vector
   rhs <- c(NA_real_)
   ## create sense vector
