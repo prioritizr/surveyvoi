@@ -13,7 +13,7 @@ Description: Decision support tool for prioritizing sites for ecological
     algorithms. After generating such survey plans, they can be evaluated using
     conditions) and maximizing value of information. Please note that several
     functions depend on the 'Gurobi' optimization software (available from
-    <https://www.gurobi.com>). Additionally, the JAGS software (available from
+    <https://www.gurobi.com>). Additionally, the 'JAGS' software (available from
     <https://mcmc-jags.sourceforge.io/>) is required to fit hierarchical
     generalized linear models.
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',

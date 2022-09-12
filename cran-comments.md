@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you very much for reviewing this submission. I recognize that there were many issues with the previous submission of this package (back in May 2021), and I apologize for my carelessness. I am extremely grateful to CRAN volunteers for providing such detailed advice on addressing these issues. I have verified that the package passes CRAN package checks on both the Win-Builder and macOS platforms, along with several other environments using GitHub Actions and Docker (see Test environments below). I have also aimed to verify that the system requirements for this package are available on CRAN's check servers, and provide details indicating the presence of these requirements on CRAN's servers (see System requirements below).
+Thank you very much for reviewing this submission. This submission aims to fix the issues causing the package checks to fail on CRAN. Specifically, it (i) fixes the compiler warnings during package checks (e.g., on Debian-clang flavor), and address unit test errors (i.e., on Fedora flavors). I have also taken this opportunity to update the package to be compatible with the upcoming Matrix package (version >= 1.4-2), whilst ensuring backwards compatibility.
 
 Cheers,
 

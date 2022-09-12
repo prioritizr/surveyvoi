@@ -1,8 +1,9 @@
 # surveyvoi 1.0.5
 
+- CRAN release.
 - Skip tests on Fedora systems because unable to reproduce error on CRAN.
 - Fix compiler warning thrown during installation.
-- Fix compatibility issues with upcoming _Matrix_ package.
+- Fix compatibility issues with upcoming _Matrix_ package (version >= 1.4-2) .
 - Fix issues unloading package properly.
 
 # surveyvoi 1.0.4
