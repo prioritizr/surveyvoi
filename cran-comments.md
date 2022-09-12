@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you very much for reviewing this submission. This submission aims to fix the issues causing the package checks to fail on CRAN. Specifically, it (i) fixes the compiler warnings during package checks (e.g., on Debian-clang flavor), and address unit test errors (i.e., on Fedora flavors). I have also taken this opportunity to update the package to be compatible with the upcoming Matrix package (version >= 1.4-2), whilst ensuring backwards compatibility.
+Thank you very much for reviewing this submission. This submission aims to fix the issues causing the package to fail CRAN checks. Specifically, it fixes the compiler warnings during package checks (e.g., on Debian-clang flavor), and address unit test errors (i.e., on Fedora flavors). I have also taken this opportunity to update the package to be compatible with the upcoming Matrix package (version >= 1.4-2), whilst maintaining backwards compatibility.
 
 Cheers,
 
@@ -21,10 +21,6 @@ Jeff
 0 errors | 0 warnings | 2 notes
 
 # Notes
-
-* Requires non-standard build of gmp (undeclared and unchecked).
-
-  **This message appears when testing the package on WinBuilder. My understanding is that this message is displayed because the package uses the RWinLib infrastructure to obtain a version of gmp with the C++ bindings available (see https://github.com/rwinlib/gmp). Although the standard Windows Rtools build-chain does provide such C++ bindings (see https://github.com/r-windows/rtools-packages/blob/master/mingw-w64-gmp/PKGBUILD), WinBuilder has a manually installed version of gmp -- which overrides the version of gmp distributed with Rtools -- that does not provide the C++ bindings (indicated by https://win-builder.r-project.org/GPLcompliance/). As such, a non-standard build of gmp is used when compiling the package on WinBuilder (i.e., the gmp build obtained from the RWinLib infrastructure).**
 
 * checking installed package size ... NOTE
   installed size is 14.4Mb
@@ -66,7 +62,7 @@ Below, I have provided a markdown table detailing whether each system requiremen
 
 There are no existing packages that depend on this package.
 
-# Previous comments from CRAN volunteers
+# Comments from CRAN volunteers on previous submissions
 
 * Correct your SystemRequirements.
 
