@@ -126,7 +126,7 @@ void assert_valid_probability_data(Eigen::MatrixXd &x, std::string msg) {
 }
 
 void assert_valid_probability_data(double x, std::string msg) {
-  if ((x > (1.0 + 1.0e-15)) | (x < (0.0 - 1.0e-15)))
+  if ((x > (1.0 + 1.0e-15)) || (x < (0.0 - 1.0e-15)))
     Rcpp::stop(msg);
   return;
 }
