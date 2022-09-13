@@ -148,6 +148,7 @@ test_that("multiple species", {
 
 test_that("multiple species (sparse, multiple threads)", {
   skip_on_cran()
+  skip_on_fedora()
   skip_on_os("windows")
   skip_if_not(suppressWarnings(is_jags_installed()))
   skip_if_parallel_processing_not_available()
