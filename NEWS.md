@@ -5,6 +5,7 @@
 - Fix compiler warning thrown during installation.
 - Fix compatibility issues with upcoming _Matrix_ package (version >= 1.4-2) .
 - Fix issues unloading package properly.
+- Update citation information in README.
 
 # surveyvoi 1.0.4
 
