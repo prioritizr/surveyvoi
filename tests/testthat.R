@@ -1,17 +1,3 @@
-# load packages
-library(testthat)
-library(surveyvoi)
-
-# enable parallel testing
-Sys.unsetenv("R_TESTS")
-
-# determine reporter
-if (identical(Sys.getenv("CI"), "true")) {
-  reporter = "progress"
-} else {
-  reporter = testthat::check_reporter()
-}
-
 # check if on Fedora
 os_name <- utils::sessionInfo()$running
 is_fedora <- TRUE
@@ -27,5 +13,20 @@ if (
 if (isTRUE(is_fedora)) {
   message("skipping tests on Fedora system")
 } else {
+  ## load packages
+  library(testthat)
+  library(surveyvoi)
+
+  ## enable parallel testing
+  Sys.unsetenv("R_TESTS")
+
+  ## determine reporter
+  if (identical(Sys.getenv("CI"), "true")) {
+    reporter <- "progress"
+  } else {
+    reporter <- testthat::check_reporter()
+  }
+
+  ## run tests
   test_check("surveyvoi", reporter = reporter)
 }
