@@ -24,8 +24,10 @@ if (
 }
 
 # run tests (but not on Fedora systems)
-if (isTRUE(is_fedora)) {
-  message("skipping tests on Fedora system")
-} else {
-  test_check("surveyvoi", reporter = reporter)
-}
+# if (isTRUE(is_fedora)) {
+#   message("skipping tests on Fedora system")
+# } else {
+#   test_check("surveyvoi", reporter = reporter)
+# }
+
+test_check("surveyvoi", reporter = reporter)
