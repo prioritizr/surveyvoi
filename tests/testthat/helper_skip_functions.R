@@ -8,15 +8,14 @@ skip_if_parallel_processing_not_available <- function() {
 }
 
 skip_on_fedora <- function() {
-  TRUE
-  # os_name <- utils::sessionInfo()$running
-  # is_fedora <- TRUE
-  # if (
-  #   is.character(os_name) &&
-  #   identical(length(os_name), 1L) &&
-  #   all(!is.na(os_name))
-  # ) {
-  #   is_fedora <- any(grepl("fedora", tolower(os_name), fixed = TRUE))
-  # }
-  # skip_if(isTRUE(is_fedora), message = "on Fedora")
+  os_name <- utils::sessionInfo()$running
+  is_fedora <- TRUE
+  if (
+    is.character(os_name) &&
+    identical(length(os_name), 1L) &&
+    all(!is.na(os_name))
+  ) {
+    is_fedora <- any(grepl("fedora", tolower(os_name), fixed = TRUE))
+  }
+  skip_if(isTRUE(is_fedora), message = "on Fedora")
 }

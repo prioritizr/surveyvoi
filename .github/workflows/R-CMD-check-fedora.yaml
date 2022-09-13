@@ -33,6 +33,7 @@ jobs:
         OMP_THREAD_LIMIT: 2
         KMP_DEVICE_THREAD_LIMIT: 2
         KMP_TEAMS_THREAD_LIMIT: 2
+        KMP_ALL_THREADS: 2
         NOT_CRAN: true
         GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         CI: true
