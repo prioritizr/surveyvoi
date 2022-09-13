@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you very much for reviewing this submission. This submission aims to fix the issues causing the package to fail CRAN checks. Specifically, it fixes the compiler warnings during package checks (e.g., on Debian-clang flavor), and address unit test errors (i.e., on Fedora flavors). I have also taken this opportunity to update the package to be compatible with the upcoming Matrix package (version >= 1.4-2), whilst maintaining backwards compatibility.
+Thank you very much for reviewing this submission. This submission aims to fix the issues causing the package to fail CRAN checks. Specifically, it fixes the compiler warnings (e.g., on Debian-clang flavor) and unit test errors (i.e., on Fedora flavors). I have also taken this opportunity to update the package to be compatible with the upcoming Matrix package (version >= 1.4-2), whilst maintaining backwards compatibility with previous versions.
 
 Cheers,
 
@@ -9,6 +9,7 @@ Jeff
 # Test environments
 
 * [Debian (testing), R-release](https://github.com/r-devel/rcheckserver) ([based on rcheckserver](https://statmath.wu.ac.at/AASC/debian/))
+* [Fedora 33, clang, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AFedora)
 * [Ubuntu 20.04, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
 * [Ubuntu 20.04, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
 * [macOS 10.15, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3A%22Mac+OSX%22)
@@ -36,9 +37,9 @@ Jeff
 
 # System requirements
 
-The package has system requirements. Some of these requirements are mandatory -- and are required for successful installation -- and others are optional. To ensure that all mandatory requirements are available on CRAN systems, I have checked the software installed on CRAN's various systems. Briefly, this information was obtained from the [Windows](https://github.com/r-windows/rtools-packages) and [macOS](https://github.com/R-macos/recipes) toolchains; the [rcheckserver Debian meta-package](https://statmath.wu.ac.at/AASC/debian/dists/stable/main/binary-amd64/Packages), and correspondence with CRAN volunteers.
+The package has system requirements. Some of these requirements are mandatory -- and are required for successful installation -- and others are optional. To ensure that all mandatory requirements are available on CRAN systems, I have checked the software installed on CRAN's various systems. Briefly, this information was obtained from the [Windows toolchain](https://github.com/r-windows/rtools-packages); [macOS toolchain](https://github.com/R-macos/recipes) toolchains; [rcheckserver Debian meta-package](https://statmath.wu.ac.at/AASC/debian/dists/stable/main/binary-amd64/Packages); and via correspondence with CRAN volunteers.
 
-Below, I have provided a markdown table detailing whether each system requirement is optional or mandatory under various operating systems. I have also included details and URLs verifying the availability of mandatory system requirements on CRAN's systems.
+Below, I have provided a markdown table detailing whether each system requirement is optional or mandatory under various operating systems. I have also included details and URLs verifying the availability of mandatory system requirements on each of CRAN's systems. Where URLs are provided for certain software on certain operating systems (e.g., for gmpxx on Windows), the URL points directly to the source code for the relevant toolchain (e.g., the RTools for Windows) for including the software.
 
 | Software | Debian | Fedora | Windows | macOS |
 |:--------|:---------:|:--------:|:------:|:------:|
