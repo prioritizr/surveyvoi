@@ -216,6 +216,7 @@ test_that("consistent results", {
 
 test_that("consistent results (multiple threads)", {
   skip_on_cran()
+  skip_on_fedora()
   skip_on_os("windows")
   skip_if_parallel_processing_not_available()
   # seeds

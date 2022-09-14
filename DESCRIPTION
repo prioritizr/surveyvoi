@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.4
+Version: 1.0.5
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -13,7 +13,7 @@ Description: Decision support tool for prioritizing sites for ecological
     algorithms. After generating such survey plans, they can be evaluated using
     conditions) and maximizing value of information. Please note that several
     functions depend on the 'Gurobi' optimization software (available from
-    <https://www.gurobi.com>). Additionally, the JAGS software (available from
+    <https://www.gurobi.com>). Additionally, the 'JAGS' software (available from
     <https://mcmc-jags.sourceforge.io/>) is required to fit hierarchical
     generalized linear models.
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
@@ -114,4 +114,5 @@ Collate:
     'simulate_site_data.R'
     'validate.R'
     'weighted_survey_scheme.R'
+    'zzz.R'
 Roxygen: list(markdown = TRUE)

@@ -7,6 +7,7 @@
 [![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
 [![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Fedora](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
 [![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage
 Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
@@ -24,16 +25,26 @@ approaches (e.g. maximizing expected species richness, geographic
 coverage, diversity of sampled environmental conditions) and by
 maximizing value of information. After generating plans for surveys,
 they can also be evaluated using value of information analysis. Please
-note that several functions depend on the ‘Gurobi’ optimization software
+note that several functions depend on the Gurobi optimization software
 (available from <https://www.gurobi.com>). Additionally, the JAGS
 software (available from <https://mcmc-jags.sourceforge.io/>) is
 required to fit hierarchical generalized linear models.
 
 ## Installation
 
-The development version can be installed from
+The latest official version can be installed from the [Comprehensive R
+Archive Network (CRAN)](https://cran.r-project.org/) using the following
+*R* code.
+
+``` r
+install.packages("surveyvoi", repos = "https://cran.rstudio.com/")
+```
+
+Alternatively, the latest development version can be installed from
 [GitHub](https://github.com/prioritizr/surveyvoi) using the following
-code.
+code. Please note that while developmental versions may contain
+additional features not present in the official version, they may also
+contain coding errors.
 
 ``` r
 if (!require(remotes)) install.packages("remotes")
@@ -83,10 +94,16 @@ following commands in the system terminal:
 ## Citation
 
 Please cite the *surveyvoi R* package when using it in publications. To
-cite the developmental version, please use:
+cite the latest official version, please use:
 
 > Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.4. Available at
+> Value of Information. R package version 1.0.5. Available at
+> <https://CRAN.R-project.org/package=surveyvoi>.
+
+Alternatively, to cite the latest development version, please use:
+
+> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
+> Value of Information. R package version 1.0.5. Available at
 > <https://github.com/prioritizr/surveyvoi>.
 
 ## Usage
@@ -99,7 +116,7 @@ features (e.g. bird species). To start off, we will set the seed for the
 random number generator for reproducibility and load some R packages.
 
 ``` r
-set.seed(500)      # set RNG for reproducibility
+set.seed(501)      # set RNG for reproducibility
 library(surveyvoi) # package for value of information analysis
 library(dplyr)     # package for preparing data
 library(tidyr)     # package for preparing data
@@ -172,7 +189,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -183,7 +200,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -281,12 +298,12 @@ then you wouldn’t survey any sites to ensure that at least one site
 could be protected. Generally, conservation planning problems occur
 somewhere between these two extremes—but the optimization process can’t
 take that into account if you don’t specify a budget. For brevity, here
-we will set the total budget as 80% of the total costs for protecting
+we will set the total budget as 90% of the total costs for protecting
 sites.
 
 ``` r
 # calculate budget
-budget <- sum(0.8 * sim_sites$management_cost)
+budget <- sum(0.90 * sim_sites$management_cost)
 
 # generate optimized survey scheme
 opt_scheme <-
@@ -318,7 +335,7 @@ opt_scheme <-
 print(str(opt_scheme))
 ```
 
-    ##  logi [1, 1:6] FALSE FALSE FALSE FALSE FALSE FALSE
+    ##  logi [1, 1:6] FALSE TRUE FALSE TRUE TRUE TRUE
     ##  - attr(*, "ev")= num [1, 1:100] 3 3 3 3 3 ...
     ## NULL
 
@@ -335,7 +352,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using

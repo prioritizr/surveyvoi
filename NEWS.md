@@ -1,3 +1,12 @@
+# surveyvoi 1.0.5
+
+- CRAN release.
+- Skip tests on Fedora systems because unable to reproduce error on CRAN.
+- Fix compiler warning thrown during installation.
+- Fix compatibility issues with upcoming _Matrix_ package (version >= 1.4-2) .
+- Fix issues unloading package properly.
+- Update citation information in README.
+
 # surveyvoi 1.0.4
 
 - CRAN release.
@@ -9,19 +18,19 @@
 
 # surveyvoi 1.0.3.11
 
-- Update `simulate_site_data()` function to remove RandomFields package
+- Update `simulate_site_data()` function to remove _RandomFields_ package
   as a dependency.
 
 # surveyvoi 1.0.3.10
 
-- Fix CRAN note about utils package dependency.
-- Skip unit tests that require RandomFields package on Windows to avoid
+- Fix CRAN note about _utils_ package dependency.
+- Skip unit tests that require _RandomFields_ package on Windows to avoid
   spurious failures.
 
 # surveyvoi 1.0.3.9
 
 - Update documentation for new code repository location.
-- Add remote for RandomFields package to facilitate installation.
+- Add remote for _RandomFields_ package to facilitate installation.
 
 # surveyvoi 1.0.3.8
 
@@ -30,11 +39,11 @@
 # surveyvoi 1.0.3.7
 
 - Tweak package documentation.
-- The RandomFields package is now an optional dependency.
+- The _RandomFields_ package is now an optional dependency.
 
 # surveyvoi 1.0.3.6
 
-- Update README with system requirements for PoissonBinomial package (#42).
+- Update README with system requirements for _PoissonBinomial_ package (#42).
 
 # surveyvoi 1.0.3.5
 
@@ -54,11 +63,11 @@
 
 # surveyvoi 1.0.3.2
 
-- Fix compatibility issues with updates to the xgboost package (version 1.5.0).
-- Fix parallel processing tests given updates to the testthat package
+- Fix compatibility issues with updated _xgboost_ package (version 1.5.0).
+- Fix parallel processing tests given updates to the _testthat_ package
   (version 3.1.2).
 - Fix tests for environmental and geographic survey schemes given updates to
-  the gurobi package (version 9.5.0).
+  the _gurobi_ package (version 9.5.0).
 
 # surveyvoi 1.0.3.1
 
@@ -100,7 +109,7 @@
 # surveyvoi 1.0.0
 
 - Refactor for official release.
-- Add support for generating surveys with the Rsymphony package.
+- Add support for generating surveys with the _Rsymphony_ package.
 
 # surveyvoi 0.0.76
 

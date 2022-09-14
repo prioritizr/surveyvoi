@@ -46,7 +46,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.5</span>
       </span>
     </div>
 
@@ -85,12 +85,15 @@
 <div class="page-header"><h1 id="surveyvoi-survey-value-of-information">surveyvoi: Survey Value of Information<a class="anchor" aria-label="anchor" href="#surveyvoi-survey-value-of-information"></a>
 </h1></div>
 
-<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>). Additionally, the JAGS software (available from <a href="https://mcmc-jags.sourceforge.io/" class="external-link uri">https://mcmc-jags.sourceforge.io/</a>) is required to fit hierarchical generalized linear models.</p>
+<p>The <em>surveyvoi</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the Gurobi optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>). Additionally, the JAGS software (available from <a href="https://mcmc-jags.sourceforge.io/" class="external-link uri">https://mcmc-jags.sourceforge.io/</a>) is required to fit hierarchical generalized linear models.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The development version can be installed from <a href="https://github.com/prioritizr/surveyvoi">GitHub</a> using the following code.</p>
+<p>The latest official version can be installed from the <a href="https://cran.r-project.org/" class="external-link">Comprehensive R Archive Network (CRAN)</a> using the following <em>R</em> code.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"surveyvoi"</span>, repos <span class="op">=</span> <span class="st">"https://cran.rstudio.com/"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, the latest development version can be installed from <a href="https://github.com/prioritizr/surveyvoi">GitHub</a> using the following code. Please note that while developmental versions may contain additional features not present in the official version, they may also contain coding errors.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="va"><a href="https://remotes.r-lib.org" class="external-link">remotes</a></span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"prioritizr/surveyvoi"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
@@ -102,8 +105,8 @@
 <h4 id="ubuntu">Ubuntu<a class="anchor" aria-label="anchor" href="#ubuntu"></a>
 </h4>
 <p>The <code>gmp</code>, <code>fftw3</code>, <code>mpfr</code>, and <code>symphony</code> libraries need to be installed to install the <em>surveyvoi R</em> package. Although the <code>fftw3</code> and <code>symphony</code> libraries are not used directly, they are needed to successfully install dependencies. For recent versions of Ubuntu (18.04 and later), these libraries are available through official repositories. They can be installed using the following system commands:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libfftw3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get <span class="sc">-</span>y update</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>apt<span class="sc">-</span>get install <span class="sc">-</span>y libgmp3<span class="sc">-</span>dev libfftw3<span class="sc">-</span>dev libmpfr<span class="sc">-</span>dev coinor<span class="sc">-</span>libsymphony<span class="sc">-</span>dev</span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
@@ -114,75 +117,77 @@
 <h4 id="macos">macOS<a class="anchor" aria-label="anchor" href="#macos"></a>
 </h4>
 <p>The <code>gmp</code>, <code>fftw</code>, <code>mpfr</code>, and <code>symphony</code> libraries are required. Although the <code>fftw3</code> and <code>symphony</code> libraries are not used directly, they are needed to successfully install dependencies. The easiest way to install these libraries is using <a href="https://brew.sh/" class="external-link">HomeBrew</a>. After installing HomeBrew, these libraries can be installed using the following commands in the system terminal:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>brew tap coin<span class="sc">-</span>or<span class="sc">-</span>tools<span class="sc">/</span>coinor</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>brew install symphony</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>brew install pkg<span class="sc">-</span>config</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>brew install gmp</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>brew install fftw</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>brew tap coin<span class="sc">-</span>or<span class="sc">-</span>tools<span class="sc">/</span>coinor</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>brew install symphony</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>brew install pkg<span class="sc">-</span>config</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>brew install gmp</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>brew install fftw</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>brew install mpfr</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<p>Please cite the <em>surveyvoi R</em> package when using it in publications. To cite the developmental version, please use:</p>
-<blockquote><p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey Value of Information. R package version 1.0.4. Available at <a href="https://github.com/prioritizr/surveyvoi" class="uri">https://github.com/prioritizr/surveyvoi</a>.</p></blockquote>
+<p>Please cite the <em>surveyvoi R</em> package when using it in publications. To cite the latest official version, please use:</p>
+<blockquote><p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey Value of Information. R package version 1.0.5. Available at <a href="https://CRAN.R-project.org/package=surveyvoi" class="external-link uri">https://CRAN.R-project.org/package=surveyvoi</a>.</p></blockquote>
+<p>Alternatively, to cite the latest development version, please use:</p>
+<blockquote><p>Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey Value of Information. R package version 1.0.5. Available at <a href="https://github.com/prioritizr/surveyvoi" class="uri">https://github.com/prioritizr/surveyvoi</a>.</p></blockquote>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p>Here we provide a short example showing how to use the <em>surveyvoi R</em> package to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (termed “survey schemes”) using simulated data for six sites and three conservation features (e.g. bird species). To start off, we will set the seed for the random number generator for reproducibility and load some R packages.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">500</span><span class="op">)</span>      <span class="co"># set RNG for reproducibility</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">501</span><span class="op">)</span>      <span class="co"># set RNG for reproducibility</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://prioritizr.github.io/surveyvoi/" class="external-link">surveyvoi</a></span><span class="op">)</span> <span class="co"># package for value of information analysis</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>     <span class="co"># package for preparing data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span>     <span class="co"># package for preparing data</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>   <span class="co"># package for plotting data</span></span></code></pre></div>
 <p>Now we will load some datasets that are distributed with the package. First, we will load the <code>sim_sites</code> object. This spatially explicit dataset (i.e. <code>sf</code> object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the <code>"management_cost"</code> column indicates the cost of protecting each site; <code>"survey_cost"</code> column indicates the cost of conducting an ecological survey within each site; and <code>"e1"</code> and <code>"e2"</code> columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The <code>"n1"</code>, <code>"n2"</code>, and <code>"n3"</code> columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and <code>"f1"</code>, <code>"f2"</code>, and <code>"f3"</code> columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if <code>"n1"</code> has a value of 2 and <code>"f1"</code> has a value of 0.5 for a given site, then the feature <code>"f1"</code> was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the <code>"p1"</code>, <code>"p2"</code>, and <code>"p3"</code> columns contain modeled probability estimates of each species being present in each site (see <code><a href="reference/fit_hglm_occupancy_models.html">fit_hglm_occupancy_models()</a></code> and <code><a href="reference/fit_xgb_occupancy_models.html">fit_xgb_occupancy_models()</a></code> to generate such estimates for your own data).</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># print table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_sites</span>, width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Simple feature collection with 6 features and 13 fields</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Geometry type: POINT</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Dimension:     XY</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="do">## CRS:           NA</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 6 × 14</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   survey_cost management_cost    f1    f2    f3    n1    n2    n3      e1     e2</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="do">##         &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 1          14             102     1   1       1     3     3     3  1.00   -0.848</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 2          25              90     0   0       0     0     0     0 -1.44    1.27 </span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 3          25             165     1   0.6     0     5     5     5  1.25    0.817</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 4          17             104     0   0       0     0     0     0 -0.484  -0.292</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 5          18             100     0   0       0     0     0     0  0.0135  0.380</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 6          15              94     0   0       0     0     0     0 -0.347  -1.33 </span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="do">##      p1    p2    p3               geometry</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;                &lt;POINT&gt;</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 1     0.999 0.789  (0.1589075 0.8637977)</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 0     0     0.112  (0.9764926 0.7485368)</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 1     0.419 0.012  (0.8362375 0.2282762)</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 0.022 0.502 0.834     (0.10513 0.179855)</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 0.318 0.13  0.225 (0.5985786 0.04556193)</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 0.474 0.997 0.991  (0.1504241 0.6821156)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Simple feature collection with 6 features and 13 fields</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Geometry type: POINT</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Dimension:     XY</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="do">## CRS:           NA</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 6 × 14</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   survey_cost management_cost    f1    f2    f3    n1    n2    n3      e1     e2</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="do">##         &lt;dbl&gt;           &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 1          14             102     1   1       1     3     3     3  1.00   -0.848</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 2          25              90     0   0       0     0     0     0 -1.44    1.27 </span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 3          25             165     1   0.6     0     5     5     5  1.25    0.817</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="do">## 4          17             104     0   0       0     0     0     0 -0.484  -0.292</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="do">## 5          18             100     0   0       0     0     0     0  0.0135  0.380</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="do">## 6          15              94     0   0       0     0     0     0 -0.347  -1.33 </span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="do">##      p1    p2    p3               geometry</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;                &lt;POINT&gt;</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 1     0.999 0.789  (0.1589075 0.8637977)</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 0     0     0.112  (0.9764926 0.7485368)</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 1     0.419 0.012  (0.8362375 0.2282762)</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="do">## 4 0.022 0.502 0.834     (0.10513 0.179855)</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="do">## 5 0.318 0.13  0.225 (0.5985786 0.04556193)</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="do">## 6 0.474 0.997 0.991  (0.1504241 0.6821156)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot cost of protecting each site</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">management_cost</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"management_cost"</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot cost of conducting an additional survey in each site</span></span>
 <span><span class="co"># note that these costs are much lower than the protection costs</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">sim_sites</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">survey_cost</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"survey_cost"</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p><img src="reference/figures/README-unnamed-chunk-10-2.png" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot survey data</span></span>
 <span><span class="co">## n1, n2, n3: number of surveys in each site that looked for each feature</span></span>
 <span><span class="va">sim_sites</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -192,7 +197,7 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">value</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-n_plot-1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot survey results</span></span>
 <span><span class="co">## f1, f2, f3: proportion of surveys in each site that looked for each feature</span></span>
 <span><span class="co">##             that detected the feature</span></span>
@@ -204,7 +209,7 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_color_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-f_plot-1.png" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot modeled probability of occupancy data</span></span>
 <span><span class="va">sim_sites</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -215,28 +220,28 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_continuous.html" class="external-link">scale_color_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-p_plot-1.png" style="display: block; margin: auto;"></p>
 <p>Next, we will load the <code>sim_features</code> object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the <code>"name"</code> column contains the name of each feature; <code>"survey"</code> column indicates whether future surveys would look for this species; <code>"survey_sensitivity"</code> and <code>"survey_specificity"</code> columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature; <code>"model_sensitivity"</code> and <code>"model_specificity"</code> columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and <code>"target"</code> column denotes the required number of protected sites for each feature (termed “representation target”, each feature has a target of 1 site).</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sim_features</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># print table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sim_features</span>, width <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 7</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">##   name  survey survey_sensitivity survey_specificity model_sensitivity</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;chr&gt; &lt;lgl&gt;               &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 f1    TRUE                0.954              0.886             0.718</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 f2    TRUE                0.974              0.875             0.705</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 f3    TRUE                0.956              0.823             0.768</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   model_specificity target</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="do">##               &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 1             0.811      1</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 2             0.860      1</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 3             0.887      1</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 7</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="do">##   name  survey survey_sensitivity survey_specificity model_sensitivity</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;chr&gt; &lt;lgl&gt;               &lt;dbl&gt;              &lt;dbl&gt;             &lt;dbl&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 f1    TRUE                0.954              0.886             0.718</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 f2    TRUE                0.974              0.875             0.705</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 f3    TRUE                0.956              0.823             0.768</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="do">##   model_specificity target</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="do">##               &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 1             0.811      1</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="do">## 2             0.860      1</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="do">## 3             0.887      1</span></span></code></pre></div>
 <p>After loading the data, we will now generate an optimized ecological survey scheme. To achieve this, we will use <code><a href="reference/approx_optimal_survey_scheme.html">approx_optimal_survey_scheme()</a></code> function. This function uses a greedy heuristic algorithm to maximize value of information. Although other functions can return solutions that are guaranteed to be optimal (i.e. <code><a href="reference/optimal_survey_scheme.html">optimal_survey_scheme()</a></code>), they can take a very long time to complete because they use a brute-force approach. This function also uses an approximation routine to reduce computational burden.</p>
-<p>To perform the optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different plans depending on available funds. For instance, if you have near infinite funds then you wouldn’t bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you wouldn’t survey any sites to ensure that at least one site could be protected. Generally, conservation planning problems occur somewhere between these two extremes—but the optimization process can’t take that into account if you don’t specify a budget. For brevity, here we will set the total budget as 80% of the total costs for protecting sites.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>To perform the optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different plans depending on available funds. For instance, if you have near infinite funds then you wouldn’t bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you wouldn’t survey any sites to ensure that at least one site could be protected. Generally, conservation planning problems occur somewhere between these two extremes—but the optimization process can’t take that into account if you don’t specify a budget. For brevity, here we will set the total budget as 90% of the total costs for protecting sites.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate budget</span></span>
-<span><span class="va">budget</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fl">0.8</span> <span class="op">*</span> <span class="va">sim_sites</span><span class="op">$</span><span class="va">management_cost</span><span class="op">)</span></span>
+<span><span class="va">budget</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fl">0.90</span> <span class="op">*</span> <span class="va">sim_sites</span><span class="op">$</span><span class="va">management_cost</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># generate optimized survey scheme</span></span>
 <span><span class="va">opt_scheme</span> <span class="op">&lt;-</span></span>
@@ -257,17 +262,17 @@
 <span>    total_budget <span class="op">=</span> <span class="va">budget</span>,</span>
 <span>    survey_budget <span class="op">=</span> <span class="va">budget</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the opt_scheme object is a matrix that contains the survey schemes</span></span>
 <span><span class="co"># each column corresponds to a different site,</span></span>
 <span><span class="co"># and each row corresponds to a different solution</span></span>
 <span><span class="co"># in the event that there are multiple near-optimal survey schemes, then this</span></span>
 <span><span class="co"># matrix will have multiple rows</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  logi [1, 1:6] FALSE FALSE FALSE FALSE FALSE FALSE</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  - attr(*, "ev")= num [1, 1:100] 3 3 3 3 3 ...</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="do">##  logi [1, 1:6] FALSE TRUE FALSE TRUE TRUE TRUE</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  - attr(*, "ev")= num [1, 1:100] 3 3 3 3 3 ...</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="do">## NULL</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># let's add the first solution (row) in opt_scheme to the site data to plot it</span></span>
 <span><span class="va">sim_sites</span><span class="op">$</span><span class="va">scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span></span>
 <span></span>
@@ -278,7 +283,7 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">scheme</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"scheme"</span><span class="op">)</span> <span class="op">+</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-14-1.png" style="display: block; margin: auto;"></p>
 <p>This has just been a taster of the <em>surveyvoi R</em> package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the <a href="https://prioritizr.github.io/surveyvoi/articles/surveyvoi.html" class="external-link">package vignette</a>.</p>
 </div>
 <div class="section level2">
@@ -334,6 +339,7 @@
 <li><a href="https://github.com/prioritizr/surveyvoi/actions"><img src="https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu" alt="R-CMD-check-Ubuntu"></a></li>
 <li><a href="https://github.com/prioritizr/surveyvoi/actions"><img src="https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows" alt="R-CMD-check-Windows"></a></li>
 <li><a href="https://github.com/prioritizr/surveyvoi/actions"><img src="https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS" alt="R-CMD-check-macOS"></a></li>
+<li><a href="https://github.com/prioritizr/surveyvoi/actions"><img src="https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora" alt="R-CMD-check-Fedora"></a></li>
 <li><a href="https://github.com/prioritizr/surveyvoi/actions"><img src="https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation" alt="Documentation"></a></li>
 <li><a href="https://codecov.io/github/prioritizr/surveyvoi?branch=master" class="external-link"><img src="https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master" alt="Coverage Status"></a></li>
 <li><a href="https://CRAN.R-project.org/package=surveyvoi" class="external-link"><img src="http://www.r-pkg.org/badges/version/surveyvoi" alt="CRAN_Status_Badge"></a></li>
