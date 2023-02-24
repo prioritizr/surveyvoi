@@ -35,6 +35,14 @@ Jeff
 
     **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation provide instructions for installing the gurobi R package.**
 
+* Found the following (possibly) invalid URLs:
+  URL: https://doi.org/10.1111/1365-2664.14309
+    From: README.md
+    Status: 503
+    Message: Service Unavailable
+
+    **I have checked this URL and can confirm that it is valid.**
+
 # System requirements
 
 The package has system requirements. Some of these requirements are mandatory -- and are required for successful installation -- and others are optional. To ensure that all mandatory requirements are available on CRAN systems, I have checked the software installed on CRAN's various systems. Briefly, this information was obtained from the [Windows toolchain](https://github.com/r-windows/rtools-packages); [macOS toolchain](https://github.com/R-macos/recipes) toolchains; [rcheckserver Debian meta-package](https://statmath.wu.ac.at/AASC/debian/dists/stable/main/binary-amd64/Packages); and via correspondence with CRAN volunteers.
