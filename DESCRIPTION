@@ -85,7 +85,7 @@ SystemRequirements:
 URL: https://prioritizr.github.io/surveyvoi/
 BugReports: https://github.com/prioritizr/surveyvoi/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Biarch: true
 Collate:
