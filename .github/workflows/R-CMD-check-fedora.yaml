@@ -56,7 +56,6 @@ jobs:
             openssl-devel \
             zlib-devel \
             pandoc \
-            pandoc-citeproc \
             geos-devel \
             make \
             gdal \

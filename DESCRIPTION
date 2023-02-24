@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.5
+Version: 1.0.5.1
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -15,7 +15,7 @@ Description: Decision support tool for prioritizing sites for ecological
     functions depend on the 'Gurobi' optimization software (available from
     <https://www.gurobi.com>). Additionally, the 'JAGS' software (available from
     <https://mcmc-jags.sourceforge.io/>) is required to fit hierarchical
-    generalized linear models.
+    generalized linear models. For further details, see Hanson et al. (2022) <doi:10.1111/1365-2664.14309>.
 Authors@R: c(person(c('Jeffrey', 'O'), 'Hanson',
                email='jeffrey.hanson@uqconnect.edu.au', role = c('aut', 'cre'),
                comment = c(ORCID = '0000-0002-4716-6134')),
@@ -85,7 +85,7 @@ SystemRequirements:
 URL: https://prioritizr.github.io/surveyvoi/
 BugReports: https://github.com/prioritizr/surveyvoi/issues
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 Biarch: true
 Collate:

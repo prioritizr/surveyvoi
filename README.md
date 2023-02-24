@@ -4,13 +4,13 @@
 # surveyvoi: Survey Value of Information
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-Fedora](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
-[![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Ubuntu](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-ubuntu.yaml?branch=master&label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Windows](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-windows.yaml?branch=master&label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-macOS](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-macos.yaml?branch=master&label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-fedora](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-fedora.yaml?branch=master&label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/documentation.yaml?branch=master&label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage
-Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
+Status](https://img.shields.io/codecov/c/github/prioritizr/surveyvoi?label=Coverage)](https://app.codecov.io/gh/prioritizr/surveyvoi/branch/master)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 The *surveyvoi* package is a decision support tool for prioritizing
@@ -94,17 +94,12 @@ following commands in the system terminal:
 ## Citation
 
 Please cite the *surveyvoi R* package when using it in publications. To
-cite the latest official version, please use:
+cite the package, please use:
 
-> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.5. Available at
-> <https://CRAN.R-project.org/package=surveyvoi>.
-
-Alternatively, to cite the latest development version, please use:
-
-> Hanson JO, Chadès I, Hudgins EJ, Bennett J (2022). surveyvoi: Survey
-> Value of Information. R package version 1.0.5. Available at
-> <https://github.com/prioritizr/surveyvoi>.
+> Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
+> (2023) Optimizing ecological surveys for conservation. Journal of
+> Applied Ecology, 60: 41–51. Available at
+> <https://doi.org/10.1111/1365-2664.14309>.
 
 ## Usage
 
@@ -189,7 +184,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -200,7 +195,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -352,7 +347,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-14-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using

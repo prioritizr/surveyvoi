@@ -1,3 +1,7 @@
+# surveyvoi 1.0.5.1
+
+- Update citation.
+
 # surveyvoi 1.0.5
 
 - CRAN release.
