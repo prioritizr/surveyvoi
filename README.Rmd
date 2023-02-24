@@ -9,12 +9,12 @@ output:
 # surveyvoi: Survey Value of Information
 
 [![lifecycle](https://img.shields.io/badge/Lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
-[![R-CMD-check-Ubuntu](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Ubuntu/master.svg?label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-Windows](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Windows/master.svg?label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-macOS](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/macOS/master.svg?label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
-[![R-CMD-check-Fedora](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Fedora/master.svg?label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
-[![Documentation](https://img.shields.io/github/workflow/status/prioritizr/surveyvoi/Documentation/master.svg?label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
-[![Coverage Status](https://codecov.io/github/prioritizr/surveyvoi/coverage.svg?branch=master)](https://codecov.io/github/prioritizr/surveyvoi?branch=master)
+[![R-CMD-check-Ubuntu](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-ubuntu.yaml?branch=master&label=Ubuntu)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-Windows](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-windows.yaml?branch=master&label=Windows)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-macOS](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-macos.yaml?branch=master&label=macOS)](https://github.com/prioritizr/surveyvoi/actions)
+[![R-CMD-check-fedora](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/R-CMD-check-fedora.yaml?branch=master&label=Fedora)](https://github.com/prioritizr/surveyvoi/actions)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/documentation.yaml?branch=master&label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
+[![Coverage Status](https://img.shields.io/codecov/c/github/prioritizr/surveyvoi?label=Coverage)](https://app.codecov.io/gh/prioritizr/surveyvoi/branch/master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 ```{r, include = FALSE}
@@ -26,47 +26,6 @@ devtools::load_all()
 h = 2.75
 w = 3.0
 ow = "400"
-```
-
-```{r, include = FALSE}
-# define helpers
-is_rel_version <- function(x) {
-  length(strsplit(as.character(x), ".", fixed = TRUE)[[1]]) == 3
-}
-
-package_version_year <- function(x) {
-  if (x %in% rownames(available.packages())) {
-    return(live_package_version_year(x))
-  } else {
-    return(archive_package_version_year(x))
-  }
-}
-
-live_package_version_year <- function(x) {
-  # fetch data
-  d <- versions::available.versions(x)[[1]]
-  d <- d[which(d$version == max(d$version)), , drop = FALSE]
-  c(as.character(d$version), as.character(format(as.POSIXct(d$date), "%Y")))
-}
-
-archive_package_version_year <- function(x) {
-  # fetch data (copied from remotes R package)
-  tf <- tempfile(fileext = ".gz")
-  on.exit(unlink(tf), add = TRUE)
-  download.file(tf, url = sprintf("%s/src/contrib/Meta/archive.rds", repo))
-  con <- gzfile(tf, "rb")
-  on.exit(close(con), add = TRUE)
-  d <- readRDS(con)[[x]]
-  # extract version
-  rel_version <- basename(rownames(d))
-  rel_version <- sapply(strsplit(rel_version, "_", fixed = TRUE), `[[`, 2)
-  rel_version <- sapply(strsplit(rel_version, ".tar", fixed = TRUE), `[[`, 1)
-  rel_version <- max(rel_version)
-  # extract year
-  rel_year <- as.character(max(format(d[, "mtime"], "%Y")))
-  # return year version
-  c(rel_version, rel_year)
-}
 ```
 
 The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the Gurobi optimization software (available from https://www.gurobi.com). Additionally, the JAGS software (available from https://mcmc-jags.sourceforge.io/) is required to fit hierarchical generalized linear models.
@@ -118,29 +77,9 @@ brew install mpfr
 
 ## Citation
 
-```{r, include = FALSE}
-dev_version_year <- c(
-  as.character(packageDescription("surveyvoi")$Version),
-  format(Sys.time(), "%Y")
-)
-if (is_rel_version(dev_version_year[[1]])) {
-  rel_version_year <- dev_version_year
-} else {
-  rel_version_year <- package_version_year("surveyvoi")
-}
-```
+Please cite the _surveyvoi R_ package when using it in publications. To cite the package, please use:
 
-Please cite the _surveyvoi R_ package when using it in publications. To cite the latest official version, please use:
-
-```{r, echo = FALSE, results = "asis", comment = ""}
-cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", rel_version_year[[2]], "). surveyvoi: Survey Value of Information. R package version ", rel_version_year[[1]], ". Available at https://CRAN.R-project.org/package=surveyvoi.\n"))
-```
-
-Alternatively, to cite the latest development version, please use:
-
-```{r, echo = FALSE, results = "asis", comment = ""}
-cat(paste0("> Hanson JO, Chadès I, Hudgins EJ, Bennett J (", dev_version_year[[2]], "). surveyvoi: Survey Value of Information. R package version ", dev_version_year[[1]], ". Available at https://github.com/prioritizr/surveyvoi.\n"))
-```
+> Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR (2023) Optimizing ecological surveys for conservation. Journal of Applied Ecology, 60: 41--51. Available at <https://doi.org/10.1111/1365-2664.14309>.
 
 ## Usage
 
