@@ -2,8 +2,6 @@ VERSION = 6.1.2
 RWINLIB = ../windows/gmp-$(VERSION)
 BUILD = ${subst gcc ,-,${R_COMPILED_BY}}
 
-CXX_STD = CXX11
-
 # PKG_CXXFLAGS = -Wno-ignored-attributes              # uncomment for debugging
 
 PKG_CPPFLAGS = -I$(RWINLIB)/include
