@@ -1,6 +1,7 @@
 # surveyvoi 1.0.6
 
 - Fix installation for Windows on arm64 (#50).
+- Fix aliasing for package overview help file.
 - Remove CXX specification in Makevars to avoid NOTEs in package checks.
 
 # surveyvoi 1.0.5.1

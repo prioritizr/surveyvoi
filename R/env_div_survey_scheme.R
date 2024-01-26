@@ -69,7 +69,7 @@ NULL
 #'   install the [Gurobi optimization software](https://www.gurobi.com/) and the
 #'   \pkg{gurobi} R package because it can generate survey schemes much faster.
 #'   Note that special academic licenses are available at no cost.
-#'   Installation instructions are available online for [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html) operating systems.
+#'   Installation instructions are [available online for Linux, Windows, and Mac OS operating systems](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-).
 #'
 #' @references
 #' Faith DP & Walker PA (1996) Environmental diversity: on the best-possible

@@ -27,8 +27,8 @@ NULL
 #' @details
 #' Please note that several functions depend on
 #' the 'Gurobi' optimization software (available from <https://www.gurobi.com>)
-#' and the \pkg{gurobi} R package (installation instructions available for
-#' [Linux](https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html), [Windows](https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html), and [Mac OS](https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html)).
+#' and the \pkg{gurobi} R package (installation instructions
+#' [available online for Linux, Windows, and Mac OS](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-)).
 #' Additionally, the JAGS software
 #' (available from <https://mcmc-jags.sourceforge.io/>) is required to fit
 #' hierarchical generalized linear models.
@@ -39,6 +39,7 @@ NULL
 #'
 #' @name surveyvoi
 #' @docType package
+#' @aliases surveyvoi-package
 NULL
 
 # ensure package checks pass

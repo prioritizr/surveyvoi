@@ -320,7 +320,8 @@ this algorithm, it can take a very long time to complete.</p>
 <p>Please note that this function requires the Gurobi optimization software
 (<a href="https://www.gurobi.com/" class="external-link">https://www.gurobi.com/</a>) and the <span class="pkg">gurobi</span> R package if different
 sites have different survey costs. Installation instruction are available
-online for for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html" class="external-link">Linux</a>, <a href="https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html" class="external-link">Windows</a>, and <a href="https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html" class="external-link">Mac OS</a>.</p>
+online for Linux, Windows, and Mac OS
+(see <a href="https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-" class="external-link">https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-</a>).</p>
     </div>
 
     <div id="ref-examples">
@@ -376,6 +377,7 @@ online for for <a href="https://www.gurobi.com/documentation/9.1/quickstart_linu
 <span class="r-in"><span>  <span class="st">"survey"</span>, <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"model_sensitivity"</span>, <span class="st">"model_specificity"</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"target"</span>, <span class="va">total_budget</span>, <span class="va">survey_budget</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package ‘PoissonBinomial’ was built under R version 4.3.2</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># print result</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">approx_opt_survey</span><span class="op">)</span></span></span>
