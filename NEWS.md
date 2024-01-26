@@ -1,7 +1,7 @@
 # surveyvoi 1.0.6
 
 - Fix installation for Windows on arm64 (#50).
-- Remove CXX specification in Makevars to avoid NOTEs in CRAN checks.
+- Remove CXX specification in Makevars to avoid NOTEs in package checks.
 
 # surveyvoi 1.0.5.1
 
