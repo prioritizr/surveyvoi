@@ -57,6 +57,8 @@ jobs:
           cache-version: 1
           extra-packages: |
             any::rcmdcheck
+            any::covr
+            any::remotes
             gurobi=?ignore
           needs: |
             check
@@ -64,11 +66,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          options("install.packages.compile.from.source" = "never")
-          install.packages("remotes")
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran("rcmdcheck")
-          remotes::install_cran("covr")
           options("install.packages.compile.from.source" = "yes")
           remotes::install_cran("sf")
           remotes::install_cran("RcppAlgos")
