@@ -208,7 +208,8 @@ this algorithm, it can take a very long time to complete.
 Please note that this function requires the Gurobi optimization software
 (\url{https://www.gurobi.com/}) and the \pkg{gurobi} R package if different
 sites have different survey costs. Installation instruction are available
-online for for \href{https://www.gurobi.com/documentation/9.1/quickstart_linux/r_ins_the_r_package.html}{Linux}, \href{https://www.gurobi.com/documentation/9.1/quickstart_windows/r_ins_the_r_package.html}{Windows}, and \href{https://www.gurobi.com/documentation/9.1/quickstart_mac/r_ins_the_r_package.html}{Mac OS}.
+online for Linux, Windows, and Mac OS
+(see \url{https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer}).
 }
 
 \examples{
