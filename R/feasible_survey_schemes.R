@@ -24,7 +24,7 @@ NULL
 #' (<https://www.gurobi.com/>) and the \pkg{gurobi} R package if different
 #' sites have different survey costs. Installation instruction are available
 #' online for Linux, Windows, and Mac OS
-#' (see <https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer->).
+#' (see <https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer>).
 #'
 #' @examples
 #' \dontrun{

@@ -72,7 +72,7 @@
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
                         <h4 data-toc-skip class="author">Jeffrey O. Hanson</h4>
             
-            <h4 data-toc-skip class="date">2024-01-26</h4>
+            <h4 data-toc-skip class="date">2024-02-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/prioritizr/surveyvoi/blob/HEAD/vignettes/surveyvoi.Rmd"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
@@ -85,7 +85,7 @@
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>The funding available for conservation is limited. To ensure that conservation funds are allocated cost-effectively, conservation plans (termed prioritizations) can be developed – using a combination of economic, biodiversity, and land-use data – to prioritize a set of sites for conservation management (e.g. protected area establishment). However, existing data on biodiversity patterns are incomplete. As a consequence, prioritizations can potentially be improved by collecting additional data. Specifically, ecological surveys can be conducted in sites to learn more about which species are present within them. However, conducting ecological surveys reduces the funds available for conservation management. Thus, decision makers need to strategically allocate funding for surveying sites and managing them for conservation—this is not a trivial task.</p>
-<p>The <em>surveyvoi R</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing value of information using optimization algorithms. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>) and the <em>gurobi R</em> package (<a href="https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-" class="external-link">installation instructions available for online Linux, Windows, and Mac OS</a>).</p>
+<p>The <em>surveyvoi R</em> package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management – wherein some sites have previously been surveyed and other sites have not – it can be used to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and directly maximizing value of information using optimization algorithms. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the ‘Gurobi’ optimization software (available from <a href="https://www.gurobi.com" class="external-link uri">https://www.gurobi.com</a>) and the <em>gurobi R</em> package (<a href="https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer" class="external-link">installation instructions available for online Linux, Windows, and Mac OS</a>).</p>
 <p>This tutorial provides a brief overview of the <em>surveyvoi R</em> package. Here, we will simulate survey data, fit statistical models to characterize the spatial distribution of a simulated species, and generate and evaluate survey schemes based on different approaches. Although this tutorial deals with only a single simulated species – to keep the tutorial simple and reduce computational burden – the functions used in this tutorial are designed to work with multiple species. If you want to learn more about a specific function, please consult the documentation written specifically for the function (accessible using the R code <code>?function</code>, where <code>function</code> is the name of desired function).</p>
 </div>
 <div class="section level2">
@@ -253,23 +253,8 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"f1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"n1"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"e1"</span>, <span class="st">"e2"</span>, <span class="st">"e3"</span><span class="op">)</span>,</span>
 <span>  <span class="st">"survey_sensitivity"</span>, <span class="st">"survey_specificity"</span>,</span>
 <span>  n_folds <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>, xgb_tuning_parameters <span class="op">=</span> <span class="va">xgb_parameters</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span>
-<span></span>
-<span><span class="co">## Warning: package 'xgboost' was built under R version 4.3.2</span></span></code></pre>
 <p>After fitting the models, we can examine the tuning parameters used to fit the models, extract the modeled probability of occupancy, and evaluate the performance of the models.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># print best parameters</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">xgb_results</span><span class="op">$</span><span class="va">parameters</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [[1]]</span></span>
@@ -285,7 +270,7 @@
 <span><span class="co">## [[1]]$scale_pos_weight</span></span>
 <span><span class="co">## [[1]]$scale_pos_weight[[1]]</span></span>
 <span><span class="co">## [1] 1 1</span></span></code></pre>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># print model performance (TSS value)</span></span>
 <span><span class="va">xgb_performance</span> <span class="op">&lt;-</span> <span class="va">xgb_results</span><span class="op">$</span><span class="va">performance</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">xgb_performance</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -297,7 +282,7 @@
 <span><span class="co">## 1     0.7194687    0.2261671             0.9396965           0.08528208</span></span>
 <span><span class="co">##   test_specificity_mean test_specificity_std</span></span>
 <span><span class="co">## 1             0.7797722            0.3114492</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># store the model sensitivities and specificities in the feature_data object</span></span>
 <span><span class="va">feature_data</span><span class="op">$</span><span class="va">model_sensitivity</span> <span class="op">&lt;-</span> <span class="va">xgb_performance</span><span class="op">$</span><span class="va">test_sensitivity_mean</span></span>
 <span><span class="va">feature_data</span><span class="op">$</span><span class="va">model_specificity</span> <span class="op">&lt;-</span> <span class="va">xgb_performance</span><span class="op">$</span><span class="va">test_specificity_mean</span></span>
@@ -319,9 +304,9 @@
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 0.452<span style="text-decoration: underline;">463</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> 0.565<span style="text-decoration: underline;">847</span></span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 20 more rows</span></span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">site_data</span><span class="op">$</span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="va">xgb_predictions</span><span class="op">$</span><span class="va">f1</span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot site-level estimated occupancy probabilities</span></span>
 <span><span class="va">site_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"p"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -337,7 +322,7 @@
 <h2 id="expected-value-given-current-information">Expected value given current information<a class="anchor" aria-label="anchor" href="#expected-value-given-current-information"></a>
 </h2>
 <p>After simulating and modeling the data, we will now examine the <em>expected value of the decision given current information</em>. This value represents the conservation value of a near-optimal prioritization given current information, whilst accounting for uncertainty in the presence (and absence) of the conservation feature in each site. Specifically, “current information” refers to our existing survey data and our occupancy models. Next, we will set a total budget (i.e. <code>total_budget</code>). This total budget represents the total amount of resources available for surveying sites and managing them for conservation. It will be set at 10% of the total site management costs.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate total budget for surveying and managing sites</span></span>
 <span><span class="va">total_budget</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">site_data</span><span class="op">$</span><span class="va">management_cost</span><span class="op">)</span> <span class="op">*</span> <span class="fl">0.1</span></span>
 <span></span>
@@ -345,7 +330,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 7498.9</span></span></code></pre>
 <p>Given the total budget, we can now calculate the <em>expected value of the decision given current information</em>.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># expected value of the decision given current information</span></span>
 <span><span class="va">evd_current</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evdci.html">evdci</a></span><span class="op">(</span></span>
 <span>  site_data <span class="op">=</span> <span class="va">site_data</span>,</span>
@@ -359,10 +344,9 @@
 <span>  feature_model_sensitivity_column <span class="op">=</span> <span class="st">"model_sensitivity"</span>,</span>
 <span>  feature_model_specificity_column <span class="op">=</span> <span class="st">"model_specificity"</span>,</span>
 <span>  feature_target_column <span class="op">=</span> <span class="st">"target"</span>,</span>
-<span>  total_budget <span class="op">=</span> <span class="va">total_budget</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning: package 'PoissonBinomial' was built under R version 4.3.2</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># print value</span></span>
+<span>  total_budget <span class="op">=</span> <span class="va">total_budget</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># print value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_current</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.9329257</span></span></code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
@@ -371,7 +355,7 @@
 <h2 id="survey-schemes">Survey schemes<a class="anchor" aria-label="anchor" href="#survey-schemes"></a>
 </h2>
 <p>Now we will generate some candidate survey schemes to see if we can improve the management decision. To achieve this, we will set a budget for surveying additional sites. Specifically, this survey budget (i.e. <code>survey_budget</code>) will be set at 25% of the survey costs for the unsurveyed sites. Note that our total budget must always be greater than or equal to the survey budget.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate budget for surveying sites</span></span>
 <span><span class="co">#   add column to site_data indicating if the sites already have data or not</span></span>
 <span><span class="va">site_data</span><span class="op">$</span><span class="va">surveyed</span> <span class="op">&lt;-</span> <span class="va">site_data</span><span class="op">$</span><span class="va">n1</span> <span class="op">&gt;</span> <span class="fl">0.5</span></span>
@@ -393,11 +377,11 @@
 <span><span class="co"># print budgets</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">survey_budget</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 30.75</span></span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">total_budget</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 7498.9</span></span></code></pre>
 <p>We will generate survey schemes by selecting unsurveyed sites that (i) increase geographic coverage among surveyed sites <span class="citation">(Yates 1948)</span>, (ii) increase coverage of environmental conditions among surveyed sites [i.e. environmental diversity; <span class="citation">Faith &amp; Walker (1996)</span>], (iii) increase coverage of sites with highly uncertain information <span class="citation">(Guisan <em>et al.</em> 2006)</span>, (iv) increase coverage of sites where species are predicted to occur <span class="citation">(Le Lay <em>et al.</em> 2010)</span>, and (v) increase coverage of sites that have low management costs.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># (i) generate survey scheme to increase geographic coverage</span></span>
 <span><span class="va">geo_scheme</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="../reference/geo_cov_survey_scheme.html">geo_cov_survey_scheme</a></span><span class="op">(</span></span>
@@ -440,7 +424,7 @@
 <span>    <span class="va">site_data</span>, <span class="st">"new_survey_cost"</span>, <span class="va">survey_budget</span>, <span class="st">"richness_score"</span>,</span>
 <span>    locked_out <span class="op">=</span> <span class="st">"surveyed"</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s visualize the different survey schemes.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add schemes to site_data</span></span>
 <span><span class="va">site_data</span><span class="op">$</span><span class="va">geo_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">geo_scheme</span><span class="op">)</span></span>
 <span><span class="va">site_data</span><span class="op">$</span><span class="va">env_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">env_scheme</span><span class="op">)</span></span>
@@ -466,7 +450,7 @@
 <h2 id="expected-value-of-the-decision-given-sample-information">Expected value of the decision given sample information<a class="anchor" aria-label="anchor" href="#expected-value-of-the-decision-given-sample-information"></a>
 </h2>
 <p>Now that we’ve generated the survey schemes, let’s calculate the <em>expected value of the decision given sample information</em> for each survey scheme.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create table to store results</span></span>
 <span><span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo_scheme"</span>, <span class="st">"env_scheme"</span>, <span class="st">"unc_scheme"</span>, <span class="st">"cheap_scheme"</span>,</span>
@@ -504,7 +488,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span></span></span></code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>expected value of sample information (EVSI)</em> for each survey scheme.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># estimate expected value of sample information for each survey scheme</span></span>
 <span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span> <span class="op">&lt;-</span></span>
 <span>  <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">value</span> <span class="op">-</span> <span class="va">evd_current</span></span>
@@ -519,7 +503,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.962<span style="text-decoration: underline;">181</span> 0.029<span style="text-decoration: underline;">255</span>3</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span> 0.037<span style="text-decoration: underline;">331</span>7</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span> 0.029<span style="text-decoration: underline;">389</span>1</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize the expected value of sample information for each survey scheme</span></span>
 <span><span class="co"># color the best survey scheme in blue</span></span>
 <span><span class="va">evd_survey_schemes</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -540,7 +524,7 @@
 <h2 id="optimized-survey-scheme">Optimized survey scheme<a class="anchor" aria-label="anchor" href="#optimized-survey-scheme"></a>
 </h2>
 <p>Now let’s generate an optimized survey scheme by directly maximizing the <em>expected value of the decision given a survey scheme</em>.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># generate optimized survey scheme(s)</span></span>
 <span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/approx_near_optimal_survey_scheme.html">approx_near_optimal_survey_scheme</a></span><span class="op">(</span></span>
 <span>    site_data <span class="op">=</span> <span class="va">site_data</span>,</span>
@@ -561,14 +545,14 @@
 <span>    n_approx_replicates <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    n_approx_outcomes_per_replicate <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>    verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># print number of optimized survey schemes</span></span>
 <span><span class="co"># if there are multiple optimized survey schemes,</span></span>
 <span><span class="co"># this means that multiple different survey schemes are likely to deliver</span></span>
 <span><span class="co"># similar results (even if they select different sites for surveys)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 1</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># add first optimized scheme to site data</span></span>
 <span><span class="va">site_data</span><span class="op">$</span><span class="va">opt_scheme</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">opt_scheme</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span></span>
 <span></span>
@@ -582,7 +566,7 @@
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"X coordinate"</span>, y <span class="op">=</span> <span class="st">"Y coordinate"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-27-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme (<code>opt_scheme</code>) is different to the previous survey schemes.</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate expected value of sample information for the optimized scheme</span></span>
 <span><span class="va">evd_opt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/evdsi.html">evdsi</a></span><span class="op">(</span></span>
 <span>    site_data <span class="op">=</span> <span class="va">site_data</span>,</span>
@@ -604,7 +588,7 @@
 <span><span class="co"># calculate value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.9702607</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># append optimized results to results table</span></span>
 <span><span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>  <span class="va">evd_survey_schemes</span>,</span>
@@ -621,7 +605,7 @@
 <span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span> 0.037<span style="text-decoration: underline;">331</span>7</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span> 0.029<span style="text-decoration: underline;">389</span>1</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">6</span> opt_scheme   0.970<span style="text-decoration: underline;">261</span> 0.037<span style="text-decoration: underline;">335</span>1</span></span></code></pre>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize expected value of sample information</span></span>
 <span><span class="co"># color the best survey scheme in blue</span></span>
 <span><span class="va">evd_survey_schemes</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -637,7 +621,7 @@
 <span>          legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="surveyvoi_files/figure-html/unnamed-chunk-29-1.png" width="504" style="display: block; margin: auto;"></p>
 <p>We can see that the optimized survey scheme has the highest <em>expected value of sample information</em> of all the candidate survey schemes. To better understand how sub-optimal the candidate survey schemes are, let’s compute their relative performance and visualize them.</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># express values in terms of relative performance</span></span>
 <span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">relative_performance</span> <span class="op">&lt;-</span></span>
 <span>  <span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">-</span> <span class="va">evd_survey_schemes</span><span class="op">$</span><span class="va">evsi</span><span class="op">)</span> <span class="op">/</span></span>

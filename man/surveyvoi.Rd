@@ -23,7 +23,7 @@ value of information analysis.
 Please note that several functions depend on
 the 'Gurobi' optimization software (available from \url{https://www.gurobi.com})
 and the \pkg{gurobi} R package (installation instructions
-\href{https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer-}{available online for Linux, Windows, and Mac OS}).
+\href{https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer}{available online for Linux, Windows, and Mac OS}).
 Additionally, the JAGS software
 (available from \url{https://mcmc-jags.sourceforge.io/}) is required to fit
 hierarchical generalized linear models.
@@ -33,13 +33,11 @@ The package vignette provides a tutorial
 (accessible using the code \code{vignettes("surveyvoi")}).
 }
 \author{
-\strong{Maintainer}: Jeffrey O Hanson \email{jeffrey.hanson@uqconnect.edu.au} (\href{https://orcid.org/0000-0002-4716-6134}{ORCID})
-
-Authors:
+Package authors:
 \itemize{
-  \item Iadine Chadès \email{iadine.chades@csiro.au} (\href{https://orcid.org/0000-0002-7442-2850}{ORCID})
-  \item Emma J Hudgins \email{emma.hudgins@mail.mcgill.ca} (\href{https://orcid.org/0000-0002-8402-5111}{ORCID})
-  \item Joseph R Bennett \email{joseph.bennett@carleton.ca} (\href{https://orcid.org/0000-0002-3901-9513}{ORCID})
+\item Jeffrey O. Hanson \email{jeffrey.hanson@uqconnect.edu.au} \href{https://orcid.org/0000-0002-4716-6134}{ORCID}
+\item Iadine Chadès \email{iadine.chades@csiro.au} \href{https://orcid.org/0000-0002-7442-2850}{ORCID}
+\item Emma J. Hudgins \email{emma.hudgins@mail.mcgill.ca} \href{https://orcid.org/0000-0002-8402-5111}{ORCID}
+\item Joseph R. Bennett \email{joseph.bennett@carleton.ca} \href{https://orcid.org/0000-0002-3901-9513}{ORCID}
 }
-
 }
