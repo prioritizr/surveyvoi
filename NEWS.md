@@ -1,3 +1,7 @@
+# surveyvoi 1.0.6.1
+
+- Speed up internal greedy site selection algorithm. 
+
 # surveyvoi 1.0.6
 
 - Fix installation for Windows on arm64 (#50).

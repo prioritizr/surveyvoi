@@ -22,10 +22,10 @@ void greedy_heuristic_prioritization(
   // declare loop variables
   /// variables to keep track of planning units in the solution that
   /// will be considered for step-wise addition from the algorithm
-  std::vector<bool> solution_rem_pu(n_pu, false);
+  std::unordered_set<std::size_t> solution_rem_pu;
   for (std::size_t i = 0; i < n_pu; ++i)
     if ((pu_locked_out[i] < 0.5) && (!solution[i]))
-      solution_rem_pu[i] = true;
+      solution_rem_pu.insert(i);
   double curr_min_feasible_pu_cost;
   double curr_ce;
   double new_ce;
@@ -35,8 +35,7 @@ void greedy_heuristic_prioritization(
   std::size_t curr_idx;
   std::size_t n_pu_selected = std::accumulate(
     solution.begin(), solution.end(), 0);
-  std::size_t n_pu_remaining = std::accumulate(
-    solution_rem_pu.begin(), solution_rem_pu.end(), 0);
+  std::size_t n_pu_remaining = solution_rem_pu.size();
   // variable to keep track of costs in unselected planning units
   Eigen::VectorXd costs_rem_pu = pu_costs;
   Eigen::VectorXd costs_rem_pu_sorted;
@@ -81,22 +80,28 @@ void greedy_heuristic_prioritization(
 
     // calculate cost-effectiveness score for each planning unit
     curr_ce = std::numeric_limits<double>::lowest();
-    for (std::size_t i = 0; i < n_pu; ++i) {
-      if (solution_rem_pu[i]) {
-        if (
-          ((curr_min_feasible_pu_cost >= pu_costs[i]) ||
-            ((std::abs(pu_costs[i] - costs_rem_pu_sorted[0])) < 1.0e-15)) &&
-          ((pu_costs[i] + solution_cost) <= budget)) {
-          // calculate objective with i'th planning unit included
-          curr_log_1m_rij.col(i) = log_1m_rij.col(i);
-          log_obj = log_proxy_expected_value_of_action(curr_log_1m_rij);
-          curr_log_1m_rij.col(i).setZero();
-          // calculate cost effectiveness
-          new_ce = log_obj - log_pu_costs[i]; // note that this is logged
-          if (new_ce > curr_ce) {
-            curr_ce = new_ce;
-            curr_idx = i;
-          }
+    std::size_t i = 0;
+    std::unordered_set<std::size_t>::iterator curr_itr;
+    for (
+      std::unordered_set<std::size_t>::iterator itr = solution_rem_pu.begin();
+      itr != solution_rem_pu.end(); ++itr
+    ) {
+      i = *itr;
+      if (
+        ((curr_min_feasible_pu_cost >= pu_costs[i]) ||
+          ((std::abs(pu_costs[i] - costs_rem_pu_sorted[0])) < 1.0e-15)) &&
+        ((pu_costs[i] + solution_cost) <= budget)
+      ) {
+        // calculate objective with i'th planning unit included
+        curr_log_1m_rij.col(i) = log_1m_rij.col(i);
+        log_obj = log_proxy_expected_value_of_action(curr_log_1m_rij);
+        curr_log_1m_rij.col(i).setZero();
+        // calculate cost effectiveness
+        new_ce = log_obj - log_pu_costs[i]; // note that this is logged
+        if (new_ce > curr_ce) {
+          curr_ce = new_ce;
+          curr_idx = i;
+          curr_itr = itr;
         }
       }
     }
@@ -105,7 +110,7 @@ void greedy_heuristic_prioritization(
     solution_cost += pu_costs[curr_idx];
     costs_rem_pu[curr_idx] = std::numeric_limits<double>::max();
     solution[curr_idx] = true;
-    solution_rem_pu[curr_idx] = false;
+    solution_rem_pu.erase(curr_itr);
     curr_log_1m_rij.col(curr_idx) = log_1m_rij.col(curr_idx);
     ++n_pu_selected;
     --n_pu_remaining;
