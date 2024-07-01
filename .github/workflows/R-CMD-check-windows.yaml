@@ -60,7 +60,7 @@ jobs:
             any::rcmdcheck
             any::remotes
             any::XML
-            prepr=?ignore
+            gurobi=?ignore
           needs: |
             check
 
