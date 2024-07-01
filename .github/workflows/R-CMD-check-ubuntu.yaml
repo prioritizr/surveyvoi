@@ -65,6 +65,7 @@ jobs:
             any::rcmdcheck
             any::remotes
             any::XML
+            any::covr
             gurobi=?ignore
           needs: |
             check
