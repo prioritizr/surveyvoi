@@ -1,3 +1,14 @@
+# surveyvoi 1.0.6.1
+
+- Fix bug in `approx_near_optimal_survey_scheme()`,
+  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
+  `approx_evdsi()`, `evdsi()`, and `evdci()` where all species were incorrectly
+  assigned the same target as the first species.
+- Update internal greedy reserve selection algorithm to find better quality
+  prioritizations. This impacts `approx_near_optimal_survey_scheme()`,
+  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
+  `approx_evdsi()`, `evdsi()`, and `evdci()`.
+
 # surveyvoi 1.0.6
 
 - Fix installation for Windows on arm64 (#50).
