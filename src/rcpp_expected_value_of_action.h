@@ -11,6 +11,9 @@ double expected_value_of_action(
 double approx_expected_value_of_action(
   Eigen::MatrixXd&, Rcpp::IntegerVector&);
 
+double exact_expected_value_of_action(
+  Eigen::MatrixXd&, Rcpp::IntegerVector&);
+
 double log_proxy_expected_value_of_action(Eigen::MatrixXd&);
 
 #endif

@@ -27,12 +27,17 @@ double expected_value_of_action(
   Eigen::VectorXd spp_prob(n_f);
   Rcpp::NumericVector curr_spp_probs;
   Rcpp::NumericVector curr_density_probs;
-  Rcpp::IntegerVector curr_target_values((rij.cols() - target[0]) + 1);
-  std::iota(curr_target_values.begin(), curr_target_values.end(), target[0]);
+  std::vector<int> curr_target_values;
   for (std::size_t i = 0; i < n_f; ++i) {
-    curr_spp_probs = wrap(rij.row(i));
+    curr_spp_probs = Rcpp::wrap(rij.row(i));
+    curr_target_values.resize((n_pu_solution - target[i]) + 1);
+    std::iota(
+      curr_target_values.begin(),
+      curr_target_values.end(),
+      target[i]
+    );
     curr_density_probs = PoissonBinomial::dpb_dc(
-      curr_target_values, curr_spp_probs);
+      Rcpp::wrap(curr_target_values), curr_spp_probs);
     spp_prob[i] = Rcpp::sum(curr_density_probs);
   }
 
@@ -40,18 +45,86 @@ double expected_value_of_action(
   return spp_prob.sum();
 }
 
-double approx_expected_value_of_action(
+double exact_expected_value_of_action(
   Eigen::MatrixXd &pij,
   Rcpp::IntegerVector &target_values) {
+  if (static_cast<int>(pij.cols()) < Rcpp::max(target_values)) {
+    Rcpp::stop("prioritization contains fewer planning units than a target");
+  }
   double out = 0.0;
   const std::size_t n_f = pij.rows();
   Rcpp::NumericVector curr_density_probs;
   Rcpp::NumericVector curr_spp_probs;
+  std::vector<int> curr_target_values;
   for (std::size_t i = 0; i < n_f; ++i) {
     curr_spp_probs = wrap(pij.row(i));
-    curr_density_probs = PoissonBinomial::dpb_na(
-      target_values, curr_spp_probs, false);
+    curr_target_values.resize((pij.cols() - target_values[i]) + 1);
+    std::iota(
+      curr_target_values.begin(),
+      curr_target_values.end(),
+      target_values[i]
+    );
+    curr_density_probs = PoissonBinomial::dpb_dc(
+      Rcpp::wrap(curr_target_values), curr_spp_probs);
     out += Rcpp::sum(curr_density_probs);
+  }
+  return out;
+}
+
+double approx_expected_value_of_action(
+  Eigen::MatrixXd &pij,
+  Rcpp::IntegerVector &target_values) {
+  if (static_cast<int>(pij.cols()) < Rcpp::max(target_values)) {
+    Rcpp::stop("prioritization contains fewer planning units than a target");
+  }
+  double out = 0.0;
+  const std::size_t n_f = pij.rows();
+  const std::size_t n_pu = pij.cols();
+  Rcpp::NumericVector curr_density_probs;
+  std::vector<double> curr_spp_probs;
+  std::vector<int> curr_target_values;
+  for (std::size_t i = 0; i < n_f; ++i) {
+    // find non-zero species probabilities
+    // this is because the approximation methods in PoissonBinomial
+    // require non-zero values
+    curr_spp_probs.reserve(n_pu);
+    for (std::size_t j = 0; j < n_pu; ++j) {
+      if (pij(i, j) > 0.0) {
+        curr_spp_probs.push_back(pij(i, j));
+      }
+    }
+    // if there are no non-zero probabilities, then skip rest of loop
+    if (curr_spp_probs.size() == 0) {
+      continue;
+    }
+    // prepare target values
+    curr_target_values.resize((curr_spp_probs.size() - target_values[i]) + 1);
+    std::iota(
+      curr_target_values.begin(),
+      curr_target_values.end(),
+      target_values[i]
+    );
+    // calculate probability that target is met
+    if (
+      (curr_spp_probs.size() == 1) &&
+      (target_values[i] == 1.0)
+    ) {
+      /// if running calculations for only one probability value and
+      /// the target is equal to one, then manually calculate the probability
+      /// since PoissonBinomial library gets it wrong
+      out += curr_spp_probs[0];
+    } else {
+      /// othweise use the PoissonBinomial library to run the calculations
+      curr_density_probs = PoissonBinomial::dpb_na(
+        Rcpp::wrap(curr_target_values),
+        Rcpp::wrap(curr_spp_probs),
+        false
+      );
+      // add the prob. of the species' target being met to the running total
+      out += Rcpp::sum(curr_density_probs);
+    }
+    // clean up species probability data
+    curr_spp_probs.clear();
   }
   return out;
 }
