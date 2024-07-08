@@ -49,7 +49,7 @@ test_that("single species", {
     survey_sensitivity = feature_data$survey_sensitivity,
     survey_specificity = feature_data$survey_specificity,
     pu_survey_solution = site_data$survey,
-    pu_survey_costs  = site_data$survey_cost,
+    pu_survey_costs = site_data$survey_cost,
     pu_purchase_costs = site_data$management_cost,
     pu_purchase_locked_in = rep(FALSE, nrow(site_data)),
     pu_purchase_locked_out = rep(FALSE, nrow(site_data)),
