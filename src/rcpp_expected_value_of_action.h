@@ -9,7 +9,11 @@ double expected_value_of_action(
   std::vector<bool>&, Eigen::MatrixXd&, Eigen::VectorXi&);
 
 double approx_expected_value_of_action(
-  Eigen::MatrixXd&, Rcpp::IntegerVector&);
+  std::vector<std::vector<double>>&,
+  Rcpp::IntegerVector&,
+  Rcpp::IntegerVector&,
+  std::vector<std::size_t>&
+);
 
 double exact_expected_value_of_action(
   Eigen::MatrixXd&, Rcpp::IntegerVector&);

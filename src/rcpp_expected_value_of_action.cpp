@@ -72,60 +72,61 @@ double exact_expected_value_of_action(
 }
 
 double approx_expected_value_of_action(
-  Eigen::MatrixXd &pij,
-  Rcpp::IntegerVector &target_values) {
-  if (static_cast<int>(pij.cols()) < Rcpp::max(target_values)) {
-    Rcpp::stop("prioritization contains fewer planning units than a target");
-  }
+  std::vector<std::vector<double>> &pij,
+  Rcpp::IntegerVector &curr_n,
+  Rcpp::IntegerVector &target_values,
+  std::vector<std::size_t> &extra_n
+) {
+  // initialze values
   double out = 0.0;
-  const std::size_t n_f = pij.rows();
-  const std::size_t n_pu = pij.cols();
+  std::size_t curr_spp_n;
+  const std::size_t n_f = pij.size();
   Rcpp::NumericVector curr_density_probs;
-  std::vector<double> curr_spp_probs;
   std::vector<int> curr_target_values;
+  std::vector<double> curr_spp_probs;
+  // main calculations
   for (std::size_t i = 0; i < n_f; ++i) {
-    // find non-zero species probabilities
-    // this is because the approximation methods in PoissonBinomial
-    // require non-zero values
-    curr_spp_probs.reserve(n_pu);
-    for (std::size_t j = 0; j < n_pu; ++j) {
-      if (pij(i, j) > 0.0) {
-        curr_spp_probs.push_back(pij(i, j));
-      }
-    }
-    // if there are no non-zero probabilities, then skip rest of loop
-    if (curr_spp_probs.size() == 0) {
-      continue;
-    }
-    // prepare target values
-    curr_target_values.resize((curr_spp_probs.size() - target_values[i]) + 1);
-    std::iota(
-      curr_target_values.begin(),
-      curr_target_values.end(),
-      target_values[i]
-    );
-    // calculate probability that target is met
-    if (
-      (curr_spp_probs.size() == 1) &&
-      (target_values[i] == 1.0)
+    // determine number of planning units with non-zero probabilities
+    // of occupancy for species
+    curr_spp_n = curr_n[i] + extra_n[i];
+    // calculate probability that species target is met
+    if ((curr_spp_n == 1) && (target_values[0] == 1)) {
+      // manually calculate if only one selected planning unit has non-zero
+      // probability of species occurrence and target value of 1
+      // this is due to a bug in PoissonBinomial library
+      out += pij[i][0];
+    } else if (
+      (curr_spp_n > 1) &&
+      !(static_cast<std::size_t>(target_values[i]) > curr_spp_n)
     ) {
-      /// if running calculations for only one probability value and
-      /// the target is equal to one, then manually calculate the probability
-      /// since PoissonBinomial library gets it wrong
-      out += curr_spp_probs[0];
-    } else {
-      /// othweise use the PoissonBinomial library to run the calculations
-      curr_density_probs = PoissonBinomial::dpb_na(
-        Rcpp::wrap(curr_target_values),
-        Rcpp::wrap(curr_spp_probs),
-        false
+      // otherwise, use PoissonBinomial library to run calculations
+      /// prepare probability data
+      curr_spp_probs.resize(curr_spp_n);
+      std::copy(
+        pij[i].cbegin(),
+        pij[i].cbegin() + curr_spp_n,
+        curr_spp_probs.begin()
       );
-      // add the prob. of the species' target being met to the running total
-      out += Rcpp::sum(curr_density_probs);
+
+      /// prepare target data
+      curr_target_values.resize((curr_spp_n - target_values[i]) + 1);
+      std::iota(
+        curr_target_values.begin(),
+        curr_target_values.end(),
+        target_values[i]
+      );
+
+      /// otherwise, use the PoissonBinomial library to run the calculations
+      out += Rcpp::sum(
+        PoissonBinomial::dpb_na(
+          Rcpp::wrap(curr_target_values),
+          Rcpp::wrap(curr_spp_probs),
+          false
+        )
+      );
     }
-    // clean up species probability data
-    curr_spp_probs.clear();
   }
+  // return result
   return out;
 }
 
