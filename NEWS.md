@@ -8,6 +8,10 @@
   prioritizations. This impacts `approx_near_optimal_survey_scheme()`,
   `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
   `approx_evdsi()`, `evdsi()`, and `evdci()`.
+- New `greedy_heuristic_algorithm()` function that can be used to generate
+  reserve selection prioritizations. This function provides access to the
+  internal algorithm used for the reserve selection component of the
+  value of information calculations.
 
 # surveyvoi 1.0.6
 
