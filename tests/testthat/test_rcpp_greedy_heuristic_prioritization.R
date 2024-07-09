@@ -74,7 +74,7 @@ test_that("expected result (one feature has all 0s)", {
   expect_true(all(r1$x))
   expect_true(all(r2$x))
   expect_lte(abs(r1$objval - r2$objval), 1e-5)
-  expect_lte(abs(r1$objval - r3$objval), 1e-4)
+  expect_lte(abs(r1$objval - r3$objval), 1e-5)
 })
 
 test_that("complex example", {
