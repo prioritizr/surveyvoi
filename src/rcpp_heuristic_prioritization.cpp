@@ -107,8 +107,8 @@ void greedy_heuristic_prioritization(
 
     // calculate the cost of the cheapest n-1 remaining planning units,
     // if the solution contains fewer planning units than the highest target
-    if (n_pu_selected < max_target) {
-      n_additional_units_needed = max_target - n_pu_selected;
+    if ((n_pu_selected + 1) < max_target) {
+      n_additional_units_needed = max_target - n_pu_selected - 1;
       costs_rem_pu_sorted = costs_rem_pu;
       std::partial_sort(
         costs_rem_pu_sorted.data(), costs_rem_pu_sorted.data() +
@@ -126,7 +126,7 @@ void greedy_heuristic_prioritization(
     for (std::size_t i = 0; i < n_pu; ++i) {
       if (solution_rem_pu[i]) {
         if (
-          ((curr_min_feasible_pu_cost >= pu_costs[i]) ||
+          ((pu_costs[i] <= curr_min_feasible_pu_cost) ||
             ((std::abs(pu_costs[i] - costs_rem_pu_sorted[0])) < 1.0e-15)) &&
           ((pu_costs[i] + solution_cost) <= budget)
         ) {

@@ -71,11 +71,14 @@ r_greedy_heuristic_prioritization <- function(
     }
 
     ## calculate the cost of the cheapest n-1 remaining planning units
-    if (sum(curr_solution) < max(target)) {
+    if ((sum(curr_solution) + 1) < max(target)) {
+      curr_solution_cost <- sum(curr_solution * pu_costs)
+      curr_rem_pu_costs <- pu_costs[!curr_solution]
+      n_pu_needed_to_meet_target <- max(target) - sum(curr_solution)
+      cheapest_rem_pu_needed_to_meet_max_target <-
+        sort(curr_rem_pu_costs)[seq_len(n_pu_needed_to_meet_target - 1)]
       curr_min_feasible_pu_cost <- budget -
-        (sum(curr_solution * pu_costs) +
-         sum(sort(pu_costs[!curr_solution])[seq_len(max(target) -
-                                                    sum(curr_solution))]))
+        (curr_solution_cost + sum(cheapest_rem_pu_needed_to_meet_max_target))
     } else {
       curr_min_feasible_pu_cost <- Inf
     }
@@ -88,7 +91,7 @@ r_greedy_heuristic_prioritization <- function(
       ## (where n = max(targets))
       curr_feasible <-
         (
-          (curr_min_feasible_pu_cost >= pu_costs[i]) ||
+          (pu_costs[i] <= curr_min_feasible_pu_cost) ||
           ((abs(pu_costs[i] - min(pu_costs[curr_pu_rem_idx])) < 1.0e-15))
         ) &&
         ((pu_costs[i] + curr_solution_cost) <= budget)

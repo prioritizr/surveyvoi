@@ -132,7 +132,7 @@ test_that("edge case", {
   expect_lte(abs(r1$objval - r3$objval), 1e-4)
 })
 
-test_that("highly variable costs", {
+test_that("highly variable costs (test 1)", {
   # data
   set.seed(123)
   n_sites <- 12
@@ -156,4 +156,55 @@ test_that("highly variable costs", {
   expect_lte(abs(r1$objval - r2$objval), 1e-4)
   expect_gte(mean(r1$x == r3$x), 0.6) # expect similar solutions
   expect_lte((r3$objval - r1$objval) / r3$objval, 0.15) # expect <15% optimality
+})
+
+test_that("highly variable costs (test 2)", {
+  set.seed(123)
+  n_sites <- 7
+  n_f <- 2
+  target <- c(3, n_f)
+  rij <- matrix(runif(n_sites * n_f), ncol = n_sites, nrow = n_f)
+  pu_costs <- runif(n_sites)
+  budget <- sum(pu_costs) * 0.3
+  pu_costs[c(6:7)] <- 1e+5
+  pu_costs <- round(pu_costs, 3)
+  pu_locked_in <- rep(0, ncol(rij))
+  pu_locked_out <- rep(0, ncol(rij))
+  # results
+  r1 <- r_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r2 <- rcpp_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r3 <- brute_force_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  # tests
+  expect_equal(r1$x, r2$x)
+  expect_equal(r1$objval, r2$objval)
+  expect_equal(r1$x, r3$x)
+  expect_equal(r1$objval, r3$objval)
+})
+
+test_that("highly variable costs (test 3)", {
+  set.seed(123)
+  n_sites <- 7
+  n_f <- 2
+  target <- c(3, n_f)
+  rij <- matrix(0.01, ncol = n_sites, nrow = n_f)
+  rij[, 2] <- rep(0.99, n_f)
+  pu_costs <- c(0.1, 2, 0.101, 0.102, 0.103, 100, 100)
+  budget <- sum(sort(pu_costs[-2])[1:2]) + pu_costs[2] + 0.0001
+  pu_locked_in <- rep(0, ncol(rij))
+  pu_locked_out <- rep(0, ncol(rij))
+  # results
+  r1 <- r_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r2 <- rcpp_greedy_heuristic_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  r3 <- brute_force_prioritization(
+    rij, pu_costs, pu_locked_in, pu_locked_out, target, budget)
+  # tests
+  expect_equal(r1$x, r2$x)
+  expect_equal(r1$objval, r2$objval)
+  expect_equal(r1$x, r3$x)
+  expect_equal(r1$objval, r3$objval)
 })
