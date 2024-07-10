@@ -10,7 +10,9 @@ double expected_value_of_action(
   const std::size_t n_pu_solution = std::accumulate(solution.begin(),
                                                     solution.end(), 0);
   if (static_cast<int>(n_pu_solution) < target.maxCoeff()) {
+    // nocov start
     Rcpp::stop("prioritization contains fewer planning units than a target");
+    // nocov end
   }
 
   // prepare rij matrix containing only solution values
