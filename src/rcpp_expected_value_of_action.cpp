@@ -49,7 +49,7 @@ double expected_value_of_action(
 // the expected value of actions using methods that produce correct
 // (not approximation) results
 
-// nocov start
+// # nocov start
 double exact_expected_value_of_action(
   Eigen::MatrixXd &pij,
   Rcpp::IntegerVector &target_values) {
@@ -75,7 +75,7 @@ double exact_expected_value_of_action(
   }
   return out;
 }
-// nocov end
+// # nocov end
 
 double approx_expected_value_of_action(
   std::vector<std::vector<double>> &pij,
