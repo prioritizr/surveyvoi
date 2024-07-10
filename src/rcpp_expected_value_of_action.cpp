@@ -45,6 +45,11 @@ double expected_value_of_action(
   return spp_prob.sum();
 }
 
+// this function is used for internal debugging when we need to calculate
+// the expected value of actions using methods that produce correct
+// (not approximation) results
+
+// nocov start
 double exact_expected_value_of_action(
   Eigen::MatrixXd &pij,
   Rcpp::IntegerVector &target_values) {
@@ -70,6 +75,7 @@ double exact_expected_value_of_action(
   }
   return out;
 }
+// nocov end
 
 double approx_expected_value_of_action(
   std::vector<std::vector<double>> &pij,
@@ -128,15 +134,6 @@ double approx_expected_value_of_action(
   }
   // return result
   return out;
-}
-
-double log_proxy_expected_value_of_action(
-  Eigen::MatrixXd &log_1m_pij) {
-  Eigen::VectorXd out = log_1m_pij.rowwise().sum();
-  // note we that we use log_substract(0, ..) because 0 is log(1.0)
-  for (auto itr = out.data(); itr != out.data() + out.size(); ++itr)
-    *itr = log_subtract(0.0, *itr);
-  return log_sum(out);
 }
 
 // [[Rcpp::export]]
