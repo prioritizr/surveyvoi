@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0.0</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
       <h1 data-toc-skip>surveyvoi: Survey Value of Information</h1>
                         <h4 data-toc-skip class="author">Jeffrey O. Hanson</h4>
             
-            <h4 data-toc-skip class="date">2024-02-14</h4>
+            <h4 data-toc-skip class="date">2024-07-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/prioritizr/surveyvoi/blob/HEAD/vignettes/surveyvoi.Rmd"><code>vignettes/surveyvoi.Rmd</code></a></small>
       <div class="hidden name"><code>surveyvoi.Rmd</code></div>
@@ -348,7 +348,7 @@
 <span></span>
 <span><span class="co"># print value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_current</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.9329257</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.9443835</span></span></code></pre>
 <p>We can potentially improve the <em>expected value of the decision given current information</em> by learning more about which sites are more likely (and less likely) to contain the conservation feature.</p>
 </div>
 <div class="section level2">
@@ -482,11 +482,11 @@
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 2</span></span></span>
 <span><span class="co">##   name            value</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.961<span style="text-decoration: underline;">496</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.962<span style="text-decoration: underline;">181</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.962<span style="text-decoration: underline;">181</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.981<span style="text-decoration: underline;">973</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.986<span style="text-decoration: underline;">738</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.986<span style="text-decoration: underline;">738</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.993<span style="text-decoration: underline;">256</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.988<span style="text-decoration: underline;">133</span></span></span></code></pre>
 <p>We can also calculate how much the information gained from each of the survey schemes is expected to improve the management decision. This quantity is called the <em>expected value of sample information (EVSI)</em> for each survey scheme.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># estimate expected value of sample information for each survey scheme</span></span>
@@ -498,11 +498,11 @@
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 5 × 3</span></span></span>
 <span><span class="co">##   name            value      evsi</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.961<span style="text-decoration: underline;">496</span> 0.028<span style="text-decoration: underline;">570</span>2</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.962<span style="text-decoration: underline;">181</span> 0.029<span style="text-decoration: underline;">255</span>3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.962<span style="text-decoration: underline;">181</span> 0.029<span style="text-decoration: underline;">255</span>3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span> 0.037<span style="text-decoration: underline;">331</span>7</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span> 0.029<span style="text-decoration: underline;">389</span>1</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.981<span style="text-decoration: underline;">973</span> 0.037<span style="text-decoration: underline;">589</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.986<span style="text-decoration: underline;">738</span> 0.042<span style="text-decoration: underline;">354</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.986<span style="text-decoration: underline;">738</span> 0.042<span style="text-decoration: underline;">354</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.993<span style="text-decoration: underline;">256</span> 0.048<span style="text-decoration: underline;">872</span>7</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.988<span style="text-decoration: underline;">133</span> 0.043<span style="text-decoration: underline;">749</span>9</span></span></code></pre>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize the expected value of sample information for each survey scheme</span></span>
 <span><span class="co"># color the best survey scheme in blue</span></span>
@@ -587,7 +587,7 @@
 <span></span>
 <span><span class="co"># calculate value</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">evd_opt</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 0.9702607</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.9934998</span></span></code></pre>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># append optimized results to results table</span></span>
 <span><span class="va">evd_survey_schemes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
@@ -599,12 +599,12 @@
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
 <span><span class="co">##   name            value      evsi</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.961<span style="text-decoration: underline;">496</span> 0.028<span style="text-decoration: underline;">570</span>2</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.962<span style="text-decoration: underline;">181</span> 0.029<span style="text-decoration: underline;">255</span>3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.962<span style="text-decoration: underline;">181</span> 0.029<span style="text-decoration: underline;">255</span>3</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.970<span style="text-decoration: underline;">257</span> 0.037<span style="text-decoration: underline;">331</span>7</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.962<span style="text-decoration: underline;">315</span> 0.029<span style="text-decoration: underline;">389</span>1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">6</span> opt_scheme   0.970<span style="text-decoration: underline;">261</span> 0.037<span style="text-decoration: underline;">335</span>1</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">1</span> geo_scheme   0.981<span style="text-decoration: underline;">973</span> 0.037<span style="text-decoration: underline;">589</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">2</span> env_scheme   0.986<span style="text-decoration: underline;">738</span> 0.042<span style="text-decoration: underline;">354</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">3</span> unc_scheme   0.986<span style="text-decoration: underline;">738</span> 0.042<span style="text-decoration: underline;">354</span>6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">4</span> cheap_scheme 0.993<span style="text-decoration: underline;">256</span> 0.048<span style="text-decoration: underline;">872</span>7</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">5</span> rich_scheme  0.988<span style="text-decoration: underline;">133</span> 0.043<span style="text-decoration: underline;">749</span>9</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">6</span> opt_scheme   0.993<span style="text-decoration: underline;">500</span> 0.049<span style="text-decoration: underline;">116</span>3</span></span></code></pre>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># visualize expected value of sample information</span></span>
 <span><span class="co"># color the best survey scheme in blue</span></span>
