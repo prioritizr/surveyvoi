@@ -1,17 +1,18 @@
-# surveyvoi 1.0.6.1
+# surveyvoi 1.1.0.0
 
-- Fix bug in `approx_near_optimal_survey_scheme()`,
-  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
-  `approx_evdsi()`, `evdsi()`, and `evdci()` where all species were incorrectly
-  assigned the same target as the first species.
-- Update internal greedy reserve selection algorithm to find better quality
-  prioritizations. This impacts `approx_near_optimal_survey_scheme()`,
-  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
-  `approx_evdsi()`, `evdsi()`, and `evdci()`.
 - New `greedy_heuristic_algorithm()` function that can be used to generate
   reserve selection prioritizations. This function provides access to the
   internal algorithm used for the reserve selection component of the
   value of information calculations.
+- Update internal greedy reserve selection algorithm to find better quality
+  prioritizations. This impacts `approx_near_optimal_survey_scheme()`,
+  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
+  `approx_evdsi()`, `evdsi()`, and `evdci()`.
+- Update `sim_sites` and `sim_features` example datasets.
+- Fix bug in `approx_near_optimal_survey_scheme()`,
+  `approx_optimal_survey_scheme()`, `optimal_survey_scheme()`,
+  `approx_evdsi()`, `evdsi()`, and `evdci()` where all species were incorrectly
+  assigned the same target as the first species during calculations.
 
 # surveyvoi 1.0.6
 

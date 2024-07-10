@@ -111,7 +111,7 @@ features (e.g. bird species). To start off, we will set the seed for the
 random number generator for reproducibility and load some R packages.
 
 ``` r
-set.seed(501)      # set RNG for reproducibility
+set.seed(502)      # set RNG for reproducibility
 library(surveyvoi) # package for value of information analysis
 library(dplyr)     # package for preparing data
 library(tidyr)     # package for preparing data
@@ -156,25 +156,25 @@ print(sim_sites, width = Inf)
     ## Simple feature collection with 6 features and 13 fields
     ## Geometry type: POINT
     ## Dimension:     XY
-    ## Bounding box:  xmin: 0.10513 ymin: 0.04556193 xmax: 0.9764926 ymax: 0.8637977
+    ## Bounding box:  xmin: 0.02541313 ymin: 0.07851093 xmax: 0.9888107 ymax: 0.717068
     ## CRS:           NA
     ## # A tibble: 6 × 14
-    ##   survey_cost management_cost    f1    f2    f3    n1    n2    n3      e1     e2
-    ##         <dbl>           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>   <dbl>  <dbl>
-    ## 1          14             102     1   1       1     3     3     3  1.00   -0.848
-    ## 2          25              90     0   0       0     0     0     0 -1.44    1.27 
-    ## 3          25             165     1   0.6     0     5     5     5  1.25    0.817
-    ## 4          17             104     0   0       0     0     0     0 -0.484  -0.292
-    ## 5          18             100     0   0       0     0     0     0  0.0135  0.380
-    ## 6          15              94     0   0       0     0     0     0 -0.347  -1.33 
+    ##   survey_cost management_cost    f1    f2    f3    n1    n2    n3     e1     e2
+    ##         <dbl>           <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl>
+    ## 1          19              99     0     0  0        0     0     0  1.13   0.535
+    ## 2          22              87     0     1  0.25     4     4     4 -1.37  -1.45 
+    ## 3          13              94     1     1  0        1     1     1  0.155 -0.867
+    ## 4          19              61     0     0  0        0     0     0 -0.792  1.32 
+    ## 5           9             105     0     0  0        0     0     0 -0.194  0.238
+    ## 6          12             136     0     0  0        0     0     0  1.07   0.220
     ##      p1    p2    p3               geometry
     ##   <dbl> <dbl> <dbl>                <POINT>
-    ## 1 1     0.999 0.789  (0.1589075 0.8637977)
-    ## 2 0     0     0.112  (0.9764926 0.7485368)
-    ## 3 1     0.419 0.012  (0.8362375 0.2282762)
-    ## 4 0.022 0.502 0.834     (0.10513 0.179855)
-    ## 5 0.318 0.13  0.225 (0.5985786 0.04556193)
-    ## 6 0.474 0.997 0.991  (0.1504241 0.6821156)
+    ## 1 0.999 0.988 0.21   (0.03529733 0.544939)
+    ## 2 0.001 0.995 0.152    (0.33276 0.3174416)
+    ## 3 0.966 1     0.017 (0.6141922 0.07851093)
+    ## 4 0     0     1     (0.02541313 0.1147132)
+    ## 5 0.11  0.006 0.831  (0.9888107 0.2152785)
+    ## 6 1     1     0.082   (0.9038749 0.717068)
 
 ``` r
 # plot cost of protecting each site
@@ -184,7 +184,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-management_cost_plot-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -195,7 +195,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_cost_plot-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -252,7 +252,7 @@ sensitivity (true positive rate) and specificity (true negative rate)
 for the species distribution models fitted for each feature; and
 `"target"` column denotes the required number of protected sites for
 each feature (termed “representation target”, each feature has a target
-of 1 site).
+of 2 site).
 
 ``` r
 # load data
@@ -265,14 +265,14 @@ print(sim_features, width = Inf)
     ## # A tibble: 3 × 7
     ##   name  survey survey_sensitivity survey_specificity model_sensitivity
     ##   <chr> <lgl>               <dbl>              <dbl>             <dbl>
-    ## 1 f1    TRUE                0.954              0.886             0.718
-    ## 2 f2    TRUE                0.974              0.875             0.705
-    ## 3 f3    TRUE                0.956              0.823             0.768
+    ## 1 f1    TRUE                0.951              0.854             0.711
+    ## 2 f2    TRUE                0.990              0.832             0.722
+    ## 3 f3    TRUE                0.986              0.808             0.772
     ##   model_specificity target
     ##               <dbl>  <dbl>
-    ## 1             0.811      1
-    ## 2             0.860      1
-    ## 3             0.887      1
+    ## 1             0.841      2
+    ## 2             0.806      2
+    ## 3             0.871      2
 
 After loading the data, we will now generate an optimized ecological
 survey scheme. To achieve this, we will use
@@ -298,7 +298,7 @@ sites.
 
 ``` r
 # calculate budget
-budget <- sum(0.90 * sim_sites$management_cost)
+budget <- sum(0.4 * sim_sites$management_cost)
 
 # generate optimized survey scheme
 opt_scheme <-
@@ -318,7 +318,8 @@ opt_scheme <-
     feature_target_column = "target",
     total_budget = budget,
     survey_budget = budget,
-    verbose = TRUE)
+    verbose = TRUE
+  )
 ```
 
 ``` r
@@ -330,8 +331,8 @@ opt_scheme <-
 print(str(opt_scheme))
 ```
 
-    ##  logi [1, 1:6] FALSE TRUE FALSE TRUE TRUE TRUE
-    ##  - attr(*, "ev")= num [1, 1:100] 3 3 3 3 3 ...
+    ##  logi [1, 1:6] TRUE FALSE FALSE TRUE TRUE FALSE
+    ##  - attr(*, "ev")= num [1, 1:100] 0.596 0.596 0.596 0.596 0.596 ...
     ## NULL
 
 ``` r
@@ -347,7 +348,7 @@ ggtitle("scheme") +
 theme(legend.title = element_blank())
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_scheme_plot-1.png" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using
