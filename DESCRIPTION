@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.0.6
+Version: 1.1.0.0
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving
@@ -103,6 +103,7 @@ Collate:
     'fit_hglm_occupancy_models.R'
     'fit_xgb_occupancy_models.R'
     'geo_cov_survey_scheme.R'
+    'greedy_heuristic_optimization.R'
     'n_states.R'
     'optimal_survey_scheme.R'
     'package.R'

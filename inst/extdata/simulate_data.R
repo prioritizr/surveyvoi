@@ -7,7 +7,7 @@ source("R/simulate_feature_data.R")
 source("R/simulate_site_data.R")
 
 ## set seed for reproducibility
-seed <- 607
+seed <- 609
 
 ## set simulation parameters
 number_features <- 3
@@ -27,7 +27,7 @@ output_probabilities <- TRUE
 set.seed(seed)
 sim_features <- simulate_feature_data(
   number_features, proportion_of_survey_features)
-sim_features$target <- 1
+sim_features$target <- 2
 
 ## sites
 set.seed(seed)

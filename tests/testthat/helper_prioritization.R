@@ -27,14 +27,15 @@ r_greedy_heuristic_prioritization <- function(
   ## locked planning units
   curr_solution[(pu_locked_in > 0.5) | (pu_costs < 1e-15)] <- TRUE
   curr_pu_rem_idx <- which((!curr_solution) & (pu_locked_out < 0.5))
-  ## define targets
-  curr_target <- pmin(sum(curr_solution), target)
-  ## define obj fun for starting solution
+
+  ## update target
   if (sum(curr_solution) == 0) {
-    curr_obj <- 0
+    curr_target <- pmin(target, 1)
   } else {
-    curr_obj <- r_approx_conservation_value(
-      rij[, which(curr_solution), drop = FALSE], rep(curr_target))
+    curr_target <- pmin(
+      target,
+      rowSums(rij[, which(curr_solution > 0.5), drop = FALSE] > 1e-6)
+    )
   }
 
   # main iteration loop
@@ -45,46 +46,82 @@ r_greedy_heuristic_prioritization <- function(
      budget)
 
   while(keep_looping) {
+
     ## update target
+    if (sum(curr_solution) == 0) {
+      curr_target <- pmin(target, 1)
+    } else {
+      curr_target <- pmin(
+        target,
+        rowSums(rij[, which(curr_solution > 0.5), drop = FALSE] > 1e-6)
+      )
+    }
+
+    ## update solution cost
     curr_solution_cost <- sum(pu_costs * curr_solution)
+
+    ## calculate benefit associated with current solution
+    if (sum(curr_solution) > 0) {
+      prev_obj <- r_approx_conservation_value(
+        rij[, which(curr_solution), drop = FALSE],
+        curr_target
+      )
+    } else {
+      prev_obj <- 0
+    }
+
     ## calculate the cost of the cheapest n-1 remaining planning units
-    if (sum(curr_solution) < max(target)) {
+    if ((sum(curr_solution) + 1) < max(target)) {
+      curr_solution_cost <- sum(curr_solution * pu_costs)
+      curr_rem_pu_costs <- pu_costs[!curr_solution]
+      n_pu_needed_to_meet_target <- max(target) - sum(curr_solution)
+      cheapest_rem_pu_needed_to_meet_max_target <-
+        sort(curr_rem_pu_costs)[seq_len(n_pu_needed_to_meet_target - 1)]
       curr_min_feasible_pu_cost <- budget -
-        (sum(curr_solution * pu_costs) +
-         sum(sort(pu_costs[!curr_solution])[seq_len(max(target) -
-                                                    sum(curr_solution))]))
+        (curr_solution_cost + sum(cheapest_rem_pu_needed_to_meet_max_target))
     } else {
       curr_min_feasible_pu_cost <- Inf
     }
 
-    ## calculate benefit associated with dropping each remaining planning unit
+    ## calculate benefit associated with adding each remaining planning unit
     curr_alt_obj <- vapply(curr_pu_rem_idx, FUN.VALUE = numeric(2),
                            function(i) {
       ## determine if selecting the i'th planning unit would prevent the final
       ## solution from containing n number of planning units
       ## (where n = max(targets))
       curr_feasible <-
-        (((curr_min_feasible_pu_cost >= pu_costs[i]) ||
-          ((abs(pu_costs[i] - min(pu_costs)) < 1.0e-15))) &&
-        ((pu_costs[i] + curr_solution_cost) <= budget))
+        (
+          (pu_costs[i] <= curr_min_feasible_pu_cost) ||
+          ((abs(pu_costs[i] - min(pu_costs[curr_pu_rem_idx])) < 1.0e-15))
+        ) &&
+        ((pu_costs[i] + curr_solution_cost) <= budget)
+
       ## calculate the alternate obj fun for the i'th planning unit
       s <- curr_solution
       s[i] <- TRUE
-      obj <- r_proxy_conservation_value(
-        rij[, which(s), drop = FALSE], curr_target)
+
+      ## prepare rij data for calculating objecive value
+      curr_rij <-
+        rij *
+        matrix(s, byrow = TRUE, ncol = length(s), nrow = nrow(rij))
+      curr_rij[curr_rij < 1e-6] <- 0
+
+      ## calculate objective value with i'th planning unit selected
+      obj <- r_approx_conservation_value(curr_rij, curr_target)
+
       ## return data
       c(!curr_feasible, obj)
     })
 
     ## find idx with best performance
-    curr_ce <- curr_alt_obj[2, ] / pu_costs[curr_pu_rem_idx]
+    curr_ce <- (curr_alt_obj[2, ] - prev_obj) / pu_costs[curr_pu_rem_idx]
     curr_ce[curr_alt_obj[1, ] > 0.5] <- -Inf
     curr_idx <- which.max(curr_ce)
 
     ## update curr_solution and curr_obj
     curr_solution[curr_pu_rem_idx[curr_idx]] <- TRUE
     curr_pu_rem_idx <- which((!curr_solution) & (pu_locked_out < 0.5))
-    curr_obj <- curr_alt_obj[2, curr_idx]
+    prev_obj <- curr_alt_obj[2, curr_idx]
 
     ## update loop status
     keep_looping <-

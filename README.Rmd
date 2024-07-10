@@ -17,11 +17,11 @@ output:
 [![Coverage Status](https://img.shields.io/codecov/c/github/prioritizr/surveyvoi?label=Coverage)](https://app.codecov.io/gh/prioritizr/surveyvoi/branch/master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
-```{r, include = FALSE}
+```{r "knitr_config", include = FALSE}
 knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
 ```
 
-```{r, include = FALSE}
+```{r "initialization", include = FALSE}
 devtools::load_all()
 h = 2.75
 w = 3.0
@@ -86,7 +86,7 @@ Please cite the _surveyvoi R_ package when using it in publications. To cite the
 Here we provide a short example showing how to use the _surveyvoi R_ package to prioritize funds for ecological surveys. In this example, we will generate plans for conducting ecological surveys (termed "survey schemes") using simulated data for six sites and three conservation features (e.g. bird species). To start off, we will set the seed for the random number generator for reproducibility and load some R packages.
 
 ```{r, message = FALSE}
-set.seed(501)      # set RNG for reproducibility
+set.seed(502)      # set RNG for reproducibility
 library(surveyvoi) # package for value of information analysis
 library(dplyr)     # package for preparing data
 library(tidyr)     # package for preparing data
@@ -96,19 +96,22 @@ library(ggplot2)   # package for plotting data
 Now we will load some datasets that are distributed with the package. First, we will load the `sim_sites` object. This spatially explicit dataset (i.e. `sf` object) contains information on the sites within our study area. Critically, it contains (i) sites that have already been surveyed, (ii) candidate sites for additional surveys, (iii) sites that have already been protected, and (iv) candidate sites that could be protected in the future. Each row corresponds to a different site, and each column describes different properties associated with each site. In this table, the `"management_cost"` column indicates the cost of protecting each site; `"survey_cost"` column indicates the cost of conducting an ecological survey within each site; and `"e1"` and `"e2"` columns contain environmental data for each site (not used in this example). The remaining columns describe the existing survey data and the spatial distribution of the features across the sites. The `"n1"`, `"n2"`, and `"n3"` columns indicate the number of surveys conducted within each site that looked for each of the three features (respectively); and `"f1"`, `"f2"`, and `"f3"` columns describe the proportion of surveys within each site that looked for each feature where the feature was detected (respectively). For example, if `"n1"` has a value of 2 and `"f1"` has a value of 0.5 for a given site, then the feature `"f1"` was detected in only one of the two surveys conducted in this site that looked for the feature. Finally, the `"p1"`, `"p2"`, and `"p3"` columns contain modeled probability estimates of each species being present in each site (see `fit_hglm_occupancy_models()` and `fit_xgb_occupancy_models()` to generate such estimates for your own data).
 
 
-```{r, fig.height = h, fig.width = w}
+```{r "load_site_data"}
 # load data
 data(sim_sites)
 
 # print table
 print(sim_sites, width = Inf)
 
+```{r "management_cost_plot", fig.height = h, fig.width = w}
 # plot cost of protecting each site
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
 ggtitle("management_cost") +
 theme(legend.title = element_blank())
+```
 
+```{r "survey_cost_plot", fig.height = h, fig.width = w}
 # plot cost of conducting an additional survey in each site
 # note that these costs are much lower than the protection costs
 ggplot(sim_sites) +
@@ -154,7 +157,7 @@ scale_color_continuous(limits = c(0, 1))
 
 Next, we will load the `sim_features` object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the `"name"` column contains the name of each feature; `"survey"` column indicates whether future surveys would look for this species; `"survey_sensitivity"` and `"survey_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature;  `"model_sensitivity"` and `"model_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and `"target"` column denotes the required number of protected sites for each feature (termed "representation target", each feature has a target of `r sim_features$target[1]` site).
 
-```{r}
+```{r "load_feature_data"}
 # load data
 data(sim_features)
 
@@ -166,9 +169,9 @@ After loading the data, we will now generate an optimized ecological survey sche
 
 To perform the optimization, we will set a total budget for (i) protecting sites and (ii) surveying sites. Although you might be hesitant to specify a budget, please recall that you would make very different plans depending on available funds. For instance, if you have near infinite funds then you wouldn't bother conducting any surveys and simply protect everything. Similarly, if you had very limited funds, then you wouldn't survey any sites to ensure that at least one site could be protected. Generally, conservation planning problems occur somewhere between these two extremes---but the optimization process can't take that into account if you don't specify a budget. For brevity, here we will set the total budget as 90% of the total costs for protecting sites.
 
-```{r, message = FALSE, results = FALSE}
+```{r "generate_optimal_survey_scheme", message = FALSE, results = FALSE}
 # calculate budget
-budget <- sum(0.90 * sim_sites$management_cost)
+budget <- sum(0.4 * sim_sites$management_cost)
 
 # generate optimized survey scheme
 opt_scheme <-
@@ -188,10 +191,11 @@ opt_scheme <-
     feature_target_column = "target",
     total_budget = budget,
     survey_budget = budget,
-    verbose = TRUE)
+    verbose = TRUE
+  )
 ```
 
-```{r, include = FALSE}
+```{r "validation", include = FALSE}
 # ensure that at least one site is selected
 assertthat::assert_that(
   sum(c(opt_scheme[1, ])) >= 1,
@@ -199,7 +203,7 @@ assertthat::assert_that(
 )
 ```
 
-```{r, fig.height = h, fig.width = w * 1.5}
+```{r "survey_scheme_plot", fig.height = h, fig.width = w * 1.5}
 # the opt_scheme object is a matrix that contains the survey schemes
 # each column corresponds to a different site,
 # and each row corresponds to a different solution

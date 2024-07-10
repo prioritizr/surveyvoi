@@ -51,5 +51,6 @@ reference:
   - title: Miscellaneous function
     desc: Assorted functions with varying uses
     contents:
+      - greedy_heuristic_prioritization
       - relative_site_richness_scores
       - relative_site_uncertainty_scores

@@ -38,7 +38,8 @@ se <- function(x) sqrt(var(x) / length(x))
 r_conservation_value <- function(pij, target) {
   assertthat::assert_that(all(target <= ncol(pij)))
   out <- vapply(seq_along(target), FUN.VALUE = numeric(1), function(i) {
-    convolve_binomial(pij[i, ], target[i])
+    sum(PoissonBinomial::dpbinom(
+      seq(target[i], ncol(pij)), pij[i, ], method = "DivideFFT"))
   })
   sum(out)
 }
