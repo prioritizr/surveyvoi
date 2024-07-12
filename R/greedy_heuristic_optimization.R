@@ -142,15 +142,37 @@ greedy_heuristic_prioritization <- function(
     site_management_locked_out <- rep(FALSE, nrow(site_data))
   }
 
-  ## validate that targets are feasible given budget and locked out units
-  sorted_costs <- sort(
-    site_data[[site_management_cost_column]][!site_management_locked_out])
-  sorted_costs <- sorted_costs[
-    seq_len(max(feature_data[[feature_target_column]]))]
-  assertthat::assert_that(
-    sum(sorted_costs) <= total_budget,
-    msg = paste("targets cannot be achieved given budget and locked out",
-                "planning units"))
+  ## validate it is possible to select enough planning units to meet
+  ## the target for even a single feature,
+  ## if not, then it's not possible to generate a single solution
+  ## with an objective value > 0
+  cheapest_sol <- rep(FALSE, nrow(site_data))
+  cheapest_sol[site_management_locked_in] <- TRUE
+  n_extra_needed <-
+  if (min(feature_data[[feature_target_column]]) > sum(cheapest_sol)) {
+    idx <- which(!site_management_locked_out & !site_management_locked_in)
+    idx_costs <- site_data[[site_management_cost_column]]
+    idx_costs <- idx_costs[idx]
+    idx_order <- order(idx_costs)
+    idx_add <- cumsum(idx_costs[idx_order]) <= total_budget
+    sel_idx <- idx[idx_order[which(idx_add)]]
+    cheapest_sol[sel_idx] <- TRUE
+  }
+  if (
+    sum(cheapest_sol) <= min(feature_data[[feature_target_column]])
+  ) {
+    ### throw warning
+    warning(
+      paste(
+        "it is not possible to select enough planning units to meet",
+        "any targets for even a single feature",
+        "(given the budget and locked out planning units)"
+      ),
+      call. = TRUE, immediate. = FALSE
+    )
+    ## return solution
+    return(list(x = cheapest_sol, objval = 0))
+  }
 
   # create prior data
   prior_data <-

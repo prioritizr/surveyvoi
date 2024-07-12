@@ -9,10 +9,11 @@ double expected_value_of_action(
   const std::size_t n_f = pij.rows();
   const std::size_t n_pu_solution = std::accumulate(solution.begin(),
                                                     solution.end(), 0);
-  if (static_cast<int>(n_pu_solution) < target.maxCoeff()) {
-    // nocov start
-    Rcpp::stop("prioritization contains fewer planning units than a target");
-    // nocov end
+  if (static_cast<int>(n_pu_solution) < target.minCoeff()) {
+    Rcpp::warning(
+      "prioritization contains fewer planning units than minimum target"
+    );
+    return 0.0;
   }
 
   // prepare rij matrix containing only solution values
@@ -32,15 +33,19 @@ double expected_value_of_action(
   std::vector<int> curr_target_values;
   for (std::size_t i = 0; i < n_f; ++i) {
     curr_spp_probs = Rcpp::wrap(rij.row(i));
-    curr_target_values.resize((n_pu_solution - target[i]) + 1);
-    std::iota(
-      curr_target_values.begin(),
-      curr_target_values.end(),
-      target[i]
-    );
-    curr_density_probs = PoissonBinomial::dpb_dc(
-      Rcpp::wrap(curr_target_values), curr_spp_probs);
-    spp_prob[i] = Rcpp::sum(curr_density_probs);
+    if (curr_spp_probs.size() < target[i]) {
+      spp_prob[i] = 0.0;
+    } else {
+      curr_target_values.resize((n_pu_solution - target[i]) + 1);
+      std::iota(
+        curr_target_values.begin(),
+        curr_target_values.end(),
+        target[i]
+      );
+      curr_density_probs = PoissonBinomial::dpb_dc(
+        Rcpp::wrap(curr_target_values), curr_spp_probs);
+      spp_prob[i] = Rcpp::sum(curr_density_probs);
+    }
   }
 
   // calculate sum of probabilities of species meeting targets
