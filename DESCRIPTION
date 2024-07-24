@@ -1,6 +1,6 @@
 Package: surveyvoi
 Type: Package
-Version: 1.1.0.0
+Version: 1.1.0.1
 Title: Survey Value of Information
 Description: Decision support tool for prioritizing sites for ecological
     surveys based on their potential to improve plans for conserving

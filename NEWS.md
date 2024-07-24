@@ -1,3 +1,13 @@
+# surveyvoi 1.1.0.1
+
+- Fix bug in `greedy_heuristic_algorithm()` function so that it returns a
+  solution if it is not possible to select enough planning units to meet the
+  target for any species. Instead of throwing an error, it will now throw a
+  warning and return a solution containing the cheapest set of planning units
+  within the budget and locked out constraints. Note that this solution
+  will have an objective value of zero, because it has zero probability of
+  meeting any of the species' targets.
+
 # surveyvoi 1.1.0.0
 
 - New `greedy_heuristic_algorithm()` function that can be used to generate

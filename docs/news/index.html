@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">surveyvoi</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0.1</span>
       </span>
     </div>
 
@@ -50,6 +50,9 @@
       <small>Source: <a href="https://github.com/prioritizr/surveyvoi/blob/HEAD/NEWS.md"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.1.0.1" id="surveyvoi-1101">surveyvoi 1.1.0.1<a class="anchor" aria-label="anchor" href="#surveyvoi-1101"></a></h2>
+<ul><li>Fix bug in <code>greedy_heuristic_algorithm()</code> function so that it returns a solution if it is not possible to select enough planning units to meet the target for any species. Instead of throwing an error, it will now throw a warning and return a solution containing the cheapest set of planning units within the budget and locked out constraints. Note that this solution will have an objective value of zero, because it has zero probability of meeting any of the species’ targets.</li></ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.1.0.0" id="surveyvoi-1100">surveyvoi 1.1.0.0<a class="anchor" aria-label="anchor" href="#surveyvoi-1100"></a></h2>
 <ul><li>New <code>greedy_heuristic_algorithm()</code> function that can be used to generate reserve selection prioritizations. This function provides access to the internal algorithm used for the reserve selection component of the value of information calculations.</li>
