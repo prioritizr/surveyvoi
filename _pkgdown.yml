@@ -11,6 +11,7 @@ authors:
     href: https://josephrbennett.wordpress.com
 
 template:
+  bootstrap: 5
   params:
     bootswatch: flatly
 

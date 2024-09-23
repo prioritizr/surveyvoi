@@ -23,9 +23,16 @@ knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
 
 ```{r "initialization", include = FALSE}
 devtools::load_all()
-h = 2.75
-w = 3.0
-ow = "400"
+h = 4.5
+w = 6.0
+ow = "500"
+knitr::opts_chunk$set(
+  fig.height = h,
+  fig.width = w,
+  out.width = ow,
+  fig.path = "man/figures/README-",
+  fig.align = "center"
+)
 ```
 
 The _surveyvoi_ package is a decision support tool for prioritizing sites for ecological surveys based on their potential to improve plans for conserving biodiversity (e.g. plans for establishing protected areas). Given a set of sites that could potentially be acquired for conservation management -- wherein some sites have previously been surveyed and other sites have not -- this package provides functionality to generate and evaluate plans for additional surveys. Specifically, plans for ecological surveys can be generated using various conventional approaches (e.g. maximizing expected species richness, geographic coverage, diversity of sampled environmental conditions) and by maximizing value of information. After generating plans for surveys, they can also be evaluated using value of information analysis. Please note that several functions depend on the Gurobi optimization software (available from https://www.gurobi.com). Additionally, the JAGS software (available from https://mcmc-jags.sourceforge.io/) is required to fit hierarchical generalized linear models.
@@ -103,7 +110,7 @@ data(sim_sites)
 # print table
 print(sim_sites, width = Inf)
 
-```{r "management_cost_plot", fig.height = h, fig.width = w}
+```{r "management_cost_plot"}
 # plot cost of protecting each site
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
@@ -111,7 +118,7 @@ ggtitle("management_cost") +
 theme(legend.title = element_blank())
 ```
 
-```{r "survey_cost_plot", fig.height = h, fig.width = w}
+```{r "survey_cost_plot"}
 # plot cost of conducting an additional survey in each site
 # note that these costs are much lower than the protection costs
 ggplot(sim_sites) +
@@ -120,7 +127,7 @@ ggtitle("survey_cost") +
 theme(legend.title = element_blank())
 ```
 
-```{r "n_plot", fig.height = h, fig.width = w * 2.25}
+```{r "n_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
 # plot survey data
 ## n1, n2, n3: number of surveys in each site that looked for each feature
 sim_sites %>%
@@ -131,7 +138,7 @@ geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1)
 ```
 
-```{r "f_plot", fig.height = h, fig.width = w * 2.25}
+```{r "f_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
 # plot survey results
 ## f1, f2, f3: proportion of surveys in each site that looked for each feature
 ##             that detected the feature
@@ -144,7 +151,7 @@ facet_wrap(~name, nrow = 1) +
 scale_color_continuous(limits = c(0, 1))
 ```
 
-```{r "p_plot", fig.height = h, fig.width = w * 2.25}
+```{r "p_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
 # plot modeled probability of occupancy data
 sim_sites %>%
 select(p1, p2, p3) %>%
@@ -203,7 +210,7 @@ assertthat::assert_that(
 )
 ```
 
-```{r "survey_scheme_plot", fig.height = h, fig.width = w * 1.5}
+```{r "survey_scheme_plot"}
 # the opt_scheme object is a matrix that contains the survey schemes
 # each column corresponds to a different site,
 # and each row corresponds to a different solution
