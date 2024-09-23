@@ -558,7 +558,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       yhat_test <- c(withr::with_package("xgboost",
         stats::predict(
           model, dtest[[k]],
-          iterationrange = c(1, model$best_iteration + 1)
+          iterationrange = c(1, model$best_iteration)
         )))
       ### validate predictions
       assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
