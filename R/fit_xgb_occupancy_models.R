@@ -568,6 +568,10 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
         data[[k]]$test$y, yhat_test, data[[k]]$test$w,
         survey_sensitivity, survey_specificity)[[1]]
       ## check that model evaluations are consistent
+      message("perf")
+      print(perf)
+      message("model$best_score")
+      print(model$best_score)
       assertthat::assert_that(abs(perf - model$best_score) < 1e-5)
       ### return result
       list(eval = perf, model = model)
