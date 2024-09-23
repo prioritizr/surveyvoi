@@ -400,11 +400,11 @@ fit_xgb_occupancy_models <- function(
       p_train_k <- c(withr::with_package("xgboost",
         stats::predict(
           m_k, xgboost::xgb.DMatrix(x_train_k, nthread = n_threads),
-          iterationrange = c(1, nround_k + 1))))
+          iterationrange = c(1, nround_k))))
       p_test_k <- c(withr::with_package("xgboost",
         stats::predict(
           m_k, xgboost::xgb.DMatrix(x_test_k, nthread = n_threads),
-          iterationrange = c(1, nround_k + 1))))
+          iterationrange = c(1, nround_k))))
       ## validate predictions
       assertthat::assert_that(all(p_train_k >= 0), all(p_train_k <= 1),
         msg = "xgboost predictions are not between zero and one")

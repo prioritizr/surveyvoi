@@ -1,3 +1,9 @@
+# surveyvoi 1.1.0.2
+
+- Fix bug in `fit_xgb_occupancy_models()` that caused an error during model
+  fitting due to failed predictions.
+- Fix package citation.
+
 # surveyvoi 1.1.0.1
 
 - Fix bug in `greedy_heuristic_algorithm()` function so that it returns a
