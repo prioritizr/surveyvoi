@@ -553,9 +553,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       })
       ### generate predictions
       yhat_test <- c(withr::with_package("xgboost",
-        stats::predict(
-          model, dtest[[k]]
-        )))
+        stats::predict(model, dtest[[k]])))
       ### validate predictions
       assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -564,10 +562,6 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
         data[[k]]$test$y, yhat_test, data[[k]]$test$w,
         survey_sensitivity, survey_specificity)[[1]]
       ## check that model evaluations are consistent
-      message("perf")
-      print(perf)
-      message("model$best_score")
-      print(model$best_score)
       assertthat::assert_that(abs(perf - model$best_score) < 1e-2)
       ### return result
       list(eval = perf, model = model)
