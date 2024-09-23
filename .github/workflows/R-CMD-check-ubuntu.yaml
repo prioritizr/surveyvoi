@@ -56,7 +56,9 @@ jobs:
 
       - name: Install system dependencies
         run: |
-          sudo apt-get install libnlopt-dev coinor-libsymphony-dev
+          sudo apt-get -y install \
+            libnlopt-dev coinor-libsymphony-dev \
+            libudunits2-dev libgdal-dev libgeos-dev libproj-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
