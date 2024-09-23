@@ -450,7 +450,7 @@ fit_xgb_occupancy_models <- function(
       ## generate predictions
       out <- c(withr::with_package("xgboost", stats::predict(
         x, xgboost::xgb.DMatrix(site_env_data, nthread = n_threads),
-        iterationrange = c(1, x$best_iteration + 1)
+        iterationrange = c(1, x$best_iteration)
       )))
       ## validate predictions
       assertthat::assert_that(
