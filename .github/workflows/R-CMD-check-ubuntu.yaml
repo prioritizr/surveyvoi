@@ -24,8 +24,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-20.04, r: 'release'}
-          - {os: ubuntu-20.04, r: 'devel'}
+          - {os: ubuntu-22.04, r: 'release'}
+          - {os: ubuntu-22.04, r: 'devel'}
 
     env:
       _R_REMOTES_NO_ERRORS_FROM_WARNINGS_: true
@@ -57,8 +57,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get -y install \
-            libnlopt-dev coinor-libsymphony-dev \
-            libudunits2-dev libgdal-dev libgeos-dev libproj-dev
+            libnlopt-dev coinor-libsymphony-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
