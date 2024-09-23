@@ -181,10 +181,10 @@ print(sim_sites, width = Inf)
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
 ggtitle("management_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-management_cost_plot-1.png" width="500" style="display: block; margin: auto;" />
+<img src="man/figures/README-management_cost_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -192,10 +192,10 @@ theme(legend.title = element_blank())
 ggplot(sim_sites) +
 geom_sf(aes(color = survey_cost), size = 4) +
 ggtitle("survey_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-survey_cost_plot-1.png" width="500" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_cost_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -205,7 +205,8 @@ select(n1, n2, n3) %>%
 gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
-facet_wrap(~name, nrow = 1)
+facet_wrap(~name, nrow = 1) +
+theme(text = element_text(size = 16))
 ```
 
 <img src="man/figures/README-n_plot-1.png" width="800" style="display: block; margin: auto;" />
@@ -220,7 +221,8 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
 <img src="man/figures/README-f_plot-1.png" width="800" style="display: block; margin: auto;" />
@@ -233,7 +235,8 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
 <img src="man/figures/README-p_plot-1.png" width="800" style="display: block; margin: auto;" />
@@ -345,10 +348,10 @@ sim_sites$scheme <- c(opt_scheme[1, ])
 ggplot(sim_sites) +
 geom_sf(aes(color = scheme), size = 4) +
 ggtitle("scheme") +
-theme(legend.title = element_blank())
+theme(text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-survey_scheme_plot-1.png" width="500" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_scheme_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using

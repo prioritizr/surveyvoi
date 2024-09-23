@@ -23,9 +23,9 @@ knitr::opts_chunk$set(fig.path = "man/figures/README-", fig.align = "center")
 
 ```{r "initialization", include = FALSE}
 devtools::load_all()
-h = 4.5
-w = 6.0
-ow = "500"
+h = 3.5
+w = 5.0
+ow = "350"
 knitr::opts_chunk$set(
   fig.height = h,
   fig.width = w,
@@ -115,7 +115,7 @@ print(sim_sites, width = Inf)
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
 ggtitle("management_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
 ```{r "survey_cost_plot"}
@@ -124,10 +124,10 @@ theme(legend.title = element_blank())
 ggplot(sim_sites) +
 geom_sf(aes(color = survey_cost), size = 4) +
 ggtitle("survey_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
-```{r "n_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
+```{r "n_plot", fig.height = h, fig.width = w * 2.4, out.width = "800"}
 # plot survey data
 ## n1, n2, n3: number of surveys in each site that looked for each feature
 sim_sites %>%
@@ -135,10 +135,11 @@ select(n1, n2, n3) %>%
 gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
-facet_wrap(~name, nrow = 1)
+facet_wrap(~name, nrow = 1) +
+theme(text = element_text(size = 16))
 ```
 
-```{r "f_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
+```{r "f_plot", fig.height = h, fig.width = w * 2.4, out.width = "800"}
 # plot survey results
 ## f1, f2, f3: proportion of surveys in each site that looked for each feature
 ##             that detected the feature
@@ -148,10 +149,11 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
-```{r "p_plot", fig.height = h, fig.width = w * 2.0, out.width = "800"}
+```{r "p_plot", fig.height = h, fig.width = w * 2.4, out.width = "800"}
 # plot modeled probability of occupancy data
 sim_sites %>%
 select(p1, p2, p3) %>%
@@ -159,7 +161,8 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
 Next, we will load the `sim_features` object. This table contains information on the conservation features (e.g. species). Specifically, each row corresponds to a different feature, and each column contains information associated with the features. In this table, the `"name"` column contains the name of each feature; `"survey"` column indicates whether future surveys would look for this species; `"survey_sensitivity"` and `"survey_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the survey methodology for correctly detecting the feature;  `"model_sensitivity"` and `"model_specificity"` columns denote the sensitivity (true positive rate) and specificity (true negative rate) for the species distribution models fitted for each feature; and `"target"` column denotes the required number of protected sites for each feature (termed "representation target", each feature has a target of `r sim_features$target[1]` site).
@@ -227,7 +230,7 @@ sim_sites$scheme <- c(opt_scheme[1, ])
 ggplot(sim_sites) +
 geom_sf(aes(color = scheme), size = 4) +
 ggtitle("scheme") +
-theme(legend.title = element_blank())
+theme(text = element_text(size = 16))
 ```
 
 This has just been a taster of the _surveyvoi R_ package. In addition to this functionality, it can be used to evaluate survey schemes using value of information analysis. Furthermore, it can be used to generate survey schemes using conventional approaches (e.g. sampling environmental gradients, and selecting places with highly uncertain information). For more information, see the [package vignette](https://prioritizr.github.io/surveyvoi/articles/surveyvoi.html).
