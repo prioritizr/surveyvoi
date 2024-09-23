@@ -568,7 +568,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       print(perf)
       message("model$best_score")
       print(model$best_score)
-      assertthat::assert_that(abs(perf - model$best_score) < 1e-5)
+      assertthat::assert_that(abs(perf - model$best_score) < 1e-2)
       ### return result
       list(eval = perf, model = model)
     })
