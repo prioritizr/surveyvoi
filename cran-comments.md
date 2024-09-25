@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you for reviewing this submission. This submission contains updates for the _surveyvoi_ package to fix (i) aliasing for the package manual entry, (ii) uneeded C++11 specification, and (iii) installation for Windows on arm64 systems.
+Thank you for reviewing this submission. This submission contains minor updates for the _surveyvoi_ package to (i) improve algorithmic performance, (ii) fix a typo in the citation, and (iii) improve compatibility with updates to dependencies.
 
 Cheers,
 
@@ -10,8 +10,8 @@ Jeff
 
 * [Debian (testing), R-release](https://github.com/r-devel/rcheckserver) ([based on rcheckserver](https://statmath.wu.ac.at/AASC/debian/))
 * [Fedora 33, clang, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AFedora)
-* [Ubuntu 20.04, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
-* [Ubuntu 20.04, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
+* [Ubuntu 22.04, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
+* [Ubuntu 22.04, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
 * [macOS 10.15, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3A%22Mac+OSX%22)
 * [macOS 11.5.2 (arm64), R-release (macOS builder)](https://mac.r-project.org/macbuilder/submit.html)
 * [Windows Server 2019, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AWindows)
