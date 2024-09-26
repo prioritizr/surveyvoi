@@ -1,87 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/404.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/articles/surveyvoi.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/index.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/approx_evdsi.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/approx_near_optimal_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/approx_optimal_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/env_div_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/evdci.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/evdsi.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/feasible_survey_schemes.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/fit_hglm_occupancy_models.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/fit_xgb_occupancy_models.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/geo_cov_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/greedy_heuristic_prioritization.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/n_states.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/optimal_survey_scheme.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/prior_probability_matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/relative_site_richness_scores.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/relative_site_uncertainty_scores.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/sim_data.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/simulate_feature_data.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/simulate_site_data.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/surveyvoi.html</loc>
-  </url>
-  <url>
-    <loc>https://github.com/prioritizr/surveyvoi/reference/weighted_survey_scheme.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://github.com/prioritizr/surveyvoi/404.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/articles/index.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/articles/surveyvoi.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/authors.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/index.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/news/index.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/approx_evdsi.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/approx_near_optimal_survey_scheme.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/approx_optimal_survey_scheme.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/env_div_survey_scheme.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/evdci.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/evdsi.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/feasible_survey_schemes.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/fit_hglm_occupancy_models.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/fit_xgb_occupancy_models.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/geo_cov_survey_scheme.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/greedy_heuristic_prioritization.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/index.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/n_states.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/optimal_survey_scheme.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/prior_probability_matrix.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/relative_site_richness_scores.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/relative_site_uncertainty_scores.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/sim_data.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/simulate_feature_data.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/simulate_site_data.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/surveyvoi.html</loc></url>
+<url><loc>https://github.com/prioritizr/surveyvoi/reference/weighted_survey_scheme.html</loc></url>
 </urlset>
+

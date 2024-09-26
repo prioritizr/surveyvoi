@@ -11,7 +11,7 @@
 [![Documentation](https://img.shields.io/github/actions/workflow/status/prioritizr/surveyvoi/documentation.yaml?branch=master&label=Documentation)](https://github.com/prioritizr/surveyvoi/actions)
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/prioritizr/surveyvoi?label=Coverage)](https://app.codecov.io/gh/prioritizr/surveyvoi/branch/master)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/surveyvoi)](https://CRAN.R-project.org/package=surveyvoi)
 
 The *surveyvoi* package is a decision support tool for prioritizing
 sites for ecological surveys based on their potential to improve plans
@@ -72,8 +72,8 @@ They can be installed using the following system commands:
 
 #### Linux
 
-For Unix-alikes, `gmp` (&gt;= 4.2.3), `mpfr` (&gt;= 3.0.0), `fftw3`
-(&gt;= 3.3), and `symphony` (&gt;= 5.6.16) are required.
+For Unix-alikes, `gmp` (\>= 4.2.3), `mpfr` (\>= 3.0.0), `fftw3` (\>=
+3.3), and `symphony` (\>= 5.6.16) are required.
 
 #### macOS
 
@@ -181,10 +181,10 @@ print(sim_sites, width = Inf)
 ggplot(sim_sites) +
 geom_sf(aes(color = management_cost), size = 4) +
 ggtitle("management_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-management_cost_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-management_cost_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 ``` r
 # plot cost of conducting an additional survey in each site
@@ -192,10 +192,10 @@ theme(legend.title = element_blank())
 ggplot(sim_sites) +
 geom_sf(aes(color = survey_cost), size = 4) +
 ggtitle("survey_cost") +
-theme(legend.title = element_blank())
+theme(legend.title = element_blank(), text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-survey_cost_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_cost_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey data
@@ -205,10 +205,11 @@ select(n1, n2, n3) %>%
 gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
-facet_wrap(~name, nrow = 1)
+facet_wrap(~name, nrow = 1) +
+theme(text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-n_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-n_plot-1.png" width="800" style="display: block; margin: auto;" />
 
 ``` r
 # plot survey results
@@ -220,10 +221,11 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-f_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-f_plot-1.png" width="800" style="display: block; margin: auto;" />
 
 ``` r
 # plot modeled probability of occupancy data
@@ -233,10 +235,11 @@ gather(name, value, -geometry) %>%
 ggplot() +
 geom_sf(aes(color = value), size = 4) +
 facet_wrap(~name, nrow = 1) +
-scale_color_continuous(limits = c(0, 1))
+scale_color_continuous(limits = c(0, 1)) +
+theme(text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-p_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-p_plot-1.png" width="800" style="display: block; margin: auto;" />
 
 Next, we will load the `sim_features` object. This table contains
 information on the conservation features (e.g. species). Specifically,
@@ -345,10 +348,10 @@ sim_sites$scheme <- c(opt_scheme[1, ])
 ggplot(sim_sites) +
 geom_sf(aes(color = scheme), size = 4) +
 ggtitle("scheme") +
-theme(legend.title = element_blank())
+theme(text = element_text(size = 16))
 ```
 
-<img src="man/figures/README-survey_scheme_plot-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-survey_scheme_plot-1.png" width="350" style="display: block; margin: auto;" />
 
 This has just been a taster of the *surveyvoi R* package. In addition to
 this functionality, it can be used to evaluate survey schemes using

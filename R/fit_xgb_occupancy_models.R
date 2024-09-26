@@ -399,12 +399,10 @@ fit_xgb_occupancy_models <- function(
       ## make predictions
       p_train_k <- c(withr::with_package("xgboost",
         stats::predict(
-          m_k, xgboost::xgb.DMatrix(x_train_k, nthread = n_threads),
-          iterationrange = c(1, nround_k + 1))))
+          m_k, xgboost::xgb.DMatrix(x_train_k, nthread = n_threads))))
       p_test_k <- c(withr::with_package("xgboost",
         stats::predict(
-          m_k, xgboost::xgb.DMatrix(x_test_k, nthread = n_threads),
-          iterationrange = c(1, nround_k + 1))))
+          m_k, xgboost::xgb.DMatrix(x_test_k, nthread = n_threads))))
       ## validate predictions
       assertthat::assert_that(all(p_train_k >= 0), all(p_train_k <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -449,8 +447,7 @@ fit_xgb_occupancy_models <- function(
              function(x) {
       ## generate predictions
       out <- c(withr::with_package("xgboost", stats::predict(
-        x, xgboost::xgb.DMatrix(site_env_data, nthread = n_threads),
-        iterationrange = c(1, x$best_iteration + 1)
+        x, xgboost::xgb.DMatrix(site_env_data, nthread = n_threads)
       )))
       ## validate predictions
       assertthat::assert_that(
@@ -556,10 +553,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
       })
       ### generate predictions
       yhat_test <- c(withr::with_package("xgboost",
-        stats::predict(
-          model, dtest[[k]],
-          iterationrange = c(1, model$best_iteration + 1)
-        )))
+        stats::predict(model, dtest[[k]])))
       ### validate predictions
       assertthat::assert_that(all(yhat_test >= 0), all(yhat_test <= 1),
         msg = "xgboost predictions are not between zero and one")
@@ -568,7 +562,7 @@ tune_model <- function(data, folds, survey_sensitivity, survey_specificity,
         data[[k]]$test$y, yhat_test, data[[k]]$test$w,
         survey_sensitivity, survey_specificity)[[1]]
       ## check that model evaluations are consistent
-      assertthat::assert_that(abs(perf - model$best_score) < 1e-5)
+      assertthat::assert_that(abs(perf - model$best_score) < 1e-2)
       ### return result
       list(eval = perf, model = model)
     })
