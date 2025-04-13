@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you for reviewing this submission. This submission contains minor updates for the _surveyvoi_ package to (i) improve algorithmic performance, (ii) fix a typo in the citation, and (iii) improve compatibility with updates to dependencies.
+Thank you for reviewing this submission for the the _surveyvoi_ package. It contains an update to address the failing CRAN checks. Additionally, it contains minor updates to (i) improve algorithmic performance, (ii) fix a typo in the citation, and (iii) improve compatibility with updates to dependencies.
 
 Cheers,
 
@@ -8,7 +8,6 @@ Jeff
 
 # Test environments
 
-* [Debian (testing), R-release](https://github.com/r-devel/rcheckserver) ([based on rcheckserver](https://statmath.wu.ac.at/AASC/debian/))
 * [Fedora 33, clang, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AFedora)
 * [Ubuntu 22.04, R-release](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
 * [Ubuntu 22.04, R-devel](https://github.com/prioritizr/surveyvoi/actions?query=workflow%3AUbuntu)
@@ -19,21 +18,16 @@ Jeff
 
 # R CMD check results
 
-0 errors | 0 warnings | 3 notes
+0 errors | 0 warnings | 2 notes | 1 info
 
-# Notes
+## Note checks
 
 * checking installed package size ... NOTE
-  installed size is 14.4Mb
+  installed size is 13.2Mb
   sub-directories of 1Mb or more:
-    libs  13.8Mb
+    libs  12.4Mb
 
     **The package makes extensive use of C++ code to reduce run time.**
-
-* checking package dependencies ... NOTE
-  Packages suggested but not available for checking: 'gurobi'
-
-    **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation provide instructions for installing the gurobi R package.**
 
 * found the following (possibly) invalid URLs:
   URL: https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer
@@ -49,6 +43,12 @@ Jeff
     Message: Forbidden
 
     **I have checked this URL and can confirm that it is valid.**
+
+## Info checks
+
+* Package suggested but not available for checking: 'gurobi'
+
+  **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation provide instructions for installing the gurobi R package.**
 
 # Downstream dependencies
 
