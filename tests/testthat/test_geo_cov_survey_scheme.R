@@ -87,7 +87,7 @@ test_that("locked out (gurobi)", {
     tibble::tibble(x = c(0.1, 0.21, 0.22, 0.23, 10),
                    y = c(0.1, 0.21, 0.22, 0.23, 10),
                    locked_in = rep(FALSE, 5),
-                   locked_out = c(rep(FALSE, 4), TRUE),
+                   locked_out = c(FALSE, FALSE, FALSE, FALSE, TRUE),
                    cost = rep(1, 5)),
     coords = c("x", "y"))
   # generate prioritisation
@@ -107,7 +107,7 @@ test_that("locked out, exclude = TRUE (gurobi)", {
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
                    y = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
+                   locked_out = c(TRUE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
@@ -127,7 +127,7 @@ test_that("single solution (Rsymphony)", {
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.3, 10),
                    y = c(0.1, 0.2, 0.3, 10),
-                   locked_in = rep(FALSE, 4),
+                   locked_in = c(FALSE, FALSE, FALSE, TRUE),
                    cost = rep(1, 4)),
     coords = c("x", "y"))
   # generate prioritisation
@@ -223,7 +223,7 @@ test_that("locked out, exclude = TRUE (Rsymphony)", {
   x <- sf::st_as_sf(
     tibble::tibble(x = c(0.1, 0.2, 0.5, 10),
                    y = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
+                   locked_out = c(TRUE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
