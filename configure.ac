@@ -69,7 +69,7 @@ AC_DEFUN([AC_PROG_PKGCONFIG], [AC_CHECK_PROG(PKGCONFIG,pkg-config,yes)])
 AC_PROG_PKGCONFIG
 
 ## specify flags and library paths
-if test x"${PKGCONFIG}" == x"yes"; then
+if test "${PKGCONFIG}" = "yes"; then
   ### GMP settings
   if pkg-config --exists ${GMP_CONFIG_NAME}; then
     GMP_CFLAGS=`pkg-config --cflags --silence-errors ${GMP_CONFIG_NAME}`
@@ -131,7 +131,7 @@ else
 fi
 
 ## throw error if needed
-if test x"${gmp_ok}" == x"no"; then
+if test "${gmp_ok}" = "no"; then
   AC_MSG_NOTICE([Configuration failed because ${GMP_NAME} was not found. Try installing:])
   AC_MSG_NOTICE([  * deb:  ${GMP_DEB_NAME} (Debian, Ubuntu)])
   AC_MSG_NOTICE([  * rpm:  ${GMP_RPM_NAME} (Fedora, EPEL)])
@@ -172,7 +172,7 @@ else
 fi
 
 ## throw error if needed
-if test x"${mpfr_ok}" == x"no"; then
+if test "${mpfr_ok}" = "no"; then
   AC_MSG_NOTICE([Configuration failed because ${MPFR_NAME} was not found. Try installing:])
   AC_MSG_NOTICE([  * deb:  ${MPFR_DEB_NAME} (Debian, Ubuntu)])
   AC_MSG_NOTICE([  * rpm:  ${MPFR_RPM_NAME} (Fedora, EPEL)])
