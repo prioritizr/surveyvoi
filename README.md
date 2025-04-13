@@ -334,7 +334,7 @@ opt_scheme <-
 print(str(opt_scheme))
 ```
 
-    ##  logi [1, 1:6] TRUE FALSE FALSE TRUE TRUE FALSE
+    ##  logi [1, 1:6] TRUE FALSE FALSE TRUE FALSE TRUE
     ##  - attr(*, "ev")= num [1, 1:100] 0.596 0.596 0.596 0.596 0.596 ...
     ## NULL
 

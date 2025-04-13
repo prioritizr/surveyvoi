@@ -1,7 +1,9 @@
 # surveyvoi 1.1.1
 
 - CRAN release.
-- Fix `configure.ac` file to remove bashisms and pass CRAN checks.
+- Update `configure.ac` and `configure` files to remove bashisms.
+- Update tests for `env_div_survey_scheme()` and `geo_cov_survey_scheme()`
+  to prevent tests from sporadically failing due to multiple optimal solutions.
 
 # surveyvoi 1.1.0.2
 
