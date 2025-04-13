@@ -1,3 +1,8 @@
+# surveyvoi 1.1.1
+
+- CRAN release.
+- Fix `configure.ac` file to remove bashisms and pass CRAN checks.
+
 # surveyvoi 1.1.0.2
 
 - Fix bug in `fit_xgb_occupancy_models()` that caused an error during model
