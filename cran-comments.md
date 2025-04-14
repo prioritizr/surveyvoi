@@ -1,6 +1,6 @@
 Dear CRAN volunteers,
 
-Thank you for reviewing this submission for the the _surveyvoi_ package. It contains an update to address the failing CRAN checks. Additionally, it contains minor updates to (i) improve algorithmic performance, (ii) fix a typo in the citation, and (iii) improve compatibility with updates to dependencies.
+Thank you for reviewing this submission to update the _surveyvoi_ package. It contains an update to address the failing CRAN checks (i.e., related to the `configure` script). Additionally, it contains minor updates to (i) improve algorithmic performance, (ii) fix a typo in the citation, and (iii) improve compatibility with updates to dependencies.
 
 Cheers,
 
@@ -46,7 +46,7 @@ Jeff
 
 ## Info checks
 
-* Package suggested but not available for checking: 'gurobi'
+* package suggested but not available for checking: 'gurobi'
 
   **The package uses the gurobi R package that is distributed with Gurobi software suite (and not available on CRAN). The DESCRIPTION, README, and package documentation provide instructions for installing the gurobi R package.**
 

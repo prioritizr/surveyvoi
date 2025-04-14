@@ -2,6 +2,9 @@
 
 - CRAN release.
 - Update `configure.ac` and `configure` files to remove bashisms.
+- Update package manual entry and vignette with citation information.
+- Update package manual entry with package website, issue tracker, and code
+  repository.
 - Update tests for `env_div_survey_scheme()` and `geo_cov_survey_scheme()`
   to prevent tests from sporadically failing due to multiple optimal solutions.
 
