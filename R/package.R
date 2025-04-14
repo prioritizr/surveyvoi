@@ -42,7 +42,7 @@ NULL
 #' * Report bugs (<https://github.com/prioritizr/surveyvoi/issues>)
 #'
 #' @section Citation:
-#' Please cite the _surveyoi_ package when using it in publications. To
+#' Please cite the _surveyvoi_ package when using it in publications. To
 #' cite the package, please use:
 #'
 #' Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR

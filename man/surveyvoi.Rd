@@ -32,7 +32,7 @@ hierarchical generalized linear models.
 }
 \section{Citation}{
 
-Please cite the \emph{surveyoi} package when using it in publications. To
+Please cite the \emph{surveyvoi} package when using it in publications. To
 cite the package, please use:
 
 Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
