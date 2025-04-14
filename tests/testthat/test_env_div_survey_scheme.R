@@ -120,7 +120,7 @@ test_that("locked out, exclude = TRUE (gurobi)", {
                    y = rnorm(4),
                    v1 = c(0.1, 0.2, 0.5, 10),
                    v2 = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
+                   locked_out = c(TRUE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
@@ -228,7 +228,7 @@ test_that("locked out (Rsymphony)", {
                    y = rnorm(4),
                    v1 = c(0.1, 0.2, 0.5, 10),
                    v2 = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
+                   locked_out = c(TRUE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation
@@ -250,7 +250,7 @@ test_that("locked out, exclude = TRUE (Rsymphony)", {
                    y = rnorm(4),
                    v1 = c(0.1, 0.2, 0.5, 10),
                    v2 = c(0.1, 0.2, 0.5, 10),
-                   locked_out = c(FALSE, FALSE, FALSE, TRUE),
+                   locked_out = c(TRUE, FALSE, FALSE, TRUE),
                    cost = c(1, 1, 1, 1)),
     coords = c("x", "y"))
   # generate prioritisation

@@ -22,10 +22,12 @@ NULL
 #' species richness, geographic coverage, diversity of sampled environmental
 #' conditions) and by maximizing value of information. After generating
 #' plans for surveys, they can also be evaluated using
-#' value of information analysis.
+#' value of information analysis. For further details, see Hanson et al. (2023).
 #'
 #' @details
-#' Please note that several functions depend on
+#' The package vignette provides a tutorial
+#' (accessible using the code `vignettes("surveyvoi")`). Also, please note that
+#' several functions depend on
 #' the 'Gurobi' optimization software (available from <https://www.gurobi.com>)
 #' and the \pkg{gurobi} R package (installation instructions
 #' [available online for Linux, Windows, and Mac OS](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer)).
@@ -34,12 +36,23 @@ NULL
 #' hierarchical generalized linear models.
 #'
 #' @seealso
-#' The package vignette provides a tutorial
-#' (accessible using the code `vignettes("surveyvoi")`).
+#' Useful links:
+#' * Package website (<https://prioritizr.github.io/surveyvoi/>)
+#' * Source code repository (<https://github.com/prioritizr/surveyvoi>)
+#' * Report bugs (<https://github.com/prioritizr/surveyvoi/issues>)
 #'
-#' @name surveyvoi
+#' @section Citation:
+#' Please cite the _surveyvoi_ package when using it in publications. To
+#' cite the package, please use:
 #'
-#' @aliases surveyvoi-package
+#' Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
+#' (2023) Optimizing ecological surveys for conservation. Journal of
+#' Applied Ecology, 60: 41--51.
+#'
+#' @references
+#' Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
+#' (2023) Optimizing ecological surveys for conservation. Journal of
+#' Applied Ecology, 60: 41--51.
 #'
 #' @author
 #' Package authors:
@@ -47,6 +60,10 @@ NULL
 #' * Iadine Chadès \email{iadine.chades@csiro.au} [ORCID](https://orcid.org/0000-0002-7442-2850)
 #' * Emma J. Hudgins \email{emma.hudgins@mail.mcgill.ca} [ORCID](https://orcid.org/0000-0002-8402-5111)
 #' * Joseph R. Bennett \email{joseph.bennett@carleton.ca} [ORCID](https://orcid.org/0000-0002-3901-9513)
+#'
+#' @name surveyvoi
+#'
+#' @aliases surveyvoi-package
 "_PACKAGE"
 
 # ensure package checks pass

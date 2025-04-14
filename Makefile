@@ -6,6 +6,7 @@ initc:
 
 conf:
 	autoconf
+	rm ./configure~
 
 docs: man readme vigns
 

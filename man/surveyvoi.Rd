@@ -17,10 +17,12 @@ generated using various conventional approaches (e.g. maximizing expected
 species richness, geographic coverage, diversity of sampled environmental
 conditions) and by maximizing value of information. After generating
 plans for surveys, they can also be evaluated using
-value of information analysis.
+value of information analysis. For further details, see Hanson et al. (2023).
 }
 \details{
-Please note that several functions depend on
+The package vignette provides a tutorial
+(accessible using the code \code{vignettes("surveyvoi")}). Also, please note that
+several functions depend on
 the 'Gurobi' optimization software (available from \url{https://www.gurobi.com})
 and the \pkg{gurobi} R package (installation instructions
 \href{https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer}{available online for Linux, Windows, and Mac OS}).
@@ -28,9 +30,28 @@ Additionally, the JAGS software
 (available from \url{https://mcmc-jags.sourceforge.io/}) is required to fit
 hierarchical generalized linear models.
 }
+\section{Citation}{
+
+Please cite the \emph{surveyvoi} package when using it in publications. To
+cite the package, please use:
+
+Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
+(2023) Optimizing ecological surveys for conservation. Journal of
+Applied Ecology, 60: 41--51.
+}
+
+\references{
+Hanson, JO, McCune JL, Chadès I, Proctor CA, Hudgins EJ, & Bennett JR
+(2023) Optimizing ecological surveys for conservation. Journal of
+Applied Ecology, 60: 41--51.
+}
 \seealso{
-The package vignette provides a tutorial
-(accessible using the code \code{vignettes("surveyvoi")}).
+Useful links:
+\itemize{
+\item Package website (\url{https://prioritizr.github.io/surveyvoi/})
+\item Source code repository (\url{https://github.com/prioritizr/surveyvoi})
+\item Report bugs (\url{https://github.com/prioritizr/surveyvoi/issues})
+}
 }
 \author{
 Package authors:

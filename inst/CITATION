@@ -11,7 +11,7 @@ bibentry(
     person(c("Emma", "J"), "Hudgins"),
     person(c("Joseph", "R"), "Bennett")
   ),
-  year = "2022",
+  year = "2023",
   journal = "Journal of Applied Ecology",
   volume = "60",
   number = "1",

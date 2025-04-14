@@ -1834,7 +1834,7 @@ fi
 
 
 ## specify flags and library paths
-if test x"${PKGCONFIG}" == x"yes"; then
+if test "${PKGCONFIG}" = "yes"; then
   ### GMP settings
   if pkg-config --exists ${GMP_CONFIG_NAME}; then
     GMP_CFLAGS=`pkg-config --cflags --silence-errors ${GMP_CONFIG_NAME}`
@@ -1901,7 +1901,7 @@ printf "%s\n" "yes" >&6; }
 fi
 
 ## throw error if needed
-if test x"${gmp_ok}" == x"no"; then
+if test "${gmp_ok}" = "no"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Configuration failed because ${GMP_NAME} was not found. Try installing:" >&5
 printf "%s\n" "$as_me: Configuration failed because ${GMP_NAME} was not found. Try installing:" >&6;}
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}:   * deb:  ${GMP_DEB_NAME} (Debian, Ubuntu)" >&5
@@ -1953,7 +1953,7 @@ printf "%s\n" "yes" >&6; }
 fi
 
 ## throw error if needed
-if test x"${mpfr_ok}" == x"no"; then
+if test "${mpfr_ok}" = "no"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Configuration failed because ${MPFR_NAME} was not found. Try installing:" >&5
 printf "%s\n" "$as_me: Configuration failed because ${MPFR_NAME} was not found. Try installing:" >&6;}
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}:   * deb:  ${MPFR_DEB_NAME} (Debian, Ubuntu)" >&5
